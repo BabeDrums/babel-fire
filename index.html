@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0e0b">
+<title>Production Projects</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0e0b;
+  --surface:#141814;
+  --surface-2:#191e18;
+  --surface-3:#20261f;
+  --text:#f4f1e8;
+  --muted:#9ca395;
+  --quiet:#70786d;
+  --line:rgba(255,255,255,.085);
+  --line-strong:rgba(255,255,255,.14);
+  --accent:#e4d84b;
+  --accent-soft:rgba(228,216,75,.12);
+  --accent-text:#fff8a7;
+  --danger:#e48888;
+  --radius:18px;
+  --shadow:0 24px 70px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 88% -8%,rgba(124,136,104,.16),transparent 31%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;font-size:17px}
+body.is-sorting{user-select:none;-webkit-user-select:none;overflow:hidden}
+button,input,textarea,select{font:inherit}
+button{appearance:none;-webkit-appearance:none;border:0;color:inherit;background:none}
+input,textarea,select{color:var(--text)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:active{transform:scale(.985)}
+.app-shell{max-width:720px;margin:0 auto;min-height:100vh;padding:calc(18px + env(safe-area-inset-top)) 18px calc(90px + env(safe-area-inset-bottom))}
+.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;min-height:44px;margin-bottom:22px}
+.topbar .left{justify-self:start}.topbar .center{justify-self:center}.topbar .right{justify-self:end}
+.nav-btn,.text-btn{min-height:44px;padding:0 2px;color:var(--muted);font-size:15px;cursor:pointer}
+.nav-btn{display:inline-flex;align-items:center;gap:5px}.nav-btn .arrow{font-size:23px;line-height:1;margin-top:-1px}
+.saved{font-size:12px;color:var(--muted);opacity:0;transition:opacity .18s}.saved.show{opacity:1}
+.eyebrow{font-size:12px;font-weight:760;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pill-tag{display:inline-flex;align-items:center;min-height:32px;padding:0 11px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid var(--line);font-size:12px;font-weight:680;color:#d7dbd2}
+h1{font-size:40px;line-height:1.02;letter-spacing:-.038em;margin:10px 0 8px;font-weight:790}
+h2{font-size:30px;line-height:1.06;letter-spacing:-.028em;margin:6px 0 8px;font-weight:760}
+h3{font-size:18px;line-height:1.2;margin:0;font-weight:720}
+p{margin:0}.sub{color:var(--muted);font-size:15px;line-height:1.45}.micro{color:var(--quiet);font-size:12px;line-height:1.4}.guided{display:block}
+body.minimal .guided{display:none!important}
+.spacer-8{height:8px}.spacer-12{height:12px}.spacer-18{height:18px}.spacer-24{height:24px}.spacer-32{height:32px}
+.section-kicker{margin:30px 2px 11px;font-size:12px;font-weight:760;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.divider{height:1px;background:var(--line);margin:24px 0}
+.progress{height:4px;background:#242a23;border-radius:999px;overflow:hidden;margin:20px 0 5px}.progress>span{display:block;height:100%;width:0;background:var(--accent);border-radius:inherit;transition:width .24s ease}
+.progress-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}
+.card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:var(--radius)}
+.card-pad{padding:17px}
+.hero-card{padding:20px;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.022));border:1px solid var(--line)}
+.hero-card .phase-line{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.hero-card h3{font-size:23px;letter-spacing:-.02em}.hero-card .phase-num{font-size:12px;color:var(--muted)}
+.primary,.secondary,.destructive{min-height:50px;border-radius:15px;padding:0 17px;font-weight:720;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.primary{background:var(--accent);color:#14150f}.secondary{background:rgba(255,255,255,.055);border:1px solid var(--line);color:var(--text)}.destructive{background:rgba(228,136,136,.1);border:1px solid rgba(228,136,136,.2);color:#ffb5b5}
+.primary.full,.secondary.full,.destructive.full{width:100%}.primary:disabled,.secondary:disabled{opacity:.35}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick-card{min-height:82px;border-radius:17px;padding:14px;text-align:left;background:rgba(255,255,255,.025);border:1px solid var(--line);cursor:pointer}.quick-card strong{display:block;font-size:15px;margin-bottom:4px}.quick-card span{display:block;font-size:12px;color:var(--muted);line-height:1.35}
+.list{border-top:1px solid var(--line)}
+.list-row{width:100%;min-height:68px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer;appearance:none;-webkit-appearance:none;background:transparent;color:inherit}
+.list-row.static{cursor:default}.list-row:active{transform:none}.list-row .title{font-size:16px;font-weight:680}.list-row .desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.35}.chev{font-size:23px;color:#667064}.status-dot{width:25px;height:25px;border-radius:50%;border:1.5px solid #66705f;display:grid;place-items:center;font-size:13px;font-weight:900;color:#111}.status-dot.done{background:var(--accent);border-color:var(--accent)}.status-dot.done:after{content:"✓"}.status-dot.current{border-color:var(--accent);box-shadow:inset 0 0 0 5px var(--accent-soft)}
+.setup-panel{border-top:1px solid var(--line)}.setup-row{min-height:66px;display:grid;grid-template-columns:1fr 132px;align-items:center;gap:16px;border-bottom:1px solid var(--line)}.setup-label{font-size:16px}.setup-value{width:132px;min-height:46px;border-radius:14px;background:rgba(255,255,255,.038);border:1px solid transparent;display:flex;align-items:center;justify-content:flex-end;padding:0 13px;gap:6px}.setup-value input,.setup-value select{min-width:0;width:100%;border:0;outline:0;background:transparent;text-align:right;color:var(--text);font-size:16px;padding:0}.setup-value select{text-align-last:right;appearance:auto}.suffix{color:var(--muted);font-size:14px;white-space:nowrap}.state-control{width:132px;min-height:46px;border-radius:14px;background:rgba(255,255,255,.038);border:1px solid transparent;padding:0 10px 0 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}.state-control span:first-child{font-size:14px;color:var(--muted)}.state-control.on{background:var(--accent-soft);border-color:rgba(228,216,75,.25)}.state-control.on span:first-child{color:var(--accent-text)}.check-circle{width:23px;height:23px;border-radius:50%;border:1.5px solid #6f776a;display:grid;place-items:center;font-size:12px;color:#17180f}.state-control.on .check-circle{background:var(--accent);border-color:var(--accent)}.state-control.on .check-circle:after{content:"✓";font-weight:900}
+.tip{margin:14px 0 0;padding:13px 14px;border-radius:15px;background:rgba(255,255,255,.025);border:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}.tip .num{flex:0 0 auto;min-width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);font-size:12px;font-weight:800}.tip strong{display:block;font-size:13px;margin-bottom:2px}.tip span{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+.choice-wrap{display:flex;flex-wrap:wrap;gap:8px}.choice{min-height:44px;border-radius:999px;padding:0 14px;border:1px solid var(--line);background:rgba(255,255,255,.026);color:#d0d4cb;cursor:pointer;font-size:15px}.choice.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.34);color:var(--accent-text)}.choice.quiet{color:var(--muted)}
+.inline-add{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:12px}.field{width:100%;min-height:48px;border:1px solid var(--line);outline:0;border-radius:14px;background:rgba(255,255,255,.035);padding:0 14px;color:var(--text)}.field::placeholder,.textarea::placeholder{color:#646b61}.inline-add .secondary{min-height:48px}
+.textarea{width:100%;min-height:96px;border:1px solid var(--line);outline:0;border-radius:15px;background:rgba(255,255,255,.035);padding:13px 14px;resize:vertical;line-height:1.45;color:var(--text)}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:13px;color:#dce0d7}.chip.choice-chip{min-height:44px;padding:0 14px;font-size:15px}.chip.accent{background:var(--accent-soft);border-color:rgba(228,216,75,.28);color:var(--accent-text)}.chip .x{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:16px}
+.sort-list{display:grid;gap:9px}.sort-row{min-height:66px;padding:0 14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;touch-action:pan-y;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}.sort-row .index{font-size:12px;color:var(--muted);text-align:center}.sort-row .name{font-size:16px}.sort-row.dragging{background:var(--surface-3);border-color:rgba(228,216,75,.35);box-shadow:var(--shadow);transform:scale(1.015);z-index:20;touch-action:none}
+.horizontal-nav{display:flex;gap:7px;overflow-x:auto;padding:2px 0 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.horizontal-nav::-webkit-scrollbar{display:none}.section-tab{white-space:nowrap;min-height:36px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.022);font-size:12px;color:var(--muted);cursor:pointer}.section-tab.current{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}.section-tab.done:before{content:"✓ ";color:var(--accent)}
+.study-block{padding:23px 0;border-top:1px solid var(--line)}.study-block:first-of-type{border-top:0}.block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}.block-head strong{font-size:16px}.block-head span{font-size:12px;color:var(--muted)}
+.segment-stack{display:grid;gap:12px}.scale-row{display:grid;grid-template-columns:78px 1fr 38px;gap:10px;align-items:center}.scale-label{font-size:13px;color:#cbd0c6}.segmented{display:grid;grid-template-columns:repeat(3,1fr);min-height:42px;border-radius:13px;padding:3px;background:rgba(255,255,255,.045);border:1px solid var(--line)}.segment{border-radius:10px;font-size:12px;color:var(--muted);cursor:pointer;min-width:0;padding:0 4px}.segment.selected{background:rgba(255,255,255,.09);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,.04)}.segment.selected.accent{background:var(--accent);color:#15160f;font-weight:760}.unsure-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);cursor:pointer}.unsure-btn.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}
+.relation-box{padding:14px;border-radius:17px;background:rgba(255,255,255,.022);border:1px solid var(--line);margin-top:12px}.small-label{font-size:12px;color:var(--muted);margin-bottom:8px}
+details.note-disclosure{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}details.note-disclosure summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:650}details.note-disclosure summary::-webkit-details-marker{display:none}details.note-disclosure summary:after{content:"+";font-size:22px;color:var(--muted);font-weight:350}details.note-disclosure[open] summary:after{content:"–"}.note-grid{display:grid;gap:13px;padding:5px 0 3px}.note-grid label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px}
+.action-row{display:flex;gap:10px;margin-top:24px}.action-row>*{flex:1}.finish-note{text-align:center;color:var(--muted);font-size:12px;margin-top:9px;line-height:1.4}
+.summary-card{appearance:none;-webkit-appearance:none;width:100%;display:block;text-align:left;color:var(--text);background:rgba(255,255,255,.026);border:1px solid var(--line);border-radius:17px;padding:15px;margin:0 0 10px;cursor:pointer}.summary-card:active{background:rgba(255,255,255,.045)}.summary-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.summary-title strong{font-size:16px}.summary-title span{font-size:12px;color:var(--muted)}.summary-lines{display:grid;gap:6px}.summary-line{display:grid;grid-template-columns:62px 1fr;gap:9px;font-size:12px;line-height:1.45}.summary-line b{color:var(--muted);font-weight:600}.summary-line span{color:#d9ddd3}
+.verify-row{min-height:64px;display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;border-bottom:1px solid var(--line)}.verify-row:first-child{border-top:1px solid var(--line)}.verify-row strong{display:block;font-size:15px}.verify-row span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.round-check{width:27px;height:27px;border-radius:50%;border:1.5px solid #6c7467;display:grid;place-items:center;cursor:pointer}.round-check.on{background:var(--accent);border-color:var(--accent);color:#15160f}.round-check.on:after{content:"✓";font-weight:900;font-size:13px}
+.phase-brief{padding:16px;border-radius:17px;background:rgba(228,216,75,.06);border:1px solid rgba(228,216,75,.18)}.phase-brief strong{display:block;font-size:14px;color:var(--accent-text);margin-bottom:6px}.phase-brief p{font-size:13px;color:#d1d4ca;line-height:1.5}.listen-card{appearance:none;-webkit-appearance:none;width:100%;min-height:72px;margin-top:12px;padding:14px 15px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.026);display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;text-align:left;color:var(--text);cursor:pointer}.listen-card.on{background:var(--accent-soft);border-color:rgba(228,216,75,.28)}.listen-card strong{display:block;font-size:15px;margin-bottom:3px}.listen-card span.copy{display:block;font-size:12px;color:var(--muted);line-height:1.4}.listen-card.on span.copy{color:#d8d5b2}.status-open-list{display:grid;gap:8px;margin-top:12px}.status-open-item{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;border:1px solid rgba(228,216,75,.14);background:rgba(0,0,0,.12);border-radius:13px;padding:10px 12px;color:var(--text);display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;text-align:left;cursor:pointer}.status-open-item strong{font-size:13px;color:#e7e6dd;margin:0}.status-open-item span{font-size:18px;color:var(--accent-text)}
+.road-phase{padding:17px 0;border-bottom:1px solid var(--line)}.road-phase:first-child{border-top:1px solid var(--line)}.road-top{display:grid;grid-template-columns:28px 1fr auto;gap:11px;align-items:start}.road-num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-strong);font-size:12px;color:var(--muted)}.road-phase.active .road-num{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}.road-phase.done .road-num{background:var(--accent);border-color:var(--accent);color:#15160f}.road-phase h3{font-size:16px}.road-phase p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}.road-checks{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0 39px}.road-check{font-size:11px;color:var(--muted);padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.032);border:1px solid var(--line)}
+.project-card{width:100%;text-align:left;padding:18px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.026);cursor:pointer;margin-bottom:10px}.project-card .type{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}.project-card strong{display:block;font-size:20px;margin-bottom:3px}.project-card .artist{font-size:13px;color:var(--muted)}.project-card .foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:15px;font-size:12px;color:var(--muted)}
+.new-type{display:grid;grid-template-columns:1fr 1fr;gap:10px}.type-card{min-height:120px;text-align:left;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.026);padding:16px;cursor:pointer}.type-card.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.3)}.type-card strong{display:block;font-size:16px;margin-bottom:6px}.type-card span{display:block;font-size:12px;color:var(--muted);line-height:1.4}.type-card.selected span{color:#d9d7ae}
+.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.54);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:16px}.sheet-backdrop.open{display:flex}.sheet{width:min(680px,100%);max-height:84vh;overflow:auto;border-radius:24px 24px 18px 18px;background:#171b16;border:1px solid var(--line-strong);box-shadow:var(--shadow);padding:9px 16px calc(18px + env(safe-area-inset-bottom))}.grabber{width:38px;height:5px;border-radius:999px;background:#4b5249;margin:2px auto 16px}.sheet h3{font-size:21px;margin-bottom:12px}.sheet-actions{display:grid;gap:9px;margin-top:14px}.sheet-close{width:100%;min-height:48px;color:var(--muted);cursor:pointer}
+.empty{padding:18px 0;color:var(--muted);font-size:13px;line-height:1.45}.count-badge{min-width:28px;height:28px;padding:0 8px;border-radius:999px;display:inline-grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.backbone-row{width:100%;min-height:72px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;text-align:left;cursor:pointer}.backbone-row:first-child{border-top:1px solid var(--line)}.backbone-row strong{display:block;font-size:15px}.backbone-row span{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
+.part-check-grid{display:flex;flex-wrap:wrap;gap:8px}.part-check{min-height:42px;border-radius:999px;border:1px solid var(--line);padding:0 12px;color:var(--muted);background:rgba(255,255,255,.025);cursor:pointer;font-size:13px}.part-check.done{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}.part-check.done:before{content:"✓ ";font-weight:800}
+.original-anchor{padding:14px;border-radius:17px;border:1px solid rgba(228,216,75,.2);background:rgba(228,216,75,.06)}
+@media(max-width:430px){.app-shell{padding-left:16px;padding-right:16px}h1{font-size:37px}.setup-row{grid-template-columns:1fr 126px}.setup-value,.state-control{width:126px}.scale-row{grid-template-columns:68px 1fr 38px;gap:8px}.segment{font-size:11.5px}.quick-grid{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app-shell" id="app"></div>
+<div id="sheetRoot" class="sheet-backdrop" aria-hidden="true"></div>
+<input id="importFile" type="file" accept="application/json" hidden>
+<script>
+(()=>{
+'use strict';
+const DB_KEY='production-projects-v1';
+const LEGACY_KEYS=['smithereens-map-v6','smithereens-map-v5','smithereens-map-v2'];
+const FEEL_SCALES={
+  depth:['Close','Mixed','Distant'],
+  space:['Dry','Mixed','Wet'],
+  width:['Narrow','Mixed','Wide'],
+  density:['Sparse','Balanced','Dense'],
+  energy:['Low','Medium','High']
+};
+const FEEL_LABELS={depth:'Depth',space:'Space',width:'Width',density:'Density',energy:'Energy'};
+const SECTION_TYPES=['Intro','Verse','Pre-Chorus','Chorus','Bridge','Instrumental','Outro'];
+const COMMON_PARTS=['Vocal','Drums','Bass','Ukulele','Guitar','Piano','Synth','Backing vocals','Percussion','FX'];
+const STUDY_PHASES=[
+  ['The Map','Understand the reference before rebuilding it.',['Structure','Ingredients','Section Study']],
+  ['The Skeleton','Build the whole rough song.',['Session','Backbone','Full Rough']],
+  ['The Sounds','Match sources and performances.',['Sources','Performance','Character']],
+  ['The Balance','Build the static mix.',['Levels','Pan','Hierarchy']],
+  ['The Shape','Control tone and dynamics.',['Frequency','Dynamics','Character']],
+  ['The World','Build depth, width, and movement.',['Depth','Width','Movement']],
+  ['The Finish','Compare, revise, complete.',['A/B','Revise','Deliver']]
+];
+const ORIGINAL_PHASES=[
+  ['The Spark','Capture the thing worth making.'],
+  ['The Direction','Decide where the idea wants to go.'],
+  ['The Skeleton','Build a rough song from beginning to end.'],
+  ['The Production','Develop arrangement, transitions, and identity.'],
+  ['The Recording','Replace placeholders with intentional performances.'],
+  ['The Mix','Balance, shape, and place the record.'],
+  ['The Finish','Reference, revise, and commit.']
+];
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const uid=()=>crypto?.randomUUID?.()||('id-'+Date.now().toString(36)+Math.random().toString(36).slice(2));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const clean=s=>String(s??'').trim();
+const app=document.getElementById('app');
+const sheetRoot=document.getElementById('sheetRoot');
+let saveFlashTimer=null;
+let ui={route:'project',sectionIndex:0,newType:'original',selectedTarget:null};
+
+function makeStudyProject(title='Smithereens',artist='Twenty One Pilots'){
+  return {
+    id:uid(),type:'study',title,artist,guidance:'guided',createdAt:Date.now(),
+    map:{
+      setup:{reference:false,tempo:'',meter:'4/4',grid:false,firstListen:false},
+      sections:[],structureVerified:false,ingredients:[],unknowns:[],analysis:{},transitions:{},
+      mapVerified:false,teachBack:false,phaseParking:'',phaseTakeaway:''
+    },
+    skeleton:{session:{tracks:{},markers:false},backbone:{sections:{}},rough:{parts:{},bounce:false}},
+    notes:[]
+  };
+}
+function makeOriginalProject(title='Untitled'){
+  return {
+    id:uid(),type:'original',title:title||'Untitled',guidance:'guided',createdAt:Date.now(),
+    spark:{starts:[],idea:'',reasons:[],anchor:''},notes:[]
+  };
+}
+function seedDB(){
+  const p=makeStudyProject();p.id='smithereens';
+  return {version:1,currentProjectId:p.id,projects:[p]};
+}
+function migrateLegacy(){
+  for(const key of LEGACY_KEYS){
+    try{
+      const old=JSON.parse(localStorage.getItem(key));
+      if(!old) continue;
+      const p=makeStudyProject();p.id='smithereens';
+      if(old.setup) p.map.setup={
+        reference:!!old.setup.reference,tempo:old.setup.tempo||'',meter:old.setup.meter||'4/4',
+        grid:!!(old.setup.grid??old.setup.alignment),firstListen:!!(old.setup.firstListen??old.setup.listen)
+      };
+      p.map.sections=(old.sections||[]).map((s,i)=>typeof s==='string'?{id:'legacy-'+i+'-'+uid(),name:s}:{id:s.id||uid(),name:s.name||'Section'});
+      p.map.structureVerified=!!(old.structureVerified??old.transitionsChecked);
+      p.map.ingredients=[...(old.ingredients||old.parts||[])];
+      p.map.unknowns=[...(old.unknowns||[])];
+      p.map.phaseParking=old.phaseParking||old.parkingLot||'';
+      p.map.phaseTakeaway=old.phaseTakeaway||old.babelTakeaway||'';
+      p.map.teachBack=!!old.teachBack;
+      p.map.analysis=old.analysis||old.sectionAnalysis||{};
+      p.map.transitions=old.transitions||{};
+      return {version:1,currentProjectId:p.id,projects:[p]};
+    }catch(e){}
+  }
+  return null;
+}
+function loadDB(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(DB_KEY));
+    if(saved?.projects?.length) return saved;
+  }catch(e){}
+  return migrateLegacy()||seedDB();
+}
+let db=loadDB();
+function save(){
+  try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}
+  clearTimeout(saveFlashTimer);
+  document.querySelectorAll('.saved').forEach(el=>el.classList.add('show'));
+  saveFlashTimer=setTimeout(()=>document.querySelectorAll('.saved').forEach(el=>el.classList.remove('show')),700);
+}
+function project(){return db.projects.find(p=>p.id===db.currentProjectId)||db.projects[0]}
+function setGuidanceClass(){document.body.classList.toggle('minimal',project()?.guidance==='minimal')}
+function go(route,extra={},push=true){
+  ui={...ui,...extra,route};
+  if(push){try{history.pushState({route,...extra},'',location.pathname+location.search)}catch(e){}}
+  render();window.scrollTo(0,0);
+}
+window.addEventListener('popstate',e=>{ui={...ui,...(e.state||{}),route:e.state?.route||'project'};render()});
+function backButton(target='project'){return `<button class="nav-btn left" data-action="go" data-route="${target}"><span class="arrow">‹</span>Back</button>`}
+function topbar(left='',center='',right=''){return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`}
+function savedMark(){return `<span class="saved">Saved</span>`}
+function phaseTag(text){return `<span class="pill-tag">${esc(text)}</span>`}
+function progressBar(done,total){const pct=total?Math.round(done/total*100):0;return `<div class="progress"><span style="width:${pct}%"></span></div><div class="progress-meta"><span>${done} of ${total}</span><span>${pct}%</span></div>`}
+function sectionLabels(p){
+  const counts={};p.map.sections.forEach(s=>counts[s.name]=(counts[s.name]||0)+1);const seen={};
+  return p.map.sections.map(s=>{if(counts[s.name]>1){seen[s.name]=(seen[s.name]||0)+1;return `${s.name} ${seen[s.name]}`}return s.name});
+}
+function availableParts(p){return [...new Set([...(p.map.ingredients||[]),...(p.map.unknowns||[])])];}
+function ensureAnalysis(p,index){
+  const s=p.map.sections[index];if(!s) return null;
+  if(!p.map.analysis[s.id]){
+    const previous=index>0?ensureAnalysis(p,index-1):null;
+    const inherited=previous?.parts?.slice()||[];
+    p.map.analysis[s.id]={parts:inherited,partsStatus:inherited.length?'mapped':'',feel:{depth:null,space:null,width:null,density:null,energy:null},feelUnsure:{},focus:[],focusState:'',parking:'',takeaway:'',visited:false};
+    save();
+  }
+  const a=p.map.analysis[s.id];
+  a.parts=a.parts||[];a.partsStatus=a.partsStatus||'';a.feel=a.feel||{};a.feelUnsure=a.feelUnsure||{};a.focus=a.focus||[];a.focusState=a.focusState||'';
+  return a;
+}
+function transitionKey(a,b){return `${a}→${b}`}
+function ensureTransition(p,index){
+  if(index<1) return null;const prev=p.map.sections[index-1],cur=p.map.sections[index];if(!prev||!cur)return null;
+  const key=transitionKey(prev.id,cur.id);if(!p.map.transitions[key])p.map.transitions[key]={changes:[],status:''};return p.map.transitions[key];
+}
+function feelComplete(a){return Object.keys(FEEL_SCALES).every(k=>a.feel?.[k]||a.feelUnsure?.[k])}
+function sectionComplete(p,index){
+  const s=p.map.sections[index];if(!s)return false;
+  const a=p.map.analysis[s.id];if(!a||!a.partsStatus||!feelComplete(a)||!a.focusState)return false;
+  if(index===0)return true;
+  const prev=p.map.sections[index-1];const t=prev?p.map.transitions[transitionKey(prev.id,s.id)]:null;
+  return !!(t?.changes?.length||t?.status);
+}
+function structureDone(p){return p.map.sections.length>0&&p.map.structureVerified}
+function ingredientsDone(p){return availableParts(p).length>0}
+function sectionStudyDone(p){return p.map.sections.length>0&&p.map.sections.every((_,i)=>sectionComplete(p,i))}
+function mapDone(p){return !!p.map.setup.firstListen&&structureDone(p)&&ingredientsDone(p)&&sectionStudyDone(p)&&p.map.mapVerified&&p.map.teachBack}
+function skeletonSessionDone(p){const parts=availableParts(p);return !!p.skeleton.session.markers&&parts.every(x=>p.skeleton.session.tracks[x])}
+function skeletonBackboneDone(p){return p.map.sections.length>0&&p.map.sections.every(s=>p.skeleton.backbone.sections[s.id])}
+function skeletonRoughDone(p){
+  if(!p.map.sections.length)return false;
+  const every=p.map.sections.every((s,i)=>{const a=ensureAnalysis(p,i);const parts=a.parts||[];return parts.every(part=>p.skeleton.rough.parts[s.id]?.[part]);});
+  return every&&!!p.skeleton.rough.bounce;
+}
+function skeletonDone(p){return skeletonSessionDone(p)&&skeletonBackboneDone(p)&&skeletonRoughDone(p)}
+function currentStudyPhaseIndex(p){if(!mapDone(p))return 0;if(!skeletonDone(p))return 1;return 2}
+function studyPhaseStatus(p,i){if(i===0)return mapDone(p)?'done':currentStudyPhaseIndex(p)===0?'current':'future';if(i===1)return skeletonDone(p)?'done':currentStudyPhaseIndex(p)===1?'current':'future';return currentStudyPhaseIndex(p)===i?'current':'future'}
+function mapCheckpointCount(p){return [structureDone(p),ingredientsDone(p),sectionStudyDone(p)].filter(Boolean).length}
+function skeletonCheckpointCount(p){return [skeletonSessionDone(p),skeletonBackboneDone(p),skeletonRoughDone(p)].filter(Boolean).length}
+function originalSparkDone(p){return !!(p.spark.idea.trim()||p.spark.starts.length)&&!!(p.spark.anchor.trim()||p.spark.reasons.length)}
+
+function render(){
+  setGuidanceClass();
+  switch(ui.route){
+    case 'projects':return renderProjects();
+    case 'new-project':return renderNewProject();
+    case 'roadmap':return renderRoadmap();
+    case 'notes':return renderNotes();
+    case 'map':return renderMapHome();
+    case 'structure':return renderStructure();
+    case 'ingredients':return renderIngredients();
+    case 'section-study':return renderSectionStudy();
+    case 'map-summary':return renderMapSummary();
+    case 'skeleton':return renderSkeletonHome();
+    case 'skeleton-session':return renderSkeletonSession();
+    case 'skeleton-backbone':return renderSkeletonBackbone();
+    case 'skeleton-rough':return renderSkeletonRough();
+    case 'original-spark':return renderOriginalSpark();
+    default:return renderProject();
+  }
+}
+
+function renderProjects(){
+  app.innerHTML=topbar('',phaseTag('Projects'),`<button class="text-btn" data-action="new-project">New</button>`)+`
+    <h1>Your work.</h1><p class="sub">Reference studies and original songs live together here.</p>
+    <div class="spacer-24"></div>
+    ${db.projects.map(p=>{
+      const phase=p.type==='study'?STUDY_PHASES[currentStudyPhaseIndex(p)][0]:(originalSparkDone(p)?'The Direction':'The Spark');
+      return `<button class="project-card" data-action="open-project" data-id="${p.id}"><div class="type">${p.type==='study'?'Reference Study':'Original Song'}</div><strong>${esc(p.title)}</strong>${p.artist?`<div class="artist">${esc(p.artist)}</div>`:''}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button>`;
+    }).join('')}
+    <div class="spacer-12"></div><button class="secondary full" data-action="new-project">New Project</button>`;
+}
+
+function renderProject(){
+  const p=project();if(!p)return go('projects',{},false);
+  if(p.type==='original') return renderOriginalOverview();
+  const phaseIndex=currentStudyPhaseIndex(p),phase=STUDY_PHASES[phaseIndex],done=phaseIndex===0?mapCheckpointCount(p):phaseIndex===1?skeletonCheckpointCount(p):0;
+  app.innerHTML=topbar(`<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,phaseTag('Reference Study'),`<button class="text-btn" data-action="settings">•••</button>`)+`
+    <div class="eyebrow">${esc(p.artist||'Reference')}</div><h1>${esc(p.title)}</h1>
+    <div class="spacer-18"></div>
+    <div class="hero-card">
+      <div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase[0])}</h3></div><div class="phase-num">Phase ${phaseIndex+1} of 7</div></div>
+      <p class="sub">${esc(phase[1])}</p>
+      ${phaseIndex<2?progressBar(done,3):''}
+      <div class="spacer-18"></div>
+      <button class="primary full" data-action="go" data-route="${phaseIndex===0?'map':phaseIndex===1?'skeleton':'roadmap'}">${phaseIndex===0?(mapCheckpointCount(p)?'Continue The Map':'Start The Map'):phaseIndex===1?(skeletonCheckpointCount(p)?'Continue The Skeleton':'Start The Skeleton'):'View Roadmap'}</button>
+    </div>
+    <div class="section-kicker">Project</div>
+    <div class="quick-grid">
+      <button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases. One finished recreation.</span></button>
+      <button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Parking Lot and Takeaway.</span></button>
+    </div>
+    <div class="section-kicker">Next</div>
+    <div class="list">
+      ${STUDY_PHASES.slice(Math.min(phaseIndex+1,6),Math.min(phaseIndex+3,7)).map((ph,j)=>`<div class="list-row static"><span class="status-dot"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="count-badge">${Math.min(phaseIndex+2+j,7)}</span></div>`).join('')}
+    </div>`;
+}
+
+function renderOriginalOverview(){
+  const p=project(),done=originalSparkDone(p);
+  app.innerHTML=topbar(`<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,phaseTag('Original Song'),`<button class="text-btn" data-action="settings">•••</button>`)+`
+    <h1>${esc(p.title)}</h1><p class="sub">Take anything worth keeping and turn it into a finished record.</p>
+    <div class="spacer-24"></div>
+    <div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>The Spark</h3></div><div class="phase-num">Phase 1 of 7</div></div><p class="sub">Capture the thing worth making before you overthink it.</p>${progressBar(done?1:0,1)}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="original-spark">${done?'Open The Spark':'Start The Spark'}</button></div>
+    <div class="section-kicker">Roadmap</div><div class="list">${ORIGINAL_PHASES.slice(1,4).map((ph,i)=>`<div class="list-row static"><span class="status-dot"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="count-badge">${i+2}</span></div>`).join('')}</div>`;
+}
+
+function renderNewProject(){
+  app.innerHTML=topbar(backButton('projects'),phaseTag('New Project'),'')+`
+    <h2>What are you making?</h2><p class="sub">Both paths end at a finished record. They just start differently.</p>
+    <div class="spacer-24"></div>
+    <div class="new-type">
+      <button class="type-card ${ui.newType==='original'?'selected':''}" data-action="set-new-type" data-type="original"><strong>Original Song</strong><span>Start with a lyric, beat, melody, sound, concept, or anything else.</span></button>
+      <button class="type-card ${ui.newType==='study'?'selected':''}" data-action="set-new-type" data-type="study"><strong>Reference Study</strong><span>Analyze and rebuild an existing record to learn how it works.</span></button>
+    </div>
+    <div class="section-kicker">Project</div>
+    <input class="field" id="newTitle" placeholder="${ui.newType==='study'?'Song title':'Song title or Untitled'}">
+    ${ui.newType==='study'?`<div class="spacer-10"></div><input class="field" id="newArtist" placeholder="Artist">`:''}
+    <div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+}
+
+function renderMapHome(){
+  const p=project(),m=p.map,done=mapCheckpointCount(p);
+  app.innerHTML=topbar(backButton('project'),phaseTag('The Map'),savedMark())+`
+    ${progressBar(done,3)}
+    <div class="section-kicker">Song Setup</div>
+    <div class="setup-panel">
+      ${setupToggle('Reference','Imported','reference',m.setup.reference)}
+      <div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div>
+      <div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+      ${setupToggle('Grid','Aligned','grid',m.setup.grid)}
+    </div>
+    <button id="first-listen" class="listen-card ${m.setup.firstListen?'on':''}" data-action="toggle-setup" data-field="firstListen">
+      <div><strong>First Listen</strong><span class="copy">Play the full song once without stopping.</span></div>
+      <span class="round-check ${m.setup.firstListen?'on':''}" aria-hidden="true"></span>
+    </button>
+    <div class="section-kicker">Checkpoints</div>
+    <div class="list">
+      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),1)}
+      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),2)}
+      ${checkpointRow('Section Study','Study the song one section at a time.','section-study',sectionStudyDone(p),3)}
+    </div>
+    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="phase-parking" placeholder="Question or mystery for later">${esc(m.phaseParking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="phase-takeaway" placeholder="Something worth carrying into your own work">${esc(m.phaseTakeaway)}</textarea></div></div></details>
+    <div class="spacer-24"></div><button class="secondary full" data-action="go" data-route="map-summary">Open Map Summary</button>`;
+}
+function setupToggle(label,state,field,on){return `<div class="setup-row"><div class="setup-label">${label}</div><button class="state-control ${on?'on':''}" data-action="toggle-setup" data-field="${field}"><span>${state}</span><span class="check-circle"></span></button></div>`}
+function checkpointRow(title,desc,route,done,num){return `<button class="list-row" data-action="go" data-route="${route}"><span class="status-dot ${done?'done':''}"></span><div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">›</span></button>`}
+
+function renderStructure(){
+  const p=project(),labels=sectionLabels(p);
+  app.innerHTML=topbar(backButton('map'),phaseTag('Structure'),savedMark())+`
+    <h2>Map the form.</h2><p class="sub guided">Play through the record. Add a section when the form changes. Pause and rewind freely.</p>
+    <div class="section-kicker">Add Section</div><div class="choice-wrap">${SECTION_TYPES.map(x=>`<button class="choice" data-action="add-section" data-name="${x}">${x}</button>`).join('')}</div>
+    <div class="inline-add"><input class="field" id="customSection" placeholder="Custom section"><button class="secondary" data-action="add-custom-section">Add</button></div>
+    <div class="section-kicker">Song</div>
+    <div class="sort-list" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div></div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
+    <div class="section-kicker">Verify</div>
+    <div class="verify-row"><div><strong>Structure verified</strong><span>Play through once and confirm the order and section boundaries.</span></div><button class="round-check ${p.map.structureVerified?'on':''}" data-action="toggle-structure-verified"></button></div>
+    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="go" data-route="ingredients">Next</button></div>`;
+  installSorting();
+}
+
+function renderIngredients(){
+  const p=project(),parts=p.map.ingredients,unknowns=p.map.unknowns;
+  app.innerHTML=topbar(backButton('map'),phaseTag('Ingredients'),savedMark())+`
+    <h2>Map what plays.</h2><p class="sub guided">Replay freely. Identify the main parts across the whole song. You do not need to solve every mystery yet.</p>
+    <div class="section-kicker">Main Parts</div><div class="choice-wrap">${COMMON_PARTS.map(x=>`<button class="choice ${parts.includes(x)?'selected':''}" data-action="toggle-ingredient" data-name="${x}">${x}</button>`).join('')}</div>
+    <div class="inline-add"><input class="field" id="customPart" placeholder="Other part"><button class="secondary" data-action="add-custom-part">Add</button></div>
+    ${parts.filter(x=>!COMMON_PARTS.includes(x)).length?`<div class="spacer-12"></div><div class="chip-list">${parts.filter(x=>!COMMON_PARTS.includes(x)).map(x=>removableChip(x,'remove-custom-part')).join('')}</div>`:''}
+    <div class="section-kicker">Unidentified</div>
+    <div class="inline-add"><input class="field" id="unknownSound" placeholder="Filtered hit, distant texture…"><button class="secondary" data-action="add-unknown">Add</button></div>
+    ${unknowns.length?`<div class="spacer-12"></div><div class="chip-list">${unknowns.map(x=>removableChip(x,'remove-unknown')).join('')}</div>`:''}
+    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="start-section-study">Next</button></div>`;
+}
+function removableChip(text,action){return `<span class="chip choice-chip"><span>${esc(text)}</span><button class="x" data-action="${action}" data-name="${esc(text)}">×</button></span>`}
+
+function renderSectionStudy(){
+  const p=project();if(!p.map.sections.length){return app.innerHTML=topbar(backButton('map'),phaseTag('Section Study'),savedMark())+`<h2>No sections yet.</h2><p class="sub">Map the structure first.</p><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="structure">Open Structure</button>`}
+  ui.sectionIndex=Math.max(0,Math.min(ui.sectionIndex,p.map.sections.length-1));
+  const i=ui.sectionIndex,s=p.map.sections[i],labels=sectionLabels(p),a=ensureAnalysis(p,i),t=ensureTransition(p,i),allParts=availableParts(p);
+  const activeParts=a.parts||[];
+  const currentDone=sectionComplete(p,i);
+  app.innerHTML=topbar(backButton('map'),phaseTag('Section Study'),`<span class="micro">${i+1} of ${p.map.sections.length}</span>`)+`
+    <div class="horizontal-nav">${p.map.sections.map((sec,idx)=>`<button class="section-tab ${idx===i?'current':''} ${sectionComplete(p,idx)?'done':''}" data-action="jump-section" data-index="${idx}">${esc(labels[idx])}</button>`).join('')}</div>
+    <div class="spacer-12"></div><h2>${esc(labels[i])}</h2><p class="sub guided">Loop this section in your DAW. Stay here until the section makes sense.</p>
+    <div class="study-block">
+      <div class="block-head"><strong>Parts</strong></div>
+      <div class="choice-wrap">${allParts.map(x=>`<button class="choice ${activeParts.includes(x)?'selected':''}" data-action="toggle-section-part" data-name="${esc(x)}">${esc(x)}</button>`).join('')}${!allParts.length?`<span class="empty">Add Ingredients first.</span>`:''}</div>
+      <div class="spacer-8"></div><button class="choice quiet ${a.partsStatus==='silence'?'selected':''}" data-action="section-silence">No active parts</button>
+    </div>
+    ${i>0?renderChangesBlock(p,i,t):''}
+    <div class="study-block">
+      <div class="block-head"><strong>Feel</strong></div>
+      <div class="segment-stack">${Object.keys(FEEL_SCALES).map(k=>renderScale(k,a)).join('')}</div>
+    </div>
+    <div class="study-block">
+      <div class="block-head"><strong>Focus</strong></div>
+      <div class="choice-wrap">${activeParts.map(x=>`<button class="choice ${a.focus.includes(x)?'selected':''}" data-action="toggle-focus" data-name="${esc(x)}">${esc(x)}</button>`).join('')}${activeParts.length?'':'<span class="empty">Map the active parts first.</span>'}</div>
+      <div class="spacer-8"></div><div class="choice-wrap"><button class="choice quiet ${a.focusState==='none'?'selected':''}" data-action="focus-status" data-status="none">No clear focus</button><button class="choice quiet ${a.focusState==='unsure'?'selected':''}" data-action="focus-status" data-status="unsure">Not sure</button></div>
+    </div>
+    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(a.parking||'')}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something from this section worth remembering">${esc(a.takeaway||'')}</textarea></div></div></details>
+    <div class="action-row"><button class="secondary" data-action="prev-section" ${i===0?'disabled':''}>Back</button><button class="primary" data-action="next-section">${i===p.map.sections.length-1?'Summary':'Next'}</button></div>
+    <div class="finish-note">${currentDone?'This section is mapped.':'Unanswered items can be marked Not sure.'}</div>`;
+}
+function renderScale(key,a){
+  const value=a.feel?.[key],unsure=a.feelUnsure?.[key];
+  return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map(opt=>`<button class="segment ${value===opt&&!unsure?'selected accent':''}" data-action="set-feel" data-scale="${key}" data-value="${opt}">${opt}</button>`).join('')}</div><button class="unsure-btn ${unsure?'selected':''}" data-action="feel-unsure" data-scale="${key}" aria-label="Not sure about ${FEEL_LABELS[key]}">?</button></div>`;
+}
+function renderChangesBlock(p,i,t){
+  const targets=[...availableParts(p),'Mix','Texture','Ambience'];
+  const status=t?.status||'',hasChanges=!!t?.changes?.length;
+  return `<div class="study-block"><div class="block-head"><strong>Changes</strong></div>
+    ${hasChanges?'':`<div class="choice-wrap"><button class="choice quiet ${status==='none'?'selected':''}" data-action="transition-status" data-status="none">No notable change</button><button class="choice quiet ${status==='unsure'?'selected':''}" data-action="transition-status" data-status="unsure">Not sure</button></div>`}
+    ${status?'':`<div class="relation-box"><div class="choice-wrap">${targets.map(x=>`<button class="choice ${ui.selectedTarget===x?'selected':''}" data-action="select-change-target" data-name="${esc(x)}">${esc(x)}</button>`).join('')}</div><div class="inline-add"><input class="field" id="customTarget" placeholder="Other"><button class="secondary" data-action="use-custom-target">Use</button></div>${ui.selectedTarget?renderChangeActions(ui.selectedTarget):''}</div>
+      ${hasChanges?`<div class="spacer-12"></div><div class="chip-list">${t.changes.map((c,idx)=>`<span class="chip accent"><span>${esc(c.target)} · ${esc(c.action)}</span><button class="x" data-action="remove-change" data-index="${idx}">×</button></span>`).join('')}</div>`:''}`}
+  </div>`;
+}
+function actionsFor(target){
+  if(target==='Mix')return ['Widens','Narrows','Louder','Softer','Thins out','Fills out','Effect shift'];
+  if(target==='Texture'||target==='Ambience')return ['Enters','Leaves','Widens','Narrows','Louder','Softer','Effect shift'];
+  return ['Enters','Leaves','Doubles','Louder','Softer','Register shift','Pattern shift','Effect shift','Widens','Narrows'];
+}
+function renderChangeActions(target){return `<div class="spacer-12"></div><div class="choice-wrap">${actionsFor(target).map(x=>`<button class="choice" data-action="add-change" data-value="${x}">${x}</button>`).join('')}</div><div class="inline-add"><input class="field" id="customAction" placeholder="Other change"><button class="secondary" data-action="add-custom-change">Add</button></div>`}
+
+function renderMapSummary(){
+  const p=project(),labels=sectionLabels(p),openItems=mapOpenItems(p);
+  app.innerHTML=topbar(backButton('map'),phaseTag('Map Summary'),savedMark())+`
+    <h2>Your map.</h2><p class="sub guided">Listen through once more with this open. Correct anything that doesn’t match what you hear.</p>
+    <div class="section-kicker">Structure</div><div class="chip-list">${labels.length?labels.map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No sections mapped.</span>'}</div>
+    <div class="section-kicker">Ingredients</div><div class="chip-list">${availableParts(p).length?availableParts(p).map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No ingredients mapped.</span>'}</div>
+    <div class="section-kicker">Sections</div>
+    ${p.map.sections.length?p.map.sections.map((s,i)=>renderSummaryCard(p,i,labels[i])).join(''):'<div class="empty">Map the structure to build a section summary.</div>'}
+    ${(p.map.phaseParking||p.map.phaseTakeaway)?`<div class="section-kicker">Notes</div><div class="card card-pad">${p.map.phaseParking?`<div class="summary-line"><b>Parking Lot</b><span>${esc(p.map.phaseParking)}</span></div>`:''}${p.map.phaseTakeaway?`<div class="summary-line" style="margin-top:8px"><b>Takeaway</b><span>${esc(p.map.phaseTakeaway)}</span></div>`:''}</div>`:''}
+    <div class="section-kicker">Verify</div>
+    <div class="verify-row" id="mapVerifyRow"><div><strong>Map verified</strong><span>Listen through once more while reviewing the finished map.</span></div><button class="round-check ${p.map.mapVerified?'on':''}" data-action="toggle-map-verified"></button></div>
+    <div class="verify-row" id="teachBackRow"><div><strong>Teach it back</strong><span>Explain the structure, parts, changes, feel, and focus in your own words.</span></div><button class="round-check ${p.map.teachBack?'on':''}" data-action="toggle-teach-back"></button></div>
+    <div class="spacer-24"></div>
+    ${mapDone(p)?`<div class="phase-brief"><strong>The Map is complete.</strong><p>The Skeleton can now inherit your section order and active parts automatically.</p></div>`:`<div class="phase-brief"><strong>${openItems.length} map item${openItems.length===1?'':'s'} still open.</strong><div class="status-open-list">${openItems.map((item,idx)=>`<button class="status-open-item" data-action="open-map-item" data-open-index="${idx}"><strong>${esc(item.label)}</strong><span>›</span></button>`).join('')}</div></div>`}
+    <div class="spacer-18"></div><button class="primary full" data-action="go" data-route="skeleton">Continue to The Skeleton</button>`;
+}
+function renderSummaryCard(p,i,label){
+  const a=ensureAnalysis(p,i),t=ensureTransition(p,i),feel=Object.keys(FEEL_SCALES).map(k=>a.feelUnsure?.[k]?`${FEEL_LABELS[k]}: ?`:a.feel?.[k]).filter(Boolean).join(' · ');
+  const changes=i===0?'Starting state':t?.status==='none'?'None noted':t?.status==='unsure'?'Not sure':(t?.changes||[]).map(c=>`${c.target} ${c.action.toLowerCase()}`).join(' · ')||'Not mapped';
+  const focus=a.focusState==='none'?'No clear focus':a.focusState==='unsure'?'Not sure':a.focus.join(' · ')||'Not mapped';
+  return `<button class="summary-card" data-action="summary-jump" data-index="${i}"><div class="summary-title"><strong>${esc(label)}</strong><span>Edit ›</span></div><div class="summary-lines"><div class="summary-line"><b>Parts</b><span>${a.partsStatus==='silence'?'No active parts':a.parts.length?esc(a.parts.join(' · ')):'Not mapped'}</span></div>${i>0?`<div class="summary-line"><b>Changes</b><span>${esc(changes)}</span></div>`:''}<div class="summary-line"><b>Feel</b><span>${esc(feel||'Not mapped')}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus)}</span></div>${a.parking?`<div class="summary-line"><b>Parking Lot</b><span>${esc(a.parking)}</span></div>`:''}${a.takeaway?`<div class="summary-line"><b>Takeaway</b><span>${esc(a.takeaway)}</span></div>`:''}</div></button>`;
+}
+function sectionMissingItems(p,index){
+  const s=p.map.sections[index],a=s?p.map.analysis[s.id]:null,missing=[];
+  if(!a?.partsStatus)missing.push('Parts');
+  if(!a||!feelComplete(a))missing.push('Feel');
+  if(!a?.focusState)missing.push('Focus');
+  if(index>0){const prev=p.map.sections[index-1],t=prev&&s?p.map.transitions[transitionKey(prev.id,s.id)]:null;if(!(t?.changes?.length||t?.status))missing.push('Changes');}
+  return missing;
+}
+function mapOpenItems(p){
+  const items=[],labels=sectionLabels(p);
+  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'first-listen'});
+  if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
+  else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
+  if(!ingredientsDone(p))items.push({label:'Ingredients · Add at least one part',route:'ingredients'});
+  p.map.sections.forEach((_,i)=>{const missing=sectionMissingItems(p,i);if(missing.length)items.push({label:`${labels[i]} · ${missing.join(', ')}`,route:'section-study',index:i});});
+  if(!p.map.mapVerified)items.push({label:'Map Verified · Final listen',route:'map-summary',target:'mapVerifyRow'});
+  if(!p.map.teachBack)items.push({label:'Teach It Back · Explain the map',route:'map-summary',target:'teachBackRow'});
+  return items;
+}
+function countMapOpenItems(p){return mapOpenItems(p).length;}
+
+function renderSkeletonHome(){
+  const p=project(),done=skeletonCheckpointCount(p);
+  app.innerHTML=topbar(backButton('project'),phaseTag('The Skeleton'),savedMark())+`
+    <h1>Build the whole song before perfecting it.</h1><p class="sub guided">Use placeholders. The goal is a complete, recognizable rough — not final sounds.</p>
+    ${progressBar(done,3)}
+    <div class="phase-brief"><strong>Inherited from The Map</strong><p>${p.map.sections.length} section${p.map.sections.length===1?'':'s'} · ${availableParts(p).length} mapped ingredient${availableParts(p).length===1?'':'s'}. Nothing needs to be re-entered.</p></div>
+    <div class="section-kicker">Checkpoints</div><div class="list">
+      ${checkpointRow('Session','Turn the map into a DAW session.','skeleton-session',skeletonSessionDone(p),1)}
+      ${checkpointRow('Backbone','Get every section recognizable.','skeleton-backbone',skeletonBackboneDone(p),2)}
+      ${checkpointRow('Full Rough','Fill every mapped part from start to finish.','skeleton-rough',skeletonRoughDone(p),3)}
+    </div>
+    <div class="spacer-24"></div><button class="secondary full" data-action="go" data-route="roadmap">View Full Roadmap</button>`;
+}
+function renderSkeletonSession(){
+  const p=project(),parts=availableParts(p);
+  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Session'),savedMark())+`
+    <h2>Turn the map into a session.</h2><p class="sub guided">Create simple placeholder tracks and section markers. Don’t hunt for final sounds yet.</p>
+    <div class="section-kicker">Tracks</div>
+    <div class="list">${parts.length?parts.map(part=>`<button class="list-row" data-action="toggle-track" data-name="${esc(part)}"><span class="status-dot ${p.skeleton.session.tracks[part]?'done':''}"></span><div><div class="title">${esc(part)}</div><div class="desc">Placeholder track created</div></div><span class="chev">›</span></button>`).join(''):'<div class="empty">Map Ingredients first so the track list can be generated.</div>'}</div>
+    <div class="section-kicker">Markers</div><div class="verify-row"><div><strong>Section markers created</strong><span>${p.map.sections.length?sectionLabels(p).join(' · '):'Map Structure first.'}</span></div><button class="round-check ${p.skeleton.session.markers?'on':''}" data-action="toggle-markers"></button></div>
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-backbone">Next</button></div>`;
+}
+function renderSkeletonBackbone(){
+  const p=project(),labels=sectionLabels(p);
+  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Backbone'),savedMark())+`
+    <h2>Make every section recognizable.</h2><p class="sub guided">Rough the musical spine — enough harmony, rhythm, and melody that you can tell what section you’re hearing.</p>
+    <div class="tip guided"><div class="num">2</div><div><strong>Keep it ugly on purpose.</strong><span>Scratch parts are allowed. Detailed sound matching belongs in The Sounds.</span></div></div>
+    <div class="section-kicker">Sections</div>
+    <div>${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i);return `<button class="backbone-row" data-action="toggle-backbone" data-id="${s.id}"><div><strong>${esc(labels[i])}</strong><span>${a.partsStatus==='silence'?'No active parts':esc((a.parts||[]).join(' · ')||'Parts not mapped')}</span></div><span class="round-check ${p.skeleton.backbone.sections[s.id]?'on':''}"></span></button>`}).join(''):'<div class="empty">Map Structure first.</div>'}</div>
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-rough">Next</button></div>`;
+}
+function renderSkeletonRough(){
+  const p=project(),labels=sectionLabels(p);
+  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Full Rough'),savedMark())+`
+    <h2>Fill the whole arrangement.</h2><p class="sub guided">A mapped part counts when a rough placeholder exists through that section. Accuracy before polish.</p>
+    <div class="section-kicker">Sections</div>
+    ${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i),parts=a.parts||[],state=p.skeleton.rough.parts[s.id]||{};return `<div class="card card-pad" style="margin-bottom:10px"><div class="block-head"><strong>${esc(labels[i])}</strong><span>${parts.filter(x=>state[x]).length} / ${parts.length}</span></div><div class="part-check-grid">${parts.length?parts.map(part=>`<button class="part-check ${state[part]?'done':''}" data-action="toggle-rough-part" data-section-id="${s.id}" data-name="${esc(part)}">${esc(part)}</button>`).join(''):`<span class="micro">No active parts mapped.</span>`}</div></div>`}).join(''):'<div class="empty">Map Structure and Section Study first.</div>'}
+    <div class="section-kicker">Print</div><div class="verify-row"><div><strong>Rough bounce exported</strong><span>One beginning-to-end bounce you can listen to away from the session.</span></div><button class="round-check ${p.skeleton.rough.bounce?'on':''}" data-action="toggle-rough-bounce"></button></div>
+    <div class="spacer-24"></div><div class="phase-brief"><strong>${skeletonDone(p)?'The Skeleton is complete.':'Finish the rough, then stop polishing.'}</strong><p>${skeletonDone(p)?'You now have a complete rough arrangement. The next phase is about matching sources and performances.':'The goal is coverage, not perfection.'}</p></div>
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="roadmap">Next Phase</button></div>`;
+}
+
+function renderRoadmap(){
+  const p=project();
+  if(p.type==='original'){
+    app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph,i)=>`<div class="road-phase ${i===0?'active':''}"><div class="road-top"><div class="road-num">${i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join('')}`;return;
+  }
+  const current=currentStudyPhaseIndex(p);
+  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Seven phases. One record.</h2><p class="sub">Analysis becomes a blueprint, the blueprint becomes a recreation, and the recreation becomes production judgment.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i);return `<div class="road-phase ${st}"><div class="road-top"><div class="road-num">${st==='done'?'✓':i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div>${i<2?`<button class="text-btn" data-action="go" data-route="${i===0?'map':'skeleton'}">Open</button>`:''}</div><div class="road-checks">${ph[2].map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></div>`}).join('')}`;
+}
+
+function renderNotes(){
+  const p=project();if(p.type==='original')return app.innerHTML=topbar(backButton('project'),phaseTag('Notes'),'')+`<h2>Project memory.</h2><p class="sub">Original-song notes will grow here as the workflow expands.</p>`;
+  const labels=sectionLabels(p),parking=[],takeaways=[];
+  if(p.map.phaseParking)parking.push(['The Map',p.map.phaseParking]);if(p.map.phaseTakeaway)takeaways.push(['The Map',p.map.phaseTakeaway]);
+  p.map.sections.forEach((s,i)=>{const a=ensureAnalysis(p,i);if(a.parking)parking.push([`The Map · ${labels[i]}`,a.parking]);if(a.takeaway)takeaways.push([`The Map · ${labels[i]}`,a.takeaway])});
+  app.innerHTML=topbar(backButton('project'),phaseTag('Notes'),'')+`<h2>Project memory.</h2><p class="sub">Questions stay visible until you solve them. Useful lessons stay available for future songs.</p>
+    <div class="section-kicker">Parking Lot</div>${parking.length?parking.map(([ctx,text])=>noteCard(ctx,text)).join(''):'<div class="empty">Nothing parked yet.</div>'}
+    <div class="section-kicker">Takeaways</div>${takeaways.length?takeaways.map(([ctx,text])=>noteCard(ctx,text)).join(''):'<div class="empty">No takeaways yet.</div>'}`;
+}
+function noteCard(ctx,text){return `<div class="card card-pad" style="margin-bottom:9px"><div class="micro" style="margin-bottom:6px">${esc(ctx)}</div><div style="font-size:14px;line-height:1.5">${esc(text)}</div></div>`}
+
+function renderOriginalSpark(){
+  const p=project(),starts=['Lyric','Melody','Beat','Chords','Instrument part','Sound','Concept','Voice memo','Other'],reasons=['Rhythm','Emotion','Melody','Sound','Words','Energy'];
+  app.innerHTML=topbar(backButton('project'),phaseTag('The Spark'),savedMark())+`
+    <h1>Start with what you have.</h1><p class="sub">Don’t turn the idea into homework. Capture the thing that made you want to make something.</p>
+    <div class="section-kicker">Starting With</div><div class="choice-wrap">${starts.map(x=>`<button class="choice ${p.spark.starts.includes(x)?'selected':''}" data-action="toggle-spark-start" data-name="${x}">${x}</button>`).join('')}</div>
+    <div class="section-kicker">The Idea</div><textarea class="textarea" data-input="spark-idea" placeholder="What do you have right now?">${esc(p.spark.idea)}</textarea>
+    <div class="section-kicker">What Makes It Worth Keeping?</div><div class="choice-wrap">${reasons.map(x=>`<button class="choice ${p.spark.reasons.includes(x)?'selected':''}" data-action="toggle-spark-reason" data-name="${x}">${x}</button>`).join('')}</div>
+    <div class="section-kicker">Anchor</div><textarea class="textarea" data-input="spark-anchor" placeholder="What absolutely should survive as this song grows?">${esc(p.spark.anchor)}</textarea>
+    <div class="spacer-24"></div><div class="original-anchor"><div class="micro" style="margin-bottom:5px">THE RULE</div><div style="font-size:14px;line-height:1.45">Protect the reason you started. Everything else can change.</div></div>
+    <div class="spacer-18"></div><button class="secondary full" data-action="go" data-route="project">Done for now</button>`;
+}
+
+function openSectionSheet(id){
+  const p=project(),s=p.map.sections.find(x=>x.id===id);if(!s)return;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Edit Section</h3><input class="field" id="renameSection" value="${esc(s.name)}"><div class="sheet-actions"><button class="primary full" data-action="save-section-name" data-id="${id}">Save</button><button class="destructive full" data-action="remove-section" data-id="${id}">Remove Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+  sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
+  setTimeout(()=>document.getElementById('renameSection')?.focus(),50);
+}
+function openSettings(){
+  const p=project();
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="section-kicker" style="margin-top:10px">Guidance</div><div class="segmented"><button class="segment ${p.guidance==='minimal'?'selected accent':''}" data-action="set-guidance" data-value="minimal">Minimal</button><button class="segment ${p.guidance!=='minimal'?'selected accent':''}" data-action="set-guidance" data-value="guided">Guided</button><button class="segment" disabled style="opacity:0"></button></div><div class="micro" style="margin-top:8px">Guided adds short listening instructions. The workflow stays the same.</div><div class="section-kicker">Backup</div><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
+  sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
+}
+function closeSheet(){sheetRoot.classList.remove('open');sheetRoot.setAttribute('aria-hidden','true');setTimeout(()=>sheetRoot.innerHTML='',150)}
+
+function addSection(name){name=clean(name);if(!name)return;const p=project();p.map.sections.push({id:uid(),name});save();renderStructure()}
+function toggleArray(arr,val){const i=arr.indexOf(val);if(i>=0)arr.splice(i,1);else arr.push(val)}
+function syncPresenceChanges(p,index){
+  if(index<1)return;
+  const prev=ensureAnalysis(p,index-1),cur=ensureAnalysis(p,index),t=ensureTransition(p,index),known=availableParts(p);
+  t.changes=(t.changes||[]).filter(c=>!(known.includes(c.target)&&(c.action==='Enters'||c.action==='Leaves')));
+  known.forEach(part=>{
+    const was=(prev.parts||[]).includes(part),now=(cur.parts||[]).includes(part);
+    if(!was&&now)t.changes.push({target:part,action:'Enters',presence:true});
+    if(was&&!now)t.changes.push({target:part,action:'Leaves',presence:true});
+  });
+  if(t.changes.length)t.status='';
+}
+function setSectionPartPresence(p,index,name,on){
+  const a=ensureAnalysis(p,index),has=a.parts.includes(name);
+  if(on&&!has)a.parts.push(name);
+  if(!on&&has)a.parts=a.parts.filter(x=>x!==name);
+  a.partsStatus=a.parts.length?'mapped':'silence';
+  a.focus=a.focus.filter(x=>a.parts.includes(x));
+  if(!a.focus.length&&a.focusState==='selected')a.focusState='';
+  if(index>0)syncPresenceChanges(p,index);
+}
+function removePartEverywhere(p,name){
+  p.map.ingredients=p.map.ingredients.filter(x=>x!==name);p.map.unknowns=p.map.unknowns.filter(x=>x!==name);
+  Object.values(p.map.analysis).forEach(a=>{a.parts=(a.parts||[]).filter(x=>x!==name);a.focus=(a.focus||[]).filter(x=>x!==name);if(!a.parts.length&&a.partsStatus==='mapped')a.partsStatus=''});
+}
+function addChange(action){
+  const p=project(),i=ui.sectionIndex,t=ensureTransition(p,i),target=ui.selectedTarget;if(!target||!action||!t)return;
+  const known=availableParts(p).includes(target);
+  t.status='';
+  if(known&&(action==='Enters'||action==='Leaves')){
+    setSectionPartPresence(p,i,target,action==='Enters');
+    syncPresenceChanges(p,i);
+  }else if(!t.changes.some(c=>c.target===target&&c.action===action)){
+    t.changes.push({target,action});
+  }
+  ui.selectedTarget=null;save();renderSectionStudy();
+}
+function markVisitedAndAdvance(){
+  const p=project(),a=ensureAnalysis(p,ui.sectionIndex);a.visited=true;if(!a.partsStatus&&a.parts.length)a.partsStatus='mapped';save();
+  if(ui.sectionIndex<p.map.sections.length-1){ui.sectionIndex++;ui.selectedTarget=null;renderSectionStudy();window.scrollTo(0,0)}else go('map-summary');
+}
+
+app.addEventListener('click',e=>{
+  const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,p=project();
+  if(action==='go')return go(b.dataset.route);
+  if(action==='new-project')return go('new-project');
+  if(action==='set-new-type'){ui.newType=b.dataset.type;return renderNewProject()}
+  if(action==='create-project'){
+    const title=clean(document.getElementById('newTitle')?.value)||'Untitled';const np=ui.newType==='study'?makeStudyProject(title,clean(document.getElementById('newArtist')?.value)):makeOriginalProject(title);db.projects.push(np);db.currentProjectId=np.id;save();return go('project');
+  }
+  if(action==='open-project'){db.currentProjectId=b.dataset.id;save();return go('project')}
+  if(action==='settings')return openSettings();
+  if(action==='close-sheet')return closeSheet();
+  if(action==='set-guidance'){p.guidance=b.dataset.value;save();closeSheet();return render()}
+  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
+  if(action==='add-section')return addSection(b.dataset.name);
+  if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
+  if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}
+  if(action==='toggle-ingredient'){toggleArray(p.map.ingredients,b.dataset.name);save();return renderIngredients()}
+  if(action==='add-custom-part'){const input=document.getElementById('customPart');const v=clean(input?.value);if(v&&!p.map.ingredients.includes(v)){p.map.ingredients.push(v);input.value='';save();renderIngredients()}return}
+  if(action==='remove-custom-part'||action==='remove-unknown'){removePartEverywhere(p,b.dataset.name);save();return renderIngredients()}
+  if(action==='add-unknown'){const input=document.getElementById('unknownSound');const v=clean(input?.value);if(v&&!p.map.unknowns.includes(v)){p.map.unknowns.push(v);input.value='';save();renderIngredients()}return}
+  if(action==='start-section-study'){ui.sectionIndex=0;ui.selectedTarget=null;return go('section-study')}
+  if(action==='jump-section'){ui.sectionIndex=Number(b.dataset.index);ui.selectedTarget=null;return renderSectionStudy()}
+  if(action==='toggle-section-part'){const a=ensureAnalysis(p,ui.sectionIndex),name=b.dataset.name;setSectionPartPresence(p,ui.sectionIndex,name,!a.parts.includes(name));save();return renderSectionStudy()}
+  if(action==='section-silence'){const a=ensureAnalysis(p,ui.sectionIndex);if(a.partsStatus==='silence'){a.partsStatus=''}else{a.parts=[];a.focus=[];a.focusState='';a.partsStatus='silence'}if(ui.sectionIndex>0)syncPresenceChanges(p,ui.sectionIndex);save();return renderSectionStudy()}
+  if(action==='set-feel'){const a=ensureAnalysis(p,ui.sectionIndex),k=b.dataset.scale;a.feel[k]=b.dataset.value;a.feelUnsure[k]=false;save();return renderSectionStudy()}
+  if(action==='feel-unsure'){const a=ensureAnalysis(p,ui.sectionIndex),k=b.dataset.scale;a.feelUnsure[k]=!a.feelUnsure[k];if(a.feelUnsure[k])a.feel[k]=null;save();return renderSectionStudy()}
+  if(action==='toggle-focus'){const a=ensureAnalysis(p,ui.sectionIndex);toggleArray(a.focus,b.dataset.name);a.focusState=a.focus.length?'selected':'';save();return renderSectionStudy()}
+  if(action==='focus-status'){const a=ensureAnalysis(p,ui.sectionIndex),st=b.dataset.status;a.focusState=a.focusState===st?'':st;if(a.focusState)a.focus=[];save();return renderSectionStudy()}
+  if(action==='transition-status'){const t=ensureTransition(p,ui.sectionIndex),st=b.dataset.status;t.status=t.status===st?'':st;if(t.status)t.changes=[];ui.selectedTarget=null;save();return renderSectionStudy()}
+  if(action==='select-change-target'){ui.selectedTarget=ui.selectedTarget===b.dataset.name?null:b.dataset.name;return renderSectionStudy()}
+  if(action==='use-custom-target'){const v=clean(document.getElementById('customTarget')?.value);if(v){ui.selectedTarget=v;renderSectionStudy()}return}
+  if(action==='add-change')return addChange(b.dataset.value);
+  if(action==='add-custom-change'){const v=clean(document.getElementById('customAction')?.value);if(v)return addChange(v);return}
+  if(action==='remove-change'){
+    const t=ensureTransition(p,ui.sectionIndex),idx=Number(b.dataset.index),change=t.changes[idx];
+    if(change&&availableParts(p).includes(change.target)&&(change.action==='Enters'||change.action==='Leaves')){
+      const prev=ensureAnalysis(p,ui.sectionIndex-1),was=prev.parts.includes(change.target);
+      setSectionPartPresence(p,ui.sectionIndex,change.target,was);
+      syncPresenceChanges(p,ui.sectionIndex);
+    }else t.changes.splice(idx,1);
+    save();return renderSectionStudy();
+  }
+  if(action==='prev-section'){if(ui.sectionIndex>0){ui.sectionIndex--;ui.selectedTarget=null;renderSectionStudy();window.scrollTo(0,0)}return}
+  if(action==='next-section')return markVisitedAndAdvance();
+  if(action==='open-map-item'){
+    const item=mapOpenItems(p)[Number(b.dataset.openIndex)];if(!item)return;
+    if(item.route==='section-study'){ui.sectionIndex=Number(item.index)||0;ui.selectedTarget=null;return go('section-study')}
+    if(item.route==='map-summary'){const el=document.getElementById(item.target);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});return}
+    go(item.route);if(item.target)setTimeout(()=>document.getElementById(item.target)?.scrollIntoView({behavior:'smooth',block:'center'}),30);return;
+  }
+  if(action==='summary-jump'){ui.sectionIndex=Number(b.dataset.index);ui.selectedTarget=null;return go('section-study')}
+  if(action==='toggle-map-verified'){p.map.mapVerified=!p.map.mapVerified;save();return renderMapSummary()}
+  if(action==='toggle-teach-back'){p.map.teachBack=!p.map.teachBack;save();return renderMapSummary()}
+  if(action==='toggle-track'){p.skeleton.session.tracks[b.dataset.name]=!p.skeleton.session.tracks[b.dataset.name];save();return renderSkeletonSession()}
+  if(action==='toggle-markers'){p.skeleton.session.markers=!p.skeleton.session.markers;save();return renderSkeletonSession()}
+  if(action==='toggle-backbone'){p.skeleton.backbone.sections[b.dataset.id]=!p.skeleton.backbone.sections[b.dataset.id];save();return renderSkeletonBackbone()}
+  if(action==='toggle-rough-part'){const sid=b.dataset.sectionId,name=b.dataset.name;p.skeleton.rough.parts[sid]=p.skeleton.rough.parts[sid]||{};p.skeleton.rough.parts[sid][name]=!p.skeleton.rough.parts[sid][name];save();return renderSkeletonRough()}
+  if(action==='toggle-rough-bounce'){p.skeleton.rough.bounce=!p.skeleton.rough.bounce;save();return renderSkeletonRough()}
+  if(action==='toggle-spark-start'){toggleArray(p.spark.starts,b.dataset.name);save();return renderOriginalSpark()}
+  if(action==='toggle-spark-reason'){toggleArray(p.spark.reasons,b.dataset.name);save();return renderOriginalSpark()}
+  if(action==='save-section-name'){const s=p.map.sections.find(x=>x.id===b.dataset.id),v=clean(document.getElementById('renameSection')?.value);if(s&&v)s.name=v;save();closeSheet();return renderStructure()}
+  if(action==='remove-section'){
+    const id=b.dataset.id,index=p.map.sections.findIndex(x=>x.id===id);if(index>=0){p.map.sections.splice(index,1);delete p.map.analysis[id];delete p.skeleton.backbone.sections[id];delete p.skeleton.rough.parts[id];Object.keys(p.map.transitions).forEach(k=>{if(k.includes(id))delete p.map.transitions[k]})}save();closeSheet();return renderStructure();
+  }
+  if(action==='export-backup')return exportBackup();
+  if(action==='import-backup'){document.getElementById('importFile').click();return}
+  if(action==='reset-project'){if(confirm(`Reset ${p.title}? This clears its saved progress.`)){const fresh=p.type==='study'?makeStudyProject(p.title,p.artist):makeOriginalProject(p.title);fresh.id=p.id;const idx=db.projects.findIndex(x=>x.id===p.id);db.projects[idx]=fresh;save();closeSheet();go('project')}return}
+});
+
+app.addEventListener('input',e=>{
+  const p=project();
+  if(e.target.id==='tempoInput'){p.map.setup.tempo=e.target.value.replace(/[^0-9.]/g,'');save()}
+  if(e.target.dataset.input==='phase-parking'){p.map.phaseParking=e.target.value;save()}
+  if(e.target.dataset.input==='phase-takeaway'){p.map.phaseTakeaway=e.target.value;save()}
+  if(e.target.dataset.input==='section-parking'){ensureAnalysis(p,ui.sectionIndex).parking=e.target.value;save()}
+  if(e.target.dataset.input==='section-takeaway'){ensureAnalysis(p,ui.sectionIndex).takeaway=e.target.value;save()}
+  if(e.target.dataset.input==='spark-idea'){p.spark.idea=e.target.value;save()}
+  if(e.target.dataset.input==='spark-anchor'){p.spark.anchor=e.target.value;save()}
+});
+app.addEventListener('change',e=>{if(e.target.id==='meterInput'){project().map.setup.meter=e.target.value;save()}});
+app.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.shiftKey)return;
+  if(e.target.id==='customSection'){e.preventDefault();document.querySelector('[data-action="add-custom-section"]')?.click()}
+  if(e.target.id==='customPart'){e.preventDefault();document.querySelector('[data-action="add-custom-part"]')?.click()}
+  if(e.target.id==='unknownSound'){e.preventDefault();document.querySelector('[data-action="add-unknown"]')?.click()}
+  if(e.target.id==='customTarget'){e.preventDefault();document.querySelector('[data-action="use-custom-target"]')?.click()}
+  if(e.target.id==='customAction'){e.preventDefault();document.querySelector('[data-action="add-custom-change"]')?.click()}
+});
+
+sheetRoot.addEventListener('click',e=>{
+  if(e.target===sheetRoot)return closeSheet();
+  const b=e.target.closest('[data-action]');if(!b)return;
+  const action=b.dataset.action,p=project();
+  if(action==='close-sheet')return closeSheet();
+  if(action==='save-section-name'){
+    const s=p.map.sections.find(x=>x.id===b.dataset.id),v=clean(document.getElementById('renameSection')?.value);
+    if(s&&v)s.name=v;save();closeSheet();return renderStructure();
+  }
+  if(action==='remove-section'){
+    const id=b.dataset.id,index=p.map.sections.findIndex(x=>x.id===id);
+    if(index>=0){p.map.sections.splice(index,1);delete p.map.analysis[id];delete p.skeleton.backbone.sections[id];delete p.skeleton.rough.parts[id];Object.keys(p.map.transitions).forEach(k=>{if(k.includes(id))delete p.map.transitions[k]});}
+    save();closeSheet();return renderStructure();
+  }
+  if(action==='set-guidance'){p.guidance=b.dataset.value;save();closeSheet();return render();}
+  if(action==='export-backup')return exportBackup();
+  if(action==='import-backup'){document.getElementById('importFile').click();return;}
+  if(action==='reset-project'){
+    if(confirm(`Reset ${p.title}? This clears its saved progress.`)){
+      const fresh=p.type==='study'?makeStudyProject(p.title,p.artist):makeOriginalProject(p.title);fresh.id=p.id;
+      const idx=db.projects.findIndex(x=>x.id===p.id);db.projects[idx]=fresh;save();closeSheet();go('project');
+    }
+  }
+});
+
+function installSorting(){
+  const container=document.getElementById('sortList');if(!container)return;
+  let hold=null,drag=null,startY=0,moved=false,pointerId=null;
+  container.querySelectorAll('.sort-row').forEach(row=>{
+    row.addEventListener('pointerdown',e=>{
+      if(e.button!==undefined&&e.button!==0)return;startY=e.clientY;moved=false;pointerId=e.pointerId;
+      hold=setTimeout(()=>begin(row,e),e.pointerType==='mouse'?120:320);
+    });
+    row.addEventListener('pointermove',e=>{
+      if(Math.abs(e.clientY-startY)>7)moved=true;
+      if(!drag&&e.pointerType==='mouse'&&moved)begin(row,e);
+      if(!drag)return;e.preventDefault();
+      drag.style.transform=`translateY(${e.clientY-startY}px) scale(1.015)`;
+      const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('.sort-row');
+      if(under&&under!==drag&&under.parentElement===container){
+        const rect=under.getBoundingClientRect();
+        if(e.clientY<rect.top+rect.height/2)container.insertBefore(drag,under);else container.insertBefore(drag,under.nextSibling);
+        startY=e.clientY;drag.style.transform='scale(1.015)';
+      }
+    });
+    row.addEventListener('pointerup',e=>{
+      clearTimeout(hold);if(drag){endDrag();return}
+      if(!moved)openSectionSheet(row.dataset.sectionId);
+    });
+    row.addEventListener('pointercancel',()=>{clearTimeout(hold);if(drag)endDrag()});
+  });
+  function begin(row,e){
+    if(drag)return;drag=row;row.classList.add('dragging');row.style.pointerEvents='none';document.body.classList.add('is-sorting');try{row.setPointerCapture(pointerId)}catch(_){ }if(navigator.vibrate)navigator.vibrate(12);
+  }
+  function endDrag(){
+    const p=project();drag.classList.remove('dragging');drag.style.pointerEvents='';drag.style.transform='';document.body.classList.remove('is-sorting');
+    const ids=[...container.querySelectorAll('.sort-row')].map(x=>x.dataset.sectionId);p.map.sections=ids.map(id=>p.map.sections.find(s=>s.id===id)).filter(Boolean);save();drag=null;renderStructure();
+  }
+}
+
+function exportBackup(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='production-projects-backup.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+const importFile=document.getElementById('importFile');
+importFile.addEventListener('change',async()=>{
+  const file=importFile.files?.[0];if(!file)return;try{const next=JSON.parse(await file.text());if(!next?.projects)throw new Error();db=next;save();closeSheet();go('project')}catch(e){alert('That backup file could not be read.')}finally{importFile.value=''}
+});
+
+render();
+})();
+</script>
+</body>
+</html>
