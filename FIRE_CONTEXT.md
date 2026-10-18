@@ -254,12 +254,14 @@ One uninterrupted orientation listen.
 
 It should be visually consistent with other completion/action cards.
 
-Song Setup currently includes:
+Song Setup includes:
 - Reference
 - Tempo (with BPM suffix)
 - Meter
 - Grid
 - First Listen action state
+
+**LOCKED home-screen behavior:** Song Setup should not occupy the Map phase home. The Map home shows one compact tappable **Setup** row underneath the checkpoints, summarizing items such as `120 BPM · 4/4 · Grid aligned`. Tapping it opens the dedicated setup screen containing the full controls and First Listen card.
 
 ### Structure
 Instruction style:
@@ -640,27 +642,39 @@ Screens should not invent their own navigation logic.
 
 The Map and Skeleton previously looked too different.
 
-LOCKED direction:
-Every phase uses the same basic Phase Home template.
+## LOCKED phase-home rule
+A phase home is an **overview**, not a workspace.
 
-Example:
+Default structure:
+- interactive phase pill
+- phase progress
+- checkpoint list
+- at most one compact utility/details row when the phase genuinely needs it
 
-### Phase pill
-The Skeleton
+Do not put full forms, large action cards, long instructional copy, or expanded notes directly on a phase home. Those belong inside the relevant checkpoint/detail screen.
 
-### One simple sentence
-Build the whole song before perfecting it.
+### The Map
+The Map home should show:
+- progress
+- Structure
+- Ingredients
+- Section Study
+- one compact **Setup** row underneath the checkpoint card
 
-### Progress
+The full Reference / Tempo / Meter / Grid / First Listen controls live inside that Setup screen.
 
-### Checkpoints
-Session  
-Backbone  
-Full Rough
+When Section Study is already complete, opening its checkpoint can lead to the Map Summary/verification screen, which still provides access back into individual sections for editing.
 
-### Notes
+### The Skeleton
+The Skeleton home should show:
+- progress
+- Session
+- Backbone
+- Full Rough
 
-Same structural layout should eventually serve:
+No extra explanatory dashboard content is needed.
+
+The same visual grammar should eventually serve:
 - Map
 - Skeleton
 - Sounds
@@ -669,7 +683,7 @@ Same structural layout should eventually serve:
 - World
 - Finish
 
-Only content changes.
+Only checkpoint content changes.
 
 Do not independently design every phase home.
 

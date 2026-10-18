@@ -93,6 +93,8 @@ details.note-disclosure{border:1px solid var(--line);border-radius:17px;padding:
 .phase-pill:active{background:rgba(255,255,255,.08)}
 .checkpoint-row[disabled]{cursor:default;opacity:.46}
 .checkpoint-row[disabled]:active{transform:none}
+.phase-utility{margin-top:12px;background:rgba(255,255,255,.018);border:1px solid var(--line);border-radius:17px;overflow:hidden}
+.phase-utility .list-row{padding:11px 14px;min-height:62px}
 .current-ring{width:27px;height:27px;border-radius:50%;border:1.5px solid var(--accent);box-shadow:inset 0 0 0 5px var(--accent-soft)}
 .lock-dot{width:27px;height:27px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--quiet);font-size:12px}
 .phase-nav-list{display:grid;gap:8px}
@@ -313,6 +315,7 @@ function sectionComplete(p,index){
 function structureDone(p){return p.map.sections.length>0&&p.map.structureVerified}
 function ingredientsDone(p){return availableParts(p).length>0}
 function sectionStudyDone(p){return p.map.sections.length>0&&p.map.sections.every((_,i)=>sectionComplete(p,i))}
+function mapSetupComplete(p){const s=p.map.setup||{};return !!(s.reference&&clean(s.tempo)&&s.meter&&s.grid&&s.firstListen)}
 function mapDone(p){return !!p.map.setup.firstListen&&structureDone(p)&&ingredientsDone(p)&&sectionStudyDone(p)&&p.map.mapVerified&&p.map.teachBack}
 function skeletonSessionDone(p){const parts=availableParts(p);return !!p.skeleton.session.markers&&parts.every(x=>p.skeleton.session.tracks[x])}
 function skeletonBackboneDone(p){return p.map.sections.length>0&&p.map.sections.every(s=>p.skeleton.backbone.sections[s.id])}
@@ -336,6 +339,7 @@ function render(){
     case 'roadmap':return renderRoadmap();
     case 'notes':return renderNotes();
     case 'map':return renderMapHome();
+    case 'map-setup':return renderMapSetup();
     case 'structure':return renderStructure();
     case 'ingredients':return renderIngredients();
     case 'section-study':return renderSectionStudy();
@@ -411,24 +415,27 @@ function renderMapHome(){
   const structureUnlocked=!!m.setup.firstListen||structureDone(p);
   const ingredientsUnlocked=structureDone(p)||ingredientsDone(p)||sectionStudyDone(p);
   const studyUnlocked=(structureDone(p)&&ingredientsDone(p))||sectionStudyDone(p);
-  const reviewVisible=sectionStudyDone(p)||m.mapVerified||m.teachBack;
-  const before=`
-    <div class="section-kicker">Song Setup</div>
+  const studyRoute=sectionStudyDone(p)?'map-summary':'section-study';
+  const checkpoints=`
+      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
+      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
+      ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
+  const setupBits=[clean(m.setup.tempo)?`${esc(m.setup.tempo)} BPM`:'Tempo not set',m.setup.meter||'Meter not set',m.setup.grid?'Grid aligned':'Grid not aligned'];
+  const setupRow=`<div class="phase-utility"><button class="list-row" data-action="go" data-route="map-setup">${mapSetupComplete(p)?`<span class="round-check on" aria-hidden="true"></span>`:`<span class="status-dot"></span>`}<div><div class="title">Setup</div><div class="desc">${setupBits.join(' · ')}</div></div><span class="chev">›</span></button></div>`;
+  app.innerHTML=phaseHome(0,done,3,checkpoints,'',setupRow);
+}
+function renderMapSetup(){
+  const p=project(),m=p.map;
+  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+    <h2>Song setup.</h2>
     <div class="group-card setup-panel">
       ${setupToggle('Reference','Imported','reference',m.setup.reference)}
       <div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div>
       <div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
       ${setupToggle('Grid','Aligned','grid',m.setup.grid)}
     </div>
+    <div class="section-kicker">Listen</div>
     ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}`;
-  const checkpoints=`
-      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
-      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
-      ${checkpointRow('Section Study','Study the song one section at a time.','section-study',sectionStudyDone(p),studyUnlocked)}`;
-  const after=`
-    ${reviewVisible?`${actionCard('Review & Verify','Review the finished map, then confirm it.',p.map.mapVerified&&p.map.teachBack,'go-review-map')}`:''}
-    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="phase-parking" placeholder="Question or mystery for later">${esc(m.phaseParking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="phase-takeaway" placeholder="Something worth carrying into your own work">${esc(m.phaseTakeaway)}</textarea></div></div></details>`;
-  app.innerHTML=phaseHome(0,done,3,checkpoints,before,after);
 }
 function setupToggle(label,state,field,on){return `<div class="setup-row"><div class="setup-label">${label}</div><button class="state-control ${on?'on':''}" data-action="toggle-setup" data-field="${field}"><span>${state}</span><span class="check-circle"></span></button></div>`}
 function checkpointRow(title,desc,route,done,unlocked=true){
@@ -529,7 +536,7 @@ function renderMapSummary(){
     <div class="section-kicker">Tracks</div><div class="chip-list">${availableParts(p).length?availableParts(p).map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No tracks mapped.</span>'}</div>
     <div class="section-kicker">Sections</div>
     ${p.map.sections.length?p.map.sections.map((s,i)=>renderSummaryCard(p,i,labels[i])).join(''):'<div class="empty">Map the structure to build a section summary.</div>'}
-    ${(p.map.phaseParking||p.map.phaseTakeaway)?`<div class="section-kicker">Notes</div><div class="card card-pad">${p.map.phaseParking?`<div class="summary-line"><b>Parking Lot</b><span>${esc(p.map.phaseParking)}</span></div>`:''}${p.map.phaseTakeaway?`<div class="summary-line" style="margin-top:8px"><b>Takeaway</b><span>${esc(p.map.phaseTakeaway)}</span></div>`:''}</div>`:''}
+    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="phase-parking" placeholder="Question or mystery for later">${esc(p.map.phaseParking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="phase-takeaway" placeholder="Something worth carrying into your own work">${esc(p.map.phaseTakeaway)}</textarea></div></div></details>
     <div class="section-kicker">Verify</div>
     ${actionCard('Map verified','Listen through once more while reviewing the finished map.',p.map.mapVerified,'toggle-map-verified','mapVerifyRow')}
     ${actionCard('Teach it back','Explain the structure, parts, changes, feel, and focus in your own words.',p.map.teachBack,'toggle-teach-back','teachBackRow')}
@@ -553,7 +560,7 @@ function sectionMissingItems(p,index){
 }
 function mapOpenItems(p){
   const items=[],labels=sectionLabels(p);
-  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'first-listen'});
+  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map-setup',target:'first-listen'});
   if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
   else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
   if(!ingredientsDone(p))items.push({label:'Tracks · Add at least one track',route:'ingredients'});
@@ -744,7 +751,7 @@ app.addEventListener('click',e=>{
   if(action==='close-sheet')return closeSheet();
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
-  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return ui.route==='map-setup'?renderMapSetup():renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
   if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
   if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}
