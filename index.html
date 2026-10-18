@@ -71,7 +71,7 @@ body.minimal .guided{display:none!important}
 .inline-add{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:12px}.field{width:100%;min-height:48px;border:1px solid var(--line);outline:0;border-radius:14px;background:rgba(255,255,255,.035);padding:0 14px;color:var(--text)}.field::placeholder,.textarea::placeholder{color:#646b61}.inline-add .secondary{min-height:48px}
 .textarea{width:100%;min-height:96px;border:1px solid var(--line);outline:0;border-radius:15px;background:rgba(255,255,255,.035);padding:13px 14px;resize:vertical;line-height:1.45;color:var(--text)}
 .chip-list{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:13px;color:#dce0d7}.chip.choice-chip{min-height:44px;padding:0 14px;font-size:15px}.chip.accent{background:var(--accent-soft);border-color:rgba(228,216,75,.28);color:var(--accent-text)}.chip .x{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:16px}
-.sort-list{display:grid;gap:9px}.sort-row{min-height:66px;padding:0 14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;touch-action:none;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;will-change:transform}.sort-row .index{font-size:12px;color:var(--muted);text-align:center}.sort-row .name{font-size:16px}.sort-row.dragging{background:var(--surface-3);border-color:rgba(228,216,75,.35);box-shadow:var(--shadow);transform:scale(1.015);z-index:20;touch-action:none}
+.sort-list{display:grid;gap:9px}.sort-row{min-height:66px;padding:0 14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:10px;cursor:pointer}.sort-row .index{font-size:12px;color:var(--muted);text-align:center}.sort-row .name{font-size:16px}.sort-list.reorder-mode .sort-row{cursor:default}.drag-handle{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--muted);font-size:21px;line-height:1;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.drag-handle:active{background:rgba(255,255,255,.055);color:var(--text);cursor:grabbing}.sort-placeholder{min-height:66px;border-radius:17px;border:1px dashed rgba(228,216,75,.28);background:rgba(228,216,75,.035)}.sort-ghost{position:fixed!important;z-index:9999!important;margin:0!important;pointer-events:none!important;background:var(--surface-3)!important;border-color:rgba(228,216,75,.35)!important;box-shadow:var(--shadow)!important;transform:scale(1.015)}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:30px}.section-heading .section-kicker{margin:0}.section-heading .text-btn{min-height:36px}.top-icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:28px;font-weight:300;color:var(--text);cursor:pointer}.top-icon-btn:active{background:rgba(255,255,255,.05)}
 .horizontal-nav{display:flex;gap:7px;overflow-x:auto;padding:2px 0 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.horizontal-nav::-webkit-scrollbar{display:none}.section-tab{white-space:nowrap;min-height:36px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.022);font-size:12px;color:var(--muted);cursor:pointer}.section-tab.current{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}.section-tab.done:before{content:"✓ ";color:var(--accent)}
 .study-block{padding:18px 0 4px;border-top:0;margin-top:10px}.study-block:first-of-type{margin-top:0}.block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}.block-head strong{font-size:16px}.block-head span{font-size:12px;color:var(--muted)}
 .segment-stack{display:grid;gap:12px}.scale-row{display:grid;grid-template-columns:78px 1fr 38px;gap:10px;align-items:center}.scale-label{font-size:13px;color:#cbd0c6}.segmented{display:grid;grid-template-columns:repeat(3,1fr);min-height:42px;border-radius:13px;padding:3px;background:rgba(255,255,255,.045);border:1px solid var(--line)}.segment{border-radius:10px;font-size:12px;color:var(--muted);cursor:pointer;min-width:0;padding:0 4px}.segment.selected{background:rgba(255,255,255,.09);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,.04)}.segment.selected.accent{background:var(--accent);color:#15160f;font-weight:760}.unsure-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);cursor:pointer}.unsure-btn.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}
@@ -81,8 +81,8 @@ details.note-disclosure{border:1px solid var(--line);border-radius:17px;padding:
 .summary-card{appearance:none;-webkit-appearance:none;width:100%;display:block;text-align:left;color:var(--text);background:rgba(255,255,255,.026);border:1px solid var(--line);border-radius:17px;padding:15px;margin:0 0 10px;cursor:pointer}.summary-card:active{background:rgba(255,255,255,.045)}.summary-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.summary-title strong{font-size:16px}.summary-title span{font-size:12px;color:var(--muted)}.summary-lines{display:grid;gap:6px}.summary-line{display:grid;grid-template-columns:62px 1fr;gap:9px;font-size:12px;line-height:1.45}.summary-line b{color:var(--muted);font-weight:600}.summary-line span{color:#d9ddd3}
 .verify-row{min-height:64px;display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;border-bottom:1px solid var(--line)}.verify-row:first-child{border-top:1px solid var(--line)}.verify-row strong{display:block;font-size:15px}.verify-row span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.round-check{width:27px;height:27px;border-radius:50%;border:1.5px solid #6c7467;display:grid;place-items:center;cursor:pointer}.round-check.on{background:var(--accent);border-color:var(--accent);color:#15160f}.round-check.on:after{content:"✓";font-weight:900;font-size:13px}
 .phase-brief{padding:16px;border-radius:17px;background:rgba(228,216,75,.06);border:1px solid rgba(228,216,75,.18)}.phase-brief strong{display:block;font-size:14px;color:var(--accent-text);margin-bottom:6px}.phase-brief p{font-size:13px;color:#d1d4ca;line-height:1.5}.listen-card,.action-card{appearance:none;-webkit-appearance:none;width:100%;min-height:72px;margin-top:12px;padding:14px 15px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.026);display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;text-align:left;color:var(--text);cursor:pointer}.listen-card.on,.action-card.on{background:var(--accent-soft);border-color:rgba(228,216,75,.28)}.listen-card strong,.action-card strong{display:block;font-size:15px;margin-bottom:3px}.listen-card span.copy,.action-card span.copy{display:block;font-size:12px;color:var(--muted);line-height:1.4}.listen-card.on span.copy,.action-card.on span.copy{color:#d8d5b2}.status-open-list{display:grid;gap:8px;margin-top:12px}.status-open-item{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;border:1px solid rgba(228,216,75,.14);background:rgba(0,0,0,.12);border-radius:13px;padding:10px 12px;color:var(--text);display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;text-align:left;cursor:pointer}.status-open-item strong{font-size:13px;color:#e7e6dd;margin:0}.status-open-item span{font-size:18px;color:var(--accent-text)}
-.road-phase{padding:17px 0;border-bottom:1px solid var(--line)}.road-phase:first-child{border-top:1px solid var(--line)}.road-top{display:grid;grid-template-columns:28px 1fr auto;gap:11px;align-items:start}.road-num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-strong);font-size:12px;color:var(--muted)}.road-phase.active .road-num{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}.road-phase.done .road-num{background:var(--accent);border-color:var(--accent);color:#15160f}.road-phase h3{font-size:16px}.road-phase p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}.road-checks{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0 39px}.road-check{font-size:11px;color:var(--muted);padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.032);border:1px solid var(--line)}
-.project-card{width:100%;text-align:left;padding:18px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.026);cursor:pointer;margin-bottom:10px}.project-card .type{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}.project-card strong{display:block;font-size:20px;margin-bottom:3px}.project-card .artist{font-size:13px;color:var(--muted)}.project-card .foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:15px;font-size:12px;color:var(--muted)}
+.road-phase{padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.022);margin-bottom:9px}.road-phase.done{background:rgba(228,216,75,.035);border-color:rgba(228,216,75,.12)}.road-phase.active{border-color:rgba(228,216,75,.25)}.road-top{display:grid;grid-template-columns:28px 1fr auto;gap:11px;align-items:start}.road-num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-strong);font-size:12px;color:var(--muted)}.road-phase.active .road-num{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}.road-phase h3{font-size:16px}.road-phase p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}.road-checks{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0 39px}.road-check{font-size:11px;color:var(--muted);padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.032);border:1px solid var(--line)}
+.project-card{position:relative;width:100%;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.026);margin-bottom:10px;overflow:hidden}.project-open{appearance:none;-webkit-appearance:none;width:100%;text-align:left;padding:18px 54px 18px 18px;color:var(--text);cursor:pointer}.project-card .type{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}.project-card strong{display:block;font-size:20px;margin-bottom:3px}.project-card .artist{font-size:13px;color:var(--muted)}.project-card .foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:15px;font-size:12px;color:var(--muted)}.project-menu{position:absolute;top:11px;right:9px;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:var(--muted);font-size:19px;cursor:pointer}.project-menu:active{background:rgba(255,255,255,.055);color:var(--text)}
 .new-type{display:grid;grid-template-columns:1fr 1fr;gap:10px}.type-card{min-height:120px;text-align:left;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.026);padding:16px;cursor:pointer}.type-card.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.3)}.type-card strong{display:block;font-size:16px;margin-bottom:6px}.type-card span{display:block;font-size:12px;color:var(--muted);line-height:1.4}.type-card.selected span{color:#d9d7ae}
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.54);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:16px}.sheet-backdrop.open{display:flex}.sheet{width:min(680px,100%);max-height:84vh;overflow:auto;border-radius:24px 24px 18px 18px;background:#171b16;border:1px solid var(--line-strong);box-shadow:var(--shadow);padding:9px 16px calc(18px + env(safe-area-inset-bottom))}.grabber{width:38px;height:5px;border-radius:999px;background:#4b5249;margin:2px auto 16px}.sheet h3{font-size:21px;margin-bottom:12px}.sheet-actions{display:grid;gap:9px;margin-top:14px}.sheet-close{width:100%;min-height:48px;color:var(--muted);cursor:pointer}
 .empty{padding:18px 0;color:var(--muted);font-size:13px;line-height:1.45}.count-badge{min-width:28px;height:28px;padding:0 8px;border-radius:999px;display:inline-grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12px;color:var(--muted)}
@@ -137,7 +137,7 @@ const clean=s=>String(s??'').trim();
 const app=document.getElementById('app');
 const sheetRoot=document.getElementById('sheetRoot');
 let saveFlashTimer=null;
-let ui={route:'project',sectionIndex:0,newType:'original',selectedTarget:null};
+let ui={route:'projects',sectionIndex:0,newType:'original',selectedTarget:null,reorderMode:false};
 
 function makeStudyProject(title='Smithereens',artist='Twenty One Pilots'){
   return {
@@ -211,6 +211,7 @@ function save(){
 function project(){return db.projects.find(p=>p.id===db.currentProjectId)||db.projects[0]}
 function setGuidanceClass(){document.body.classList.toggle('minimal',project()?.guidance==='minimal')}
 function go(route,extra={},push=true){
+  if(route!=='structure')ui.reorderMode=false;
   ui={...ui,...extra,route};
   if(push){try{history.pushState({route,...extra},'',location.pathname+location.search)}catch(e){}}
   render();window.scrollTo(0,0);
@@ -291,14 +292,13 @@ function render(){
 }
 
 function renderProjects(){
-  app.innerHTML=topbar('',phaseTag('Projects'),`<button class="text-btn" data-action="new-project">New</button>`)+`
+  app.innerHTML=topbar('',phaseTag('FIRE'),`<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`)+`
     <h1>Your work.</h1><p class="sub">Reference studies and original songs live together here.</p>
     <div class="spacer-24"></div>
-    ${db.projects.map(p=>{
+    ${db.projects.length?db.projects.map(p=>{
       const phase=p.type==='study'?STUDY_PHASES[currentStudyPhaseIndex(p)][0]:(originalSparkDone(p)?'The Direction':'The Spark');
-      return `<button class="project-card" data-action="open-project" data-id="${p.id}"><div class="type">${p.type==='study'?'Reference Study':'Original Song'}</div><strong>${esc(p.title)}</strong>${p.artist?`<div class="artist">${esc(p.artist)}</div>`:''}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button>`;
-    }).join('')}
-    <div class="spacer-12"></div><button class="secondary full" data-action="new-project">New Project</button>`;
+      return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type==='study'?'Reference Study':'Original Song'}</div><strong>${esc(p.title)}</strong>${p.artist?`<div class="artist">${esc(p.artist)}</div>`:''}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
+    }).join(''):`<div class="empty">No projects yet. Tap + to start one.</div>`}`;
 }
 
 function renderProject(){
@@ -315,6 +315,7 @@ function renderProject(){
       <div class="spacer-18"></div>
       <button class="primary full" data-action="go" data-route="${phaseIndex===0?'map':phaseIndex===1?'skeleton':'roadmap'}">${phaseIndex===0?(mapCheckpointCount(p)?'Continue The Map':'Start The Map'):phaseIndex===1?(skeletonCheckpointCount(p)?'Continue The Skeleton':'Start The Skeleton'):'View Roadmap'}</button>
     </div>
+    ${phaseIndex>0?`<div class="section-kicker">Previous</div><div class="group-card list">${STUDY_PHASES.slice(0,phaseIndex).map((ph,i)=>`<button class="list-row" data-action="go" data-route="${i===0?'map':i===1?'skeleton':'roadmap'}"><span class="round-check on" aria-hidden="true"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="chev">›</span></button>`).join('')}</div>`:''}
     <div class="section-kicker">Next</div>
     <div class="group-card list">
       ${STUDY_PHASES.slice(Math.min(phaseIndex+1,6),Math.min(phaseIndex+3,7)).map((ph,j)=>`<div class="list-row static"><span class="status-dot"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="count-badge">${Math.min(phaseIndex+2+j,7)}</span></div>`).join('')}
@@ -382,8 +383,8 @@ function renderStructure(){
     <h2>Map the form.</h2><p class="sub guided">Play through the record. Add a section when the form changes. Pause and rewind freely.</p>
     <div class="section-kicker">Add Section</div><div class="choice-wrap">${SECTION_TYPES.map(x=>`<button class="choice" data-action="add-section" data-name="${x}">${x}</button>`).join('')}</div>
     <div class="inline-add"><input class="field" id="customSection" placeholder="Custom section"><button class="secondary" data-action="add-custom-section">Add</button></div>
-    <div class="section-kicker">Song</div>
-    <div class="sort-list" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div></div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
+    <div class="section-heading"><div class="section-kicker">Song</div>${p.map.sections.length>1?`<button class="text-btn" data-action="toggle-reorder">${ui.reorderMode?'Done':'Reorder'}</button>`:''}</div>
+    <div class="sort-list ${ui.reorderMode?'reorder-mode':''}" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" ${ui.reorderMode?'':`data-action="edit-section"`} data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div>${ui.reorderMode?`<div class="drag-handle" data-drag-handle aria-label="Drag ${esc(labels[i])}">≡</div>`:''}</div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
     <div class="section-kicker">Verify</div>
     <button class="action-card ${p.map.structureVerified?'on':''}" data-action="toggle-structure-verified"><div><strong>Structure verified</strong><span class="copy">Play through once and confirm the order and section boundaries.</span></div><span class="round-check ${p.map.structureVerified?'on':''}" aria-hidden="true"></span></button>
     <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="go" data-route="ingredients">Next</button></div>`;
@@ -545,7 +546,7 @@ function renderRoadmap(){
     app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph,i)=>`<div class="road-phase ${i===0?'active':''}"><div class="road-top"><div class="road-num">${i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join('')}`;return;
   }
   const current=currentStudyPhaseIndex(p);
-  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Seven phases. One record.</h2><p class="sub">Analysis becomes a blueprint, the blueprint becomes a recreation, and the recreation becomes production judgment.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i);return `<div class="road-phase ${st}"><div class="road-top"><div class="road-num">${st==='done'?'✓':i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div>${i<2?`<button class="text-btn" data-action="go" data-route="${i===0?'map':'skeleton'}">Open</button>`:''}</div><div class="road-checks">${ph[2].map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></div>`}).join('')}`;
+  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Seven phases. One record.</h2><p class="sub">Analysis becomes a blueprint, the blueprint becomes a recreation, and the recreation becomes production judgment.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i);return `<div class="road-phase ${st}"><div class="road-top">${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:`<div class="road-num">${i+1}</div>`}<div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div>${i<2?`<button class="text-btn" data-action="go" data-route="${i===0?'map':'skeleton'}">Open</button>`:''}</div><div class="road-checks">${ph[2].map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></div>`}).join('')}`;
 }
 
 function renderNotes(){
@@ -579,7 +580,12 @@ function openSectionSheet(id){
 }
 function openSettings(){
   const p=project();
-  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="section-kicker" style="margin-top:10px">Guidance</div><div class="segmented"><button class="segment ${p.guidance==='minimal'?'selected accent':''}" data-action="set-guidance" data-value="minimal">Minimal</button><button class="segment ${p.guidance!=='minimal'?'selected accent':''}" data-action="set-guidance" data-value="guided">Guided</button><button class="segment" disabled style="opacity:0"></button></div><div class="micro" style="margin-top:8px">Guided adds short listening instructions. The workflow stays the same.</div><div class="section-kicker">Backup</div><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="section-kicker" style="margin-top:10px">Guidance</div><div class="segmented"><button class="segment ${p.guidance==='minimal'?'selected accent':''}" data-action="set-guidance" data-value="minimal">Minimal</button><button class="segment ${p.guidance!=='minimal'?'selected accent':''}" data-action="set-guidance" data-value="guided">Guided</button><button class="segment" disabled style="opacity:0"></button></div><div class="micro" style="margin-top:8px">Guided shows short instruction lines. Minimal hides them; the workflow stays the same.</div><div class="section-kicker">Backup</div><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
+  sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
+}
+function openProjectMenu(id){
+  const p=db.projects.find(x=>x.id===id);if(!p)return;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>${esc(p.title)}</h3>${p.artist?`<div class="micro" style="margin-top:5px">${esc(p.artist)}</div>`:''}<div class="sheet-actions" style="margin-top:18px"><button class="destructive full" data-action="delete-project" data-id="${p.id}">Delete Project</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
   sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
 }
 function closeSheet(){sheetRoot.classList.remove('open');sheetRoot.setAttribute('aria-hidden','true');setTimeout(()=>sheetRoot.innerHTML='',150)}
@@ -661,6 +667,9 @@ app.addEventListener('click',e=>{
   const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,p=project();
   if(action==='go')return go(b.dataset.route);
   if(action==='new-project')return go('new-project');
+  if(action==='project-menu')return openProjectMenu(b.dataset.id);
+  if(action==='toggle-reorder'){ui.reorderMode=!ui.reorderMode;return renderStructure()}
+  if(action==='edit-section')return openSectionSheet(b.dataset.sectionId);
   if(action==='set-new-type'){ui.newType=b.dataset.type;return renderNewProject()}
   if(action==='create-project'){
     const title=clean(document.getElementById('newTitle')?.value)||'Untitled';const np=ui.newType==='study'?makeStudyProject(title,clean(document.getElementById('newArtist')?.value)):makeOriginalProject(title);db.projects.push(np);db.currentProjectId=np.id;save();return go('project');
@@ -668,6 +677,7 @@ app.addEventListener('click',e=>{
   if(action==='open-project'){db.currentProjectId=b.dataset.id;save();return go('project')}
   if(action==='settings')return openSettings();
   if(action==='close-sheet')return closeSheet();
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}
   if(action==='set-guidance'){p.guidance=b.dataset.value;save();closeSheet();return render()}
   if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
@@ -749,6 +759,7 @@ sheetRoot.addEventListener('click',e=>{
   const b=e.target.closest('[data-action]');if(!b)return;
   const action=b.dataset.action,p=project();
   if(action==='close-sheet')return closeSheet();
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}
   if(action==='save-section-name'){
     const s=p.map.sections.find(x=>x.id===b.dataset.id),v=clean(document.getElementById('renameSection')?.value);
     if(s&&v)s.name=v;save();closeSheet();return renderStructure();
@@ -770,47 +781,37 @@ sheetRoot.addEventListener('click',e=>{
 });
 
 function installSorting(){
-  const container=document.getElementById('sortList');if(!container)return;
-  let hold=null,drag=null,startY=0,moved=false,pointerId=null,lastY=0;
-  container.querySelectorAll('.sort-row').forEach(row=>{
-    row.addEventListener('pointerdown',e=>{
-      if(e.button!==undefined&&e.button!==0)return;
-      startY=lastY=e.clientY;moved=false;pointerId=e.pointerId;
-      clearTimeout(hold);hold=setTimeout(()=>begin(row,e),e.pointerType==='mouse'?80:180);
-    });
-    row.addEventListener('pointermove',e=>{
-      lastY=e.clientY;
-      if(Math.abs(e.clientY-startY)>7)moved=true;
-      if(!drag)return;
-      e.preventDefault();
-      const delta=e.clientY-startY;
-      drag.style.transform=`translateY(${delta}px) scale(1.015)`;
-      const edge=95,step=12;
-      if(e.clientY<edge)window.scrollBy(0,-step);
-      else if(e.clientY>window.innerHeight-edge)window.scrollBy(0,step);
-      const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('.sort-row');
-      if(under&&under!==drag&&under.parentElement===container){
-        const rect=under.getBoundingClientRect();
-        if(e.clientY<rect.top+rect.height/2)container.insertBefore(drag,under);else container.insertBefore(drag,under.nextSibling);
-        startY=e.clientY;drag.style.transform='scale(1.015)';
-      }
-    },{passive:false});
-    row.addEventListener('pointerup',()=>{
-      clearTimeout(hold);if(drag){endDrag();return}
-      if(!moved)openSectionSheet(row.dataset.sectionId);
-    });
-    row.addEventListener('pointercancel',()=>{clearTimeout(hold);if(drag)endDrag()});
-  });
-  function begin(row,e){
-    if(drag)return;drag=row;drag.classList.add('dragging');document.body.classList.add('is-sorting');
-    try{drag.setPointerCapture(pointerId)}catch(_){}
-    if(navigator.vibrate)navigator.vibrate(10);
-  }
-  function endDrag(){
-    const p=project();drag.classList.remove('dragging');drag.style.transform='';document.body.classList.remove('is-sorting');
-    const ids=[...container.querySelectorAll('.sort-row')].map(x=>x.dataset.sectionId);
-    p.map.sections=ids.map(id=>p.map.sections.find(s=>s.id===id)).filter(Boolean);
-    reconcileAllPresence(p);save();drag=null;renderStructure();
+  const container=document.getElementById('sortList');
+  if(!container||!ui.reorderMode)return;
+  container.querySelectorAll('[data-drag-handle]').forEach(handle=>handle.addEventListener('pointerdown',startDrag,{passive:false}));
+
+  function startDrag(e){
+    if(e.button!==undefined&&e.button!==0)return;
+    e.preventDefault();
+    const row=e.currentTarget.closest('.sort-row');if(!row)return;
+    const rect=row.getBoundingClientRect(),offsetY=e.clientY-rect.top;
+    const placeholder=document.createElement('div');placeholder.className='sort-placeholder';placeholder.style.height=rect.height+'px';
+    const ghost=row.cloneNode(true);ghost.classList.add('sort-ghost');
+    Object.assign(ghost.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'});
+    row.replaceWith(placeholder);document.body.appendChild(ghost);document.body.classList.add('is-sorting');
+    if(navigator.vibrate)navigator.vibrate(8);
+
+    const move=ev=>{
+      if(ev.pointerId!==e.pointerId)return;ev.preventDefault();
+      ghost.style.top=(ev.clientY-offsetY)+'px';
+      const edge=82,step=10;if(ev.clientY<edge)window.scrollBy(0,-step);else if(ev.clientY>window.innerHeight-edge)window.scrollBy(0,step);
+      const rows=[...container.querySelectorAll('.sort-row')];let inserted=false;
+      for(const candidate of rows){const r=candidate.getBoundingClientRect();if(ev.clientY<r.top+r.height/2){container.insertBefore(placeholder,candidate);inserted=true;break;}}
+      if(!inserted)container.appendChild(placeholder);
+    };
+    const end=ev=>{
+      if(ev.pointerId!==e.pointerId)return;
+      document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',end);document.removeEventListener('pointercancel',end);
+      placeholder.replaceWith(row);ghost.remove();document.body.classList.remove('is-sorting');
+      const p=project(),ids=[...container.querySelectorAll('.sort-row')].map(x=>x.dataset.sectionId);
+      p.map.sections=ids.map(id=>p.map.sections.find(s=>s.id===id)).filter(Boolean);reconcileAllPresence(p);save();renderStructure();
+    };
+    document.addEventListener('pointermove',move,{passive:false});document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
   }
 }
 
