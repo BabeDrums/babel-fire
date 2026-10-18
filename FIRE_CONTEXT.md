@@ -292,6 +292,8 @@ Notes/analysis must stay attached if sections are reordered.
 
 Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
 
+**V4 locked interaction:** Structure is a clean ordered list with one **+ Add section** action. Tapping it opens section type selection; choosing a type immediately asks for bar length **before the section is inserted**. Never create a section with a missing bar length and then force the user to repair it afterward. If the same section type already exists, FIRE may quietly prefill that type's most recently used bar length, but it remains editable before Add.
+
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
 
@@ -377,14 +379,16 @@ Renaming or reordering must not detach data.
 ## Section length / timing
 Every section has a whole-number bar length.
 
-V3 UI snaps to **whole bars** by default. The internal model should remain capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
+V4 UI snaps to **whole bars** by default. The internal model remains capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
 
 Do not add beat-level controls until real use proves they are necessary.
 
 ## Presence ranges
 A track's presence is represented visually by one or more ranges.
 
-Adding a track to a section defaults to full-section presence because that is the common case. The user refines it only when needed.
+**V4 continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
+
+If a track stops, the user uses a single clear **Cut / End** action and chooses the musical boundary. If it stops at the end of a section, the line receives an end cap at that boundary. If it stops earlier, the end cap appears at that bar. A later re-entry creates a new open presence range from the re-entry point forward.
 
 Visual grammar:
 - uninterrupted line = continuous presence
@@ -400,9 +404,19 @@ Presence ranges may cross section boundaries. A Synth that begins in Verse bar 5
 ## Changes
 Changes live on a Track or on Mix.
 
-Use two kinds:
-- **Duration range** — the change has a start and end, e.g. Widens, Doubles, Louder/Softer, Effect shift.
-- **Moment marker** — the meaningful information is a point in time, e.g. Pattern shift, Register shift, Transition cue.
+Use two underlying kinds:
+- **Duration/state range** — e.g. Widens, Narrows, Doubles, Louder/Softer, Effect shift.
+- **Moment marker** — e.g. Pattern shift, Register shift, Transition cue.
+
+Do **not** make the user choose “Duration” vs “Moment” as the first interaction. That is implementation language. The Add Change flow should first ask **What changed?** and progressively disclose semantic families such as:
+- **Space** — Widens / Narrows
+- **Level** — Louder / Softer
+- **Performance** — Doubles / Pattern shift / Register shift
+- **Sound** — Effect shift
+- **Cue** — Transition cue
+- **Other…** — only here may FIRE ask whether a custom change lasts or happens once
+
+Known duration/state changes begin at a musical position and, like presence, may remain open-ended until explicitly ended or superseded. If another range in the same underlying property begins later (for example `Widens` followed by `Narrows`), the earlier state should end automatically at the new state's start. Different properties may overlap. A track-level open state naturally cannot outlive the track presence that contains it.
 
 A duration range may cross section boundaries exactly like presence.
 
@@ -414,15 +428,28 @@ Entering and leaving are **derived from presence edges**. Do not create separate
 The data may be detailed; the default screen must not look detailed.
 
 Collapsed timeline row:
-- Track name
-- one thin presence visualization
-- a concise timing summary or tiny change count
+- **Track name only** — no `1 change`, `Starts bar 3`, `Full section`, or other redundant subtext
+- one clean neutral presence rail
+- duration changes reflected as restrained colored segments
+- moment changes reflected as small colored markers
 
-Only one Track expands at a time. Expanded state reveals its change lanes and contextual actions. Do not show every change lane for every Track simultaneously.
+The visualization should carry the timing information instead of repeating it as text. Color may distinguish semantic change families, but shape must also carry meaning so the system never relies on color alone.
+
+Only one Track expands at a time. Expanded state reveals labeled change lanes and contextual actions such as **+ Change** and **Cut**. Collapsing the Track must keep all meaningful duration/marker information visible on the compact rail. Do not show every detailed change lane for every Track simultaneously.
 
 Tap/drag should be the natural interaction, but important editing must also have a tap-based sheet alternative. Drag may never be the only way to set timing precisely.
 
-A Mix row may provide section-wide changes, but keep it visually quiet.
+A Mix row may provide section-wide changes, but keep it visually quiet. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
+
+## V4 visual language
+FIRE itself is no longer themed around Smithereens. The product chrome should use a neutral, premium graphite/near-black palette with crisp light type and restrained borders. Smithereens is a project inside FIRE, not FIRE's brand identity.
+
+Reserve color primarily for musical information and interaction state. Current semantic change families may use restrained distinct hues (for example Space, Level, Performance, Sound, Cue) while presence stays neutral. Avoid rainbow clutter, gradients, foggy glass, or decorative effects that reduce precision.
+
+The governing UI principle is:
+> **FIRE assumes the music keeps doing what it was doing. You only tell it when something changes.**
+
+This should make V4 visibly simpler than V3 even though the underlying engine is smarter.
 
 ## Section-to-section motion
 Section Study is one continuous musical model under a focused viewport.
