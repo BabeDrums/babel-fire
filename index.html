@@ -343,7 +343,6 @@ function render(){
     case 'roadmap':return renderRoadmap();
     case 'notes':return renderNotes();
     case 'map':return renderMapHome();
-    case 'map-setup':return renderMapSetup();
     case 'structure':return renderStructure();
     case 'ingredients':return renderIngredients();
     case 'section-study':return renderSectionStudy();
@@ -420,28 +419,9 @@ function renderMapHome(){
   const ingredientsUnlocked=structureDone(p)||ingredientsDone(p)||sectionStudyDone(p);
   const studyUnlocked=(structureDone(p)&&ingredientsDone(p))||sectionStudyDone(p);
   const studyRoute=sectionStudyDone(p)?'map-summary':'section-study';
-  const setupSummary=[
-    clean(m.setup.tempo)?`${esc(m.setup.tempo)} BPM`:'Tempo not set',
-    esc(m.setup.meter||'4/4'),
-    m.setup.grid?'Grid aligned':'Grid not aligned',
-    m.setup.firstListen?'First listen complete':'First listen remaining'
-  ].join(' · ');
-  const setup=`
-    <div class="section-kicker">Setup</div>
-    <div class="group-card list">
-      ${checkpointRow('Setup',setupSummary,'map-setup',setupDone,true)}
-    </div>`;
-  const checkpoints=`
-      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
-      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
-      ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
-  app.innerHTML=phaseHome(0,done,3,checkpoints,setup,'');
-}
 
-function renderMapSetup(){
-  const p=project(),m=p.map,done=mapSetupComplete(p);
-  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
-    <div class="section-kicker" style="margin-top:4px">Setup</div>
+  const setup=`
+    <div class="section-kicker">Song Setup</div>
     <div class="group-card setup-panel">
       <div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference?'on':''}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference?'Imported':'Import'}</span><span class="check-circle"></span></button></div>
       <div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div>
@@ -449,14 +429,14 @@ function renderMapSetup(){
       <div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid?'on':''}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid?'Aligned':'Align'}</span><span class="check-circle"></span></button></div>
     </div>
     <div class="spacer-18"></div>
-    ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}
-    ${!done?`<div class="gate-note">${[
-      !m.setup.reference?'Reference':'',
-      !clean(m.setup.tempo)?'Tempo':'',
-      !m.setup.meter?'Meter':'',
-      !m.setup.grid?'Grid':'',
-      !m.setup.firstListen?'First Listen':''
-    ].filter(Boolean).join(' · ')} remaining</div>`:''}`;
+    ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}`;
+
+  const checkpoints=`
+      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
+      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
+      ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
+
+  app.innerHTML=phaseHome(0,done,3,checkpoints,setup,'');
 }
 
 function checkpointRow(title,desc,route,done,unlocked=true){
@@ -585,7 +565,7 @@ function sectionMissingItems(p,index){
 }
 function mapOpenItems(p){
   const items=[],labels=sectionLabels(p);
-  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map-setup',target:'first-listen'});
+  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'first-listen'});
   if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
   else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
   if(!ingredientsDone(p))items.push({label:'Tracks · Add at least one track',route:'ingredients'});
@@ -776,7 +756,7 @@ app.addEventListener('click',e=>{
   if(action==='close-sheet')return closeSheet();
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
-  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return ui.route==='map-setup'?renderMapSetup():renderMapHome()}
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
   if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
   if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}

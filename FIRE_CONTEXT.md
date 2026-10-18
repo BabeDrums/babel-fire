@@ -261,7 +261,7 @@ Song Setup includes:
 - Grid
 - First Listen action state
 
-**LOCKED home-screen behavior:** Song Setup appears **above Checkpoints as one normal Setup row**, visually consistent with checkpoint rows. The row summarizes the current setup state and opens a dedicated Setup screen for Reference, Tempo, Meter, Grid, and First Listen. Do not use an expandable/collapsible panel or a multi-pill preflight strip on the phase home.
+**LOCKED home-screen behavior:** The Map is an intentional exception to the otherwise minimal phase-home template because it has genuine setup work that must happen before analysis. Keep the full **Song Setup** controls directly on The Map home: Reference, Tempo, Meter, Grid, followed by the First Listen action card. Then show Checkpoints below. Do not hide setup behind a separate page, disclosure, compact row, or pill strip.
 
 ### Structure
 Instruction style:
@@ -665,7 +665,7 @@ The Map home should show:
 - Section Study
 - optional compact phase-specific utility/preflight content **above** Checkpoints (The Map uses Setup)
 
-For The Map, Setup is one compact row above Checkpoints. Tapping it opens a dedicated Setup screen. Setup must be complete before Structure unlocks.
+For The Map, the full setup controls live directly above Checkpoints because setup is part of starting The Map. Setup must be complete before Structure unlocks. Other phases such as The Skeleton do not need to imitate this because they do not have an equivalent setup stage.
 
 Checkpoint progress belongs visually to the **Checkpoints** section: show `X of Y` beside the Checkpoints label and the thin progress bar directly beneath it. Do not show a redundant percentage on phase homes.
 
