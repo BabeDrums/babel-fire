@@ -623,7 +623,7 @@ Example normal state:
 or
 **The Skeleton**
 
-Tap it → compact phase navigation sheet titled **Recreation**.
+Tap it → compact phase navigation sheet titled **Roadmap**.
 
 It should make it easy to:
 - see Roadmap
@@ -660,7 +660,7 @@ Use contextual hierarchy labels instead of a generic `Back` whenever the parent 
 - phase homes / Recreation-level screens → `‹ Recreation`
 - project overview → `‹ Projects`
 
-The tappable phase pill remains available throughout Recreation. Its phase sheet must show the current project (for example `Smithereens`) at the top as a direct shortcut back to the Recreation overview, followed by the seven phases.
+The tappable phase pill remains available throughout Recreation. Its **Roadmap** sheet must show the current project (for example `Smithereens`) at the top as a direct shortcut back to the Recreation overview, followed by the seven phases. The project shortcut should be labeled as `Project overview` rather than repeating artist metadata.
 
 Button semantics are strict:
 - **Back** / contextual header navigation = move backward in hierarchy

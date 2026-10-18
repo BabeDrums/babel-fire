@@ -646,7 +646,7 @@ function openSettings(){
 }
 function openPhaseNavigator(index){
   const p=project();if(!p||p.type!=='study')return;
-  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Recreation</h3><button class="phase-nav-project" data-action="open-project-overview"><div><strong>${esc(p.title)}</strong><span class="copy">${esc(p.artist||'Project overview')}</span></div><span class="phase-nav-arrow">›</span></button><div class="phase-nav-list">${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i);return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked?'':'disabled'}>${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked?'›':''}</span></button>`}).join('')}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Roadmap</h3><button class="phase-nav-project" data-action="open-project-overview"><div><strong>${esc(p.title)}</strong><span class="copy">Project overview</span></div><span class="phase-nav-arrow">›</span></button><div class="phase-nav-list">${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i);return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked?'':'disabled'}>${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked?'›':''}</span></button>`}).join('')}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
   sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
 }
 function openProjectMenu(id){
@@ -744,7 +744,6 @@ app.addEventListener('click',e=>{
   if(action==='phase-nav')return openPhaseNavigator(Number(b.dataset.phaseIndex));
   if(action==='go-review-map')return go('map-summary');
   if(action==='close-sheet')return closeSheet();
-  if(action==='open-project-overview'){closeSheet();return go('project');}
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
   if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
@@ -820,6 +819,7 @@ sheetRoot.addEventListener('click',e=>{
   const b=e.target.closest('[data-action]');if(!b)return;
   const action=b.dataset.action,p=project();
   if(action==='close-sheet')return closeSheet();
+  if(action==='open-project-overview'){closeSheet();return go('project');}
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
   if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}
