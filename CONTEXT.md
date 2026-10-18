@@ -375,14 +375,14 @@ Renaming or reordering must not detach data.
 ## Section length / timing
 Every section has a whole-number bar length.
 
-V4 UI snaps to **whole bars** by default. The internal model remains capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
+The current timeline UI snaps to **whole bars** by default. The internal model remains capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
 
 Do not add beat-level controls until real use proves they are necessary.
 
 ## Presence ranges
 A track's presence is represented visually by one or more ranges.
 
-**V4 continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
+**Open-ended presence / continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
 
 In V5, selecting the generous presence/row target reveals neutral start/end handles directly on the current timeline viewport, including edges of continuing ranges. Whole-bar dragging trims or extends presence. Compact inline timing steppers provide a tap-based alternative. Continue restores an open end. There is no dedicated Cut button or cut-bar modal. Contextual Split exposes an inline gap editor; a later re-entry remains open by default.
 
@@ -431,7 +431,7 @@ Tap/drag is the primary interaction. Inline tap-based timing controls provide pr
 
 A Mix row may provide section-wide changes, but keep it visually quiet. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
 
-## V4 visual language
+## Current FIRE / timeline visual language
 FIRE itself is no longer themed around Smithereens. The product chrome should use a neutral, premium graphite/near-black palette with crisp light type and restrained borders. Smithereens is a project inside FIRE, not FIRE's brand identity.
 
 Reserve color primarily for musical information and interaction state. Current semantic change families may use restrained distinct hues (for example Space, Level, Performance, Sound, Cue) while presence stays neutral. Avoid rainbow clutter, gradients, foggy glass, or decorative effects that reduce precision.
@@ -439,7 +439,7 @@ Reserve color primarily for musical information and interaction state. Current s
 The governing UI principle is:
 > **FIRE assumes the music keeps doing what it was doing. You only tell it when something changes.**
 
-This should make V4 visibly simpler than V3 even though the underlying engine is smarter.
+The default interface should stay visually simple even when the underlying timeline model is detailed.
 
 ## Section-to-section motion
 Section Study is one continuous musical model under a focused viewport.
@@ -854,7 +854,7 @@ The Session checkpoint creates DAW elements one-by-one.
 
 The user wants the UI to feel native/intentional, not like a web form.
 
-For the V3 timeline specifically, keep the implementation **crisp rather than foggy/frosted**:
+For the current timeline, keep the implementation **crisp rather than foggy/frosted**:
 - solid dark surfaces
 - sharp readable contrast
 - thin precise timeline/grid lines
@@ -914,7 +914,7 @@ Do not reintroduce:
 
 # 23. Current refactor direction / code architecture
 
-FIRE is now on the **V3 timeline architecture**.
+FIRE retains the **continuous timeline architecture originally introduced in V3**, while **V5 is the active interaction generation**.
 
 FIRE uses three plain static files: `index.html` is the document shell, `styles.css` owns visual styles, and `app.js` owns the application. Deploy all three together from the GitHub Pages root. There is no framework, package installation, bundler, or backend. Within the application, keep concerns separated:
 - schema/migration
@@ -936,7 +936,7 @@ Important engineering rules:
 - centralize destructive/mutation logic; do not keep duplicate remove/update paths that clean different dependent state
 - avoid keeping both the old Parts/Changes editor and the new timeline editor for the same truth
 
-## V3 migration
+## Legacy data migration
 Old data should migrate rather than reset:
 - old global ingredient names → stable Track objects/IDs
 - old active Parts → Presence ranges

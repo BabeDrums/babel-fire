@@ -52,6 +52,7 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Task-specific implementation details, validation results, and review findings belong in the PR/completion report.
 - `START_HERE.md` is a short entry point, not a second context document. Keep its active-specification reference current.
 - `CHANGELOG.md` records meaningful product milestones, not every technical commit. Do not fabricate unverifiable history; Git contains detailed technical history.
+- Changelog milestone text describes the product milestone itself; avoid temporary PR-state wording that automatically becomes false on merge. Determine shipped/unmerged state from `main` and open PRs.
 - Avoid duplicating large bodies of information across files. Remove obsolete filenames and contradictory guidance rather than retaining duplicate context/specification files.
 
 ## Verification and definition of done

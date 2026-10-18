@@ -1,8 +1,8 @@
 # Babel FIRE changelog
 
-Meaningful product milestones only; Git history records detailed technical changes. Unreleased work is not evidence of deployment.
+Meaningful product milestones only; Git history records detailed technical changes. Determine shipped/unmerged state from `main` and open pull requests.
 
-## V5 — Unreleased
+## V5
 
 - One cohesive section builder with section/name and bar-length selection before insertion.
 - Direct presence/change editing with whole-bar handles, tap-based timing controls, large selectors, and contextual gap editing.
@@ -12,4 +12,4 @@ Meaningful product milestones only; Git history records detailed technical chang
 - Plain static HTML/CSS/JavaScript separation, plus browser regressions for migration, touch interaction, history, and responsive layouts.
 - Repository continuity entry point, source-of-truth hierarchy, and task-branch/PR review workflow.
 
-V5 is prepared for review, not released. Automated Chromium/browser tests at iPhone and iPad viewport widths do not establish physical iOS Safari verification; that testing remains unverified.
+Automated Chromium/browser tests at iPhone and iPad viewport widths do not establish physical iOS Safari verification; that testing remains unverified.
