@@ -391,12 +391,11 @@ function renderStructure(){
 }
 
 function renderIngredients(){
-  const p=project(),parts=p.map.ingredients;
+  const p=project(),parts=p.map.ingredients,customParts=parts.filter(x=>!COMMON_PARTS.includes(x)),trackChoices=[...COMMON_PARTS,...customParts];
   app.innerHTML=topbar(backButton('map'),phaseTag('Ingredients'),savedMark())+`
     <h2>Map what plays.</h2><p class="sub guided">Replay freely. Identify the main parts across the whole song. You do not need to solve every mystery yet.</p>
-    <div class="section-kicker">Tracks</div><div class="choice-wrap">${COMMON_PARTS.map(x=>`<button class="choice ${parts.includes(x)?'selected':''}" data-action="toggle-ingredient" data-name="${x}">${x}</button>`).join('')}</div>
-    <div class="inline-add"><input class="field" id="customPart" placeholder="Other track or sound"><button class="secondary" data-action="add-custom-part">Add</button></div>
-    ${parts.filter(x=>!COMMON_PARTS.includes(x)).length?`<div class="spacer-12"></div><div class="chip-list">${parts.filter(x=>!COMMON_PARTS.includes(x)).map(x=>removableChip(x,'remove-custom-part')).join('')}</div>`:''}
+    <div class="section-kicker">Tracks</div><div class="choice-wrap">${trackChoices.map(x=>`<button class="choice ${parts.includes(x)?'selected':''}" data-action="toggle-ingredient" data-name="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+    <div class="inline-add"><input class="field" id="customPart" placeholder="Other..."><button class="secondary" data-action="add-custom-part">Add</button></div>
     <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="start-section-study">Next</button></div>`;
 }
 function removableChip(text,action){return `<span class="chip choice-chip"><span>${esc(text)}</span><button class="x" data-action="${action}" data-name="${esc(text)}">×</button></span>`}
@@ -443,8 +442,14 @@ function renderChangesBlock(p,i,t){
   </div>`;
 }
 function actionsFor(target){
+  const p=project(),known=availableParts(p).includes(target);
   if(target==='Mix')return ['Widens','Narrows','Louder','Softer','Thins out','Fills out','Effect shift'];
   if(target==='Texture'||target==='Ambience')return ['Enters','Leaves','Widens','Narrows','Louder','Softer','Effect shift'];
+  if(known){
+    const a=ensureAnalysis(p,ui.sectionIndex),active=!!a?.parts?.includes(target);
+    if(!active)return ['Enters'];
+    return ['Leaves','Doubles','Louder','Softer','Register shift','Pattern shift','Effect shift','Widens','Narrows'];
+  }
   return ['Enters','Leaves','Doubles','Louder','Softer','Register shift','Pattern shift','Effect shift','Widens','Narrows'];
 }
 function renderChangeActions(target){return `<div class="spacer-12"></div><div class="choice-wrap">${actionsFor(target).map(x=>`<button class="choice" data-action="add-change" data-value="${x}">${x}</button>`).join('')}</div><div class="inline-add"><input class="field" id="customAction" placeholder="Other change"><button class="secondary" data-action="add-custom-change">Add</button></div>`}
