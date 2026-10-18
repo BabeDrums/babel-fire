@@ -72,10 +72,14 @@ FIRE is one app with two project modes:
 The main long-term product.
 Goal: start with anything → finish a record.
 
-### Reference Study — SECONDARY / LEARNING MODE
+### Recreation — SECONDARY / LEARNING MODE
 Take an existing record apart, reconstruct it, and learn production decisions by doing.
 
-**Smithereens by Twenty One Pilots is the first preloaded Reference Study.**
+**Smithereens by Twenty One Pilots is the first preloaded Recreation.**
+
+
+### Internal data compatibility
+The public project-type name is **Recreation**. Existing stored projects may continue to use the internal type/key `study` for backward compatibility; do not migrate or break saved projects just to rename the UI.
 
 The Smithereens reconstruction started as a way to apply production lessons in practice. The app must not become a procrastination substitute for making music.
 
@@ -141,8 +145,8 @@ FIRE should emphasize structured listening, diagnosis, intentional experimentati
 
 # 4. Long-term app architecture
 
-## Reference Study — 7 phases
-These phase names are currently the core Reference Study framework:
+## Recreation — 7 phases
+These phase names are currently the core Recreation framework:
 
 1. **The Map** — understand the reference
 2. **The Skeleton** — build the complete rough song
@@ -154,7 +158,7 @@ These phase names are currently the core Reference Study framework:
 
 Historically this was designed as 3 checkpoints per phase / 21 checkpoints total.
 
-### Goal of a Reference Study
+### Goal of a Recreation
 The target is a **complete finished reconstruction** taken as far as the user’s current ability allows.
 
 Success does **not** require being indistinguishable from the commercial master.
@@ -192,10 +196,10 @@ Current conceptual workflow:
 7. **The Finish**
    - reference, revise, final mix/master/commit
 
-Original projects should be **more flexible** than Reference Study.
+Original projects should be **more flexible** than Recreation.
 
 Important distinction:
-- **Reference Study:** sequential forward, flexible backward
+- **Recreation:** sequential forward, flexible backward
 - **Original Song:** progress should guide, not police creativity
 
 Do not impose strict gating on Original mode just because Study mode uses it.
@@ -227,7 +231,7 @@ The app should never become bureaucracy.
 
 ---
 
-# 7. Reference Study — The Map (most developed phase)
+# 7. Recreation — The Map (most developed phase)
 
 The Map should answer:
 > What is this record doing before we try to recreate how it was made?
@@ -306,7 +310,7 @@ Meaning:
 
 It is different from the final Map Verified action.
 
-### Tracks / Ingredients
+### Tracks
 The separate **Unidentified** area has been removed.
 
 Use a single section called:
@@ -423,7 +427,7 @@ Use **Mix**, not “Whole mix.”
 
 # 10. “Not sure” policy — LOCKED
 
-The user explicitly decided that Reference Study should not use **Not sure** as a completed answer.
+The user explicitly decided that Recreation should not use **Not sure** as a completed answer.
 
 Remove / do not reintroduce:
 - `Not sure` in Changes
@@ -520,7 +524,7 @@ The app can later surface learned principles in Original Song mode.
 
 # 14. Map completion / gating
 
-Reference Study is now intentionally stricter.
+Recreation is intentionally stricter.
 
 ## Core rule
 **Forward progress is gated. Backward movement is always allowed.**
@@ -577,6 +581,9 @@ Use same action-card visual language as First Listen / Structure Verified.
 
 # 15. Map Summary
 
+
+**LOCKED status behavior:** Do not show a separate yellow/open-items status panel at the bottom of Map Review. The unchecked Verify cards and disabled `Continue to The Skeleton` button are sufficient. Avoid repeating incomplete-state information.
+
 Map Summary remains part of The Map, not a separate phase.
 
 It should show:
@@ -616,7 +623,7 @@ Example normal state:
 or
 **The Skeleton**
 
-Tap it → compact phase navigation sheet.
+Tap it → compact phase navigation sheet titled **Recreation**.
 
 It should make it easy to:
 - see Roadmap
@@ -627,6 +634,9 @@ It should make it easy to:
 - move forward only if unlocked
 
 The user floated `< The Map >`; current preferred interpretation is a tappable phase pill that opens navigation rather than permanent arrows.
+
+
+The phase sheet itself is the compact phase navigator; do not add a redundant Roadmap button inside that sheet. The full Roadmap remains available from the project dashboard.
 
 Important:
 Summary is **inside a phase**, not a peer navigation destination.
@@ -661,7 +671,7 @@ Do not put full forms, large action cards, long instructional copy, or expanded 
 The Map home should show:
 - progress
 - Structure
-- Ingredients
+- Tracks
 - Section Study
 - optional compact phase-specific utility/preflight content **above** Checkpoints (The Map uses Setup)
 
@@ -737,11 +747,11 @@ Detailed sound matching belongs in The Sounds.
 
 Main app should open to the **Projects** screen.
 
-Smithereens is preloaded as a project/template on fresh install.
+Smithereens is preloaded as a Recreation on fresh install.
 
 User can create:
 - Original Song
-- Reference Study
+- Recreation
 
 There should be only **one** clean new-project affordance (e.g. top-right `+`).
 
@@ -751,7 +761,7 @@ Project menu should support:
 - Delete Project
 - with deliberate confirmation
 
-Reference Study overview order:
+Recreation overview order:
 1. Current Phase
 2. Next
 3. Project
@@ -776,6 +786,17 @@ Use the same visual family for:
 - future phase completion states
 
 No random second checkmark style.
+
+---
+
+
+## UI copy rule — LOCKED
+FIRE copy should be concise and action-oriented:
+- Page titles should be short and normally omit terminal periods.
+- Subtext should be one short sentence only when it adds necessary context.
+- Prefer concrete verbs: `Map the form`, `Identify the tracks`, `Build the backbone`, `Review the map`.
+- Avoid repeating information already communicated by disabled states, checkmarks, progress bars, or section labels.
+- Consistency means shared typography, spacing, cards, navigation, and completion language — not forcing every phase to contain the same content.
 
 ---
 
@@ -990,7 +1011,7 @@ The normal Chat GitHub connection is not a reliable direct push workflow, so man
 
 # 29. Smithereens / collaboration specifics
 
-Smithereens by Twenty One Pilots is the first Reference Study.
+Smithereens by Twenty One Pilots is the first Recreation.
 
 The original Driver/Detective and later Lead/Six roles were deliberately removed.
 
