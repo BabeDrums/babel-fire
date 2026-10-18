@@ -50,6 +50,18 @@ p{margin:0}.sub{color:var(--muted);font-size:15px;line-height:1.45}.micro{color:
 .divider{height:1px;background:var(--line);margin:24px 0}
 .progress{height:4px;background:#242a23;border-radius:999px;overflow:hidden;margin:20px 0 5px}.progress>span{display:block;height:100%;width:0;background:var(--accent);border-radius:inherit;transition:width .24s ease}
 .progress-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}
+.checkpoint-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 2px 9px}
+.checkpoint-head .section-kicker{margin:0}.checkpoint-count{font-size:12px;color:var(--muted)}
+.checkpoint-progress{margin:0 0 12px}
+.preflight{display:flex;gap:8px;overflow-x:auto;padding:1px 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.preflight::-webkit-scrollbar{display:none}
+.preflight-item{flex:0 0 auto;min-height:44px;border:1px solid var(--line);background:rgba(255,255,255,.026);border-radius:999px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;color:#d0d4cb;font-size:13px}
+button.preflight-item{cursor:pointer}.preflight-item.done{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}
+.preflight-item .mini-check{font-size:12px;font-weight:900;color:var(--accent)}
+.preflight-input{width:38px;min-width:38px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;text-align:right;padding:0}
+.preflight-input::placeholder{color:var(--quiet)}
+.preflight-select{border:0;outline:0;background:transparent;color:var(--text);font:inherit;padding:0 2px 0 0;appearance:auto}
+
 .card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:var(--radius)}
 .card-pad{padding:17px}
 .hero-card{padding:20px;border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.022));border:1px solid var(--line)}
@@ -339,7 +351,6 @@ function render(){
     case 'roadmap':return renderRoadmap();
     case 'notes':return renderNotes();
     case 'map':return renderMapHome();
-    case 'map-setup':return renderMapSetup();
     case 'structure':return renderStructure();
     case 'ingredients':return renderIngredients();
     case 'section-study':return renderSectionStudy();
@@ -420,34 +431,27 @@ function renderMapHome(){
       ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
       ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
       ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
-  const setupBits=[clean(m.setup.tempo)?`${esc(m.setup.tempo)} BPM`:'Tempo not set',m.setup.meter||'Meter not set',m.setup.grid?'Grid aligned':'Grid not aligned'];
-  const setupRow=`<div class="phase-utility"><button class="list-row" data-action="go" data-route="map-setup">${mapSetupComplete(p)?`<span class="round-check on" aria-hidden="true"></span>`:`<span class="status-dot"></span>`}<div><div class="title">Setup</div><div class="desc">${setupBits.join(' · ')}</div></div><span class="chev">›</span></button></div>`;
-  app.innerHTML=phaseHome(0,done,3,checkpoints,setupRow,'');
-}
-function renderMapSetup(){
-  const p=project(),m=p.map;
-  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
-    <h2>Song setup.</h2>
-    <div class="group-card setup-panel">
-      ${setupToggle('Reference','Imported','reference',m.setup.reference)}
-      <div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div>
-      <div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
-      ${setupToggle('Grid','Aligned','grid',m.setup.grid)}
-    </div>
-    <div class="section-kicker">Listen</div>
-    ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}`;
-}
-function setupToggle(label,state,field,on){return `<div class="setup-row"><div class="setup-label">${label}</div><button class="state-control ${on?'on':''}" data-action="toggle-setup" data-field="${field}"><span>${state}</span><span class="check-circle"></span></button></div>`}
-function checkpointRow(title,desc,route,done,unlocked=true){
-  return `<button class="list-row checkpoint-row" data-action="go" data-route="${route}" ${unlocked?'':'disabled'}>${done?`<span class="round-check on" aria-hidden="true"></span>`:unlocked?`<span class="status-dot"></span>`:`<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked?'›':''}</span></button>`;
+  const setup=`
+    <div class="section-kicker">Setup</div>
+    <div class="preflight" id="setup-preflight" aria-label="Song setup">
+      <button class="preflight-item ${m.setup.reference?'done':''}" data-action="toggle-setup" data-field="reference">Reference${m.setup.reference?'<span class="mini-check">✓</span>':''}</button>
+      <label class="preflight-item"><input class="preflight-input" id="tempoQuick" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span>BPM</span></label>
+      <label class="preflight-item"><select class="preflight-select" id="meterQuick">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></label>
+      <button class="preflight-item ${m.setup.grid?'done':''}" data-action="toggle-setup" data-field="grid">Grid${m.setup.grid?'<span class="mini-check">✓</span>':''}</button>
+      <button class="preflight-item ${m.setup.firstListen?'done':''}" data-action="toggle-setup" data-field="firstListen">First Listen${m.setup.firstListen?'<span class="mini-check">✓</span>':''}</button>
+    </div>`;
+  app.innerHTML=phaseHome(0,done,3,checkpoints,setup,'');
 }
 function actionCard(title,copy,on,action,id='',disabled=false,attrs=''){
   return `<button class="action-card ${on?'on':''}" ${id?`id="${id}"`:''} data-action="${action}" ${attrs} ${disabled?'disabled':''}><div><strong>${esc(title)}</strong>${copy?`<span class="copy">${esc(copy)}</span>`:''}</div><span class="round-check ${on?'on':''}" aria-hidden="true"></span></button>`;
 }
 function phaseHome(index,done,total,checkpointsHtml,beforeHtml='',afterHtml=''){
+  const pct=total?Math.round(done/total*100):0;
   return topbar(backButton('project'),phasePill(index),savedMark())+
-    progressBar(done,total)+beforeHtml+
-    `<div class="section-kicker">Checkpoints</div><div class="group-card list">${checkpointsHtml}</div>`+
+    beforeHtml+
+    `<div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div>`+
+    `<div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div>`+
+    `<div class="group-card list">${checkpointsHtml}</div>`+
     afterHtml;
 }
 
@@ -560,7 +564,7 @@ function sectionMissingItems(p,index){
 }
 function mapOpenItems(p){
   const items=[],labels=sectionLabels(p);
-  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map-setup',target:'first-listen'});
+  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'setup-preflight'});
   if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
   else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
   if(!ingredientsDone(p))items.push({label:'Tracks · Add at least one track',route:'ingredients'});
@@ -751,7 +755,7 @@ app.addEventListener('click',e=>{
   if(action==='close-sheet')return closeSheet();
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
-  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return ui.route==='map-setup'?renderMapSetup():renderMapHome()}
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
   if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
   if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}
@@ -808,7 +812,7 @@ app.addEventListener('click',e=>{
 
 app.addEventListener('input',e=>{
   const p=project();
-  if(e.target.id==='tempoInput'){p.map.setup.tempo=e.target.value.replace(/[^0-9.]/g,'');save()}
+  if(e.target.id==='tempoInput'||e.target.id==='tempoQuick'){p.map.setup.tempo=e.target.value.replace(/[^0-9.]/g,'');save()}
   if(e.target.dataset.input==='phase-parking'){p.map.phaseParking=e.target.value;save()}
   if(e.target.dataset.input==='phase-takeaway'){p.map.phaseTakeaway=e.target.value;save()}
   if(e.target.dataset.input==='section-parking'){ensureAnalysis(p,ui.sectionIndex).parking=e.target.value;save()}
@@ -816,7 +820,7 @@ app.addEventListener('input',e=>{
   if(e.target.dataset.input==='spark-idea'){p.spark.idea=e.target.value;save()}
   if(e.target.dataset.input==='spark-anchor'){p.spark.anchor=e.target.value;save()}
 });
-app.addEventListener('change',e=>{if(e.target.id==='meterInput'){project().map.setup.meter=e.target.value;save()}});
+app.addEventListener('change',e=>{if(e.target.id==='meterInput'||e.target.id==='meterQuick'){project().map.setup.meter=e.target.value;save()}});
 app.addEventListener('keydown',e=>{
   if(e.key!=='Enter'||e.shiftKey)return;
   if(e.target.id==='customSection'){e.preventDefault();document.querySelector('[data-action="add-custom-section"]')?.click()}
