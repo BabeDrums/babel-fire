@@ -27,7 +27,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{margin:0;min-height:100vh;background:radial-gradient(circle at 88% -8%,rgba(124,136,104,.16),transparent 31%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;font-size:17px}
-body.is-sorting{user-select:none;-webkit-user-select:none;overflow:hidden}
+body.is-sorting{user-select:none;-webkit-user-select:none}
 button,input,textarea,select{font:inherit}
 button{appearance:none;-webkit-appearance:none;border:0;color:inherit;background:none}
 input,textarea,select{color:var(--text)}
@@ -44,8 +44,7 @@ button:active{transform:scale(.985)}
 h1{font-size:40px;line-height:1.02;letter-spacing:-.038em;margin:10px 0 8px;font-weight:790}
 h2{font-size:30px;line-height:1.06;letter-spacing:-.028em;margin:6px 0 8px;font-weight:760}
 h3{font-size:18px;line-height:1.2;margin:0;font-weight:720}
-p{margin:0}.sub{color:var(--muted);font-size:15px;line-height:1.45}.micro{color:var(--quiet);font-size:12px;line-height:1.4}.guided{display:block}
-body.minimal .guided{display:none!important}
+p{margin:0}.sub{color:var(--muted);font-size:15px;line-height:1.45}.micro{color:var(--quiet);font-size:12px;line-height:1.4}
 .spacer-8{height:8px}.spacer-12{height:12px}.spacer-18{height:18px}.spacer-24{height:24px}.spacer-32{height:32px}
 .section-kicker{margin:30px 2px 11px;font-size:12px;font-weight:760;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .divider{height:1px;background:var(--line);margin:24px 0}
@@ -71,13 +70,12 @@ body.minimal .guided{display:none!important}
 .inline-add{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:12px}.field{width:100%;min-height:48px;border:1px solid var(--line);outline:0;border-radius:14px;background:rgba(255,255,255,.035);padding:0 14px;color:var(--text)}.field::placeholder,.textarea::placeholder{color:#646b61}.inline-add .secondary{min-height:48px}
 .textarea{width:100%;min-height:96px;border:1px solid var(--line);outline:0;border-radius:15px;background:rgba(255,255,255,.035);padding:13px 14px;resize:vertical;line-height:1.45;color:var(--text)}
 .chip-list{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:13px;color:#dce0d7}.chip.choice-chip{min-height:44px;padding:0 14px;font-size:15px}.chip.accent{background:var(--accent-soft);border-color:rgba(228,216,75,.28);color:var(--accent-text)}.chip .x{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:16px}
-.sort-list{display:grid;gap:9px}.sort-row{min-height:66px;padding:0 14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:10px;cursor:pointer}.sort-row .index{font-size:12px;color:var(--muted);text-align:center}.sort-row .name{font-size:16px}.sort-list.reorder-mode .sort-row{cursor:default}.drag-handle{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--muted);font-size:21px;line-height:1;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.drag-handle:active{background:rgba(255,255,255,.055);color:var(--text);cursor:grabbing}.sort-placeholder{min-height:66px;border-radius:17px;border:1px dashed rgba(228,216,75,.28);background:rgba(228,216,75,.035)}.sort-ghost{position:fixed!important;z-index:9999!important;margin:0!important;pointer-events:none!important;background:var(--surface-3)!important;border-color:rgba(228,216,75,.35)!important;box-shadow:var(--shadow)!important;transform:scale(1.015)}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:30px}.section-heading .section-kicker{margin:0}.section-heading .text-btn{min-height:36px}.top-icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:28px;font-weight:300;color:var(--text);cursor:pointer}.top-icon-btn:active{background:rgba(255,255,255,.05)}
+.sort-list{display:grid;gap:9px}.sort-row{min-height:66px;padding:0 10px 0 14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:10px;cursor:pointer;touch-action:pan-y;transition:transform .14s ease,background .14s ease,border-color .14s ease}.sort-row .index{font-size:12px;color:var(--muted);text-align:center}.sort-row .name{font-size:16px}.drag-handle{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--muted);font-size:21px;line-height:1;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.drag-handle:active{background:rgba(255,255,255,.055);color:var(--text);cursor:grabbing}.sort-placeholder{min-height:66px;border-radius:17px;border:1px dashed rgba(228,216,75,.28);background:rgba(228,216,75,.035)}.sort-ghost{position:fixed!important;z-index:9999!important;margin:0!important;pointer-events:none!important;background:var(--surface-3)!important;border-color:rgba(228,216,75,.35)!important;box-shadow:var(--shadow)!important;transform:scale(1.015)}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:30px}.section-heading .section-kicker{margin:0}.section-heading .text-btn{min-height:36px}.top-icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:28px;font-weight:300;color:var(--text);cursor:pointer}.top-icon-btn:active{background:rgba(255,255,255,.05)}
 .horizontal-nav{display:flex;gap:7px;overflow-x:auto;padding:2px 0 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.horizontal-nav::-webkit-scrollbar{display:none}.section-tab{white-space:nowrap;min-height:36px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.022);font-size:12px;color:var(--muted);cursor:pointer}.section-tab.current{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}.section-tab.done:before{content:"✓ ";color:var(--accent)}
 .study-block{padding:18px 0 4px;border-top:0;margin-top:10px}.study-block:first-of-type{margin-top:0}.block-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}.block-head strong{font-size:16px}.block-head span{font-size:12px;color:var(--muted)}
-.segment-stack{display:grid;gap:12px}.scale-row{display:grid;grid-template-columns:78px 1fr 38px;gap:10px;align-items:center}.scale-label{font-size:13px;color:#cbd0c6}.segmented{display:grid;grid-template-columns:repeat(3,1fr);min-height:42px;border-radius:13px;padding:3px;background:rgba(255,255,255,.045);border:1px solid var(--line)}.segment{border-radius:10px;font-size:12px;color:var(--muted);cursor:pointer;min-width:0;padding:0 4px}.segment.selected{background:rgba(255,255,255,.09);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,.04)}.segment.selected.accent{background:var(--accent);color:#15160f;font-weight:760}.unsure-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);cursor:pointer}.unsure-btn.selected{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}
-.relation-box{padding:14px;border-radius:17px;background:rgba(255,255,255,.022);border:1px solid var(--line);margin-top:12px}.small-label{font-size:12px;color:var(--muted);margin-bottom:8px}
+.segment-stack{display:grid;gap:12px}.scale-row{display:grid;grid-template-columns:78px 1fr;gap:10px;align-items:center}.scale-label{font-size:13px;color:#cbd0c6}.segmented{display:grid;grid-template-columns:repeat(3,1fr);min-height:42px;border-radius:13px;padding:3px;background:rgba(255,255,255,.045);border:1px solid var(--line)}.segment{border-radius:10px;font-size:12px;color:var(--muted);cursor:pointer;min-width:0;padding:0 4px}.segment.selected{background:rgba(255,255,255,.09);color:var(--text);box-shadow:0 1px 0 rgba(255,255,255,.04)}.segment.selected.accent{background:var(--accent);color:#15160f;font-weight:760}.relation-box{padding:14px;border-radius:17px;background:rgba(255,255,255,.022);border:1px solid var(--line);margin-top:12px}.small-label{font-size:12px;color:var(--muted);margin-bottom:8px}
 details.note-disclosure{border:1px solid var(--line);border-radius:17px;padding:0 14px;margin-top:24px;background:rgba(255,255,255,.024)}details.note-disclosure[open]{padding-bottom:13px}details.note-disclosure summary{list-style:none;cursor:pointer;min-height:58px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:650}details.note-disclosure summary::-webkit-details-marker{display:none}details.note-disclosure summary:after{content:"+";font-size:22px;color:var(--muted);font-weight:350}details.note-disclosure[open] summary:after{content:"–"}.note-grid{display:grid;gap:13px;padding:5px 0 3px}.note-grid label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px}
-.action-row{display:flex;gap:10px;margin-top:24px}.action-row>*{flex:1}.finish-note{text-align:center;color:var(--muted);font-size:12px;margin-top:9px;line-height:1.4}
+.action-row{display:flex;gap:10px;margin-top:24px}.action-row>*{flex:1}
 .summary-card{appearance:none;-webkit-appearance:none;width:100%;display:block;text-align:left;color:var(--text);background:rgba(255,255,255,.026);border:1px solid var(--line);border-radius:17px;padding:15px;margin:0 0 10px;cursor:pointer}.summary-card:active{background:rgba(255,255,255,.045)}.summary-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.summary-title strong{font-size:16px}.summary-title span{font-size:12px;color:var(--muted)}.summary-lines{display:grid;gap:6px}.summary-line{display:grid;grid-template-columns:62px 1fr;gap:9px;font-size:12px;line-height:1.45}.summary-line b{color:var(--muted);font-weight:600}.summary-line span{color:#d9ddd3}
 .verify-row{min-height:64px;display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;border-bottom:1px solid var(--line)}.verify-row:first-child{border-top:1px solid var(--line)}.verify-row strong{display:block;font-size:15px}.verify-row span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.round-check{width:27px;height:27px;border-radius:50%;border:1.5px solid #6c7467;display:grid;place-items:center;cursor:pointer}.round-check.on{background:var(--accent);border-color:var(--accent);color:#15160f}.round-check.on:after{content:"✓";font-weight:900;font-size:13px}
 .phase-brief{padding:16px;border-radius:17px;background:rgba(228,216,75,.06);border:1px solid rgba(228,216,75,.18)}.phase-brief strong{display:block;font-size:14px;color:var(--accent-text);margin-bottom:6px}.phase-brief p{font-size:13px;color:#d1d4ca;line-height:1.5}.listen-card,.action-card{appearance:none;-webkit-appearance:none;width:100%;min-height:72px;margin-top:12px;padding:14px 15px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.026);display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;text-align:left;color:var(--text);cursor:pointer}.listen-card.on,.action-card.on{background:var(--accent-soft);border-color:rgba(228,216,75,.28)}.listen-card strong,.action-card strong{display:block;font-size:15px;margin-bottom:3px}.listen-card span.copy,.action-card span.copy{display:block;font-size:12px;color:var(--muted);line-height:1.4}.listen-card.on span.copy,.action-card.on span.copy{color:#d8d5b2}.status-open-list{display:grid;gap:8px;margin-top:12px}.status-open-item{appearance:none;-webkit-appearance:none;width:100%;min-height:48px;border:1px solid rgba(228,216,75,.14);background:rgba(0,0,0,.12);border-radius:13px;padding:10px 12px;color:var(--text);display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;text-align:left;cursor:pointer}.status-open-item strong{font-size:13px;color:#e7e6dd;margin:0}.status-open-item span{font-size:18px;color:var(--accent-text)}
@@ -89,7 +87,27 @@ details.note-disclosure{border:1px solid var(--line);border-radius:17px;padding:
 .backbone-row{width:100%;min-height:72px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;text-align:left;cursor:pointer}.backbone-row:first-child{border-top:1px solid var(--line)}.backbone-row strong{display:block;font-size:15px}.backbone-row span{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
 .part-check-grid{display:flex;flex-wrap:wrap;gap:8px}.part-check{min-height:42px;border-radius:999px;border:1px solid var(--line);padding:0 12px;color:var(--muted);background:rgba(255,255,255,.025);cursor:pointer;font-size:13px}.part-check.done{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}.part-check.done:before{content:"✓ ";font-weight:800}
 .original-anchor{padding:14px;border-radius:17px;border:1px solid rgba(228,216,75,.2);background:rgba(228,216,75,.06)}
-@media(max-width:430px){.app-shell{padding-left:16px;padding-right:16px}h1{font-size:37px}.setup-row{grid-template-columns:1fr 126px}.setup-value,.state-control{width:126px}.scale-row{grid-template-columns:68px 1fr 38px;gap:8px}.segment{font-size:11.5px}.quick-grid{grid-template-columns:1fr 1fr}}
+
+.phase-pill{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 11px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid var(--line);font-size:12px;font-weight:680;color:#d7dbd2;cursor:pointer}
+.phase-pill .caret{font-size:11px;color:var(--muted);transform:translateY(-1px)}
+.phase-pill:active{background:rgba(255,255,255,.08)}
+.checkpoint-row[disabled]{cursor:default;opacity:.46}
+.checkpoint-row[disabled]:active{transform:none}
+.current-ring{width:27px;height:27px;border-radius:50%;border:1.5px solid var(--accent);box-shadow:inset 0 0 0 5px var(--accent-soft)}
+.lock-dot{width:27px;height:27px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--quiet);font-size:12px}
+.phase-nav-list{display:grid;gap:8px}
+.phase-nav-row{width:100%;min-height:58px;padding:10px 12px;border-radius:15px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;text-align:left;color:var(--text);cursor:pointer}
+.phase-nav-row[disabled]{opacity:.42;cursor:default}
+.phase-nav-row[disabled]:active{transform:none}
+.phase-nav-row strong{display:block;font-size:14px}
+.phase-nav-row span.copy{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.phase-nav-arrow{font-size:19px;color:var(--muted)}
+.phase-home{display:block}
+.requirement-note{min-height:20px;text-align:center;color:var(--muted);font-size:12px;line-height:1.4;margin-top:8px}
+.road-phase.clickable{cursor:pointer;width:100%;text-align:left;color:inherit}
+.road-phase.clickable:active{background:rgba(255,255,255,.04)}
+
+@media(max-width:430px){.app-shell{padding-left:16px;padding-right:16px}h1{font-size:37px}.setup-row{grid-template-columns:1fr 126px}.setup-value,.state-control{width:126px}.scale-row{grid-template-columns:68px 1fr;gap:8px}.segment{font-size:11.5px}.quick-grid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -113,13 +131,13 @@ const FEEL_LABELS={depth:'Depth',space:'Space',width:'Width',density:'Density',e
 const SECTION_TYPES=['Intro','Verse','Pre-Chorus','Chorus','Bridge','Instrumental','Outro'];
 const COMMON_PARTS=['Vocal','Drums','Bass','Ukulele','Guitar','Piano','Synth','Backing vocals','Percussion','FX'];
 const STUDY_PHASES=[
-  ['The Map','Understand the reference before rebuilding it.',['Structure','Ingredients','Section Study']],
-  ['The Skeleton','Build the whole rough song.',['Session','Backbone','Full Rough']],
-  ['The Sounds','Match sources and performances.',['Sources','Performance','Character']],
-  ['The Balance','Build the static mix.',['Levels','Pan','Hierarchy']],
-  ['The Shape','Control tone and dynamics.',['Frequency','Dynamics','Character']],
-  ['The World','Build depth, width, and movement.',['Depth','Width','Movement']],
-  ['The Finish','Compare, revise, complete.',['A/B','Revise','Deliver']]
+  {key:'map',title:'The Map',desc:'Understand the reference before rebuilding it.',route:'map',checkpoints:['Structure','Ingredients','Section Study']},
+  {key:'skeleton',title:'The Skeleton',desc:'Build the whole rough song.',route:'skeleton',checkpoints:['Session','Backbone','Full Rough']},
+  {key:'sounds',title:'The Sounds',desc:'Match sources and performances.',route:'roadmap',checkpoints:['Sources','Performance','Character']},
+  {key:'balance',title:'The Balance',desc:'Build the static mix.',route:'roadmap',checkpoints:['Levels','Pan','Hierarchy']},
+  {key:'shape',title:'The Shape',desc:'Control tone and dynamics.',route:'roadmap',checkpoints:['Frequency','Dynamics','Character']},
+  {key:'world',title:'The World',desc:'Build depth, width, and movement.',route:'roadmap',checkpoints:['Depth','Width','Movement']},
+  {key:'finish',title:'The Finish',desc:'Compare, revise, complete.',route:'roadmap',checkpoints:['A/B','Revise','Deliver']}
 ];
 const ORIGINAL_PHASES=[
   ['The Spark','Capture the thing worth making.'],
@@ -132,16 +150,15 @@ const ORIGINAL_PHASES=[
 ];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const uid=()=>crypto?.randomUUID?.()||('id-'+Date.now().toString(36)+Math.random().toString(36).slice(2));
-const clone=o=>JSON.parse(JSON.stringify(o));
 const clean=s=>String(s??'').trim();
 const app=document.getElementById('app');
 const sheetRoot=document.getElementById('sheetRoot');
 let saveFlashTimer=null;
-let ui={route:'projects',sectionIndex:0,newType:'original',selectedTarget:null,reorderMode:false};
+let ui={route:'projects',sectionIndex:0,newType:'original',selectedTarget:null};
 
 function makeStudyProject(title='Smithereens',artist='Twenty One Pilots'){
   return {
-    id:uid(),type:'study',title,artist,guidance:'guided',createdAt:Date.now(),
+    id:uid(),type:'study',title,artist,createdAt:Date.now(),
     map:{
       setup:{reference:false,tempo:'',meter:'4/4',grid:false,firstListen:false},
       sections:[],structureVerified:false,ingredients:[],unknowns:[],analysis:{},transitions:{},
@@ -153,7 +170,7 @@ function makeStudyProject(title='Smithereens',artist='Twenty One Pilots'){
 }
 function makeOriginalProject(title='Untitled'){
   return {
-    id:uid(),type:'original',title:title||'Untitled',guidance:'guided',createdAt:Date.now(),
+    id:uid(),type:'original',title:title||'Untitled',createdAt:Date.now(),
     spark:{starts:[],idea:'',reasons:[],anchor:''},notes:[]
   };
 }
@@ -194,10 +211,45 @@ function loadDB(){
 }
 let db=loadDB();
 function normalizeDB(){
+  db.version=2;
   (db.projects||[]).forEach(p=>{
-    if(p.type!=='study'||!p.map)return;
-    p.map.ingredients=[...new Set([...(p.map.ingredients||[]),...(p.map.unknowns||[])])];
-    p.map.unknowns=[];
+    delete p.guidance;
+    if(p.type==='study'&&p.map){
+      p.map.setup=p.map.setup||{reference:false,tempo:'',meter:'4/4',grid:false,firstListen:false};
+      p.map.sections=p.map.sections||[];
+      p.map.ingredients=[...new Set([...(p.map.ingredients||[]),...(p.map.unknowns||[])])];
+      p.map.unknowns=[];
+      p.map.analysis=p.map.analysis||{};
+      p.map.transitions=p.map.transitions||{};
+      p.map.mapVerified=!!p.map.mapVerified;
+      p.map.teachBack=!!p.map.teachBack;
+      p.map.phaseParking=p.map.phaseParking||'';
+      p.map.phaseTakeaway=p.map.phaseTakeaway||'';
+      p.skeleton=p.skeleton||{session:{tracks:{},markers:false},backbone:{sections:{}},rough:{parts:{},bounce:false}};
+      p.skeleton.session=p.skeleton.session||{tracks:{},markers:false};
+      p.skeleton.session.tracks=p.skeleton.session.tracks||{};
+      p.skeleton.backbone=p.skeleton.backbone||{sections:{}};
+      p.skeleton.backbone.sections=p.skeleton.backbone.sections||{};
+      p.skeleton.rough=p.skeleton.rough||{parts:{},bounce:false};
+      p.skeleton.rough.parts=p.skeleton.rough.parts||{};
+      Object.values(p.map.analysis).forEach(a=>{
+        a.parts=a.parts||[];
+        a.partsStatus=a.partsStatus||'';
+        if(a.partsEdited===undefined)a.partsEdited=true;
+        a.feel=a.feel||{};
+        delete a.feelUnsure;
+        a.focus=a.focus||[];
+        if(a.focusState==='unsure')a.focusState='';
+        a.focusState=a.focusState||'';
+        a.parking=a.parking||'';
+        a.takeaway=a.takeaway||'';
+      });
+      Object.values(p.map.transitions).forEach(t=>{
+        t.changes=t.changes||[];
+        if(t.status==='unsure')t.status='';
+        t.status=t.status||'';
+      });
+    }
   });
   try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){}
 }
@@ -209,9 +261,7 @@ function save(){
   saveFlashTimer=setTimeout(()=>document.querySelectorAll('.saved').forEach(el=>el.classList.remove('show')),700);
 }
 function project(){return db.projects.find(p=>p.id===db.currentProjectId)||db.projects[0]}
-function setGuidanceClass(){document.body.classList.toggle('minimal',project()?.guidance==='minimal')}
 function go(route,extra={},push=true){
-  if(route!=='structure')ui.reorderMode=false;
   ui={...ui,...extra,route};
   if(push){try{history.pushState({route,...extra},'',location.pathname+location.search)}catch(e){}}
   render();window.scrollTo(0,0);
@@ -221,6 +271,13 @@ function backButton(target='project'){return `<button class="nav-btn left" data-
 function topbar(left='',center='',right=''){return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`}
 function savedMark(){return `<span class="saved">Saved</span>`}
 function phaseTag(text){return `<span class="pill-tag">${esc(text)}</span>`}
+function phasePill(index){
+  const ph=STUDY_PHASES[index];
+  return `<button class="phase-pill" data-action="phase-nav" data-phase-index="${index}" aria-label="Navigate study phases">${esc(ph.title)}<span class="caret">⌄</span></button>`;
+}
+function studyPhaseUnlocked(p,index){return index===0||index<=currentStudyPhaseIndex(p)}
+function studyPhaseDone(p,index){if(index===0)return mapDone(p);if(index===1)return skeletonDone(p);return false}
+function studyPhaseRoute(index){return STUDY_PHASES[index]?.route||'roadmap'}
 function progressBar(done,total){const pct=total?Math.round(done/total*100):0;return `<div class="progress"><span style="width:${pct}%"></span></div><div class="progress-meta"><span>${done} of ${total}</span><span>${pct}%</span></div>`}
 function sectionLabels(p){
   const counts={};p.map.sections.forEach(s=>counts[s.name]=(counts[s.name]||0)+1);const seen={};
@@ -228,15 +285,16 @@ function sectionLabels(p){
 }
 function availableParts(p){return [...new Set(p.map.ingredients||[])];}
 function ensureAnalysis(p,index){
-  const s=p.map.sections[index];if(!s) return null;
+  const s=p.map.sections[index];if(!s)return null;
   if(!p.map.analysis[s.id]){
     const previous=index>0?ensureAnalysis(p,index-1):null;
     const inherited=previous?.parts?.slice()||[];
-    p.map.analysis[s.id]={parts:inherited,partsStatus:inherited.length?'mapped':'',partsEdited:false,feel:{depth:null,space:null,width:null,density:null,energy:null},feelUnsure:{},focus:[],focusState:'',parking:'',takeaway:'',visited:false};
+    p.map.analysis[s.id]={parts:inherited,partsStatus:inherited.length?'mapped':'',partsEdited:false,feel:{depth:null,space:null,width:null,density:null,energy:null},focus:[],focusState:'',parking:'',takeaway:'',visited:false};
     save();
   }
   const a=p.map.analysis[s.id];
-  a.parts=a.parts||[];a.partsStatus=a.partsStatus||'';if(a.partsEdited===undefined)a.partsEdited=true;a.feel=a.feel||{};a.feelUnsure=a.feelUnsure||{};a.focus=a.focus||[];a.focusState=a.focusState||'';
+  a.parts=a.parts||[];a.partsStatus=a.partsStatus||'';if(a.partsEdited===undefined)a.partsEdited=true;
+  a.feel=a.feel||{};delete a.feelUnsure;a.focus=a.focus||[];if(a.focusState==='unsure')a.focusState='';a.focusState=a.focusState||'';
   return a;
 }
 function transitionKey(a,b){return `${a}→${b}`}
@@ -244,7 +302,7 @@ function ensureTransition(p,index){
   if(index<1) return null;const prev=p.map.sections[index-1],cur=p.map.sections[index];if(!prev||!cur)return null;
   const key=transitionKey(prev.id,cur.id);if(!p.map.transitions[key])p.map.transitions[key]={changes:[],status:''};return p.map.transitions[key];
 }
-function feelComplete(a){return Object.keys(FEEL_SCALES).every(k=>a.feel?.[k]||a.feelUnsure?.[k])}
+function feelComplete(a){return Object.keys(FEEL_SCALES).every(k=>!!a.feel?.[k])}
 function sectionComplete(p,index){
   const s=p.map.sections[index];if(!s)return false;
   const a=p.map.analysis[s.id];if(!a||!a.partsStatus||!feelComplete(a)||!a.focusState)return false;
@@ -265,13 +323,13 @@ function skeletonRoughDone(p){
 }
 function skeletonDone(p){return skeletonSessionDone(p)&&skeletonBackboneDone(p)&&skeletonRoughDone(p)}
 function currentStudyPhaseIndex(p){if(!mapDone(p))return 0;if(!skeletonDone(p))return 1;return 2}
-function studyPhaseStatus(p,i){if(i===0)return mapDone(p)?'done':currentStudyPhaseIndex(p)===0?'current':'future';if(i===1)return skeletonDone(p)?'done':currentStudyPhaseIndex(p)===1?'current':'future';return currentStudyPhaseIndex(p)===i?'current':'future'}
+function studyPhaseStatus(p,i){if(studyPhaseDone(p,i))return 'done';if(currentStudyPhaseIndex(p)===i)return 'current';return 'future'}
+
 function mapCheckpointCount(p){return [structureDone(p),ingredientsDone(p),sectionStudyDone(p)].filter(Boolean).length}
 function skeletonCheckpointCount(p){return [skeletonSessionDone(p),skeletonBackboneDone(p),skeletonRoughDone(p)].filter(Boolean).length}
-function originalSparkDone(p){return !!(p.spark.idea.trim()||p.spark.starts.length)&&!!(p.spark.anchor.trim()||p.spark.reasons.length)}
+function originalSparkDone(p){return !!(p.spark?.idea?.trim()||p.spark?.starts?.length)&&!!(p.spark?.anchor?.trim()||p.spark?.reasons?.length)}
 
 function render(){
-  setGuidanceClass();
   switch(ui.route){
     case 'projects':return renderProjects();
     case 'new-project':return renderNewProject();
@@ -291,35 +349,33 @@ function render(){
   }
 }
 
+
 function renderProjects(){
   app.innerHTML=topbar('',phaseTag('FIRE'),`<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`)+`
     <h1>Your work.</h1><p class="sub">Reference studies and original songs live together here.</p>
     <div class="spacer-24"></div>
     ${db.projects.length?db.projects.map(p=>{
-      const phase=p.type==='study'?STUDY_PHASES[currentStudyPhaseIndex(p)][0]:(originalSparkDone(p)?'The Direction':'The Spark');
+      const phase=p.type==='study'?STUDY_PHASES[currentStudyPhaseIndex(p)].title:(originalSparkDone(p)?'The Direction':'The Spark');
       return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type==='study'?'Reference Study':'Original Song'}</div><strong>${esc(p.title)}</strong>${p.artist?`<div class="artist">${esc(p.artist)}</div>`:''}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
     }).join(''):`<div class="empty">No projects yet. Tap + to start one.</div>`}`;
 }
 
 function renderProject(){
   const p=project();if(!p)return go('projects',{},false);
-  if(p.type==='original') return renderOriginalOverview();
+  if(p.type==='original')return renderOriginalOverview();
   const phaseIndex=currentStudyPhaseIndex(p),phase=STUDY_PHASES[phaseIndex],done=phaseIndex===0?mapCheckpointCount(p):phaseIndex===1?skeletonCheckpointCount(p):0;
+  const next=STUDY_PHASES[phaseIndex+1];
   app.innerHTML=topbar(`<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,phaseTag('Reference Study'),`<button class="text-btn" data-action="settings">•••</button>`)+`
     <div class="eyebrow">${esc(p.artist||'Reference')}</div><h1>${esc(p.title)}</h1>
     <div class="spacer-18"></div>
     <div class="hero-card">
-      <div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase[0])}</h3></div><div class="phase-num">Phase ${phaseIndex+1} of 7</div></div>
-      <p class="sub">${esc(phase[1])}</p>
+      <div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex+1} of 7</div></div>
+      <p class="sub">${esc(phase.desc)}</p>
       ${phaseIndex<2?progressBar(done,3):''}
       <div class="spacer-18"></div>
-      <button class="primary full" data-action="go" data-route="${phaseIndex===0?'map':phaseIndex===1?'skeleton':'roadmap'}">${phaseIndex===0?(mapCheckpointCount(p)?'Continue The Map':'Start The Map'):phaseIndex===1?(skeletonCheckpointCount(p)?'Continue The Skeleton':'Start The Skeleton'):'View Roadmap'}</button>
+      <button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex===0?(mapCheckpointCount(p)?'Continue The Map':'Start The Map'):phaseIndex===1?(skeletonCheckpointCount(p)?'Continue The Skeleton':'Start The Skeleton'):'View Roadmap'}</button>
     </div>
-    ${phaseIndex>0?`<div class="section-kicker">Previous</div><div class="group-card list">${STUDY_PHASES.slice(0,phaseIndex).map((ph,i)=>`<button class="list-row" data-action="go" data-route="${i===0?'map':i===1?'skeleton':'roadmap'}"><span class="round-check on" aria-hidden="true"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="chev">›</span></button>`).join('')}</div>`:''}
-    <div class="section-kicker">Next</div>
-    <div class="group-card list">
-      ${STUDY_PHASES.slice(Math.min(phaseIndex+1,6),Math.min(phaseIndex+3,7)).map((ph,j)=>`<div class="list-row static"><span class="status-dot"></span><div><div class="title">${esc(ph[0])}</div><div class="desc">${esc(ph[1])}</div></div><span class="count-badge">${Math.min(phaseIndex+2+j,7)}</span></div>`).join('')}
-    </div>
+    ${next?`<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static"><span class="status-dot"></span><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div><span class="count-badge">${phaseIndex+2}</span></div></div>`:''}
     <div class="section-kicker">Project</div>
     <div class="quick-grid">
       <button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases. One finished recreation.</span></button>
@@ -352,8 +408,11 @@ function renderNewProject(){
 
 function renderMapHome(){
   const p=project(),m=p.map,done=mapCheckpointCount(p);
-  app.innerHTML=topbar(backButton('project'),phaseTag('The Map'),savedMark())+`
-    ${progressBar(done,3)}
+  const structureUnlocked=!!m.setup.firstListen||structureDone(p);
+  const ingredientsUnlocked=structureDone(p)||ingredientsDone(p)||sectionStudyDone(p);
+  const studyUnlocked=(structureDone(p)&&ingredientsDone(p))||sectionStudyDone(p);
+  const reviewVisible=sectionStudyDone(p)||m.mapVerified||m.teachBack;
+  const before=`
     <div class="section-kicker">Song Setup</div>
     <div class="group-card setup-panel">
       ${setupToggle('Reference','Imported','reference',m.setup.reference)}
@@ -361,55 +420,62 @@ function renderMapHome(){
       <div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
       ${setupToggle('Grid','Aligned','grid',m.setup.grid)}
     </div>
-    <button id="first-listen" class="listen-card ${m.setup.firstListen?'on':''}" data-action="toggle-setup" data-field="firstListen">
-      <div><strong>First Listen</strong><span class="copy">Play the full song once without stopping.</span></div>
-      <span class="round-check ${m.setup.firstListen?'on':''}" aria-hidden="true"></span>
-    </button>
-    <div class="section-kicker">Checkpoints</div>
-    <div class="group-card list">
-      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),1)}
-      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),2)}
-      ${checkpointRow('Section Study','Study the song one section at a time.','section-study',sectionStudyDone(p),3)}
-    </div>
-    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="phase-parking" placeholder="Question or mystery for later">${esc(m.phaseParking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="phase-takeaway" placeholder="Something worth carrying into your own work">${esc(m.phaseTakeaway)}</textarea></div></div></details>
-    <div class="spacer-24"></div><button class="secondary full" data-action="go" data-route="map-summary">Open Map Summary</button>`;
+    ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}`;
+  const checkpoints=`
+      ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
+      ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
+      ${checkpointRow('Section Study','Study the song one section at a time.','section-study',sectionStudyDone(p),studyUnlocked)}`;
+  const after=`
+    ${reviewVisible?`${actionCard('Review & Verify','Review the finished map, then confirm it.',p.map.mapVerified&&p.map.teachBack,'go-review-map')}`:''}
+    <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="phase-parking" placeholder="Question or mystery for later">${esc(m.phaseParking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="phase-takeaway" placeholder="Something worth carrying into your own work">${esc(m.phaseTakeaway)}</textarea></div></div></details>`;
+  app.innerHTML=phaseHome(0,done,3,checkpoints,before,after);
 }
 function setupToggle(label,state,field,on){return `<div class="setup-row"><div class="setup-label">${label}</div><button class="state-control ${on?'on':''}" data-action="toggle-setup" data-field="${field}"><span>${state}</span><span class="check-circle"></span></button></div>`}
-function checkpointRow(title,desc,route,done,num){return `<button class="list-row" data-action="go" data-route="${route}"><span class="status-dot ${done?'done':''}"></span><div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">›</span></button>`}
+function checkpointRow(title,desc,route,done,unlocked=true){
+  return `<button class="list-row checkpoint-row" data-action="go" data-route="${route}" ${unlocked?'':'disabled'}>${done?`<span class="round-check on" aria-hidden="true"></span>`:unlocked?`<span class="status-dot"></span>`:`<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked?'›':''}</span></button>`;
+}
+function actionCard(title,copy,on,action,id='',disabled=false,attrs=''){
+  return `<button class="action-card ${on?'on':''}" ${id?`id="${id}"`:''} data-action="${action}" ${attrs} ${disabled?'disabled':''}><div><strong>${esc(title)}</strong>${copy?`<span class="copy">${esc(copy)}</span>`:''}</div><span class="round-check ${on?'on':''}" aria-hidden="true"></span></button>`;
+}
+function phaseHome(index,done,total,checkpointsHtml,beforeHtml='',afterHtml=''){
+  return topbar(backButton('project'),phasePill(index),savedMark())+
+    progressBar(done,total)+beforeHtml+
+    `<div class="section-kicker">Checkpoints</div><div class="group-card list">${checkpointsHtml}</div>`+
+    afterHtml;
+}
 
 function renderStructure(){
-  const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('map'),phaseTag('Structure'),savedMark())+`
-    <h2>Map the form.</h2><p class="sub guided">Play through the record. Add a section when the form changes. Pause and rewind freely.</p>
+  const p=project(),labels=sectionLabels(p),done=structureDone(p);
+  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+    <h2>Map the form.</h2><p class="sub">Play through the record. Add a section when the form changes. Pause and rewind freely.</p>
     <div class="section-kicker">Add Section</div><div class="choice-wrap">${SECTION_TYPES.map(x=>`<button class="choice" data-action="add-section" data-name="${x}">${x}</button>`).join('')}</div>
     <div class="inline-add"><input class="field" id="customSection" placeholder="Custom section"><button class="secondary" data-action="add-custom-section">Add</button></div>
-    <div class="section-heading"><div class="section-kicker">Song</div>${p.map.sections.length>1?`<button class="text-btn" data-action="toggle-reorder">${ui.reorderMode?'Done':'Reorder'}</button>`:''}</div>
-    <div class="sort-list ${ui.reorderMode?'reorder-mode':''}" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" ${ui.reorderMode?'':`data-action="edit-section"`} data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div>${ui.reorderMode?`<div class="drag-handle" data-drag-handle aria-label="Drag ${esc(labels[i])}">≡</div>`:''}</div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
+    <div class="section-kicker">Song</div>
+    <div class="sort-list" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" data-action="edit-section" data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div><div class="drag-handle" data-drag-handle aria-label="Reorder ${esc(labels[i])}">≡</div></div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
     <div class="section-kicker">Verify</div>
-    <button class="action-card ${p.map.structureVerified?'on':''}" data-action="toggle-structure-verified"><div><strong>Structure verified</strong><span class="copy">Play through once and confirm the order and section boundaries.</span></div><span class="round-check ${p.map.structureVerified?'on':''}" aria-hidden="true"></span></button>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="go" data-route="ingredients">Next</button></div>`;
+    ${actionCard('Structure verified','Play through once and confirm the order and section boundaries.',p.map.structureVerified,'toggle-structure-verified')}
+    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="go" data-route="ingredients" ${done?'':'disabled'}>Next</button></div>
+    <div class="requirement-note">${done?'':'Add the structure and verify it to continue.'}</div>`;
   installSorting();
 }
 
 function renderIngredients(){
-  const p=project(),parts=p.map.ingredients,customParts=parts.filter(x=>!COMMON_PARTS.includes(x)),trackChoices=[...COMMON_PARTS,...customParts];
-  app.innerHTML=topbar(backButton('map'),phaseTag('Ingredients'),savedMark())+`
-    <h2>Map what plays.</h2><p class="sub guided">Replay freely. Identify the main parts across the whole song. You do not need to solve every mystery yet.</p>
+  const p=project(),parts=p.map.ingredients,customParts=parts.filter(x=>!COMMON_PARTS.includes(x)),trackChoices=[...COMMON_PARTS,...customParts],done=ingredientsDone(p);
+  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+    <h2>Map what plays.</h2><p class="sub">Replay freely. Identify the main parts across the whole song.</p>
     <div class="section-kicker">Tracks</div><div class="choice-wrap">${trackChoices.map(x=>`<button class="choice ${parts.includes(x)?'selected':''}" data-action="toggle-ingredient" data-name="${esc(x)}">${esc(x)}</button>`).join('')}</div>
     <div class="inline-add"><input class="field" id="customPart" placeholder="Other..."><button class="secondary" data-action="add-custom-part">Add</button></div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="start-section-study">Next</button></div>`;
+    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="start-section-study" ${done?'':'disabled'}>Next</button></div>
+    <div class="requirement-note">${done?'':'Add at least one track to continue.'}</div>`;
 }
-function removableChip(text,action){return `<span class="chip choice-chip"><span>${esc(text)}</span><button class="x" data-action="${action}" data-name="${esc(text)}">×</button></span>`}
-
 function renderSectionStudy(){
-  const p=project();if(!p.map.sections.length){return app.innerHTML=topbar(backButton('map'),phaseTag('Section Study'),savedMark())+`<h2>No sections yet.</h2><p class="sub">Map the structure first.</p><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="structure">Open Structure</button>`}
+  const p=project();if(!p.map.sections.length){return app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`<h2>No sections yet.</h2><p class="sub">Map the structure first.</p><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="structure">Open Structure</button>`}
   ui.sectionIndex=Math.max(0,Math.min(ui.sectionIndex,p.map.sections.length-1));
-  const i=ui.sectionIndex,s=p.map.sections[i],labels=sectionLabels(p),a=ensureAnalysis(p,i),t=ensureTransition(p,i),allParts=availableParts(p);
-  const activeParts=a.parts||[];
-  const currentDone=sectionComplete(p,i);
-  app.innerHTML=topbar(backButton('map'),phaseTag('Section Study'),`<span class="micro">${i+1} of ${p.map.sections.length}</span>`)+`
-    <div class="horizontal-nav">${p.map.sections.map((sec,idx)=>`<button class="section-tab ${idx===i?'current':''} ${sectionComplete(p,idx)?'done':''}" data-action="jump-section" data-index="${idx}">${esc(labels[idx])}</button>`).join('')}</div>
-    <div class="spacer-12"></div><h2>${esc(labels[i])}</h2><p class="sub guided">Loop this section in your DAW. Stay here until the section makes sense.</p>
+  const i=ui.sectionIndex,labels=sectionLabels(p),a=ensureAnalysis(p,i),t=ensureTransition(p,i),allParts=availableParts(p);
+  const activeParts=a.parts||[],currentDone=sectionComplete(p,i),missing=sectionMissingItems(p,i);
+  app.innerHTML=topbar(backButton('map'),phasePill(0),`<span class="micro">${i+1} of ${p.map.sections.length}</span>`)+`
+    <div class="horizontal-nav">${p.map.sections.map((sec,idx)=>{const unlocked=idx===0||p.map.sections.slice(0,idx).every((_,j)=>sectionComplete(p,j));return `<button class="section-tab ${idx===i?'current':''} ${sectionComplete(p,idx)?'done':''}" data-action="jump-section" data-index="${idx}" ${unlocked?'':'disabled'}>${esc(labels[idx])}</button>`}).join('')}</div>
+    <div class="spacer-12"></div><h2>${esc(labels[i])}</h2><p class="sub">Loop this section in your DAW. Stay here until the section makes sense.</p>
     <div class="study-block">
       <div class="block-head"><strong>Parts</strong></div>
       <div class="choice-wrap">${allParts.map(x=>`<button class="choice ${activeParts.includes(x)?'selected':''}" data-action="toggle-section-part" data-name="${esc(x)}">${esc(x)}</button>`).join('')}${!allParts.length?`<span class="empty">Add Ingredients first.</span>`:''}</div>
@@ -423,21 +489,21 @@ function renderSectionStudy(){
     <div class="study-block">
       <div class="block-head"><strong>Focus</strong></div>
       <div class="choice-wrap">${activeParts.map(x=>`<button class="choice ${a.focus.includes(x)?'selected':''}" data-action="toggle-focus" data-name="${esc(x)}">${esc(x)}</button>`).join('')}${activeParts.length?'':'<span class="empty">Map the active parts first.</span>'}</div>
-      <div class="spacer-8"></div><div class="choice-wrap"><button class="choice quiet ${a.focusState==='none'?'selected':''}" data-action="focus-status" data-status="none">No clear focus</button><button class="choice quiet ${a.focusState==='unsure'?'selected':''}" data-action="focus-status" data-status="unsure">Not sure</button></div>
+      <div class="spacer-8"></div><div class="choice-wrap"><button class="choice quiet ${a.focusState==='none'?'selected':''}" data-action="focus-status" data-status="none">No clear focus</button></div>
     </div>
     <details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(a.parking||'')}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something from this section worth remembering">${esc(a.takeaway||'')}</textarea></div></div></details>
-    <div class="action-row"><button class="secondary" data-action="prev-section" ${i===0?'disabled':''}>Back</button><button class="primary" data-action="next-section">${i===p.map.sections.length-1?'Summary':'Next'}</button></div>
-    <div class="finish-note">${currentDone?'This section is mapped.':'Unanswered items can be marked Not sure.'}</div>`;
+    <div class="action-row"><button class="secondary" data-action="prev-section" ${i===0?'disabled':''}>Back</button><button class="primary" data-action="next-section" ${currentDone?'':'disabled'}>${i===p.map.sections.length-1?'Summary':'Next'}</button></div>
+    <div class="requirement-note">${currentDone?'':`${esc(missing.join(' · '))} ${missing.length===1?'is':'are'} still open.`}</div>`;
 }
 function renderScale(key,a){
-  const value=a.feel?.[key],unsure=a.feelUnsure?.[key];
-  return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map(opt=>`<button class="segment ${value===opt&&!unsure?'selected accent':''}" data-action="set-feel" data-scale="${key}" data-value="${opt}">${opt}</button>`).join('')}</div><button class="unsure-btn ${unsure?'selected':''}" data-action="feel-unsure" data-scale="${key}" aria-label="Not sure about ${FEEL_LABELS[key]}">?</button></div>`;
+  const value=a.feel?.[key];
+  return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map(opt=>`<button class="segment ${value===opt?'selected accent':''}" data-action="set-feel" data-scale="${key}" data-value="${opt}">${opt}</button>`).join('')}</div></div>`;
 }
 function renderChangesBlock(p,i,t){
   const targets=[...availableParts(p),'Mix','Texture','Ambience'];
   const status=t?.status||'',hasChanges=!!t?.changes?.length;
   return `<div class="study-block"><div class="block-head"><strong>Changes</strong></div>
-    ${hasChanges?'':`<div class="choice-wrap"><button class="choice quiet ${status==='none'?'selected':''}" data-action="transition-status" data-status="none">No notable change</button><button class="choice quiet ${status==='unsure'?'selected':''}" data-action="transition-status" data-status="unsure">Not sure</button></div>`}
+    ${hasChanges?'':`<div class="choice-wrap"><button class="choice quiet ${status==='none'?'selected':''}" data-action="transition-status" data-status="none">No notable change</button></div>`}
     ${status?'':`<div class="relation-box"><div class="choice-wrap">${targets.map(x=>`<button class="choice ${ui.selectedTarget===x?'selected':''}" data-action="select-change-target" data-name="${esc(x)}">${esc(x)}</button>`).join('')}</div><div class="inline-add"><input class="field" id="customTarget" placeholder="Other"><button class="secondary" data-action="use-custom-target">Use</button></div>${ui.selectedTarget?renderChangeActions(ui.selectedTarget):''}</div>
       ${hasChanges?`<div class="spacer-12"></div><div class="chip-list">${t.changes.map((c,idx)=>`<span class="chip accent"><span>${esc(c.target)} · ${esc(c.action)}</span><button class="x" data-action="remove-change" data-index="${idx}">×</button></span>`).join('')}</div>`:''}`}
   </div>`;
@@ -457,24 +523,24 @@ function renderChangeActions(target){return `<div class="spacer-12"></div><div c
 
 function renderMapSummary(){
   const p=project(),labels=sectionLabels(p),openItems=mapOpenItems(p);
-  app.innerHTML=topbar(backButton('map'),phaseTag('Map Summary'),savedMark())+`
-    <h2>Your map.</h2><p class="sub guided">Listen through once more with this open. Correct anything that doesn’t match what you hear.</p>
+  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+    <h2>Your map.</h2><p class="sub">Listen through once more with this open. Correct anything that doesn’t match what you hear.</p>
     <div class="section-kicker">Structure</div><div class="chip-list">${labels.length?labels.map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No sections mapped.</span>'}</div>
-    <div class="section-kicker">Ingredients</div><div class="chip-list">${availableParts(p).length?availableParts(p).map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No ingredients mapped.</span>'}</div>
+    <div class="section-kicker">Tracks</div><div class="chip-list">${availableParts(p).length?availableParts(p).map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No tracks mapped.</span>'}</div>
     <div class="section-kicker">Sections</div>
     ${p.map.sections.length?p.map.sections.map((s,i)=>renderSummaryCard(p,i,labels[i])).join(''):'<div class="empty">Map the structure to build a section summary.</div>'}
     ${(p.map.phaseParking||p.map.phaseTakeaway)?`<div class="section-kicker">Notes</div><div class="card card-pad">${p.map.phaseParking?`<div class="summary-line"><b>Parking Lot</b><span>${esc(p.map.phaseParking)}</span></div>`:''}${p.map.phaseTakeaway?`<div class="summary-line" style="margin-top:8px"><b>Takeaway</b><span>${esc(p.map.phaseTakeaway)}</span></div>`:''}</div>`:''}
     <div class="section-kicker">Verify</div>
-    <button class="action-card ${p.map.mapVerified?'on':''}" id="mapVerifyRow" data-action="toggle-map-verified"><div><strong>Map verified</strong><span class="copy">Listen through once more while reviewing the finished map.</span></div><span class="round-check ${p.map.mapVerified?'on':''}" aria-hidden="true"></span></button>
-    <button class="action-card ${p.map.teachBack?'on':''}" id="teachBackRow" data-action="toggle-teach-back"><div><strong>Teach it back</strong><span class="copy">Explain the structure, parts, changes, feel, and focus in your own words.</span></div><span class="round-check ${p.map.teachBack?'on':''}" aria-hidden="true"></span></button>
+    ${actionCard('Map verified','Listen through once more while reviewing the finished map.',p.map.mapVerified,'toggle-map-verified','mapVerifyRow')}
+    ${actionCard('Teach it back','Explain the structure, parts, changes, feel, and focus in your own words.',p.map.teachBack,'toggle-teach-back','teachBackRow')}
     <div class="spacer-24"></div>
     ${mapDone(p)?`<div class="phase-brief"><strong>The Map is complete.</strong><p>The Skeleton can now inherit your section order and active parts automatically.</p></div>`:`<div class="phase-brief"><strong>${openItems.length} map item${openItems.length===1?'':'s'} still open.</strong><div class="status-open-list">${openItems.map((item,idx)=>`<button class="status-open-item" data-action="open-map-item" data-open-index="${idx}"><strong>${esc(item.label)}</strong><span>›</span></button>`).join('')}</div></div>`}
-    <div class="spacer-18"></div><button class="primary full" data-action="go" data-route="skeleton">Continue to The Skeleton</button>`;
+    <div class="spacer-18"></div><button class="primary full" data-action="go" data-route="skeleton" ${mapDone(p)?'':'disabled'}>Continue to The Skeleton</button>`;
 }
 function renderSummaryCard(p,i,label){
-  const a=ensureAnalysis(p,i),t=ensureTransition(p,i),feel=Object.keys(FEEL_SCALES).map(k=>a.feelUnsure?.[k]?`${FEEL_LABELS[k]}: ?`:a.feel?.[k]).filter(Boolean).join(' · ');
-  const changes=i===0?'Starting state':t?.status==='none'?'None noted':t?.status==='unsure'?'Not sure':(t?.changes||[]).map(c=>`${c.target} ${c.action.toLowerCase()}`).join(' · ')||'Not mapped';
-  const focus=a.focusState==='none'?'No clear focus':a.focusState==='unsure'?'Not sure':a.focus.join(' · ')||'Not mapped';
+  const a=ensureAnalysis(p,i),t=ensureTransition(p,i),feel=Object.keys(FEEL_SCALES).map(k=>a.feel?.[k]).filter(Boolean).join(' · ');
+  const changes=i===0?'Starting state':t?.status==='none'?'None noted':(t?.changes||[]).map(c=>`${c.target} ${c.action.toLowerCase()}`).join(' · ')||'Not mapped';
+  const focus=a.focusState==='none'?'No clear focus':a.focus.join(' · ')||'Not mapped';
   return `<button class="summary-card" data-action="summary-jump" data-index="${i}"><div class="summary-title"><strong>${esc(label)}</strong><span>Edit ›</span></div><div class="summary-lines"><div class="summary-line"><b>Parts</b><span>${a.partsStatus==='silence'?'No active parts':a.parts.length?esc(a.parts.join(' · ')):'Not mapped'}</span></div>${i>0?`<div class="summary-line"><b>Changes</b><span>${esc(changes)}</span></div>`:''}<div class="summary-line"><b>Feel</b><span>${esc(feel||'Not mapped')}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus)}</span></div>${a.parking?`<div class="summary-line"><b>Parking Lot</b><span>${esc(a.parking)}</span></div>`:''}${a.takeaway?`<div class="summary-line"><b>Takeaway</b><span>${esc(a.takeaway)}</span></div>`:''}</div></button>`;
 }
 function sectionMissingItems(p,index){
@@ -490,54 +556,48 @@ function mapOpenItems(p){
   if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'first-listen'});
   if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
   else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
-  if(!ingredientsDone(p))items.push({label:'Ingredients · Add at least one part',route:'ingredients'});
+  if(!ingredientsDone(p))items.push({label:'Tracks · Add at least one track',route:'ingredients'});
   p.map.sections.forEach((_,i)=>{const missing=sectionMissingItems(p,i);if(missing.length)items.push({label:`${labels[i]} · ${missing.join(', ')}`,route:'section-study',index:i});});
   if(!p.map.mapVerified)items.push({label:'Map Verified · Final listen',route:'map-summary',target:'mapVerifyRow'});
   if(!p.map.teachBack)items.push({label:'Teach It Back · Explain the map',route:'map-summary',target:'teachBackRow'});
   return items;
 }
-function countMapOpenItems(p){return mapOpenItems(p).length;}
 
 function renderSkeletonHome(){
   const p=project(),done=skeletonCheckpointCount(p);
-  app.innerHTML=topbar(backButton('project'),phaseTag('The Skeleton'),savedMark())+`
-    <h1>Build the whole song before perfecting it.</h1><p class="sub guided">Use placeholders. The goal is a complete, recognizable rough — not final sounds.</p>
-    ${progressBar(done,3)}
-    <div class="phase-brief"><strong>Inherited from The Map</strong><p>${p.map.sections.length} section${p.map.sections.length===1?'':'s'} · ${availableParts(p).length} mapped ingredient${availableParts(p).length===1?'':'s'}. Nothing needs to be re-entered.</p></div>
-    <div class="section-kicker">Checkpoints</div><div class="list">
-      ${checkpointRow('Session','Turn the map into a DAW session.','skeleton-session',skeletonSessionDone(p),1)}
-      ${checkpointRow('Backbone','Get every section recognizable.','skeleton-backbone',skeletonBackboneDone(p),2)}
-      ${checkpointRow('Full Rough','Fill every mapped part from start to finish.','skeleton-rough',skeletonRoughDone(p),3)}
-    </div>
-    <div class="spacer-24"></div><button class="secondary full" data-action="go" data-route="roadmap">View Full Roadmap</button>`;
+  const checkpoints=`
+      ${checkpointRow('Session','Turn the map into a DAW session.','skeleton-session',skeletonSessionDone(p),mapDone(p)||skeletonSessionDone(p))}
+      ${checkpointRow('Backbone','Get every section recognizable.','skeleton-backbone',skeletonBackboneDone(p),skeletonSessionDone(p)||skeletonBackboneDone(p)||skeletonRoughDone(p))}
+      ${checkpointRow('Full Rough','Fill every mapped part from start to finish.','skeleton-rough',skeletonRoughDone(p),skeletonBackboneDone(p)||skeletonRoughDone(p))}`;
+  app.innerHTML=phaseHome(1,done,3,checkpoints);
 }
 function renderSkeletonSession(){
   const p=project(),parts=availableParts(p);
-  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Session'),savedMark())+`
-    <h2>Turn the map into a session.</h2><p class="sub guided">Create simple placeholder tracks and section markers. Don’t hunt for final sounds yet.</p>
+  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+    <h2>Turn the map into a session.</h2><p class="sub">Create simple placeholder tracks and section markers. Don’t hunt for final sounds yet.</p>
     <div class="section-kicker">Tracks</div>
-    <div class="list">${parts.length?parts.map(part=>`<button class="list-row" data-action="toggle-track" data-name="${esc(part)}"><span class="status-dot ${p.skeleton.session.tracks[part]?'done':''}"></span><div><div class="title">${esc(part)}</div><div class="desc">Placeholder track created</div></div><span class="chev">›</span></button>`).join(''):'<div class="empty">Map Ingredients first so the track list can be generated.</div>'}</div>
-    <div class="section-kicker">Markers</div><div class="verify-row"><div><strong>Section markers created</strong><span>${p.map.sections.length?sectionLabels(p).join(' · '):'Map Structure first.'}</span></div><button class="round-check ${p.skeleton.session.markers?'on':''}" data-action="toggle-markers"></button></div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-backbone">Next</button></div>`;
+    <div class="group-card list">${parts.length?parts.map(part=>`<button class="list-row" data-action="toggle-track" data-name="${esc(part)}"><span class="round-check ${p.skeleton.session.tracks[part]?'on':''}" aria-hidden="true"></span><div><div class="title">${esc(part)}</div><div class="desc">Placeholder track created</div></div><span class="chev">›</span></button>`).join(''):'<div class="empty" style="padding:18px 14px">Map Ingredients first so the track list can be generated.</div>'}</div>
+    <div class="section-kicker">Markers</div>${actionCard('Section markers created',p.map.sections.length?sectionLabels(p).join(' · '):'Map Structure first.',p.skeleton.session.markers,'toggle-markers')}
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-backbone" ${skeletonSessionDone(p)?'':'disabled'}>Next</button></div><div class="requirement-note">${skeletonSessionDone(p)?'':'Create every placeholder track and the section markers to continue.'}</div>`;
 }
 function renderSkeletonBackbone(){
   const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Backbone'),savedMark())+`
-    <h2>Make every section recognizable.</h2><p class="sub guided">Rough the musical spine — enough harmony, rhythm, and melody that you can tell what section you’re hearing.</p>
-    <div class="tip guided"><div class="num">2</div><div><strong>Keep it ugly on purpose.</strong><span>Scratch parts are allowed. Detailed sound matching belongs in The Sounds.</span></div></div>
+  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+    <h2>Make every section recognizable.</h2><p class="sub">Rough the musical spine — enough harmony, rhythm, and melody that you can tell what section you’re hearing.</p>
+    <div class="tip"><div class="num">2</div><div><strong>Keep it ugly on purpose.</strong><span>Scratch parts are allowed. Detailed sound matching belongs in The Sounds.</span></div></div>
     <div class="section-kicker">Sections</div>
-    <div>${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i);return `<button class="backbone-row" data-action="toggle-backbone" data-id="${s.id}"><div><strong>${esc(labels[i])}</strong><span>${a.partsStatus==='silence'?'No active parts':esc((a.parts||[]).join(' · ')||'Parts not mapped')}</span></div><span class="round-check ${p.skeleton.backbone.sections[s.id]?'on':''}"></span></button>`}).join(''):'<div class="empty">Map Structure first.</div>'}</div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-rough">Next</button></div>`;
+    <div class="group-card" style="padding:0 14px">${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i);return `<button class="backbone-row" data-action="toggle-backbone" data-id="${s.id}"><div><strong>${esc(labels[i])}</strong><span>${a.partsStatus==='silence'?'No active parts':esc((a.parts||[]).join(' · ')||'Parts not mapped')}</span></div><span class="round-check ${p.skeleton.backbone.sections[s.id]?'on':''}"></span></button>`}).join(''):'<div class="empty">Map Structure first.</div>'}</div>
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-rough" ${skeletonBackboneDone(p)?'':'disabled'}>Next</button></div><div class="requirement-note">${skeletonBackboneDone(p)?'':'Mark every section recognizable to continue.'}</div>`;
 }
 function renderSkeletonRough(){
   const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('skeleton'),phaseTag('Full Rough'),savedMark())+`
-    <h2>Fill the whole arrangement.</h2><p class="sub guided">A mapped part counts when a rough placeholder exists through that section. Accuracy before polish.</p>
+  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+    <h2>Fill the whole arrangement.</h2><p class="sub">A mapped part counts when a rough placeholder exists through that section. Accuracy before polish.</p>
     <div class="section-kicker">Sections</div>
     ${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i),parts=a.parts||[],state=p.skeleton.rough.parts[s.id]||{};return `<div class="card card-pad" style="margin-bottom:10px"><div class="block-head"><strong>${esc(labels[i])}</strong><span>${parts.filter(x=>state[x]).length} / ${parts.length}</span></div><div class="part-check-grid">${parts.length?parts.map(part=>`<button class="part-check ${state[part]?'done':''}" data-action="toggle-rough-part" data-section-id="${s.id}" data-name="${esc(part)}">${esc(part)}</button>`).join(''):`<span class="micro">No active parts mapped.</span>`}</div></div>`}).join(''):'<div class="empty">Map Structure and Section Study first.</div>'}
-    <div class="section-kicker">Print</div><div class="verify-row"><div><strong>Rough bounce exported</strong><span>One beginning-to-end bounce you can listen to away from the session.</span></div><button class="round-check ${p.skeleton.rough.bounce?'on':''}" data-action="toggle-rough-bounce"></button></div>
+    <div class="section-kicker">Print</div>${actionCard('Rough bounce exported','One beginning-to-end bounce you can listen to away from the session.',p.skeleton.rough.bounce,'toggle-rough-bounce')}
     <div class="spacer-24"></div><div class="phase-brief"><strong>${skeletonDone(p)?'The Skeleton is complete.':'Finish the rough, then stop polishing.'}</strong><p>${skeletonDone(p)?'You now have a complete rough arrangement. The next phase is about matching sources and performances.':'The goal is coverage, not perfection.'}</p></div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="roadmap">Next Phase</button></div>`;
+    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="roadmap" ${skeletonDone(p)?'':'disabled'}>Next Phase</button></div><div class="requirement-note">${skeletonDone(p)?'':'Finish every rough part and export the rough bounce to continue.'}</div>`;
 }
 
 function renderRoadmap(){
@@ -545,8 +605,7 @@ function renderRoadmap(){
   if(p.type==='original'){
     app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph,i)=>`<div class="road-phase ${i===0?'active':''}"><div class="road-top"><div class="road-num">${i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join('')}`;return;
   }
-  const current=currentStudyPhaseIndex(p);
-  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Seven phases. One record.</h2><p class="sub">Analysis becomes a blueprint, the blueprint becomes a recreation, and the recreation becomes production judgment.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i);return `<div class="road-phase ${st}"><div class="road-top">${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:`<div class="road-num">${i+1}</div>`}<div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div>${i<2?`<button class="text-btn" data-action="go" data-route="${i===0?'map':'skeleton'}">Open</button>`:''}</div><div class="road-checks">${ph[2].map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></div>`}).join('')}`;
+  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Seven phases. One record.</h2><p class="sub">Analysis becomes a blueprint, the blueprint becomes a recreation, and the recreation becomes production judgment.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i),tag=unlocked?'button':'div';return `<${tag} class="road-phase ${st} ${unlocked?'clickable':''}" ${unlocked?`data-action="go" data-route="${ph.route}"`:''}><div class="road-top">${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<div class="road-num">${i+1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p></div>${unlocked?`<span class="chev">›</span>`:''}</div><div class="road-checks">${ph.checkpoints.map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></${tag}>`}).join('')}`;
 }
 
 function renderNotes(){
@@ -580,7 +639,12 @@ function openSectionSheet(id){
 }
 function openSettings(){
   const p=project();
-  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="section-kicker" style="margin-top:10px">Guidance</div><div class="segmented"><button class="segment ${p.guidance==='minimal'?'selected accent':''}" data-action="set-guidance" data-value="minimal">Minimal</button><button class="segment ${p.guidance!=='minimal'?'selected accent':''}" data-action="set-guidance" data-value="guided">Guided</button><button class="segment" disabled style="opacity:0"></button></div><div class="micro" style="margin-top:8px">Guided shows short instruction lines. Minimal hides them; the workflow stays the same.</div><div class="section-kicker">Backup</div><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="section-kicker" style="margin-top:10px">Backup</div><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
+  sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
+}
+function openPhaseNavigator(index){
+  const p=project();if(!p||p.type!=='study')return;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Reference Study</h3><div class="phase-nav-list">${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i);return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked?'':'disabled'}>${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked?'›':''}</span></button>`}).join('')}</div><div class="spacer-12"></div><button class="secondary full" data-action="open-roadmap">Roadmap</button><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
   sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
 }
 function openProjectMenu(id){
@@ -668,7 +732,6 @@ app.addEventListener('click',e=>{
   if(action==='go')return go(b.dataset.route);
   if(action==='new-project')return go('new-project');
   if(action==='project-menu')return openProjectMenu(b.dataset.id);
-  if(action==='toggle-reorder'){ui.reorderMode=!ui.reorderMode;return renderStructure()}
   if(action==='edit-section')return openSectionSheet(b.dataset.sectionId);
   if(action==='set-new-type'){ui.newType=b.dataset.type;return renderNewProject()}
   if(action==='create-project'){
@@ -676,10 +739,12 @@ app.addEventListener('click',e=>{
   }
   if(action==='open-project'){db.currentProjectId=b.dataset.id;save();return go('project')}
   if(action==='settings')return openSettings();
+  if(action==='phase-nav')return openPhaseNavigator(Number(b.dataset.phaseIndex));
+  if(action==='go-review-map')return go('map-summary');
   if(action==='close-sheet')return closeSheet();
-  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}
-  if(action==='set-guidance'){p.guidance=b.dataset.value;save();closeSheet();return render()}
-  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
+  if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
+  if(action==='open-roadmap'){closeSheet();return go('roadmap');}
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
   if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
   if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}
@@ -690,8 +755,7 @@ app.addEventListener('click',e=>{
   if(action==='jump-section'){ui.sectionIndex=Number(b.dataset.index);ui.selectedTarget=null;return renderSectionStudy()}
   if(action==='toggle-section-part'){const a=ensureAnalysis(p,ui.sectionIndex),name=b.dataset.name;setSectionPartPresence(p,ui.sectionIndex,name,!a.parts.includes(name));save();return renderSectionStudy()}
   if(action==='section-silence'){const a=ensureAnalysis(p,ui.sectionIndex);if(a.partsStatus==='silence'){a.partsStatus='';a.partsEdited=true}else{a.parts=[];a.focus=[];a.focusState='';a.partsStatus='silence';a.partsEdited=true}reconcilePresenceAfterEdit(p,ui.sectionIndex);save();return renderSectionStudy()}
-  if(action==='set-feel'){const a=ensureAnalysis(p,ui.sectionIndex),k=b.dataset.scale;a.feel[k]=b.dataset.value;a.feelUnsure[k]=false;save();return renderSectionStudy()}
-  if(action==='feel-unsure'){const a=ensureAnalysis(p,ui.sectionIndex),k=b.dataset.scale;a.feelUnsure[k]=!a.feelUnsure[k];if(a.feelUnsure[k])a.feel[k]=null;save();return renderSectionStudy()}
+  if(action==='set-feel'){const a=ensureAnalysis(p,ui.sectionIndex),k=b.dataset.scale;a.feel[k]=b.dataset.value;save();return renderSectionStudy()}
   if(action==='toggle-focus'){const a=ensureAnalysis(p,ui.sectionIndex);toggleArray(a.focus,b.dataset.name);a.focusState=a.focus.length?'selected':'';save();return renderSectionStudy()}
   if(action==='focus-status'){const a=ensureAnalysis(p,ui.sectionIndex),st=b.dataset.status;a.focusState=a.focusState===st?'':st;if(a.focusState)a.focus=[];save();return renderSectionStudy()}
   if(action==='transition-status'){const t=ensureTransition(p,ui.sectionIndex),st=b.dataset.status;t.status=t.status===st?'':st;if(t.status)t.changes=[];ui.selectedTarget=null;save();return renderSectionStudy()}
@@ -759,6 +823,8 @@ sheetRoot.addEventListener('click',e=>{
   const b=e.target.closest('[data-action]');if(!b)return;
   const action=b.dataset.action,p=project();
   if(action==='close-sheet')return closeSheet();
+  if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
+  if(action==='open-roadmap'){closeSheet();return go('roadmap');}
   if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}
   if(action==='save-section-name'){
     const s=p.map.sections.find(x=>x.id===b.dataset.id),v=clean(document.getElementById('renameSection')?.value);
@@ -768,9 +834,7 @@ sheetRoot.addEventListener('click',e=>{
     const id=b.dataset.id,index=p.map.sections.findIndex(x=>x.id===id);
     if(index>=0){p.map.sections.splice(index,1);delete p.map.analysis[id];delete p.skeleton.backbone.sections[id];delete p.skeleton.rough.parts[id];Object.keys(p.map.transitions).forEach(k=>{if(k.includes(id))delete p.map.transitions[k]});reconcileAllPresence(p);}
     save();closeSheet();return renderStructure();
-  }
-  if(action==='set-guidance'){p.guidance=b.dataset.value;save();closeSheet();return render();}
-  if(action==='export-backup')return exportBackup();
+  }  if(action==='export-backup')return exportBackup();
   if(action==='import-backup'){document.getElementById('importFile').click();return;}
   if(action==='reset-project'){
     if(confirm(`Reset ${p.title}? This clears its saved progress.`)){
@@ -782,30 +846,46 @@ sheetRoot.addEventListener('click',e=>{
 
 function installSorting(){
   const container=document.getElementById('sortList');
-  if(!container||!ui.reorderMode)return;
-  container.querySelectorAll('[data-drag-handle]').forEach(handle=>handle.addEventListener('pointerdown',startDrag,{passive:false}));
+  if(!container)return;
+  container.querySelectorAll('[data-drag-handle]').forEach(handle=>{
+    handle.addEventListener('pointerdown',startDrag,{passive:false});
+    handle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation()});
+  });
 
   function startDrag(e){
     if(e.button!==undefined&&e.button!==0)return;
-    e.preventDefault();
-    const row=e.currentTarget.closest('.sort-row');if(!row)return;
-    const rect=row.getBoundingClientRect(),offsetY=e.clientY-rect.top;
+    e.preventDefault();e.stopPropagation();
+    const handle=e.currentTarget,row=handle.closest('.sort-row');if(!row)return;
+    try{handle.setPointerCapture(e.pointerId)}catch(_){}
+    const rect=row.getBoundingClientRect(),offsetY=e.clientY-rect.top,startTop=rect.top;
     const placeholder=document.createElement('div');placeholder.className='sort-placeholder';placeholder.style.height=rect.height+'px';
     const ghost=row.cloneNode(true);ghost.classList.add('sort-ghost');
-    Object.assign(ghost.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'});
+    Object.assign(ghost.style,{left:rect.left+'px',top:startTop+'px',width:rect.width+'px',height:rect.height+'px',willChange:'transform'});
     row.replaceWith(placeholder);document.body.appendChild(ghost);document.body.classList.add('is-sorting');
-    if(navigator.vibrate)navigator.vibrate(8);
+    if(navigator.vibrate)navigator.vibrate(6);
+    let lastY=e.clientY,raf=0;
 
-    const move=ev=>{
-      if(ev.pointerId!==e.pointerId)return;ev.preventDefault();
-      ghost.style.top=(ev.clientY-offsetY)+'px';
-      const edge=82,step=10;if(ev.clientY<edge)window.scrollBy(0,-step);else if(ev.clientY>window.innerHeight-edge)window.scrollBy(0,step);
+    const placeAt=y=>{
       const rows=[...container.querySelectorAll('.sort-row')];let inserted=false;
-      for(const candidate of rows){const r=candidate.getBoundingClientRect();if(ev.clientY<r.top+r.height/2){container.insertBefore(placeholder,candidate);inserted=true;break;}}
-      if(!inserted)container.appendChild(placeholder);
+      for(const candidate of rows){const r=candidate.getBoundingClientRect();if(y<r.top+r.height/2){if(placeholder.nextSibling!==candidate)container.insertBefore(placeholder,candidate);inserted=true;break;}}
+      if(!inserted&&container.lastElementChild!==placeholder)container.appendChild(placeholder);
+    };
+    const tick=()=>{
+      raf=0;
+      const edge=96,step=12;
+      if(lastY<edge)window.scrollBy(0,-step);
+      else if(lastY>window.innerHeight-edge)window.scrollBy(0,step);
+      placeAt(lastY);
+    };
+    const move=ev=>{
+      if(ev.pointerId!==e.pointerId)return;
+      ev.preventDefault();lastY=ev.clientY;
+      ghost.style.transform=`translate3d(0,${ev.clientY-offsetY-startTop}px,0)`;
+      if(!raf)raf=requestAnimationFrame(tick);
     };
     const end=ev=>{
       if(ev.pointerId!==e.pointerId)return;
+      if(raf)cancelAnimationFrame(raf);
       document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',end);document.removeEventListener('pointercancel',end);
       placeholder.replaceWith(row);ghost.remove();document.body.classList.remove('is-sorting');
       const p=project(),ids=[...container.querySelectorAll('.sort-row')].map(x=>x.dataset.sectionId);
