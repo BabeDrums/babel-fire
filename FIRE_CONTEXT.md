@@ -654,22 +654,22 @@ The phase title pill (for example **The Map** or **The Skeleton**) remains tappa
 
 
 ### Navigation grammar — LOCKED
-Use contextual hierarchy labels instead of a generic `Back` whenever the parent destination is known:
-- checkpoint/detail screens inside The Map → `‹ The Map`
-- checkpoint/detail screens inside The Skeleton → `‹ The Skeleton`
-- phase homes / Recreation-level screens → `‹ Recreation`
-- project overview → `‹ Projects`
+The in-app top-left Back button on workflow/detail screens must mirror the browser Back behavior and use the browser history stack.
 
-The tappable phase pill remains available throughout Recreation. Its **Roadmap** sheet must show the current project (for example `Smithereens`) at the top as a direct shortcut back to the Recreation overview, followed by the seven phases. The project shortcut should be labeled as `Project overview` rather than repeating artist metadata.
+Examples:
+- The Map → Tracks → Back returns to **The Map**
+- The Map → Structure → Next → Tracks → Back returns to **Structure**
+- Tracks → Next → Section Study → Back returns to **Tracks**
+- The Skeleton → Session → Next → Backbone → Back returns to **Session**
 
-On a Recreation project overview, the centered **Recreation** pill is also interactive and opens the exact same **Roadmap** sheet as the phase pills (`The Map`, `The Skeleton`, etc.). This gives the project overview and all phase screens one consistent shortcut into phase navigation.
+When FIRE pushes a new route, store the previous route/label in that browser-history entry so the top-left label can reflect the actual prior screen. Internal movement within one screen (for example moving between Section Study sections) must not replace that remembered entry route.
 
-Button semantics are strict:
-- **Back** / contextual header navigation = move backward in hierarchy
-- **Next** = advance through the workflow
-- **Done** = close/dismiss an editing sheet or modal only
+The phase pill remains the hierarchy/roadmap shortcut. Back and the phase pill should not duplicate one another.
 
-Do not use `Done` as a second way to return from normal workflow pages when the header already provides that navigation.
+Button semantics:
+- **Back** = actual previous screen
+- **Next** = advance the workflow
+- **Done** = close/dismiss a sheet or editing state only
 
 ---
 
@@ -818,6 +818,18 @@ FIRE copy should be concise and action-oriented:
 - Prefer concrete verbs: `Map the form`, `Identify the tracks`, `Build the backbone`, `Review the map`.
 - Avoid repeating information already communicated by disabled states, checkmarks, progress bars, or section labels.
 - Consistency means shared typography, spacing, cards, navigation, and completion language — not forcing every phase to contain the same content.
+
+---
+
+
+## Skeleton Session — LOCKED interaction
+The Session checkpoint creates DAW elements one-by-one.
+
+- **Tracks:** each mapped track has its own completion row.
+- **Markers:** each Structure section has its own marker completion row; do not use one global “Section markers created” toggle.
+- Track and marker rows should use the same left-aligned circular completion indicator.
+- Backbone section completion rows should use that same left-aligned completion pattern for visual consistency.
+- Do not show an extra Skeleton completion/status callout at the end of Full Rough; the completion control, gating, and Next Phase button are sufficient.
 
 ---
 
