@@ -422,7 +422,7 @@ function renderMapHome(){
       ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
   const setupBits=[clean(m.setup.tempo)?`${esc(m.setup.tempo)} BPM`:'Tempo not set',m.setup.meter||'Meter not set',m.setup.grid?'Grid aligned':'Grid not aligned'];
   const setupRow=`<div class="phase-utility"><button class="list-row" data-action="go" data-route="map-setup">${mapSetupComplete(p)?`<span class="round-check on" aria-hidden="true"></span>`:`<span class="status-dot"></span>`}<div><div class="title">Setup</div><div class="desc">${setupBits.join(' · ')}</div></div><span class="chev">›</span></button></div>`;
-  app.innerHTML=phaseHome(0,done,3,checkpoints,'',setupRow);
+  app.innerHTML=phaseHome(0,done,3,checkpoints,setupRow,'');
 }
 function renderMapSetup(){
   const p=project(),m=p.map;
