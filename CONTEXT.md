@@ -1,21 +1,17 @@
 # Babel FIRE — Project Continuity / Handoff Context
 
 ## Purpose of this file
-This is the continuity file for the Babel FIRE project. If a new ChatGPT conversation is started, the new assistant should treat this file as the authoritative product/design context, then inspect the current GitHub repo before making code changes.
+This is the durable product/design context for Babel FIRE, not a changelog or a report of what has shipped. Begin continuations with `START_HERE.md` and follow the source-of-truth order in `AGENTS.md`: repository rules, active version specification (currently `V5.md`), this context, then current code/tests. The active specification supersedes older product/UI descriptions here where they conflict.
 
-**Start every continuation by:**
-1. Reading this file.
-2. Inspecting `BabeDrums/babel-fire` → `main/index.html`.
-3. Treating the repo version as the code source of truth.
-4. Asking the user only about genuinely new/ambiguous decisions, not things already settled here.
+Inspect current `main`, open PRs, relevant branches, and local changes without overwriting unfinished work. Distinguish shipped, unmerged, and planned work; continue from the latest verified state rather than asking the user to repeat documented decisions.
 
 ## Continuity maintenance rule
-`FIRE_CONTEXT.md` is a **living product specification**, not a one-time handoff.
+`CONTEXT.md` is a **living product specification**, not a one-time handoff.
 
 - Keep **one canonical copy** in the root of `BabeDrums/babel-fire`.
 - Update it whenever a **locked product decision, learning-framework decision, architecture rule, or important user preference changes**.
 - Pure visual tweaks and bug fixes do not need a context rewrite unless they establish a new reusable rule.
-- The repository's `main/index.html` is the source of truth for current implementation.
+- The production branch records shipped implementation; task branches and PRs may contain newer, unmerged work. Code/tests describe implementation state without overriding approved requirements.
 - This file is the source of truth for **why FIRE works the way it does**, the user's production-learning profile, and decisions that must survive future chats.
 - A new chat should inspect both the current repo and this file before proposing changes.
 - Do not make the user repeat the original production assessment or previously settled FIRE decisions.
@@ -292,7 +288,7 @@ Notes/analysis must stay attached if sections are reordered.
 
 Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
 
-**V4 locked interaction:** Structure is a clean ordered list with one **+ Add section** action. Tapping it opens section type selection; choosing a type immediately asks for bar length **before the section is inserted**. Never create a section with a missing bar length and then force the user to repair it afterward. If the same section type already exists, FIRE may quietly prefill that type's most recently used bar length, but it remains editable before Add.
+**V5 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length pills. Custom fields appear only for Custom. Insert only after a valid name/type and length are selected. A selected length pill is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
 
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
@@ -379,16 +375,16 @@ Renaming or reordering must not detach data.
 ## Section length / timing
 Every section has a whole-number bar length.
 
-V4 UI snaps to **whole bars** by default. The internal model remains capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
+The current timeline UI snaps to **whole bars** by default. The internal model remains capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
 
 Do not add beat-level controls until real use proves they are necessary.
 
 ## Presence ranges
 A track's presence is represented visually by one or more ranges.
 
-**V4 continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
+**Open-ended presence / continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
 
-If a track stops, the user uses a single clear **Cut / End** action and chooses the musical boundary. If it stops at the end of a section, the line receives an end cap at that boundary. If it stops earlier, the end cap appears at that bar. A later re-entry creates a new open presence range from the re-entry point forward.
+In V5, selecting the generous presence/row target reveals neutral start/end handles directly on the current timeline viewport, including edges of continuing ranges. Whole-bar dragging trims or extends presence. Compact inline timing steppers provide a tap-based alternative. Continue restores an open end. There is no dedicated Cut button or cut-bar modal. Contextual Split exposes an inline gap editor; a later re-entry remains open by default.
 
 Visual grammar:
 - uninterrupted line = continuous presence
@@ -406,15 +402,9 @@ Changes live on a Track or on Mix.
 
 Use two underlying kinds:
 - **Duration/state range** — e.g. Widens, Narrows, Doubles, Louder/Softer, Effect shift.
-- **Moment marker** — e.g. Pattern shift, Register shift, Transition cue.
+- **Moment marker** — e.g. Pattern shift and Register shift; older saved data may also contain Transition cue.
 
-Do **not** make the user choose “Duration” vs “Moment” as the first interaction. That is implementation language. The Add Change flow should first ask **What changed?** and progressively disclose semantic families such as:
-- **Space** — Widens / Narrows
-- **Level** — Louder / Softer
-- **Performance** — Doubles / Pattern shift / Register shift
-- **Sound** — Effect shift
-- **Cue** — Transition cue
-- **Other…** — only here may FIRE ask whether a custom change lasts or happens once
+Do not expose Duration/Moment classification. In V5, **+ Change** opens one sheet with all standard actions visible under small headings: Width (Widens/Narrows), Level (Louder/Softer), Performance (Doubles/Pattern shift/Register shift), and Sound (Effect shift). Choosing an action creates it immediately across the selected/current visible presence and closes the sheet. Refine timing directly on the timeline. Transition cue is no longer offered; existing saved cues and custom changes remain preserved and editable.
 
 Known duration/state changes begin at a musical position and, like presence, may remain open-ended until explicitly ended or superseded. If another range in the same underlying property begins later (for example `Widens` followed by `Narrows`), the earlier state should end automatically at the new state's start. Different properties may overlap. A track-level open state naturally cannot outlive the track presence that contains it.
 
@@ -435,13 +425,13 @@ Collapsed timeline row:
 
 The visualization should carry the timing information instead of repeating it as text. Color may distinguish semantic change families, but shape must also carry meaning so the system never relies on color alone.
 
-Only one Track expands at a time. Expanded state reveals labeled change lanes and contextual actions such as **+ Change** and **Cut**. Collapsing the Track must keep all meaningful duration/marker information visible on the compact rail. Do not show every detailed change lane for every Track simultaneously.
+Only one Track expands at a time. Expanded state reveals large change chips and **+ Change**. Selecting a chip reveals one editable visual lane and Remove, without a timing/details modal. Collapsing the Track preserves all duration/marker information on the compact rail. Change properties occupy distinct subordinate positions so simultaneous categories remain legible. Routine timeline edits/removal offer Undo; another saved edit replaces that Undo opportunity.
 
-Tap/drag should be the natural interaction, but important editing must also have a tap-based sheet alternative. Drag may never be the only way to set timing precisely.
+Tap/drag is the primary interaction. Inline tap-based timing controls provide precision without opening a redundant sheet. No essential edit relies on a skinny line or an undiscoverable gesture.
 
 A Mix row may provide section-wide changes, but keep it visually quiet. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
 
-## V4 visual language
+## Current FIRE / timeline visual language
 FIRE itself is no longer themed around Smithereens. The product chrome should use a neutral, premium graphite/near-black palette with crisp light type and restrained borders. Smithereens is a project inside FIRE, not FIRE's brand identity.
 
 Reserve color primarily for musical information and interaction state. Current semantic change families may use restrained distinct hues (for example Space, Level, Performance, Sound, Cue) while presence stays neutral. Avoid rainbow clutter, gradients, foggy glass, or decorative effects that reduce precision.
@@ -449,7 +439,7 @@ Reserve color primarily for musical information and interaction state. Current s
 The governing UI principle is:
 > **FIRE assumes the music keeps doing what it was doing. You only tell it when something changes.**
 
-This should make V4 visibly simpler than V3 even though the underlying engine is smarter.
+The default interface should stay visually simple even when the underlying timeline model is detailed.
 
 ## Section-to-section motion
 Section Study is one continuous musical model under a focused viewport.
@@ -464,7 +454,7 @@ When moving to the next/previous section:
 Respect Reduce Motion.
 
 ## Structure edits and timeline safety
-Because ranges can cross sections, reorder/removal must never accidentally make a range span unrelated music or delete unaffected data.
+Because ranges can cross sections, reorder/removal must never accidentally make a range span unrelated music or delete unaffected data. Retain original IDs on surviving fragments; new fragments get new IDs. Preserve open tails when the resulting coverage reaches the current song end. If a reorder moves an open tail ahead of absent music, close that tail at its actual covered boundary rather than spreading it across unrelated sections.
 
 Before destructive Structure mutation, preserve timeline data as section-local segments; after the mutation, reconcile and merge truly adjacent compatible ranges again. Section IDs remain authoritative.
 
@@ -809,7 +799,7 @@ Project section belongs at the bottom.
 
 Use **one completion visual language everywhere**.
 
-The user strongly likes the yellow circular action-card check.
+Use the same circular action-card check throughout the app, with the neutral V5 interaction accent.
 
 Use the same visual family for:
 - First Listen
@@ -855,8 +845,8 @@ The Session checkpoint creates DAW elements one-by-one.
 - dark
 - minimal
 - polished
-- warm/Trench-ish palette
-- yellow accent
+- neutral graphite palette
+- restrained neutral interaction accent
 - comfortable touch targets
 - clean typography
 - progressive disclosure
@@ -864,12 +854,12 @@ The Session checkpoint creates DAW elements one-by-one.
 
 The user wants the UI to feel native/intentional, not like a web form.
 
-For the V3 timeline specifically, keep the implementation **crisp rather than foggy/frosted**:
+For the current timeline, keep the implementation **crisp rather than foggy/frosted**:
 - solid dark surfaces
 - sharp readable contrast
 - thin precise timeline/grid lines
 - restrained radii and separators
-- yellow reserved for selection, progress, and active editing
+- neutral accents reserved for selection, progress, and active editing
 - no decorative blur/glow just because Apple-inspired styling is desired
 
 ## Apple-like rules that have emerged
@@ -924,9 +914,9 @@ Do not reintroduce:
 
 # 23. Current refactor direction / code architecture
 
-FIRE is now on the **V3 timeline architecture**.
+FIRE retains the **continuous timeline architecture originally introduced in V3**, while **V5 is the active interaction generation**.
 
-Keep FIRE as one self-contained `index.html` for now; that deployment workflow remains valuable. Internally, keep concerns separated even inside one file:
+FIRE uses three plain static files: `index.html` is the document shell, `styles.css` owns visual styles, and `app.js` owns the application. Deploy all three together from the GitHub Pages root. There is no framework, package installation, bundler, or backend. Within the application, keep concerns separated:
 - schema/migration
 - timeline math
 - mutations + invalidation
@@ -946,7 +936,7 @@ Important engineering rules:
 - centralize destructive/mutation logic; do not keep duplicate remove/update paths that clean different dependent state
 - avoid keeping both the old Parts/Changes editor and the new timeline editor for the same truth
 
-## V3 migration
+## Legacy data migration
 Old data should migrate rather than reset:
 - old global ingredient names → stable Track objects/IDs
 - old active Parts → Presence ranges
@@ -1031,21 +1021,14 @@ Do not spend current development time on the icon unless the user explicitly ret
 ## GitHub Pages live site
 `https://babedrums.github.io/babel-fire/`
 
-## Manual upload/replace page
-`https://github.com/BabeDrums/babel-fire/upload/main`
-
 ## Deployment model
-- `main/index.html`
-- GitHub Pages deploys from `main` root
-- replacing `index.html` + committing automatically republishes the site
+- GitHub Pages serves `index.html`, `app.js`, and `styles.css` from the `main` root; deploy the three static files together with no build step.
+- Implementation belongs on dedicated task branches. Completed work is tested, committed, pushed, and opened as a PR against `main`.
+- PRs are the external/user review checkpoint. Merge and production deployment require explicit approval; opening a PR does not deploy the work.
+- Preserve history and unfinished local work before syncing or switching branches. The full workflow and completion-report requirements live in `AGENTS.md`.
+- Report the PR link, exact changed files, validation, and remaining risks. Do not substitute manual uploads to production for PR review.
 
 Netlify is no longer required for this project.
-
-### Standard update response format
-After each code update, give the user:
-1. updated `index.html` download
-2. clickable GitHub upload/replace link
-3. clickable live FIRE link
 
 ---
 
@@ -1062,8 +1045,8 @@ Use this conversation to:
 - evaluate user testing feedback
 - protect project intent
 
-## Codex = eventual repo engineering executor
-As FIRE grows, Codex is likely better for:
+## Codex = repository engineering executor
+Codex executes approved engineering work in the repository:
 - working directly in repo
 - coordinated edits
 - tests
@@ -1073,10 +1056,10 @@ As FIRE grows, Codex is likely better for:
 
 Do **not** throw away this product conversation just because Codex becomes involved.
 
-Long-term ideal:
-> user + ChatGPT decide what FIRE should do → Codex implements in repo → GitHub Pages deploys
+Collaboration workflow:
+> user + ChatGPT decide what FIRE should do → Codex implements on a task branch → tests → commit/push → PR → external/user review → explicit approval → merge → GitHub Pages production
 
-The normal Chat GitHub connection is not a reliable direct push workflow, so manual upload is currently acceptable.
+Do not bypass PR review by uploading files directly to production.
 
 ---
 
@@ -1150,15 +1133,16 @@ NOT:
 
 # 32. Latest state / likely next move
 
-The current generation is the first proper V3 implementation pass.
+The active approved interaction generation is V5, specified in `V5.md`, retaining the continuous timeline engine. An active specification does not imply that its implementation has shipped; verify `main` and open PRs for release status. Stored schema version is 5; the storage key remains `production-projects-v1`. Startup and imported backups share normalization/migration. V4 projects, stable identities, fractional timing, notes, and valid downstream progress survive migration. Legacy cue observations remain stored even though new cues are no longer offered.
 
-Locked major changes now represented in the code/spec:
+Durable V5 interaction and architecture rules:
 - Structure sections have bar lengths
 - Section Study uses the visual timeline model
-- Presence is represented by ranges with true start/end caps
+- Presence is represented by continuous ranges with clear start/end boundaries
 - uninterrupted ranges may cross section boundaries
-- timed production changes are Duration ranges or Moment markers
-- only one Track expands at a time
+- timed production changes are ranges or markers internally; those classifications are not exposed in creation UI
+- only one Track expands at a time; changes are selected through large chips
+- presence and change editing is direct, with inline timing alternatives and Undo
 - section-to-section navigation slides through the song
 - stable Track IDs replace name-as-identity logic
 - old Map data migrates into the new model where possible
@@ -1169,7 +1153,7 @@ Locked major changes now represented in the code/spec:
 
 Next product development should come from using this build on the real Smithereens recreation. Do not pre-design Sounds/Balance/Shape/World further until actual use of Map/Skeleton exposes the next meaningful need.
 
-Before any future code change, inspect the current repo `main/index.html` because the user may have deployed a newer build after this context file was generated.
+Before future code changes, follow `START_HERE.md` to inspect current production, unmerged work, and local changes. This context does not replace verification of implementation/release state.
 
 ---
 
@@ -1177,7 +1161,7 @@ Before any future code change, inspect the current repo `main/index.html` becaus
 
 If this file is uploaded into a new conversation, the user should be able to say:
 
-> **Continue Babel FIRE from the continuity file. Inspect the current `BabeDrums/babel-fire` repo first and pick up exactly where we left off.**
+> **Babel FIRE — continue from GitHub repo BabeDrums/babel-fire. Read START_HERE.md.**
 
 The assistant should not make the user repeat the project history.
 
@@ -1186,13 +1170,18 @@ The assistant should not make the user repeat the project history.
 
 The safest continuity workflow is intentionally simple:
 
-**One file: `FIRE_CONTEXT.md`.**
+**One canonical durable product context: `CONTEXT.md`.** `START_HERE.md` is the short entry point; `AGENTS.md` holds repository rules; the active specification holds approved generation requirements; `CHANGELOG.md` records meaningful milestones. Do not duplicate this context across them.
 
 Do not create a new handoff document for every chat.
 
 Instead, keep this file current as the living FIRE specification. When an important locked decision changes, update this file. When only code implementation or small UI polish changes, the repo code itself records that implementation.
 
 A future chat should not need a giant pasted prompt. The user can simply say:
-> **Continue Babel FIRE. Read `FIRE_CONTEXT.md` in the repo and inspect the current `main/index.html` before doing anything.**
+> **Babel FIRE — continue from GitHub repo BabeDrums/babel-fire. Read START_HERE.md.**
 
 That is the intended long-term handoff method.
+
+
+# 35. V5 regression workflow
+
+`tests/test_v5.py` is a browser regression suite using Python Playwright and a local Chromium installation. Serve the repository with `python3 -m http.server 8000 --bind 127.0.0.1`, then run `python3 -B -m unittest discover -s tests -v`. `CHROMIUM_PATH`, `FIRE_URL`, and `FIRE_TEST_WIDTH` can override the browser, server, and viewport. Test dependencies are development tools only; the shipped app remains dependency-free. Tests use disposable browser contexts, representative V4/legacy saved data, actual Chromium touch input, and imported backups. Physical iOS Safari verification remains a separate device check.
