@@ -442,6 +442,10 @@ function renderMapHome(){
     </div>`;
   app.innerHTML=phaseHome(0,done,3,checkpoints,setup,'');
 }
+function checkpointRow(title,desc,route,done,unlocked=true){
+  return `<button class="list-row checkpoint-row" data-action="go" data-route="${route}" ${unlocked?'':'disabled'}>${done?`<span class="round-check on" aria-hidden="true"></span>`:unlocked?`<span class="status-dot"></span>`:`<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked?'›':''}</span></button>`;
+}
+
 function actionCard(title,copy,on,action,id='',disabled=false,attrs=''){
   return `<button class="action-card ${on?'on':''}" ${id?`id="${id}"`:''} data-action="${action}" ${attrs} ${disabled?'disabled':''}><div><strong>${esc(title)}</strong>${copy?`<span class="copy">${esc(copy)}</span>`:''}</div><span class="round-check ${on?'on':''}" aria-hidden="true"></span></button>`;
 }
