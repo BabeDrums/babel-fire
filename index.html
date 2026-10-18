@@ -108,6 +108,9 @@ details.note-disclosure{border:1px solid var(--line);border-radius:17px;padding:
 .phase-nav-row strong{display:block;font-size:14px}
 .phase-nav-row span.copy{display:block;font-size:11px;color:var(--muted);margin-top:2px}
 .phase-nav-arrow{font-size:19px;color:var(--muted)}
+.phase-nav-project{width:100%;min-height:62px;padding:11px 13px;margin-bottom:12px;border-radius:16px;border:1px solid var(--line-strong);background:rgba(255,255,255,.045);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;text-align:left;color:var(--text);cursor:pointer}
+.phase-nav-project strong{display:block;font-size:15px}.phase-nav-project span.copy{display:block;font-size:11px;color:var(--muted);margin-top:3px}.phase-nav-project .phase-nav-arrow{align-self:center}
+
 .phase-home{display:block}
 .requirement-note{min-height:20px;text-align:center;color:var(--muted);font-size:12px;line-height:1.4;margin-top:8px}
 .road-phase.clickable{cursor:pointer;width:100%;text-align:left;color:inherit}
@@ -273,7 +276,7 @@ function go(route,extra={},push=true){
   render();window.scrollTo(0,0);
 }
 window.addEventListener('popstate',e=>{ui={...ui,...(e.state||{}),route:e.state?.route||'project'};render()});
-function backButton(target='project'){return `<button class="nav-btn left" data-action="go" data-route="${target}"><span class="arrow">‹</span>Back</button>`}
+function backButton(target='project',label='Back'){return `<button class="nav-btn left" data-action="go" data-route="${target}"><span class="arrow">‹</span>${esc(label)}</button>`}
 function topbar(left='',center='',right=''){return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`}
 function savedMark(){return `<span class="saved">Saved</span>`}
 function phaseTag(text){return `<span class="pill-tag">${esc(text)}</span>`}
@@ -400,7 +403,7 @@ function renderOriginalOverview(){
 }
 
 function renderNewProject(){
-  app.innerHTML=topbar(backButton('projects'),phaseTag('New Project'),'')+`
+  app.innerHTML=topbar(backButton('projects','Projects'),phaseTag('New Project'),'')+`
     <h2>New project</h2><p class="sub">Start original or rebuild a reference.</p>
     <div class="spacer-24"></div>
     <div class="new-type">
@@ -448,7 +451,7 @@ function actionCard(title,copy,on,action,id='',disabled=false,attrs=''){
 }
 function phaseHome(index,done,total,checkpointsHtml,beforeHtml='',afterHtml=''){
   const pct=total?Math.round(done/total*100):0;
-  return topbar(backButton('project'),phasePill(index),savedMark())+
+  return topbar(backButton('project','Recreation'),phasePill(index),savedMark())+
     beforeHtml+
     `<div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div>`+
     `<div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div>`+
@@ -458,7 +461,7 @@ function phaseHome(index,done,total,checkpointsHtml,beforeHtml='',afterHtml=''){
 
 function renderStructure(){
   const p=project(),labels=sectionLabels(p),done=structureDone(p);
-  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+  app.innerHTML=topbar(backButton('map','The Map'),phasePill(0),savedMark())+`
     <h2>Map the form</h2><p class="sub">Add a section whenever the form changes.</p>
     <div class="section-kicker">Add Section</div><div class="choice-wrap">${SECTION_TYPES.map(x=>`<button class="choice" data-action="add-section" data-name="${x}">${x}</button>`).join('')}</div>
     <div class="inline-add"><input class="field" id="customSection" placeholder="Custom section"><button class="secondary" data-action="add-custom-section">Add</button></div>
@@ -466,26 +469,26 @@ function renderStructure(){
     <div class="sort-list" id="sortList">${p.map.sections.length?p.map.sections.map((s,i)=>`<div class="sort-row" data-action="edit-section" data-section-id="${s.id}" data-index="${i}"><div class="index">${i+1}</div><div class="name">${esc(labels[i])}</div><div class="drag-handle" data-drag-handle aria-label="Reorder ${esc(labels[i])}">≡</div></div>`).join(''):`<div class="empty">Add the first section when the song begins.</div>`}</div>
     <div class="section-kicker">Verify</div>
     ${actionCard('Verify structure','Confirm the order and boundaries.',p.map.structureVerified,'toggle-structure-verified')}
-    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="go" data-route="ingredients" ${done?'':'disabled'}>Next</button></div>
+    <div class="spacer-24"></div><button class="primary full" data-action="go" data-route="ingredients" ${done?'':'disabled'}>Next</button>
     <div class="requirement-note">${done?'':'Finish and verify the structure.'}</div>`;
   installSorting();
 }
 
 function renderIngredients(){
   const p=project(),parts=p.map.ingredients,customParts=parts.filter(x=>!COMMON_PARTS.includes(x)),trackChoices=[...COMMON_PARTS,...customParts],done=ingredientsDone(p);
-  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+  app.innerHTML=topbar(backButton('map','The Map'),phasePill(0),savedMark())+`
     <h2>Identify the tracks</h2><p class="sub">Select the parts you hear across the song.</p>
     <div class="section-kicker">Tracks</div><div class="choice-wrap">${trackChoices.map(x=>`<button class="choice ${parts.includes(x)?'selected':''}" data-action="toggle-ingredient" data-name="${esc(x)}">${esc(x)}</button>`).join('')}</div>
     <div class="inline-add"><input class="field" id="customPart" placeholder="Other..."><button class="secondary" data-action="add-custom-part">Add</button></div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="map">Done</button><button class="primary" data-action="start-section-study" ${done?'':'disabled'}>Next</button></div>
+    <div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${done?'':'disabled'}>Next</button>
     <div class="requirement-note">${done?'':'Add at least one track to continue.'}</div>`;
 }
 function renderSectionStudy(){
-  const p=project();if(!p.map.sections.length){return app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`<h2>No sections yet.</h2><p class="sub">Map the structure first.</p><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="structure">Open Structure</button>`}
+  const p=project();if(!p.map.sections.length){return app.innerHTML=topbar(backButton('map','The Map'),phasePill(0),savedMark())+`<h2>No sections yet.</h2><p class="sub">Map the structure first.</p><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="structure">Open Structure</button>`}
   ui.sectionIndex=Math.max(0,Math.min(ui.sectionIndex,p.map.sections.length-1));
   const i=ui.sectionIndex,labels=sectionLabels(p),a=ensureAnalysis(p,i),t=ensureTransition(p,i),allParts=availableParts(p);
   const activeParts=a.parts||[],currentDone=sectionComplete(p,i),missing=sectionMissingItems(p,i);
-  app.innerHTML=topbar(backButton('map'),phasePill(0),`<span class="micro">${i+1} of ${p.map.sections.length}</span>`)+`
+  app.innerHTML=topbar(backButton('map','The Map'),phasePill(0),`<span class="micro">${i+1} of ${p.map.sections.length}</span>`)+`
     <div class="horizontal-nav">${p.map.sections.map((sec,idx)=>{const unlocked=idx===0||p.map.sections.slice(0,idx).every((_,j)=>sectionComplete(p,j));return `<button class="section-tab ${idx===i?'current':''} ${sectionComplete(p,idx)?'done':''}" data-action="jump-section" data-index="${idx}" ${unlocked?'':'disabled'}>${esc(labels[idx])}</button>`}).join('')}</div>
     <div class="spacer-12"></div><h2>${esc(labels[i])}</h2><p class="sub">Loop the section and map what you hear.</p>
     <div class="study-block">
@@ -535,7 +538,7 @@ function renderChangeActions(target){return `<div class="spacer-12"></div><div c
 
 function renderMapSummary(){
   const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+  app.innerHTML=topbar(backButton('map','The Map'),phasePill(0),savedMark())+`
     <h2>Review the map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p>
     <div class="section-kicker">Structure</div><div class="chip-list">${labels.length?labels.map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No sections mapped.</span>'}</div>
     <div class="section-kicker">Tracks</div><div class="chip-list">${availableParts(p).length?availableParts(p).map(x=>`<span class="chip">${esc(x)}</span>`).join(''):'<span class="empty">No tracks mapped.</span>'}</div>
@@ -572,47 +575,47 @@ function renderSkeletonHome(){
 }
 function renderSkeletonSession(){
   const p=project(),parts=availableParts(p);
-  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+  app.innerHTML=topbar(backButton('skeleton','The Skeleton'),phasePill(1),savedMark())+`
     <h2>Set up the session</h2><p class="sub">Create placeholder tracks and section markers.</p>
     <div class="section-kicker">Tracks</div>
     <div class="group-card list">${parts.length?parts.map(part=>`<button class="list-row" data-action="toggle-track" data-name="${esc(part)}"><span class="round-check ${p.skeleton.session.tracks[part]?'on':''}" aria-hidden="true"></span><div><div class="title">${esc(part)}</div><div class="desc">Placeholder track created</div></div><span class="chev">›</span></button>`).join(''):'<div class="empty" style="padding:18px 14px">Map Tracks first to generate the session.</div>'}</div>
     <div class="section-kicker">Markers</div>${actionCard('Section markers created',p.map.sections.length?sectionLabels(p).join(' · '):'Map Structure first.',p.skeleton.session.markers,'toggle-markers')}
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-backbone" ${skeletonSessionDone(p)?'':'disabled'}>Next</button></div><div class="requirement-note">${skeletonSessionDone(p)?'':'Create every placeholder track and the section markers to continue.'}</div>`;
+    <div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-backbone" ${skeletonSessionDone(p)?'':'disabled'}>Next</button><div class="requirement-note">${skeletonSessionDone(p)?'':'Create every placeholder track and the section markers to continue.'}</div>`;
 }
 function renderSkeletonBackbone(){
   const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+  app.innerHTML=topbar(backButton('skeleton','The Skeleton'),phasePill(1),savedMark())+`
     <h2>Build the backbone</h2><p class="sub">Make every section recognizable.</p>
     <div class="tip"><div class="num">2</div><div><strong>Keep it rough.</strong><span>Scratch parts are enough for now.</span></div></div>
     <div class="section-kicker">Sections</div>
     <div class="group-card" style="padding:0 14px">${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i);return `<button class="backbone-row" data-action="toggle-backbone" data-id="${s.id}"><div><strong>${esc(labels[i])}</strong><span>${a.partsStatus==='silence'?'No active parts':esc((a.parts||[]).join(' · ')||'Parts not mapped')}</span></div><span class="round-check ${p.skeleton.backbone.sections[s.id]?'on':''}"></span></button>`}).join(''):'<div class="empty">Map Structure first.</div>'}</div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="skeleton-rough" ${skeletonBackboneDone(p)?'':'disabled'}>Next</button></div><div class="requirement-note">${skeletonBackboneDone(p)?'':'Mark every section recognizable to continue.'}</div>`;
+    <div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-rough" ${skeletonBackboneDone(p)?'':'disabled'}>Next</button><div class="requirement-note">${skeletonBackboneDone(p)?'':'Mark every section recognizable to continue.'}</div>`;
 }
 function renderSkeletonRough(){
   const p=project(),labels=sectionLabels(p);
-  app.innerHTML=topbar(backButton('skeleton'),phasePill(1),savedMark())+`
+  app.innerHTML=topbar(backButton('skeleton','The Skeleton'),phasePill(1),savedMark())+`
     <h2>Build the full rough</h2><p class="sub">Fill every mapped part through the song.</p>
     <div class="section-kicker">Sections</div>
     ${p.map.sections.length?p.map.sections.map((s,i)=>{const a=ensureAnalysis(p,i),parts=a.parts||[],state=p.skeleton.rough.parts[s.id]||{};return `<div class="card card-pad" style="margin-bottom:10px"><div class="block-head"><strong>${esc(labels[i])}</strong><span>${parts.filter(x=>state[x]).length} / ${parts.length}</span></div><div class="part-check-grid">${parts.length?parts.map(part=>`<button class="part-check ${state[part]?'done':''}" data-action="toggle-rough-part" data-section-id="${s.id}" data-name="${esc(part)}">${esc(part)}</button>`).join(''):`<span class="micro">No active parts mapped.</span>`}</div></div>`}).join(''):'<div class="empty">Map Structure and Section Study first.</div>'}
     <div class="section-kicker">Print</div>${actionCard('Export rough bounce','One beginning-to-end bounce.',p.skeleton.rough.bounce,'toggle-rough-bounce')}
     <div class="spacer-24"></div><div class="phase-brief"><strong>${skeletonDone(p)?'The Skeleton is complete.':'Finish the rough, then stop polishing.'}</strong><p>${skeletonDone(p)?'You now have a complete rough arrangement. The next phase is about matching sources and performances.':'The goal is coverage, not perfection.'}</p></div>
-    <div class="action-row"><button class="secondary" data-action="go" data-route="skeleton">Done</button><button class="primary" data-action="go" data-route="roadmap" ${skeletonDone(p)?'':'disabled'}>Next Phase</button></div><div class="requirement-note">${skeletonDone(p)?'':'Finish every rough part and export the rough bounce to continue.'}</div>`;
+    <div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p)?'':'disabled'}>Next Phase</button><div class="requirement-note">${skeletonDone(p)?'':'Finish every rough part and export the rough bounce to continue.'}</div>`;
 }
 
 function renderRoadmap(){
   const p=project();
   if(p.type==='original'){
-    app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph,i)=>`<div class="road-phase ${i===0?'active':''}"><div class="road-top"><div class="road-num">${i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join('')}`;return;
+    app.innerHTML=topbar(backButton('project','Original Song'),phaseTag('Roadmap'),'')+`<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph,i)=>`<div class="road-phase ${i===0?'active':''}"><div class="road-top"><div class="road-num">${i+1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join('')}`;return;
   }
-  app.innerHTML=topbar(backButton('project'),phaseTag('Roadmap'),'')+`<h2>Recreation roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i),tag=unlocked?'button':'div';return `<${tag} class="road-phase ${st} ${unlocked?'clickable':''}" ${unlocked?`data-action="go" data-route="${ph.route}"`:''}><div class="road-top">${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<div class="road-num">${i+1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p></div>${unlocked?`<span class="chev">›</span>`:''}</div><div class="road-checks">${ph.checkpoints.map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></${tag}>`}).join('')}`;
+  app.innerHTML=topbar(backButton('project','Recreation'),phaseTag('Roadmap'),'')+`<h2>Recreation roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i),tag=unlocked?'button':'div';return `<${tag} class="road-phase ${st} ${unlocked?'clickable':''}" ${unlocked?`data-action="go" data-route="${ph.route}"`:''}><div class="road-top">${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<div class="road-num">${i+1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p></div>${unlocked?`<span class="chev">›</span>`:''}</div><div class="road-checks">${ph.checkpoints.map(x=>`<span class="road-check">${esc(x)}</span>`).join('')}</div></${tag}>`}).join('')}`;
 }
 
 function renderNotes(){
-  const p=project();if(p.type==='original')return app.innerHTML=topbar(backButton('project'),phaseTag('Notes'),'')+`<h2>Notes</h2><p class="sub">Keep project notes in one place.</p>`;
+  const p=project();if(p.type==='original')return app.innerHTML=topbar(backButton('project','Original Song'),phaseTag('Notes'),'')+`<h2>Notes</h2><p class="sub">Keep project notes in one place.</p>`;
   const labels=sectionLabels(p),parking=[],takeaways=[];
   if(p.map.phaseParking)parking.push(['The Map',p.map.phaseParking]);if(p.map.phaseTakeaway)takeaways.push(['The Map',p.map.phaseTakeaway]);
   p.map.sections.forEach((s,i)=>{const a=ensureAnalysis(p,i);if(a.parking)parking.push([`The Map · ${labels[i]}`,a.parking]);if(a.takeaway)takeaways.push([`The Map · ${labels[i]}`,a.takeaway])});
-  app.innerHTML=topbar(backButton('project'),phaseTag('Notes'),'')+`<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p>
+  app.innerHTML=topbar(backButton('project','Recreation'),phaseTag('Notes'),'')+`<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p>
     <div class="section-kicker">Parking Lot</div>${parking.length?parking.map(([ctx,text])=>noteCard(ctx,text)).join(''):'<div class="empty">Nothing parked yet.</div>'}
     <div class="section-kicker">Takeaways</div>${takeaways.length?takeaways.map(([ctx,text])=>noteCard(ctx,text)).join(''):'<div class="empty">No takeaways yet.</div>'}`;
 }
@@ -620,14 +623,14 @@ function noteCard(ctx,text){return `<div class="card card-pad" style="margin-bot
 
 function renderOriginalSpark(){
   const p=project(),starts=['Lyric','Melody','Beat','Chords','Instrument part','Sound','Concept','Voice memo','Other'],reasons=['Rhythm','Emotion','Melody','Sound','Words','Energy'];
-  app.innerHTML=topbar(backButton('project'),phaseTag('The Spark'),savedMark())+`
+  app.innerHTML=topbar(backButton('project','Original Song'),phaseTag('The Spark'),savedMark())+`
     <h1>Start with what you have</h1><p class="sub">Don’t turn the idea into homework. Capture the thing that made you want to make something.</p>
     <div class="section-kicker">Starting With</div><div class="choice-wrap">${starts.map(x=>`<button class="choice ${p.spark.starts.includes(x)?'selected':''}" data-action="toggle-spark-start" data-name="${x}">${x}</button>`).join('')}</div>
     <div class="section-kicker">The Idea</div><textarea class="textarea" data-input="spark-idea" placeholder="What do you have right now?">${esc(p.spark.idea)}</textarea>
     <div class="section-kicker">What Makes It Worth Keeping?</div><div class="choice-wrap">${reasons.map(x=>`<button class="choice ${p.spark.reasons.includes(x)?'selected':''}" data-action="toggle-spark-reason" data-name="${x}">${x}</button>`).join('')}</div>
     <div class="section-kicker">Anchor</div><textarea class="textarea" data-input="spark-anchor" placeholder="What absolutely should survive as this song grows?">${esc(p.spark.anchor)}</textarea>
     <div class="spacer-24"></div><div class="original-anchor"><div class="micro" style="margin-bottom:5px">THE RULE</div><div style="font-size:14px;line-height:1.45">Protect the reason you started. Everything else can change.</div></div>
-    <div class="spacer-18"></div><button class="secondary full" data-action="go" data-route="project">Done for now</button>`;
+    `;
 }
 
 function openSectionSheet(id){
@@ -643,7 +646,7 @@ function openSettings(){
 }
 function openPhaseNavigator(index){
   const p=project();if(!p||p.type!=='study')return;
-  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Recreation</h3><div class="phase-nav-list">${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i);return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked?'':'disabled'}>${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked?'›':''}</span></button>`}).join('')}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
+  sheetRoot.innerHTML=`<div class="sheet"><div class="grabber"></div><h3>Recreation</h3><button class="phase-nav-project" data-action="open-project-overview"><div><strong>${esc(p.title)}</strong><span class="copy">${esc(p.artist||'Project overview')}</span></div><span class="phase-nav-arrow">›</span></button><div class="phase-nav-list">${STUDY_PHASES.map((ph,i)=>{const st=studyPhaseStatus(p,i),unlocked=studyPhaseUnlocked(p,i);return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked?'':'disabled'}>${st==='done'?`<span class="round-check on" aria-hidden="true"></span>`:st==='current'?`<span class="current-ring" aria-hidden="true"></span>`:`<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked?'›':''}</span></button>`}).join('')}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
   sheetRoot.classList.add('open');sheetRoot.setAttribute('aria-hidden','false');
 }
 function openProjectMenu(id){
@@ -741,6 +744,7 @@ app.addEventListener('click',e=>{
   if(action==='phase-nav')return openPhaseNavigator(Number(b.dataset.phaseIndex));
   if(action==='go-review-map')return go('map-summary');
   if(action==='close-sheet')return closeSheet();
+  if(action==='open-project-overview'){closeSheet();return go('project');}
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
   if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}

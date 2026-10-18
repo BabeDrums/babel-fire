@@ -652,6 +652,25 @@ Screens should not invent their own navigation logic.
 The phase title pill (for example **The Map** or **The Skeleton**) remains tappable and opens the universal phase navigator, but **do not show a dropdown chevron/caret beside the phase name**. Keep the pill visually quiet.
 
 
+
+### Navigation grammar — LOCKED
+Use contextual hierarchy labels instead of a generic `Back` whenever the parent destination is known:
+- checkpoint/detail screens inside The Map → `‹ The Map`
+- checkpoint/detail screens inside The Skeleton → `‹ The Skeleton`
+- phase homes / Recreation-level screens → `‹ Recreation`
+- project overview → `‹ Projects`
+
+The tappable phase pill remains available throughout Recreation. Its phase sheet must show the current project (for example `Smithereens`) at the top as a direct shortcut back to the Recreation overview, followed by the seven phases.
+
+Button semantics are strict:
+- **Back** / contextual header navigation = move backward in hierarchy
+- **Next** = advance through the workflow
+- **Done** = close/dismiss an editing sheet or modal only
+
+Do not use `Done` as a second way to return from normal workflow pages when the header already provides that navigation.
+
+---
+
 # 17. Phase homes — universal template
 
 The Map and Skeleton previously looked too different.
