@@ -290,6 +290,8 @@ Repeated names auto-number:
 **Stable section IDs are required.**
 Notes/analysis must stay attached if sections are reordered.
 
+Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
+
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
 
@@ -351,79 +353,93 @@ Checkpoint 3 of The Map is:
 
 Do not rename it back to “Production.”
 
-Instruction:
-> Loop this section in your DAW. Stay here until the section makes sense.
+Section Study is no longer a Parts/Changes form. It is a **focused viewport into one continuous song timeline**.
 
-The app walks through Structure sections one-by-one in exact order.
+The app still walks through Structure sections in exact order and keeps the horizontal section navigator. Moving Verse → Chorus should use a subtle horizontal slide so it feels like moving forward through one song, not loading an unrelated form. Direct section-tab jumps use the same mental model.
 
-A horizontal section navigator can show where you are.
+Only the current section is the primary editing surface, but ranges are allowed to continue across section boundaries.
 
 ---
 
-# 9. Section Study — Parts / Changes logic
+# 9. Section Study — timeline model — LOCKED
 
-## Parts
-Each section has a set of active Parts/Tracks.
+The timeline is the source of truth for arrangement state. Do not maintain a parallel Parts/Enters/Leaves state machine.
 
-The first section establishes the starting state.
+## Stable identity
+Use stable IDs for:
+- sections
+- tracks
+- presence ranges
+- change events/ranges
 
-Later sections inherit the previous section’s active parts unless changes modify them.
+Renaming or reordering must not detach data.
+
+## Section length / timing
+Every section has a whole-number bar length.
+
+V3 UI snaps to **whole bars** by default. The internal model should remain capable of fractional bar offsets later so beat/subdivision precision can be added without another schema rewrite.
+
+Do not add beat-level controls until real use proves they are necessary.
+
+## Presence ranges
+A track's presence is represented visually by one or more ranges.
+
+Adding a track to a section defaults to full-section presence because that is the common case. The user refines it only when needed.
+
+Visual grammar:
+- uninterrupted line = continuous presence
+- `|` end cap = the part actually stops there
+- `|` start cap = the part actually begins there
+- no cap at a section boundary when the part continues across it
+- an actual gap in sound is represented by separate ranges with empty space between them
+
+If one presence range ends at the exact instant another begins, merge them automatically. With no period of absence, presence is continuous; a new phrase/performance at that instant should be represented as a change, not as fake stop/restart presence.
+
+Presence ranges may cross section boundaries. A Synth that begins in Verse bar 5 and ends in Chorus bar 4 is one range, not duplicated Verse/Chorus data.
 
 ## Changes
-Changes should be **specific relationships**, not generic labels.
+Changes live on a Track or on Mix.
 
-Example:
-- `Bass · Enters`
-- `Vocal · Doubles`
-- `Mix · Widens`
+Use two kinds:
+- **Duration range** — the change has a start and end, e.g. Widens, Doubles, Louder/Softer, Effect shift.
+- **Moment marker** — the meaningful information is a point in time, e.g. Pattern shift, Register shift, Transition cue.
 
-### Parts ↔ Changes must be bidirectional
+A duration range may cross section boundaries exactly like presence.
 
-If user toggles a Part:
-- Part OFF when it was previously active → create `Part · Leaves`
-- Part ON when it was previously absent → create `Part · Enters`
+A Track change must stay inside that Track's presence. Mix changes are not constrained to a Track presence range.
 
-If user adds a Change:
-- `Bass · Leaves` → Bass becomes inactive in that section
-- `Bass · Enters` → Bass becomes active
+Entering and leaving are **derived from presence edges**. Do not create separate Enters/Leaves events.
 
-If an earlier section is edited, later section change logic must recalculate coherently.
+## Progressive disclosure / visual calm
+The data may be detailed; the default screen must not look detailed.
 
-Example that must work:
-- Outro has Drums, Intro does not → Outro shows `Drums · Enters`
-- user goes back and adds Drums to Intro → Outro’s `Drums · Enters` disappears
-- user removes Drums from Intro → Outro gets `Drums · Enters` again
+Collapsed timeline row:
+- Track name
+- one thin presence visualization
+- a concise timing summary or tiny change count
 
-This propagation logic is critical.
+Only one Track expands at a time. Expanded state reveals its change lanes and contextual actions. Do not show every change lane for every Track simultaneously.
 
-### Context-sensitive Change actions
-If a track is **not active** in the current section, the relevant action should generally be:
-- Enters
+Tap/drag should be the natural interaction, but important editing must also have a tap-based sheet alternative. Drag may never be the only way to set timing precisely.
 
-If it **is active**, meaningful actions can include:
-- Leaves
-- Doubles
-- Louder
-- Softer
-- Register shift
-- Pattern shift
-- Effect shift
-- Widens / Narrows when appropriate
+A Mix row may provide section-wide changes, but keep it visually quiet.
 
-`Mix` may have actions such as:
-- Widens
-- Narrows
-- Louder
-- Softer
-- Effect shift
+## Section-to-section motion
+Section Study is one continuous musical model under a focused viewport.
 
-Do not offer nonsense like:
-> Ukulele · Doubles
-when no ukulele is active in that section.
+When moving to the next/previous section:
+- slide horizontally with restrained motion
+- continuous presence/change ranges should visually read as continuing, with no artificial end cap at the boundary
+- stopped parts show a real end cap
+- newly entering parts show a real start cap
+- reset the expanded Track when changing sections so the next section opens cleanly
 
-Use **Mix**, not “Whole mix.”
+Respect Reduce Motion.
 
----
+## Structure edits and timeline safety
+Because ranges can cross sections, reorder/removal must never accidentally make a range span unrelated music or delete unaffected data.
+
+Before destructive Structure mutation, preserve timeline data as section-local segments; after the mutation, reconcile and merge truly adjacent compatible ranges again. Section IDs remain authoritative.
 
 # 10. “Not sure” policy — LOCKED
 
@@ -438,9 +454,7 @@ Reason:
 The study is meant to train judgment.
 If uncertain, make the best judgment or put the question in Parking Lot.
 
-### Keep:
-**No notable change**
-because that is a real observation.
+Timeline Changes do not need an explicit **No notable change** answer anymore; no mapped event is already a valid empty state.
 
 ### Keep:
 **No clear focus**
@@ -529,86 +543,55 @@ Recreation is intentionally stricter.
 ## Core rule
 **Forward progress is gated. Backward movement is always allowed.**
 
-User can revisit completed screens/phases anytime.
-
-User should not advance if required work on the current step is incomplete.
-
-Disabled Next should have tiny, specific guidance such as:
-- `Choose a Focus to continue.`
-- `Finish Width and Energy.`
-
-Avoid vague:
-- “1 item incomplete”
-- long explanatory paragraphs
+The disabled state/checkmarks should normally communicate incompleteness by themselves. Do not place persistent helper/status sentences underneath disabled Next buttons unless the missing requirement would otherwise be genuinely unclear.
 
 ### Required Map completion conditions
-Conceptually:
 
 #### Structure
-- at least one section exists
+- at least one section
+- every section has a valid bar length
 - Structure Verified completed
 
 #### Tracks
-- at least one Track exists
+- at least one global Track
+- before the full Map can finish, every global Track must appear somewhere on the timeline
 
 #### Section Study
-Every section should have:
-- Parts established
-- Feel completed
-- Focus completed or No clear focus
-- for later sections: at least one documented Change OR No notable change
+Every section has:
+- at least one Presence range touching the section, OR explicit `No active tracks`
+- all five Feel dimensions completed
+- Focus selected, OR `No clear focus`
+
+Changes are **optional observations**, not a required checkbox. No redundant `No notable change` completion state is needed when the absence of timeline events already communicates that nothing was mapped.
 
 #### Final verification
 - Map Verified
 - Teach It Back
 
+Meaningful Structure/timeline/Feel/Focus edits invalidate Map Verified / Teach It Back. Notes alone do not.
+
 ### Map Verified
-Action card:
-> final full-song listen with the completed map open; correct anything that does not match.
+Final full-song listen with the completed map open; correct anything that does not match.
 
 ### Teach It Back
-Action card:
-Ability to explain:
-- where you are
-- what is playing
-- what changed
-- how section feels
-- what matters most
-
-Use same action-card visual language as First Listen / Structure Verified.
-
----
+Be able to explain where you are, what exists, what changes, how the section feels, and what matters most.
 
 # 15. Map Summary
-
-
-**LOCKED status behavior:** Do not show a separate yellow/open-items status panel at the bottom of Map Review. The unchecked Verify cards and disabled `Continue to The Skeleton` button are sufficient. Avoid repeating incomplete-state information.
 
 Map Summary remains part of The Map, not a separate phase.
 
 It should show:
-- Structure
-- Tracks
-- Section summaries
-- Parts
-- Changes
+- Structure + bar lengths
+- global Tracks
+- section summaries derived from timeline presence / changes
 - Feel
 - Focus
 - Notes
-- final status
+- final verification actions
 
-Summary rows should be tappable to jump back to that section.
+Section rows are tappable to return to that section for editing.
 
-If incomplete, status should say **exactly what is missing** and ideally link to it.
-
-Do not use vague:
-> “The Map can keep improving. 1 item still open.”
-
-Instead:
-- `Outro · Feel`
-- `Chorus 2 · Focus`
-- `Structure · Verify the form`
-- `Map Verified · Final listen`
+If a global Track exists but never appears on the timeline, Review may show one concise unused-track warning linking back to Tracks. Do not add a generic yellow “items still open” panel; unchecked actions and disabled continuation are sufficient.
 
 The user previously wanted Map Summary top-button clutter reduced. Navigation should be solved at the phase level instead.
 
@@ -660,7 +643,7 @@ Examples:
 - The Map → Tracks → Back returns to **The Map**
 - The Map → Structure → Next → Tracks → Back returns to **Structure**
 - Tracks → Next → Section Study → Back returns to **Tracks**
-- The Skeleton → Session → Next → Backbone → Back returns to **Session**
+- The Skeleton → Session → Next → Draft → Back returns to **Session**
 
 When FIRE pushes a new route, store the previous route/label in that browser-history entry so the top-left label can reflect the actual prior screen. Internal movement within one screen (for example moving between Section Study sections) must not replace that remembered entry route.
 
@@ -706,8 +689,8 @@ When Section Study is already complete, opening its checkpoint can lead to the M
 The Skeleton home should show:
 - progress
 - Session
-- Backbone
-- Full Rough
+- Draft
+- Bounce
 
 No extra explanatory dashboard content is needed.
 
@@ -728,39 +711,43 @@ Do not independently design every phase home.
 
 # 18. Skeleton — current conceptual structure
 
-The Skeleton uses Map data automatically.
+The Skeleton consumes The Map automatically. Do not ask the user to re-enter arrangement information.
 
-The Map hands it:
-- section order
-- tracks/ingredients
-- active parts per section
-- changes
-- focus
-- feel
-- unresolved questions
-
-No re-entry.
-
-Current checkpoints:
+Current checkpoints are locked as:
 
 ### Session
-Turn Map into a DAW session:
-- placeholder tracks
-- section markers
+Create the DAW scaffolding one item at a time:
+- one completion row per mapped Track
+- one completion row per Structure section marker
 
-### Backbone
-Make every section recognizable:
-- enough harmony/rhythm/melody to identify the section
+Tracks and Markers use the same left-aligned circular completion language.
 
-### Full Rough
-Fill the complete rough arrangement:
-- every mapped part represented through the song
-- rough beginning-to-end bounce
+### Draft
+Build the complete rough arrangement.
 
-Skeleton goal:
-**coverage, not polish**
+The main Draft screen is section-based and clean. Each section row shows automatic completion state. Tap a section to see the Tracks that The Map says actually exist there.
 
-Detailed sound matching belongs in The Sounds.
+Inside a Draft section:
+- check each required Track individually
+- show concise read-only timing/change cues from The Map
+- the section check turns on automatically when every required Track is complete
+- never ask the user to manually declare the whole section complete
+- a legitimately silent section can complete from its Map state
+
+Draft stays live-linked to The Map. New/changed requirements should invalidate only affected work where practical; preserve unrelated valid completion. Presence edits invalidate only the affected Track/section span. Structure reorders/length changes preserve completed Draft work for unaffected section IDs while resetting any DAW markers whose positions actually moved.
+
+Not every Map change belongs in Draft. Arrangement/performance cues such as **Doubles, Pattern shift, Register shift, and Transition cue** can invalidate the affected Draft Track. Width, level, and effect-space observations belong to later phases and should not force the rough arrangement to be rebuilt.
+
+### Bounce
+Two deliberate actions:
+- **Export draft bounce**
+- **Listen start to finish**
+
+Both are required. Any later Draft/arrangement change invalidates Bounce.
+
+Skeleton goal remains **coverage, not polish**. Detailed source/performance matching belongs in The Sounds.
+
+Backbone and Full Rough are removed. Do not reintroduce them as duplicate checkpoints.
 
 ---
 
@@ -828,8 +815,8 @@ The Session checkpoint creates DAW elements one-by-one.
 - **Tracks:** each mapped track has its own completion row.
 - **Markers:** each Structure section has its own marker completion row; do not use one global “Section markers created” toggle.
 - Track and marker rows should use the same left-aligned circular completion indicator.
-- Backbone section completion rows should use that same left-aligned completion pattern for visual consistency.
-- Do not show an extra Skeleton completion/status callout at the end of Full Rough; the completion control, gating, and Next Phase button are sufficient.
+- Draft section rows use the same left-aligned automatic completion indicator.
+- Do not show extra Skeleton status/helper callouts beneath the normal gating controls.
 
 ---
 
@@ -849,6 +836,14 @@ The Session checkpoint creates DAW elements one-by-one.
 - immediate selection feedback
 
 The user wants the UI to feel native/intentional, not like a web form.
+
+For the V3 timeline specifically, keep the implementation **crisp rather than foggy/frosted**:
+- solid dark surfaces
+- sharp readable contrast
+- thin precise timeline/grid lines
+- restrained radii and separators
+- yellow reserved for selection, progress, and active editing
+- no decorative blur/glow just because Apple-inspired styling is desired
 
 ## Apple-like rules that have emerged
 - avoid unnecessary hairlines
@@ -902,56 +897,72 @@ Do not reintroduce:
 
 # 23. Current refactor direction / code architecture
 
-The latest major update was intended as an internal refactor rather than another patch pile.
+FIRE is now on the **V3 timeline architecture**.
 
-The goals:
-- remove old Guided/Minimal system
-- remove old reorder mode
-- permanent drag handle only
-- centralized phase registry
-- universal phase home
-- universal action card
-- universal completion/gating logic
-- interactive phase pill navigator
-- centralized Parts ↔ Changes reconciliation
-- persistent migrations
-- same saved Smithereens data should survive updates
-
-Keep FIRE as a **single `index.html` for now** because deployment is extremely convenient.
-
-Internally, code can still be modularized with:
-- reusable render helpers
-- state/data helpers
-- phase registry
+Keep FIRE as one self-contained `index.html` for now; that deployment workflow remains valuable. Internally, keep concerns separated even inside one file:
+- schema/migration
+- timeline math
+- mutations + invalidation
+- render helpers
+- navigation/history
 - completion validators
-- migration/versioning
 
-Do not split into many files unless the project meaningfully outgrows the one-file workflow.
+The timeline engine is the musical source of truth. UI text such as “starts,” “continues,” “ends,” active Tracks, and Draft requirements should be derived from timeline ranges rather than separately persisted whenever possible.
+
+Important engineering rules:
+- preserve the existing localStorage key
+- maintain explicit schema versioning and migrations
+- normalize imported backups through the same migration path as normal startup
+- initialize browser history with `replaceState`
+- history entries carry project ID and previous route label
+- in-app Back mirrors real browser Back
+- centralize destructive/mutation logic; do not keep duplicate remove/update paths that clean different dependent state
+- avoid keeping both the old Parts/Changes editor and the new timeline editor for the same truth
+
+## V3 migration
+Old data should migrate rather than reset:
+- old global ingredient names → stable Track objects/IDs
+- old active Parts → Presence ranges
+- adjacent active sections → continuous presence where no absence existed
+- old Enters/Leaves are not migrated as separate events because Presence now derives them
+- other old transition Changes → Moment markers at the destination section start when the old schema had no more precise timing
+- old Rough completion → Draft completion where identities can be matched
+- old rough bounce → Bounce exported state; listening remains a separate requirement
 
 ---
 
 # 24. Data/state requirements
 
-Use stable identifiers:
-- project IDs
-- section IDs
+Use stable identifiers for:
+- projects
+- sections
+- tracks
+- presence ranges
+- change events/ranges
 
-Section analysis must follow section identity, not index/name.
+A Recreation project stores:
+- Map setup
+- ordered sections with `lengthBars`
+- Track objects
+- section-level Feel / Focus / Notes
+- timeline Presence ranges
+- timeline Moment/Duration changes
+- Skeleton Session / Draft / Bounce state
 
-Reordering must not lose:
-- Parts
-- Feel
-- Focus
-- Notes
-- transitions
+Timing anchors are section-relative rather than hardcoded absolute song bar numbers. That keeps timeline data attached to musical section identity when earlier section lengths change.
 
-Use localStorage autosave.
+Whole-bar snapping is the current UI precision, while the internal timing representation should remain compatible with fractional offsets later.
 
-No Save button.
+Autosave to localStorage. No Save button.
 
-Existing user progress should be preserved when possible through migrations.
+Dependency invalidation must prevent stale “complete” states:
+- Structure edits invalidate Structure verification and downstream marker/Draft/Bounce state as appropriate
+- meaningful Map analysis edits invalidate Map verification
+- affected arrangement/Track changes invalidate affected Draft work where practical
+- Draft changes invalidate Bounce
+- Notes do not invalidate musical completion
 
-The project should have a data-version/migration layer so refactors can safely evolve stored state.
+Existing user progress should be preserved whenever it is still logically valid.
 
 ---
 
@@ -1112,14 +1123,26 @@ NOT:
 
 # 32. Latest state / likely next move
 
-At the time this continuity file was created:
-- the user had just received a major refactor build
-- the user was about to test it
-- navigation, gating, phase-home consistency, and reorder behavior were recently reworked
-- the next conversation should first ask what the user found while actually testing the latest deployed build
-- before coding further, inspect the repo’s current `main/index.html` because the user may have uploaded a newer build after this file was created
+The current generation is the first proper V3 implementation pass.
 
-Do not assume an older chat-generated file is newer than the repo.
+Locked major changes now represented in the code/spec:
+- Structure sections have bar lengths
+- Section Study uses the visual timeline model
+- Presence is represented by ranges with true start/end caps
+- uninterrupted ranges may cross section boundaries
+- timed production changes are Duration ranges or Moment markers
+- only one Track expands at a time
+- section-to-section navigation slides through the song
+- stable Track IDs replace name-as-identity logic
+- old Map data migrates into the new model where possible
+- Skeleton is `Session → Draft → Bounce`
+- Backbone / Full Rough are removed
+- browser-history Back behavior is the navigation source of truth
+- imported backups pass through migration/normalization
+
+Next product development should come from using this build on the real Smithereens recreation. Do not pre-design Sounds/Balance/Shape/World further until actual use of Map/Skeleton exposes the next meaningful need.
+
+Before any future code change, inspect the current repo `main/index.html` because the user may have deployed a newer build after this context file was generated.
 
 ---
 
