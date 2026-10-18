@@ -53,14 +53,6 @@ p{margin:0}.sub{color:var(--muted);font-size:15px;line-height:1.45}.micro{color:
 .checkpoint-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:30px 2px 9px}
 .checkpoint-head .section-kicker{margin:0}.checkpoint-count{font-size:12px;color:var(--muted)}
 .checkpoint-progress{margin:0 0 12px}
-.preflight{display:flex;gap:8px;overflow-x:auto;padding:1px 0 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.preflight::-webkit-scrollbar{display:none}
-.preflight-item{flex:0 0 auto;min-height:44px;border:1px solid var(--line);background:rgba(255,255,255,.026);border-radius:999px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;color:#d0d4cb;font-size:13px}
-button.preflight-item{cursor:pointer}.preflight-item.done{background:var(--accent-soft);border-color:rgba(228,216,75,.3);color:var(--accent-text)}
-.preflight-item .mini-check{font-size:12px;font-weight:900;color:var(--accent)}
-.preflight-input{width:38px;min-width:38px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;text-align:right;padding:0}
-.preflight-input::placeholder{color:var(--quiet)}
-.preflight-select{border:0;outline:0;background:transparent;color:var(--text);font:inherit;padding:0 2px 0 0;appearance:auto}
 
 .card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:var(--radius)}
 .card-pad{padding:17px}
@@ -287,7 +279,7 @@ function savedMark(){return `<span class="saved">Saved</span>`}
 function phaseTag(text){return `<span class="pill-tag">${esc(text)}</span>`}
 function phasePill(index){
   const ph=STUDY_PHASES[index];
-  return `<button class="phase-pill" data-action="phase-nav" data-phase-index="${index}" aria-label="Navigate study phases">${esc(ph.title)}<span class="caret">⌄</span></button>`;
+  return `<button class="phase-pill" data-action="phase-nav" data-phase-index="${index}" aria-label="Navigate study phases">${esc(ph.title)}</button>`;
 }
 function studyPhaseUnlocked(p,index){return index===0||index<=currentStudyPhaseIndex(p)}
 function studyPhaseDone(p,index){if(index===0)return mapDone(p);if(index===1)return skeletonDone(p);return false}
@@ -328,7 +320,7 @@ function structureDone(p){return p.map.sections.length>0&&p.map.structureVerifie
 function ingredientsDone(p){return availableParts(p).length>0}
 function sectionStudyDone(p){return p.map.sections.length>0&&p.map.sections.every((_,i)=>sectionComplete(p,i))}
 function mapSetupComplete(p){const s=p.map.setup||{};return !!(s.reference&&clean(s.tempo)&&s.meter&&s.grid&&s.firstListen)}
-function mapDone(p){return !!p.map.setup.firstListen&&structureDone(p)&&ingredientsDone(p)&&sectionStudyDone(p)&&p.map.mapVerified&&p.map.teachBack}
+function mapDone(p){return mapSetupComplete(p)&&structureDone(p)&&ingredientsDone(p)&&sectionStudyDone(p)&&p.map.mapVerified&&p.map.teachBack}
 function skeletonSessionDone(p){const parts=availableParts(p);return !!p.skeleton.session.markers&&parts.every(x=>p.skeleton.session.tracks[x])}
 function skeletonBackboneDone(p){return p.map.sections.length>0&&p.map.sections.every(s=>p.skeleton.backbone.sections[s.id])}
 function skeletonRoughDone(p){
@@ -351,6 +343,7 @@ function render(){
     case 'roadmap':return renderRoadmap();
     case 'notes':return renderNotes();
     case 'map':return renderMapHome();
+    case 'map-setup':return renderMapSetup();
     case 'structure':return renderStructure();
     case 'ingredients':return renderIngredients();
     case 'section-study':return renderSectionStudy();
@@ -422,26 +415,50 @@ function renderNewProject(){
 }
 
 function renderMapHome(){
-  const p=project(),m=p.map,done=mapCheckpointCount(p);
-  const structureUnlocked=!!m.setup.firstListen||structureDone(p);
+  const p=project(),m=p.map,done=mapCheckpointCount(p),setupDone=mapSetupComplete(p);
+  const structureUnlocked=setupDone||structureDone(p);
   const ingredientsUnlocked=structureDone(p)||ingredientsDone(p)||sectionStudyDone(p);
   const studyUnlocked=(structureDone(p)&&ingredientsDone(p))||sectionStudyDone(p);
   const studyRoute=sectionStudyDone(p)?'map-summary':'section-study';
+  const setupSummary=[
+    clean(m.setup.tempo)?`${esc(m.setup.tempo)} BPM`:'Tempo not set',
+    esc(m.setup.meter||'4/4'),
+    m.setup.grid?'Grid aligned':'Grid not aligned',
+    m.setup.firstListen?'First listen complete':'First listen remaining'
+  ].join(' · ');
+  const setup=`
+    <div class="section-kicker">Setup</div>
+    <div class="group-card list">
+      ${checkpointRow('Setup',setupSummary,'map-setup',setupDone,true)}
+    </div>`;
   const checkpoints=`
       ${checkpointRow('Structure','Map the form.','structure',structureDone(p),structureUnlocked)}
       ${checkpointRow('Ingredients','Map what plays.','ingredients',ingredientsDone(p),ingredientsUnlocked)}
       ${checkpointRow('Section Study','Understand each section.',studyRoute,sectionStudyDone(p),studyUnlocked)}`;
-  const setup=`
-    <div class="section-kicker">Setup</div>
-    <div class="preflight" id="setup-preflight" aria-label="Song setup">
-      <button class="preflight-item ${m.setup.reference?'done':''}" data-action="toggle-setup" data-field="reference">Reference${m.setup.reference?'<span class="mini-check">✓</span>':''}</button>
-      <label class="preflight-item"><input class="preflight-input" id="tempoQuick" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span>BPM</span></label>
-      <label class="preflight-item"><select class="preflight-select" id="meterQuick">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></label>
-      <button class="preflight-item ${m.setup.grid?'done':''}" data-action="toggle-setup" data-field="grid">Grid${m.setup.grid?'<span class="mini-check">✓</span>':''}</button>
-      <button class="preflight-item ${m.setup.firstListen?'done':''}" data-action="toggle-setup" data-field="firstListen">First Listen${m.setup.firstListen?'<span class="mini-check">✓</span>':''}</button>
-    </div>`;
   app.innerHTML=phaseHome(0,done,3,checkpoints,setup,'');
 }
+
+function renderMapSetup(){
+  const p=project(),m=p.map,done=mapSetupComplete(p);
+  app.innerHTML=topbar(backButton('map'),phasePill(0),savedMark())+`
+    <div class="section-kicker" style="margin-top:4px">Setup</div>
+    <div class="group-card setup-panel">
+      <div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference?'on':''}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference?'Imported':'Import'}</span><span class="check-circle"></span></button></div>
+      <div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div>
+      <div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${['4/4','3/4','6/8','5/4','7/8'].map(x=>`<option ${m.setup.meter===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+      <div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid?'on':''}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid?'Aligned':'Align'}</span><span class="check-circle"></span></button></div>
+    </div>
+    <div class="spacer-18"></div>
+    ${actionCard('First Listen','Play the full song once without stopping.',m.setup.firstListen,'toggle-setup','first-listen',false,'data-field="firstListen"')}
+    ${!done?`<div class="gate-note">${[
+      !m.setup.reference?'Reference':'',
+      !clean(m.setup.tempo)?'Tempo':'',
+      !m.setup.meter?'Meter':'',
+      !m.setup.grid?'Grid':'',
+      !m.setup.firstListen?'First Listen':''
+    ].filter(Boolean).join(' · ')} remaining</div>`:''}`;
+}
+
 function checkpointRow(title,desc,route,done,unlocked=true){
   return `<button class="list-row checkpoint-row" data-action="go" data-route="${route}" ${unlocked?'':'disabled'}>${done?`<span class="round-check on" aria-hidden="true"></span>`:unlocked?`<span class="status-dot"></span>`:`<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked?'›':''}</span></button>`;
 }
@@ -568,7 +585,7 @@ function sectionMissingItems(p,index){
 }
 function mapOpenItems(p){
   const items=[],labels=sectionLabels(p);
-  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map',target:'setup-preflight'});
+  if(!p.map.setup.firstListen)items.push({label:'First Listen · Play the full song once',route:'map-setup',target:'first-listen'});
   if(!p.map.sections.length)items.push({label:'Structure · Add the song sections',route:'structure'});
   else if(!p.map.structureVerified)items.push({label:'Structure · Verify the form',route:'structure'});
   if(!ingredientsDone(p))items.push({label:'Tracks · Add at least one track',route:'ingredients'});
@@ -759,7 +776,7 @@ app.addEventListener('click',e=>{
   if(action==='close-sheet')return closeSheet();
   if(action==='open-phase'){const idx=Number(b.dataset.index);if(studyPhaseUnlocked(p,idx)){closeSheet();return go(studyPhaseRoute(idx))}return;}
   if(action==='open-roadmap'){closeSheet();return go('roadmap');}
-  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return renderMapHome()}
+  if(action==='delete-project'){const id=b.dataset.id,target=db.projects.find(x=>x.id===id);if(target&&confirm(`Delete ${target.title}? This removes its saved progress from this device.`)){db.projects=db.projects.filter(x=>x.id!==id);if(db.currentProjectId===id)db.currentProjectId=db.projects[0]?.id||null;save();closeSheet();return go('projects')}return;}  if(action==='toggle-setup'){p.map.setup[b.dataset.field]=!p.map.setup[b.dataset.field];save();return ui.route==='map-setup'?renderMapSetup():renderMapHome()}
   if(action==='add-section')return addSection(b.dataset.name);
   if(action==='add-custom-section'){const input=document.getElementById('customSection');const v=clean(input?.value);if(v){addSection(v);input.value=''}return}
   if(action==='toggle-structure-verified'){p.map.structureVerified=!p.map.structureVerified;save();return renderStructure()}

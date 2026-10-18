@@ -261,7 +261,7 @@ Song Setup includes:
 - Grid
 - First Listen action state
 
-**LOCKED home-screen behavior:** Song Setup stays directly on the Map phase home as a compact **preflight strip above Checkpoints**. It should not open/collapse a separate setup panel. Reference, Tempo, Meter, Grid, and First Listen are directly editable/tappable from that strip. Keep it compact and horizontally scrollable on iPhone if needed.
+**LOCKED home-screen behavior:** Song Setup appears **above Checkpoints as one normal Setup row**, visually consistent with checkpoint rows. The row summarizes the current setup state and opens a dedicated Setup screen for Reference, Tempo, Meter, Grid, and First Listen. Do not use an expandable/collapsible panel or a multi-pill preflight strip on the phase home.
 
 ### Structure
 Instruction style:
@@ -638,6 +638,10 @@ Screens should not invent their own navigation logic.
 
 ---
 
+### Phase pill affordance
+The phase title pill (for example **The Map** or **The Skeleton**) remains tappable and opens the universal phase navigator, but **do not show a dropdown chevron/caret beside the phase name**. Keep the pill visually quiet.
+
+
 # 17. Phase homes — universal template
 
 The Map and Skeleton previously looked too different.
@@ -661,7 +665,7 @@ The Map home should show:
 - Section Study
 - optional compact phase-specific utility/preflight content **above** Checkpoints (The Map uses Setup)
 
-For The Map, Setup is a directly editable preflight strip: Reference · BPM · Meter · Grid · First Listen. It does not expand into a separate setup screen.
+For The Map, Setup is one compact row above Checkpoints. Tapping it opens a dedicated Setup screen. Setup must be complete before Structure unlocks.
 
 Checkpoint progress belongs visually to the **Checkpoints** section: show `X of Y` beside the Checkpoints label and the thin progress bar directly beneath it. Do not show a redundant percentage on phase homes.
 
