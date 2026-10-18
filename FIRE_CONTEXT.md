@@ -662,6 +662,8 @@ Use contextual hierarchy labels instead of a generic `Back` whenever the parent 
 
 The tappable phase pill remains available throughout Recreation. Its **Roadmap** sheet must show the current project (for example `Smithereens`) at the top as a direct shortcut back to the Recreation overview, followed by the seven phases. The project shortcut should be labeled as `Project overview` rather than repeating artist metadata.
 
+On a Recreation project overview, the centered **Recreation** pill is also interactive and opens the exact same **Roadmap** sheet as the phase pills (`The Map`, `The Skeleton`, etc.). This gives the project overview and all phase screens one consistent shortcut into phase navigation.
+
 Button semantics are strict:
 - **Back** / contextual header navigation = move backward in hierarchy
 - **Next** = advance through the workflow

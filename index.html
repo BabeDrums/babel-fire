@@ -375,7 +375,7 @@ function renderProject(){
   if(p.type==='original')return renderOriginalOverview();
   const phaseIndex=currentStudyPhaseIndex(p),phase=STUDY_PHASES[phaseIndex],done=phaseIndex===0?mapCheckpointCount(p):phaseIndex===1?skeletonCheckpointCount(p):0;
   const next=STUDY_PHASES[phaseIndex+1];
-  app.innerHTML=topbar(`<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,phaseTag('Recreation'),`<button class="text-btn" data-action="settings">•••</button>`)+`
+  app.innerHTML=topbar(`<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,`<button class="pill-tag" data-action="phase-nav" data-phase-index="${phaseIndex}" aria-label="Open roadmap">Recreation</button>`,`<button class="text-btn" data-action="settings">•••</button>`)+`
     <div class="eyebrow">${esc(p.artist||'Recreation')}</div><h1>${esc(p.title)}</h1>
     <div class="spacer-18"></div>
     <div class="hero-card">
