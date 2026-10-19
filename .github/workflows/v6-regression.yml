@@ -41,6 +41,13 @@ jobs:
           python-version: '3.12'
           cache: pip
           cache-dependency-path: tests/test_v6.py
+      - name: Prepare local build metadata
+        run: |
+          python - <<'PY'
+          import json, os
+          with open('build-info.json', 'w', encoding='utf-8') as f:
+              json.dump({'commit': os.environ['GITHUB_SHA']}, f)
+          PY
       - name: Install Playwright
         run: |
           python -m pip install --upgrade pip
