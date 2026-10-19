@@ -1769,7 +1769,6 @@ body.sheet-open .undo-notice {
 }
 button:not(:disabled), [role="button"], summary, select {
   cursor: pointer;
-  opacity: var(--disabled-opacity);
 }
 input[type="range"] {
   cursor: ew-resize;

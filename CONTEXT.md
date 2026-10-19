@@ -288,7 +288,7 @@ Notes/analysis must stay attached if sections are reordered.
 
 Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
 
-**V6 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length segmented controls. Custom fields appear only for Custom. Insert only after a valid name/type and length are selected. A selected length pill is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
+**V6 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length segmented controls. Custom fields appear only for Custom. Each Add commits one valid section and keeps the builder open, retains the selected bar length, and shows inline confirmation; Done closes it. A deliberate new choice/input re-arms Add to prevent duplicate submissions. A selected length control is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
 
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
@@ -384,7 +384,7 @@ A track's presence is represented visually by one or more ranges.
 
 **Open-ended presence / continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
 
-In V6, selecting a generous presence/row target reveals only real musical boundaries. Whole-bar dragging edits an actual start/stop. Discoverable Stop placement creates a real stop; Start resumes in an off portion. Accessible position selection uses the same mutation path. Continuing edges do not gain fake handles; the normal workflow has no Split/gap form or persistent timing steppers. Routine edits offer Undo.
+In V6, selecting a generous presence/row target reveals only real musical boundaries. Whole-bar dragging edits an actual start/stop. Selected lanes expose subtle whole-bar targeting. Click/tap ON to Stop and OFF to Start/Resume, with provisional action/bar feedback; drag real boundary handles to reposition. Starting in a gap preserves later stops/gaps and surviving identities. Timing options are secondary accessibility/precision controls rather than the normal path. Continuing edges do not gain fake handles; the normal workflow has no Split/gap form or persistent timing steppers. Routine edits offer Undo.
 
 Visual grammar:
 - uninterrupted line = continuous presence
@@ -810,6 +810,10 @@ For the current timeline, keep the implementation **crisp rather than foggy/fros
 - restrained radii and separators
 - neutral accents reserved for selection, progress, and active editing
 - no decorative blur/glow just because Apple-inspired styling is desired
+
+## Shared component geometry
+
+Use one semantic shape/spacing/state system: meaningful cards/dialogs around 18px, standard controls around 12px, small chips/segments around 8–10px, and true capsules only for compact context/status/tag pills. A component retains its silhouette and dimensions through idle, hover, selection, press, focus and disabled states. Shared tokens control padding, spacing, gutters, motion/easing and semantic states; avoid layered conflicting overrides. Cards remain useful for meaningful groups, rows for navigation/list structure, and buttons for actions. Respect reduced motion.
 
 ## Adaptive canvas and input
 

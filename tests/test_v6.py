@@ -85,7 +85,10 @@ class V6Browser(unittest.TestCase):
         return self.page
 
     def click(self, action, extra=''):
-        self.page.locator(f'[data-action="{action}"]{extra}').click()
+        button=self.page.locator(f'[data-action="{action}"]{extra}')
+        if action in ['place-boundary','continue-range','start-track'] and not button.is_visible():
+            button.locator('xpath=ancestor::details[1]').locator('summary').click()
+        button.click()
 
     def db(self):
         return self.page.evaluate('(key)=>JSON.parse(localStorage.getItem(key))', KEY)
@@ -97,6 +100,10 @@ class V6Browser(unittest.TestCase):
         return next(e for e in self.project()['map']['timeline']['events'] if e['id'] == id)
 
     def select(self, range='r1'):
+        hit=self.page.locator(f'.presence-hit[data-range-id="{range}"]')
+        row=hit.locator('xpath=ancestor::*[@data-track-row][1]')
+        if row.evaluate('el=>el.classList.contains("expanded")'):
+            row.locator('.timeline-label').click()
         self.page.locator(f'.presence-hit[data-range-id="{range}"]').click()
 
     def add_change(self, label, target='track'):
@@ -121,6 +128,28 @@ class V6Browser(unittest.TestCase):
         self.click('place-boundary', f'[data-kind="{kind}"][data-edge="{edge}"]')
         self.page.locator('#placementPosition').fill(str(value))
         self.click('commit-placement')
+
+    def direct_boundary(self, track, boundary, touch=False, cancel=False):
+        surface=self.page.locator(f'[data-presence-surface][data-track-id="{track}"]')
+        if not surface.count():
+            self.click('toggle-timeline-track',f'[data-track-id="{track}"]')
+            surface=self.page.locator(f'[data-presence-surface][data-track-id="{track}"]')
+        surface.scroll_into_view_if_needed();box=surface.bounding_box()
+        bars=int(surface.locator('xpath=..').evaluate('el=>getComputedStyle(el).getPropertyValue("--bars")'))
+        x=box['x']+max(.25,min(box['width']-.25,box['width']*boundary/bars))
+        y=box['y']+box['height']*.9
+        if touch:
+            cdp=self.context.new_cdp_session(self.page)
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchCancel' if cancel else 'touchEnd','touchPoints':[]})
+            cdp.detach()
+        else:
+            self.page.mouse.move(x,y)
+            self.page.mouse.down()
+            if cancel:
+                surface.evaluate('el=>el.releasePointerCapture(1)')
+                self.page.mouse.move(x+.1,y)
+            self.page.mouse.up()
 
     def test_v4_migration_and_reload_preserve_identity_progress_and_fractional_offsets(self):
         original = fixture()
@@ -147,14 +176,14 @@ class V6Browser(unittest.TestCase):
         self.click('choose-section-type', '[data-name="Verse"]')
         self.click('set-new-section-bars', '[data-bars="4"]')
         expect(self.page.locator('#newSectionBars')).to_be_hidden()
-        self.click('save-new-section')
+        self.click('save-new-section');self.click('close-sheet')
         expect(self.page.locator('.structure-row').filter(has_text='Verse 2')).to_be_visible()
         self.click('open-add-section');self.click('choose-section-type', '[data-name="Custom"]')
         self.page.locator('#newSectionName').fill('Breakdown')
         self.click('set-new-section-bars', '[data-bars="custom"]')
         self.page.locator('#newSectionBars').fill('0')
         expect(self.page.locator('[data-action="save-new-section"]')).to_be_disabled()
-        self.page.locator('#newSectionBars').fill('7');self.click('save-new-section')
+        self.page.locator('#newSectionBars').fill('7');self.click('save-new-section');self.click('close-sheet')
         sid = self.project()['map']['sections'][-1]['id']
         self.click('edit-section', f'[data-section-id="{sid}"]')
         self.page.locator('#renameSection').fill('Break');self.click('set-sheet-bars', '[data-bars="12"]')
@@ -166,7 +195,7 @@ class V6Browser(unittest.TestCase):
         self.assertNotIn('Bars bars', self.page.locator('body').inner_text())
 
     def test_add_absent_presence_is_open_and_covers_later_new_sections(self):
-        self.open();self.click('add-presence-section', '[data-track-id="t2"]')
+        self.open();self.direct_boundary('t2',0)
         ranges = self.project()['map']['timeline']['presence']
         self.assertIsNone(next(r for r in ranges if r['trackId']=='t2')['end'])
         self.assertFalse(self.project()['skeleton']['draft']['parts']['s2']['t2'])
@@ -175,7 +204,7 @@ class V6Browser(unittest.TestCase):
         self.click('go', '[data-route="map"]')
         self.click('go', '[data-route="structure"]')
         self.click('open-add-section');self.click('choose-section-type', '[data-name="Outro"]')
-        self.click('set-new-section-bars', '[data-bars="4"]');self.click('save-new-section')
+        self.click('set-new-section-bars', '[data-bars="4"]');self.click('save-new-section');self.click('close-sheet')
         self.assertEqual(len(self.project()['map']['sections']), 4)
         r = next(r for r in self.project()['map']['timeline']['presence'] if r['trackId']=='t2')
         self.assertIsNone(r['end'])
@@ -298,7 +327,7 @@ class V6Browser(unittest.TestCase):
     def test_touch_targets(self):
         self.open();self.select();self.click('select-event','[data-event-id="e1"]')
         for selector in ['.presence-hit','.change-chip','.event-handle','.mini-btn','.mix-toggle']:
-            for box in self.page.locator(selector).all():
+            for box in self.page.locator(selector+':visible').all():
                 size=box.bounding_box()
                 self.assertGreaterEqual(size['height'],44,selector)
                 self.assertGreaterEqual(size['width'],44,selector)
@@ -554,7 +583,7 @@ class V6Browser(unittest.TestCase):
                 self.page.set_viewport_size({'width':width,'height':height})
                 self.page.add_style_tag(content='body {font-size:21px}')
                 self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),width)
-                self.select();button=self.page.locator('[data-action="place-boundary"]').first
+                self.select();button=self.page.locator('[data-action="remove-selected"][data-kind="presence"]').first
                 box=button.bounding_box();button.dispatch_event('pointerdown')
                 self.assertEqual(button.bounding_box(),box)
                 self.assertEqual(self.page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"),True)
@@ -750,6 +779,182 @@ class V6Browser(unittest.TestCase):
         self.page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2)
         self.page.mouse.wheel(600,0)
         self.page.wait_for_function('document.querySelector(".horizontal-nav").scrollLeft>0')
+
+    def test_repeated_builder_commits_keeps_geometry_and_blocks_double_submit(self):
+        for width in [320,390,820,1180,1440,1728,1920]:
+            with self.subTest(width=width):
+                self.open('structure',width=width,pointer=width>=1180)
+                old=self.project();initial=len(old['map']['sections'])
+                self.click('open-add-section');self.settled_sheet()
+                self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+                self.page.evaluate('window.builderNode=document.querySelector(".section-builder")')
+                for count,(name,bars) in enumerate([('Intro',4),('Verse',8),('Chorus',8),('Outro',4)],1):
+                    self.click('choose-section-type',f'[data-name="{name}"]')
+                    self.click('set-new-section-bars',f'[data-bars="{bars}"]')
+                    button=self.page.locator('[data-action="save-new-section"]');box=button.bounding_box()
+                    button.dblclick()
+                    self.assertEqual(len(self.project()['map']['sections']),initial+count)
+                    self.assertEqual(button.bounding_box(),box)
+                    expect(button).to_be_disabled()
+                    expect(self.page.locator('#builderStatus')).to_have_text(f'Added {name} · {bars} bars')
+                    expect(self.page.locator(f'[data-bars="{bars}"]')).to_have_attribute('aria-pressed','true')
+                    self.assertTrue(self.page.evaluate('window.builderNode===document.querySelector(".section-builder")'))
+                    expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','false')
+                self.assertEqual(self.project()['map']['sections'][:initial],old['map']['sections'])
+                self.assertEqual(self.project()['map']['sectionData']['s0'],old['map']['sectionData']['s0'])
+                self.assertEqual(self.project()['notes'],old['notes'])
+                self.assertEqual(len({x['id'] for x in self.project()['map']['sections']}),initial+4)
+                expect(self.page.locator('[data-action="close-sheet"]')).to_have_text('Done')
+                self.click('close-sheet');expect(self.page.locator('[data-action="open-add-section"]')).to_be_focused()
+                self.page.reload();self.assertEqual(len(self.project()['map']['sections']),initial+4)
+                self.context.close()
+
+    def test_direct_presence_start_stop_resume_mouse_and_touch_all_canvases(self):
+        for width in [320,390,820,1180,1440,1728,1920]:
+            for touch in [False,True]:
+                with self.subTest(width=width,touch=touch):
+                    self.open(width=width,pointer=not touch);self.select()
+                    old=self.project();original_id=old['map']['timeline']['presence'][0]['id']
+                    self.direct_boundary('t1',2,touch=touch)
+                    p=self.project();first=next(r for r in p['map']['timeline']['presence'] if r['id']==original_id)
+                    self.assertEqual(first['end'],{'sectionId':'s0','bar':2})
+                    expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+                    self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(),1)
+                    self.direct_boundary('t1',6,touch=touch)
+                    ranges=sorted(self.project()['map']['timeline']['presence'],key=lambda r:r['start']['bar'])
+                    self.assertEqual(len(ranges),2);self.assertEqual(ranges[0]['id'],original_id)
+                    self.assertEqual(ranges[0]['end']['bar'],2);self.assertEqual(ranges[1]['start']['bar'],6)
+                    self.assertIsNone(ranges[1]['end'])
+                    self.assertEqual(self.page.locator('.presence-segment.continue-out').count(),1)
+                    self.page.locator('#undoEdit').click()
+                    self.assertEqual(len(self.project()['map']['timeline']['presence']),1)
+                    self.assertEqual(self.project()['map']['timeline']['presence'][0]['end']['bar'],2)
+                    self.direct_boundary('t2',3,touch=touch)
+                    bass=next(r for r in self.project()['map']['timeline']['presence'] if r['trackId']=='t2')
+                    self.assertEqual(bass['start'],{'sectionId':'s0','bar':3});self.assertIsNone(bass['end'])
+                    self.assertEqual(self.project()['map']['sectionData']['s0']['parking'],old['map']['sectionData']['s0']['parking'])
+                    self.context.close()
+
+    def test_direct_resume_preserves_later_gaps_boundaries_and_surviving_ids(self):
+        data=fixture();timeline=data['projects'][0]['map']['timeline']
+        timeline['presence']=[{'id':'r1','trackId':'t1','start':{'sectionId':'s0','bar':0},'end':{'sectionId':'s0','bar':2}},
+                              {'id':'r2','trackId':'t1','start':{'sectionId':'s0','bar':4},'end':{'sectionId':'s0','bar':5}},
+                              {'id':'r3','trackId':'t1','start':{'sectionId':'s0','bar':6},'end':None}]
+        self.open(data=data);self.select();before=self.db()
+        self.direct_boundary('t1',3)
+        ranges={r['id']:r for r in self.project()['map']['timeline']['presence']}
+        self.assertEqual(ranges['r1'],before['projects'][0]['map']['timeline']['presence'][0])
+        self.assertEqual(ranges['r2']['start']['bar'],3);self.assertEqual(ranges['r2']['end']['bar'],5)
+        self.assertEqual(ranges['r3'],before['projects'][0]['map']['timeline']['presence'][2])
+        self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+        self.direct_boundary('t1',2)
+        ranges={r['id']:r for r in self.project()['map']['timeline']['presence']}
+        self.assertEqual(set(ranges),{'r1','r3'});self.assertEqual(ranges['r1']['end']['bar'],5)
+        self.assertIsNone(ranges['r3']['end'])
+        self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+
+    def test_direct_preview_cancel_and_existing_start_noop_do_not_consume_undo(self):
+        for touch in [False,True]:
+            with self.subTest(touch=touch):
+                self.open(pointer=not touch);self.select();before=self.db()
+                self.direct_boundary('t1',2,touch=touch,cancel=True)
+                self.assertEqual(self.db(),before)
+                expect(self.page.locator('#undoNotice')).to_be_hidden()
+                self.direct_boundary('t1',0,touch=touch)
+                self.assertEqual(self.db(),before)
+                self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(),0)
+                self.direct_boundary('t1',4,touch=touch)
+                before=self.db();self.direct_boundary('t1',2,touch=touch,cancel=True)
+                self.assertEqual(self.db(),before)
+                expect(self.page.locator('#undoNotice')).to_be_visible()
+                self.page.locator('#undoEdit').click()
+                self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
+                self.context.close()
+
+    def test_direct_duration_stop_and_point_move_preserve_fractional_data_until_edited(self):
+        self.open(width=1440,pointer=True);self.select()
+        self.assertEqual(self.event('e2')['point']['bar'],2.5)
+        self.click('select-event','[data-event-id="e1"]')
+        surface=self.page.locator('[data-event-surface]');box=surface.bounding_box()
+        self.page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.95)
+        expect(self.page.locator('.change-editor .lane-feedback')).to_have_text('Stop after bar 4')
+        self.assertIsNone(self.event('e1')['end'])
+        self.page.mouse.click(box['x']+box['width']*.5,box['y']+box['height']*.95)
+        self.assertEqual(self.event('e1')['end'],{'sectionId':'s0','bar':4})
+        self.assertEqual(self.event('e2')['point']['bar'],2.5)
+        expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+        self.page.locator('#undoEdit').click();self.assertIsNone(self.event('e1')['end'])
+        self.click('select-event','[data-event-id="e2"]')
+        surface=self.page.locator('[data-event-surface]');box=surface.bounding_box()
+        self.page.mouse.click(box['x']+box['width']*.5,box['y']+box['height']*.95)
+        self.assertEqual(self.event('e2')['point']['bar'],4)
+        self.page.locator('#undoEdit').click();self.assertEqual(self.event('e2')['point']['bar'],2.5)
+
+    def test_component_shapes_stay_fixed_across_hover_focus_selected_and_disabled(self):
+        self.open('projects',width=1440,data=self.complete_fixture(),pointer=True)
+        samples=[('projects','.project-open'),('projects','.project-menu'),('project','.quick-card'),
+                 ('map','.phase-pill'),('map','.state-control'),('map','.action-card'),('map','.list-row'),
+                 ('structure','.structure-row'),('tracks','.choice'),('section-study','.segment'),
+                 ('skeleton-draft','.workflow-disclosure summary'),('skeleton-bounce','.primary')]
+        for route,selector in samples:
+            with self.subTest(route=route,selector=selector):
+                self.canvas_route(route);node=self.page.locator(selector).first
+                node.scroll_into_view_if_needed();before=node.bounding_box()
+                radius=node.evaluate('el=>getComputedStyle(el).borderRadius')
+                self.assertEqual(float(node.evaluate('el=>getComputedStyle(el).opacity')),1)
+                node.hover();self.assertEqual(node.bounding_box(),before)
+                self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
+                node.focus();self.assertEqual(node.bounding_box(),before)
+                self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
+                box=node.bounding_box();self.page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2);self.page.mouse.down()
+                self.assertEqual(node.bounding_box(),before)
+                self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
+                self.page.mouse.move(0,0);self.page.mouse.up()
+                node.evaluate('el=>el.classList.add("selected")')
+                self.assertEqual(node.bounding_box(),before)
+                self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
+                if node.evaluate('el=>el.tagName')=='BUTTON':
+                    node.evaluate('el=>el.disabled=true');self.assertEqual(node.bounding_box(),before)
+                    self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
+                    self.assertGreaterEqual(float(node.evaluate('el=>getComputedStyle(el).opacity')),.5)
+        self.canvas_route('structure');self.click('edit-section','[data-section-id="s0"]');self.settled_sheet()
+        expect(self.page.locator('.sheet')).to_have_css('border-radius','18px')
+        self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+
+    def test_dense_lane_precision_fallback_keyboard_and_touch_scroll_cancellation(self):
+        data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=256
+        self.open(width=320,data=data);self.select();before=self.db()
+        self.assertLessEqual(self.page.locator('.ruler-label').count(),12)
+        self.assertLessEqual(self.page.locator('.boundary-target').count(),33)
+        surface=self.page.locator('[data-presence-surface][data-track-id="t1"]')
+        surface.focus();self.page.keyboard.press('Enter')
+        self.assertTrue(self.page.locator('.timing-options').evaluate('el=>el.open'))
+        self.assertEqual(self.db(),before)
+        self.click('place-boundary','[data-kind="presence"][data-edge="end"]')
+        expect(self.page.locator('#placementPosition')).to_have_attribute('aria-valuetext','After bar 128')
+        self.click('adjust-placement','[data-delta="-1"]')
+        expect(self.page.locator('#placementLabel')).to_have_text('After bar 127')
+        self.click('adjust-placement','[data-delta="1"]');self.click('commit-placement')
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['end']['bar'],128)
+        self.assertEqual(self.event('e2')['point']['bar'],2.5)
+        surface=self.page.locator('[data-presence-surface][data-track-id="t1"]');surface.scroll_into_view_if_needed()
+        box=surface.bounding_box();x=box['x']+box['width']*.3;y=box['y']+box['height']*.9
+        before=self.db();cdp=self.context.new_cdp_session(self.page)
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':x,'y':y+35}]})
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});cdp.detach()
+        self.assertEqual(self.db(),before)
+
+    def test_builder_keeps_keyboard_focus_inside_after_committing(self):
+        self.open('structure',width=1440,pointer=True);initial=len(self.project()['map']['sections'])
+        self.click('open-add-section');self.click('choose-section-type','[data-name="Intro"]')
+        self.click('set-new-section-bars','[data-bars="4"]')
+        self.page.locator('[data-action="save-new-section"]').focus();self.page.keyboard.press('Enter')
+        expect(self.page.locator('[data-action="choose-section-type"][data-name="Intro"]')).to_be_focused()
+        self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+        self.page.keyboard.press('Escape')
+        expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+        self.assertEqual(len(self.project()['map']['sections']),initial+1)
 
 
 if __name__ == '__main__':
