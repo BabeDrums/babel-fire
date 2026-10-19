@@ -12,19 +12,11 @@
     <title>Babel FIRE</title>
     <link rel="stylesheet" href="styles.css?v={{ site.github.build_revision }}" />
     <style>
-      @import url("polish.css?v={{ site.github.build_revision }}");
-
       /* Real timing boundaries and change markers stay directly manipulable beside sticky track labels. */
       .presence-handle,
       .event-handle,
       .change-marker {
         z-index: 7;
-      }
-
-      /* Crossing the ghost boundary previews open continuation before release. */
-      .timeline-lane.continuation-armed .presence-segment.selected {
-        right: -28px !important;
-        background: linear-gradient(90deg,#e2e4e8 0%,#e2e4e8 72%,rgba(226,228,232,.38) 100%);
       }
     </style>
   </head>
@@ -35,6 +27,5 @@
     <output id="dragPosition" class="drag-position" hidden></output>
     <input id="importFile" type="file" accept="application/json" hidden />
     <script src="app.js?v={{ site.github.build_revision }}" defer></script>
-    <script type="module">import "./polish.js?v={{ site.github.build_revision }}";</script>
   </body>
 </html>
