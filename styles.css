@@ -91,7 +91,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 button:not(:disabled):active {
   filter: none;
 }
-:is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .type-card):not(:disabled):active {
+:is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):active {
   background-color: var(--state-pressed);
 }
 .primary:not(:disabled):active {
@@ -1003,6 +1003,7 @@ details.note-disclosure summary::-webkit-details-marker {
   transition: border-color var(--motion-fast) var(--ease), background-color var(--motion-fast) var(--ease);
 }
 .project-open {
+  position: relative;
   width: 100%;
   padding: 16px 58px 15px 18px;
   text-align: left;
@@ -1031,12 +1032,20 @@ details.note-disclosure summary::-webkit-details-marker {
 }
 .project-open .foot {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 12px;
   margin-top: 11px;
+  padding-right: 22px;
   font-size: 12px;
   color: var(--muted);
+}
+.project-open .foot > span:last-child {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--quiet);
 }
 .project-menu {
   position: absolute;
@@ -1067,34 +1076,44 @@ details.note-disclosure summary::-webkit-details-marker {
 .top-icon-btn > span {
   transform: translateY(-1px);
 }
-.new-type {
+.project-type-control {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.type-card {
-  min-height: 115px;
-  text-align: left;
-  padding: 16px;
-  border-radius: var(--radius-card);
-  background: #111318;
+  gap: 3px;
+  padding: 3px;
+  min-height: 50px;
   border: 1px solid var(--line);
-  cursor: pointer;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
 }
-.type-card.selected {
-  border-color: var(--state-selected-border);
-  background: var(--state-selected);
-}
-.type-card strong {
-  display: block;
-  font-size: 15px;
-}
-.type-card span {
-  display: block;
-  font-size: 12px;
-  line-height: 1.4;
+.segment-choice {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 9px;
   color: var(--muted);
-  margin-top: 5px;
+  font-size: 15px;
+  font-weight: 650;
+  text-align: center;
+}
+.segment-choice.selected {
+  color: var(--text);
+  background: var(--surface-3);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.project-type-copy {
+  min-height: 38px;
+  margin: 10px 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.project-field-label {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .empty {
   color: var(--muted);
@@ -1707,14 +1726,13 @@ body.sheet-open .undo-notice {
 #app[data-route="projects"] {
   --canvas-width: 880px;
 }
-#app[data-route="projects"] .topbar {
-  margin-bottom: 28px;
-}
 .projects-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
+  width: 100%;
+  max-width: 760px;
   margin-bottom: var(--space-5);
 }
 .projects-heading > div {
@@ -1811,9 +1829,6 @@ from {
 }
 /* Adaptive composition and input capabilities. */
 @media (max-width: 430px) {
-  #app[data-route="projects"] .topbar {
-    margin-bottom: 22px;
-  }
   .projects-heading {
     align-items: center;
     margin-bottom: 20px;
@@ -1829,7 +1844,7 @@ from {
 }
 
 @media (max-width: 390px) {
-  .quick-grid, .new-type {
+  .quick-grid {
     grid-template-columns: 1fr;
   }
   .scale-row {
@@ -1866,14 +1881,13 @@ from {
   button:not(:disabled):hover {
     filter: none;
   }
-  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .type-card):not(:disabled):hover, summary:hover, .structure-row:hover {
+  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):hover, summary:hover, .structure-row:hover {
     background-color: var(--state-hover);
   }
   .primary:not(:disabled):hover {
     background: #d4d7dd;
   }
   .secondary:not(:disabled):hover,
-  .type-card:not(:disabled):hover,
   .top-icon-btn:not(:disabled):hover {
     border-color: var(--line-strong);
   }
