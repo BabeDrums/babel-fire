@@ -11,6 +11,14 @@
     <meta name="theme-color" content="#090a0d" />
     <title>Babel FIRE</title>
     <link rel="stylesheet" href="styles.css?v={{ site.github.build_revision }}" />
+    <style>
+      /* Real timing boundaries and change markers stay directly manipulable beside sticky track labels. */
+      .presence-handle,
+      .event-handle,
+      .change-marker {
+        z-index: 7;
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell" id="app"></div>

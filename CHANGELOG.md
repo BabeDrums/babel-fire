@@ -4,12 +4,12 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
-- Coherent shared shapes, spacing and interaction tokens; rapid repeated section entry and direct timeline Start/Stop/Resume, with secondary accessible precision controls.
+- Coherent shared shapes and states, rapid repeated section entry, separate row delete/Undo, and direct musical blocks with drag, tap-boundary/tap-destination and keyboard edits. Aligned changes and horizontal dense-section navigation replace separate timing editors.
 
 - Shared stable controls and sheets, intentional text focus, tonal selection, and reduced-motion support.
 - Current canonical prerequisites govern completion, progress, route entry, and restored browser history.
 - Back follows eligible history; parent pills open the phase/project parent; Roadmap remains explicit.
-- Musical Stop/Start placement, real boundaries, open continuation, accessible position controls, and Undo preserve the continuous timeline engine.
+- Musical Stop/Start placement, real boundaries, open continuation, direct accessible boundary movement, and Undo preserve the continuous timeline engine.
 - Inline Draft disclosures and whole-song coverage retain Session → Draft → Bounce and honestly lead onward to Roadmap.
 - Revisioned static assets and the retained FIRE V6 DEV stamp identify deployed builds without a new runtime dependency or build pipeline.
 - Storage schema 5 and `production-projects-v1` remain compatible with existing projects and migrations.

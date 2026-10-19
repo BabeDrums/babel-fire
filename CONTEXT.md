@@ -288,13 +288,13 @@ Notes/analysis must stay attached if sections are reordered.
 
 Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
 
-**V6 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length segmented controls. Custom fields appear only for Custom. Each Add commits one valid section and keeps the builder open, retains the selected bar length, and shows inline confirmation; Done closes it. A deliberate new choice/input re-arms Add to prevent duplicate submissions. A selected length control is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
+**V6 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length segmented controls. Custom fields appear only for Custom. Each Add commits one valid section and keeps the builder open, retains the selected bar length, and shows inline confirmation; Done closes it. A deliberate new choice/input re-arms Add to prevent duplicate submissions. A selected length control is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent row handles reorder by drag or focused Up/Down arrows. Edit is name/type/length only; a separate restrained 44px trash target deletes immediately with Undo. Add/Edit sheets contain no deletion.
 
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
 
 Desired behavior:
-- row tap → Rename / Remove
+- row body → edit name/type/length; trailing trash → immediate deletion with Undo
 - drag only from handle → reorder
 - page scroll should not fight drag
 - no separate Reorder / Done mode
@@ -384,10 +384,10 @@ A track's presence is represented visually by one or more ranges.
 
 **Open-ended presence / continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
 
-In V6, selecting a generous presence/row target reveals only real musical boundaries. Whole-bar dragging edits an actual start/stop. Selected lanes expose subtle whole-bar targeting. Click/tap ON to Stop and OFF to Start/Resume, with provisional action/bar feedback; drag real boundary handles to reposition. Starting in a gap preserves later stops/gaps and surviving identities. Timing options are secondary accessibility/precision controls rather than the normal path. Continuing edges do not gain fake handles; the normal workflow has no Split/gap form or persistent timing steppers. Routine edits offer Undo.
+In V6, block bodies only select. Empty space starts/resumes at a whole-bar boundary. Actual boundaries drag, or select an edge then tap its destination in the same lane; focused Left/Right arrows move one valid boundary. Escape/click-away cancels. Open continuation uses a distinct arrow grip for placing a stop, never a false stop cap. No separate timing editor, modal, slider, Earlier/Later or Stop/Continue machinery remains. During drag, preserve the mounted DOM and canonical music; move a disposable visual candidate, then commit once on release. Reject crossing/inverted boundaries. Cancel on scrolling/capture loss/Escape/route/viewport/layout interruption. Routine edits offer Undo. Long sections scroll horizontally at a usable bar scale while short sections fit naturally.
 
 Visual grammar:
-- uninterrupted line = continuous presence
+- uninterrupted block = continuous presence
 - `|` end cap = the part actually stops there
 - `|` start cap = the part actually begins there
 - no cap at a section boundary when the part continues across it
@@ -425,9 +425,7 @@ Collapsed timeline row:
 
 The visualization should carry the timing information instead of repeating it as text. Color may distinguish semantic change families, but shape must also carry meaning so the system never relies on color alone.
 
-Only one Track expands at a time. Expanded state reveals large change chips and **+ Change**. Selecting a chip reveals one editable visual lane and Remove, without a timing/details modal. Collapsing the Track preserves all duration/marker information on the compact rail. Change properties occupy distinct subordinate positions so simultaneous categories remain legible. Routine timeline edits/removal offer Undo; another saved edit replaces that Undo opportunity.
-
-Tap/drag is the primary interaction. Contextual bar-position placement provides a forgiving tap/keyboard alternative without persistent timing steppers. No essential edit relies on a skinny line or an undiscoverable gesture.
+Only one Track expands at a time. Changes are labeled thin bands or point markers directly aligned with presence in the same main-lane coordinate and scroll system. Selection reveals real edges and a small Remove action; + Change keeps the single taxonomy sheet. Do not add a duplicate mini-timeline or editor. Change edges/points share presence dragging, tap-destination, keyboard and cancellation paths. Semantic colors identify only musical change families. Another saved edit replaces the current Undo opportunity. No persistent timing instructions or hover tooltips; transient drag position feedback disappears immediately on finish/cancel.
 
 Mix belongs to the Arrangement header; reveal a global grouping only when expanded or populated. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
 
@@ -1100,8 +1098,8 @@ Durable interaction and architecture rules:
 - Presence is represented by continuous ranges with clear start/end boundaries
 - uninterrupted ranges may cross section boundaries
 - timed production changes are ranges or markers internally; those classifications are not exposed in creation UI
-- only one Track expands at a time; changes are selected through large chips
-- presence and change editing is direct, with contextual position alternatives and Undo
+- only one Track expands at a time; changes are directly selected on aligned bands/markers
+- presence and change editing shares drag, tap-boundary/tap-destination, arrow keys and Undo
 - section-to-section navigation slides through the song
 - stable Track IDs replace name-as-identity logic
 - old Map data migrates into the new model where possible
