@@ -1543,7 +1543,7 @@
     const { range: r, portion: x } = item,
       selected =
         expanded && ui.selectedPresenceId === r.id && !ui.selectedEventId;
-    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
+    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" tabindex="${expanded ? -1 : 0}" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
   }
   function rangeHandles(id, type, x) {
     return ["start", "end"].filter((edge) => edge === "start" ? x.startHere : x.endHere)
@@ -1570,7 +1570,7 @@
       if (!gap) return;
       value = Math.ceil(gap.start - sectionStarts(p)[ui.sectionIndex]);
     }
-    const min = edge === "end" ? 1 : 0, max = edge === "end" ? len : len - 1;
+    const min = edge === "end" && (!obj || anchorAbs(p, obj.start) >= sectionStarts(p)[ui.sectionIndex]) ? 1 : 0, max = edge === "end" ? len : len - 1;
     placement = { type, id, edge, trackId, value: clamp(value, min, max), sectionId: sec.id };
     const title = edge === "end" ? "Stop" : edge === "resume" ? "Start" : edge === "point" ? "Move point" : "Move start";
     sheetRoot.innerHTML = `<div class="sheet placement-sheet"><div class="grabber"></div><h3>${title}</h3><p class="sub">${esc(sectionLabels(p)[ui.sectionIndex])}</p><output id="placementLabel" aria-live="polite"></output><div class="placement-lane"><input id="placementPosition" aria-label="${title} position" type="range" min="${min}" max="${max}" step="1" value="${placement.value}"></div><p class="micro">Slide to a bar, or use the arrow keys.</p><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="commit-placement">${title === "Stop" ? "Stop here" : title === "Start" ? "Start here" : "Done"}</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
@@ -1579,7 +1579,7 @@
   }
   function updatePlacementLabel() {
     const label = document.getElementById("placementLabel");
-    if (label && placement) label.textContent = placement.edge === "end" ? `After bar ${placement.value}` : `Bar ${placement.value + 1}`;
+    if (label && placement) label.textContent = placement.edge === "end" ? placement.value ? `After bar ${placement.value}` : "Before bar 1" : `Bar ${placement.value + 1}`;
   }
   function commitPlacement() {
     if (!placement) return;
@@ -1589,11 +1589,8 @@
     if (edge === "resume") {
       const absolute = sectionStarts(p)[ui.sectionIndex] + value;
       if (presenceForTrack(p, trackId).some((r) => { const a = rangeAbs(p, r); return absolute >= a.start && absolute < a.end; })) return sheetError("Choose a bar where this track is silent.");
-      const r = { id: uid(), trackId, start: { sectionId, bar: value }, end: null };
-      p.map.timeline.presence.push(r);
-      ui.selectedPresenceId = r.id;
       closeSheet();
-      return finishTimelineEdit(before, r, "presence", "Track started");
+      return commitPresenceTransition(trackId, value);
     }
     const obj = selectedObject(type, id);
     if (!obj || !applyTiming(obj, type, edge, value)) return sheetError("Choose a position within the musical span.");
@@ -1616,17 +1613,79 @@
       .join("");
   }
   function eventDetailRows(p, targetType, targetId, index) {
+    if (targetType === "track" && !visiblePresence(p, targetId, index).length) return "";
     const events = visibleEvents(p, targetType, targetId, index),
       selected = events.find((x) => x.event.id === ui.selectedEventId),
       bars = Number(sections(p)[index].lengthBars);
     return `<div class="change-selectors">${events.map(({ event: e }) => `<button class="change-chip ${e.id === ui.selectedEventId ? "selected" : ""}" data-action="select-event" data-event-id="${e.id}" aria-pressed="${e.id === ui.selectedEventId}"><span class="change-swatch tone-${eventTone(e)}"></span>${esc(e.label)}</button>`).join("")}<button class="change-chip add-change" data-action="open-add-change" data-target-type="${targetType}" ${targetId ? `data-target-id="${targetId}"` : ""}>+ Change</button></div>${selected ? selectedEventHtml(selected, bars) : ""}`;
   }
   function selectedEventHtml({ event: e, portion: x }, bars) {
-    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}">${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div><div class="selection-actions">${boundaryActions(e, "event")}${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
+    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}"><button class="lane-input" data-event-surface data-event-id="${e.id}" aria-label="Edit ${esc(e.label)} at a bar boundary"></button>${boundaryTargetsHtml(bars)}${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div><output class="lane-feedback" aria-live="polite">Tap a boundary to place a stop. Drag a handle to move it.</output><details class="timing-options"><summary>Timing options</summary><div class="selection-actions">${boundaryActions(e, "event")}${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}</div></details><div class="selection-actions"><button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
   }
   function trackDetailHtml(p, track, index) {
     const selected = visiblePresence(p, track.id, index).find((x) => x.range.id === ui.selectedPresenceId), r = selected?.range;
-    return `<div class="track-detail">${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="presence-editor"><div class="selection-actions">${boundaryActions(r, "presence")}${r.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div></div>` : ""}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="start-track" data-track-id="${track.id}">Start</button>` : ""}${eventDetailRows(p, "track", track.id, index)}</div>`;
+    return `<div class="track-detail"><output class="lane-feedback" aria-live="polite">Tap a boundary to start or stop. Drag a handle to move it.</output>${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="selection-actions"><button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div>` : ""}<details class="timing-options"><summary>Timing options</summary><div class="selection-actions">${r ? boundaryActions(r, "presence") : ""}${r?.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="start-track" data-track-id="${track.id}">Start at a position</button>` : ""}</div></details>${eventDetailRows(p, "track", track.id, index)}</div>`;
+  }
+  function boundaryTargetsHtml(bars) {
+    return `<span class="boundary-targets" aria-hidden="true">${Array.from({ length: bars + 1 }, (_, i) => `<span class="boundary-target" style="left:${i / bars * 100}%"></span>`).join("")}</span><span class="boundary-preview" hidden aria-hidden="true"></span>`;
+  }
+  function presenceLaneHtml(p, track, index, expanded) {
+    const ranges = visiblePresence(p, track.id, index), bars = Number(sections(p)[index].lengthBars), direct = expanded || !ranges.length;
+    return `${direct ? `<button class="lane-input" data-presence-surface data-track-id="${track.id}" aria-label="Edit ${esc(track.name)} presence at a bar boundary">${!ranges.length ? "+" : ""}</button>${expanded ? boundaryTargetsHtml(bars) : '<span class="boundary-preview" hidden aria-hidden="true"></span>'}` : `<button class="lane-select" data-action="select-presence" data-track-id="${track.id}" data-range-id="${ranges[0].range.id}" aria-label="Select ${esc(track.name)}"></button>`}${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}`;
+  }
+  function transitionIntent(p, trackId, boundary) {
+    const base = sectionStarts(p)[ui.sectionIndex], len = Number(sections(p)[ui.sectionIndex].lengthBars), abs = base + boundary;
+    const spans = presenceForTrack(p, trackId).map((range) => ({ range, ...rangeAbs(p, range) })).sort((a, b) => a.start - b.start);
+    const edge = spans.find((a) => Math.abs(a.start - abs) < 1e-6);
+    if (edge) return { action: "none", label: "Existing boundary · drag the handle to move it" };
+    const inside = spans.find((a) => a.start < abs && a.end > abs);
+    if (inside) return { action: "stop", range: inside.range, abs, label: boundary ? `Stop after bar ${boundary}` : "Stop before bar 1" };
+    if (abs >= songLength(p)) return { action: "none", label: "End of song" };
+    const next = spans.find((a) => a.start > abs), resume = spans.some((a) => a.end <= abs);
+    return { action: "start", range: next?.range, abs, label: `${resume ? "Resume" : "Start"} ${boundary === len ? "in the next section" : `at bar ${boundary + 1}`}` };
+  }
+  function commitPresenceTransition(trackId, boundary) {
+    const p = project(), intent = transitionIntent(p, trackId, boundary);
+    if (intent.action === "none") return false;
+    const before = copyProject();
+    let range = intent.range;
+    if (intent.action === "stop") range.end = anchorAtAbs(p, intent.abs, true);
+    else if (range) {
+      // Starting inside an existing gap extends its next piece backwards. Its stop
+      // and every later gap/re-entry remain intact; retain that piece's identity.
+      range.start = anchorAtAbs(p, intent.abs);
+    } else {
+      range = { id: uid(), trackId, start: anchorAtAbs(p, intent.abs), end: null };
+      p.map.timeline.presence.push(range);
+    }
+    ui.expandedTrackId = trackId;
+    ui.selectedPresenceId = range.id;
+    ui.selectedEventId = null;
+    finishTimelineEdit(before, range, "presence", intent.label);
+    return true;
+  }
+  function directEventIntent(eventId, boundary) {
+    const p = project(), event = selectedObject("event", eventId), base = sectionStarts(p)[ui.sectionIndex], abs = base + boundary;
+    if (!event) return { action: "none", label: "Select a change" };
+    if (event.kind === "marker") return { action: "point", event, abs, label: `Move ${event.label} to bar ${boundary + 1}` };
+    const span = rangeAbs(p, event);
+    if (Math.abs(abs - span.start) < 1e-6 || (event.end != null && Math.abs(abs - span.end) < 1e-6)) return { action: "none", label: "Existing boundary · drag the handle to move it" };
+    if (abs > span.start && abs < span.end) return { action: "end", event, abs, label: boundary ? `Stop after bar ${boundary}` : "Stop before bar 1" };
+    return { action: "none", label: "Choose a boundary within this change" };
+  }
+  function commitDirectEvent(eventId, boundary) {
+    const p = project(), intent = directEventIntent(eventId, boundary);
+    if (intent.action === "none") return false;
+    const before = copyProject(), event = intent.event;
+    if (intent.action === "point") {
+      if (!applyTiming(event, "event", "point", boundary)) return false;
+    } else {
+      event.end = anchorAtAbs(p, intent.abs, true);
+      const span = rangeAbs(p, event);
+      if (!eventCoveredByPresence(p, event, span.start, span.end)) { Object.assign(event, before.map.timeline.events.find((e) => e.id === event.id)); return false; }
+    }
+    finishTimelineEdit(before, event, "event", intent.label);
+    return true;
   }
   function presenceSelectors(p, trackId, index) {
     const ranges = visiblePresence(p, trackId, index);
@@ -1639,7 +1698,7 @@
       ranges = visiblePresence(p, track.id, index),
       expanded = ui.expandedTrackId === track.id,
       absent = !ranges.length;
-    return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars}"><button class="lane-select" data-action="${absent ? "add-presence-section" : "select-presence"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${absent ? "Add" : "Select"} ${esc(track.name)}">${absent ? "+" : ""}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}</div>${expanded && ranges.length ? trackDetailHtml(p, track, index) : ""}</div>`;
+    return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars}">${presenceLaneHtml(p, track, index, expanded)}</div>${expanded ? trackDetailHtml(p, track, index) : ""}</div>`;
   }
   function refreshArrangement() {
     const p = project(), index = ui.sectionIndex, active = document.activeElement;
@@ -1650,9 +1709,9 @@
       row.classList.toggle("expanded", expanded);
       row.querySelector(".timeline-label").setAttribute("aria-expanded", String(expanded));
       // The label/row and all unrelated Feel/Focus/Notes nodes survive selection.
-      lane.innerHTML = `<button class="lane-select" data-action="${ranges.length ? "select-presence" : "add-presence-section"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${ranges.length ? "Select" : "Add"} ${esc(track.name)}">${ranges.length ? "" : "+"}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}`;
+      lane.innerHTML = presenceLaneHtml(p, track, index, expanded);
       row.querySelector(".track-detail")?.remove();
-      if (expanded && ranges.length) row.insertAdjacentHTML("beforeend", trackDetailHtml(p, track, index));
+      if (expanded) row.insertAdjacentHTML("beforeend", trackDetailHtml(p, track, index));
     });
     app.querySelector(".mix-utility")?.remove();
     app.querySelector(".timeline-card").insertAdjacentHTML("beforeend", mixTimelineRow(p, index));
@@ -2276,24 +2335,6 @@
     if (used) invalidateBounce(p);
     save();
   }
-  function addPresenceSection(p, trackId, index) {
-    const before = copyProject();
-    const s = sections(p)[index],
-      r = { id: uid(), trackId, start: { sectionId: s.id, bar: 0 }, end: null };
-    p.map.timeline.presence.push(r);
-    mergePresenceForTrack(p, trackId, false);
-    normalizeAllFocus(p);
-    invalidateMapVerification(p);
-    invalidateDraftTrack(
-      p,
-      trackId,
-      sections(p)
-        .slice(index)
-        .map((s) => s.id),
-    );
-    save();
-    offerUndo(before, "Track started");
-  }
   function presenceGapInSection(p, trackId, index) {
     if (!lengthsComplete(p)) return null;
     const starts = sectionStarts(p),
@@ -2484,6 +2525,74 @@
     app.querySelectorAll("[data-presence-handle], [data-event-handle], [data-event-marker]").forEach((el) => {
       el.onpointerdown = (e) => startTimelineDrag(e, el.hasAttribute("data-presence-handle") ? "presence" : "event", el.dataset.edge || "point");
     });
+    app.querySelectorAll("[data-presence-surface], [data-event-surface]").forEach((surface) => {
+      surface.onpointermove = (e) => { if (!cancelGesture && e.pointerType !== "touch") previewLane(surface, e.clientX, e.clientY); };
+      surface.onpointerleave = () => { if (!cancelGesture) clearLanePreview(surface); };
+      surface.onpointerdown = (e) => startLanePlacement(e, surface);
+      surface.onclick = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.detail !== 0) return;
+        if (surface.hasAttribute("data-presence-surface") && ui.expandedTrackId !== surface.dataset.trackId) {
+          ui.expandedTrackId = surface.dataset.trackId;
+          refreshArrangement();
+        }
+        const row = surface.hasAttribute("data-presence-surface") ? app.querySelector(`[data-track-row="${surface.dataset.trackId}"]`) : surface.closest(".change-editor");
+        const options = row?.querySelector(".timing-options");
+        if (options) { options.open = true; options.querySelector("summary").focus({ preventScroll: true }); }
+      };
+    });
+  }
+  function previewLane(surface, clientX, clientY) {
+    const p = project(), lane = surface.parentElement, rect = lane.getBoundingClientRect(), len = Number(sections(p)[ui.sectionIndex].lengthBars);
+    const boundary = clamp(Math.round((clientX - rect.left) / rect.width * len), 0, surface.hasAttribute("data-event-surface") && selectedObject("event", surface.dataset.eventId)?.kind === "marker" ? len - 1 : len);
+    const intent = surface.hasAttribute("data-presence-surface") ? transitionIntent(p, surface.dataset.trackId, boundary) : directEventIntent(surface.dataset.eventId, boundary);
+    const preview = lane.querySelector(".boundary-preview"), feedback = lane.closest(".timeline-row, .change-editor")?.querySelector(".lane-feedback");
+    if (preview) { preview.hidden = false; preview.style.left = `${boundary / len * 100}%`; }
+    if (feedback) feedback.textContent = intent.label;
+    else if (clientY != null) {
+      const output = document.getElementById("dragPosition");
+      output.hidden = false; output.textContent = intent.label;
+      output.style.left = `${clamp(clientX, 80, innerWidth - 80)}px`;
+      output.style.top = `${Math.max(12, clientY - 60)}px`;
+    }
+    surface.setAttribute("aria-description", intent.label);
+    return boundary;
+  }
+  function clearLanePreview(surface) {
+    const lane = surface.parentElement;
+    const preview = lane.querySelector(".boundary-preview"), feedback = lane.closest(".timeline-row, .change-editor")?.querySelector(".lane-feedback");
+    if (preview) preview.hidden = true;
+    document.getElementById("dragPosition").hidden = true;
+    if (feedback) feedback.textContent = "Tap a boundary to start or stop. Drag a handle to move it.";
+  }
+  function startLanePlacement(e, surface) {
+    if (e.button !== undefined && e.button !== 0 || ui.animating) return;
+    e.stopPropagation();
+    const origin = { x: e.clientX, y: e.clientY, width: innerWidth, height: innerHeight }, laneWidth = surface.parentElement.getBoundingClientRect().width;
+    const controller = new AbortController(), opts = { signal: controller.signal };
+    let boundary = previewLane(surface, e.clientX, e.clientY), scrolled = false, captureRequested = false;
+    try { surface.setPointerCapture(e.pointerId); captureRequested = true; } catch (_) {}
+    const finish = (cancel, ev) => {
+      if (ev && ev.pointerId !== e.pointerId) return;
+      controller.abort(); cancelGesture = null;
+      cancel ||= captureRequested && !surface.hasPointerCapture(e.pointerId);
+      cancel ||= scrolled || innerWidth !== origin.width || innerHeight !== origin.height || !surface.isConnected || surface.parentElement.getBoundingClientRect().width !== laneWidth;
+      clearLanePreview(surface);
+      if (cancel) return;
+      if (surface.hasAttribute("data-presence-surface")) commitPresenceTransition(surface.dataset.trackId, boundary);
+      else commitDirectEvent(surface.dataset.eventId, boundary);
+    };
+    cancelGesture = () => finish(true);
+    window.addEventListener("pointermove", (ev) => {
+      if (ev.pointerId !== e.pointerId) return;
+      if (Math.abs(ev.clientY - origin.y) > 12) scrolled = true;
+      if (!scrolled) boundary = previewLane(surface, ev.clientX, ev.clientY);
+    }, opts);
+    window.addEventListener("pointerup", (ev) => finish(false, ev), opts);
+    window.addEventListener("pointercancel", (ev) => finish(true, ev), opts);
+    surface.addEventListener("lostpointercapture", () => finish(true), opts);
+    window.addEventListener("resize", () => finish(true), opts);
+    window.addEventListener("blur", () => finish(true), opts);
   }
   function startTimelineDrag(e, type, edge) {
     if ((e.button !== undefined && e.button !== 0) || ui.animating) return;
@@ -2694,17 +2803,6 @@
         ui.sectionIndex,
       )[0]?.range.id;
       return refreshArrangement();
-    }
-    if (action === "add-presence-section") {
-      addPresenceSection(p, b.dataset.trackId, ui.sectionIndex);
-      ui.expandedTrackId = b.dataset.trackId;
-      ui.selectedPresenceId = visiblePresence(
-        p,
-        b.dataset.trackId,
-        ui.sectionIndex,
-      )[0]?.range.id;
-      ui.selectedEventId = null;
-      return renderSectionStudy();
     }
     if (action === "open-add-change")
       return openAddChangeSheet(
@@ -3183,7 +3281,10 @@
     invalidateMapVerification(p);
     save();
     offerUndo(before, message);
+    const y = scrollY, notesOpen = !!app.querySelector(".note-disclosure")?.open;
     renderSectionStudy();
+    if (notesOpen && app.querySelector(".note-disclosure")) app.querySelector(".note-disclosure").open = true;
+    window.scrollTo(0, y);
   }
   // Intersect changes with their parent's actual presence. Retain the original ID on
   // the first surviving piece; only a real new piece needs a new identity.
@@ -3249,7 +3350,7 @@
     } else {
       const value = clamp(
         boundary,
-        edge === "end" ? 1 : 0,
+        edge === "end" && anchorAbs(p, obj.start) >= sectionStarts(p)[ui.sectionIndex] ? 1 : 0,
         edge === "end" ? len : len - 1,
       );
       obj[edge] = {
