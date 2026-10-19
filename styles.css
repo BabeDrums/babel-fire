@@ -1809,3 +1809,72 @@ body.sheet-open .undo-notice {
 .real-stop::after { right: 0; }
 
 .sheet { max-width: 640px; }
+
+/* Same FIRE, different canvas. Content determines the readable/workspace width. */
+.app-shell {
+  --canvas-width: 1160px;
+  max-width: var(--canvas-width);
+  width: 100%;
+  padding-inline: clamp(18px, 3vw, 56px);
+}
+.app-shell[data-layout="focused"] { --canvas-width: 760px; }
+.app-shell[data-layout="draft"] { --canvas-width: 1480px; }
+.app-shell[data-layout="arrangement"] { --canvas-width: 1920px; }
+.app-shell > .sub { max-width: 66ch; }
+.projects-grid, .roadmap-grid, .notes-columns, .session-groups, .draft-sections,
+.phase-layout, .review-sections, .study-workspace { min-width: 0; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px 28px; }
+.projects-grid > .project-card { margin-bottom: 0; }
+.project-open { height: 100%; }
+.phase-setup, .phase-checkpoints, .arrangement-region, .study-observations { min-width: 0; }
+.study-actions { max-width: 640px; margin-left: auto; }
+.workflow-disclosure > summary > *, .summary-lines, .notes-columns section { min-width: 0; overflow-wrap: anywhere; }
+.notes-columns .card { line-height: 1.5; overflow-wrap: anywhere; }
+.app-shell[data-layout="overview"] > .primary,
+.app-shell[data-layout="draft"] > .primary { max-width: 640px; display: block; margin-left: auto; }
+button:not(:disabled), [role="button"], summary, select { cursor: pointer; }
+button:disabled { cursor: default; }
+input[type="range"] { cursor: ew-resize; }
+summary:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--control-radius);
+}
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover { filter: brightness(1.18); }
+  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle):not(:disabled):hover,
+  summary:hover, .structure-row:hover { background-color: rgba(201, 205, 213, 0.055); }
+  .presence-handle:hover::after, .event-handle:hover::after { box-shadow: 0 0 0 5px #353b46; }
+  .change-marker:hover::after { outline: 3px solid #353b46; }
+  [data-drag-handle] { cursor: grab; }
+  body.is-sorting, body.is-sorting * { cursor: grabbing !important; }
+  body.is-dragging, body.is-dragging * { cursor: ew-resize !important; }
+}
+@media (min-width: 768px) {
+  .phase-layout.with-setup, .notes-columns, .session-groups, .review-sections {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 4vw, 64px); align-items: start;
+  }
+  .roadmap-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; align-items: stretch; }
+  .roadmap-grid .road-phase { margin: 0; height: 100%; }
+  .review-sections { gap: 8px 32px; }
+  .notes-columns .section-kicker { margin-top: 24px; }
+  .app-shell[data-route="tracks"] > .choice-wrap { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+}
+@media (min-width: 900px) {
+  .draft-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px clamp(24px, 4vw, 56px); align-items: start; }
+  .app-shell[data-route="project"] .hero-card { padding: 32px; }
+}
+@media (min-width: 1100px) {
+  .study-workspace { display: grid; grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 352px); gap: clamp(28px, 3vw, 56px); align-items: start; }
+  .study-observations .study-block:first-child { margin-top: 0; padding-top: 0; }
+  .study-observations .segment-stack { display: block; }
+  .study-observations .scale-row { margin-bottom: 12px; }
+  .study-observations .choice-wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .study-observations .note-grid { display: block; }
+  .study-observations .note-grid > div + div { margin-top: 16px; }
+  .study-actions { margin-top: 24px; }
+  .timeline-row { grid-template-columns: 144px minmax(0, 1fr); }
+  .timeline-ruler { margin-left: 144px; }
+  /* Bottom sheets become contained desktop dialogs, retaining their content/focus lifecycle. */
+  .sheet-backdrop { align-items: center; padding: clamp(24px, 4vh, 48px); }
+  .sheet { border: 1px solid var(--line-strong); border-radius: 24px; max-height: calc(100dvh - 80px); padding: 24px; }
+  .grabber { display: none; }
+}

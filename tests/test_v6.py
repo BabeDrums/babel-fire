@@ -62,10 +62,10 @@ class V6Browser(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def open(self, route='section-study', width=None, data=None, reduced=False):
+    def open(self, route='section-study', width=None, data=None, reduced=False, pointer=False):
         width = width or int(os.environ.get('FIRE_TEST_WIDTH', '390'))
         self.context = self.browser.new_context(viewport={'width': width, 'height': 1000},
-                                                has_touch=True, reduced_motion='reduce' if reduced else 'no-preference')
+                                                has_touch=not pointer, reduced_motion='reduce' if reduced else 'no-preference')
         self.addCleanup(self.context.close)
         data = data if data is not None else fixture()
         # Seed exactly once: reload tests must exercise the migrated saved state.
@@ -81,7 +81,7 @@ class V6Browser(unittest.TestCase):
                      '404 (File not found)' not in m.text else None)
         response = self.page.goto(URL)
         self.assertEqual(response.status, 200)
-        self.addCleanup(lambda: self.assertEqual(self.errors, []))
+        self.addCleanup(lambda errors=self.errors: self.assertEqual(errors, []))
         return self.page
 
     def click(self, action, extra=''):
@@ -598,6 +598,158 @@ class V6Browser(unittest.TestCase):
         expect(self.page.locator('#draftCoverage')).to_have_text('4 of 4 mapped parts · 3 of 3 sections')
         expect(self.page.locator('[data-draft-section="s2"] summary')).to_contain_text('No active tracks · Complete')
         expect(self.page.locator('[data-route="skeleton-bounce"]')).to_be_enabled()
+
+    def canvas_fixture(self):
+        data=self.complete_fixture();p=data['projects'][0]
+        for i in range(3,8):
+            sid=f's{i}'
+            p['map']['sections'].append({'id':sid,'name':f'Chorus variation {i}','lengthBars':8})
+            p['map']['sectionData'][sid]=json.loads(json.dumps(p['map']['sectionData']['s0']))
+            p['skeleton']['session']['markers'][sid]=True
+            p['skeleton']['draft']['parts'][sid]={'t1':True,'t2':True}
+        return data
+
+    def canvas_route(self, route):
+        self.page.evaluate("route=>{history.pushState({route,projectId:'p1'},'');dispatchEvent(new PopStateEvent('popstate',{state:history.state}))}",route)
+
+    def settled_sheet(self):
+        self.page.locator('.sheet').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
+
+    def test_cross_platform_screen_canvases_and_fluid_widths(self):
+        routes=['projects','new-project','project','roadmap','map','structure','tracks','section-study',
+                'map-summary','skeleton','skeleton-session','skeleton-draft','skeleton-bounce','notes']
+        for width in [320,390,820,1180,1440,1728,1920]:
+            with self.subTest(width=width):
+                self.open('projects',width=width,data=self.canvas_fixture(),pointer=width>=1180)
+                for route in routes:
+                    with self.subTest(route=route):
+                        self.canvas_route(route)
+                        self.assertEqual(self.page.evaluate('history.state.route'),route)
+                        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),width)
+                        self.assertGreater(self.page.locator('#app').bounding_box()['width'],width*.8 if width<1000 else 600)
+                        if route in ['new-project','skeleton-bounce','skeleton']:
+                            self.assertLessEqual(self.page.locator('#app').bounding_box()['width'],760)
+                        if route=='section-study':
+                            self.select()
+                            self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(),0)
+                            lane=self.page.locator('.timeline-lane').first.bounding_box()
+                            self.assertGreater(lane['width'],width*.5 if width>=1440 else 100)
+                            arrangement=self.page.locator('.arrangement-region').bounding_box()
+                            observations=self.page.locator('.study-observations').bounding_box()
+                            self.assertEqual(observations['x']>arrangement['x']+arrangement['width'],width>=1100)
+                        if route=='skeleton-draft':
+                            a=self.page.locator('[data-draft-section="s0"]').bounding_box()
+                            b=self.page.locator('[data-draft-section="s1"]').bounding_box()
+                            self.assertEqual(b['x']>a['x'],width>=900)
+                # All editing panels remain contained/reachable at the same widths.
+                self.canvas_route('structure')
+                for action,extra in [('open-add-section',''),('edit-section','[data-section-id="s0"]')]:
+                    self.click(action,extra);self.settled_sheet()
+                    box=self.page.locator('.sheet').bounding_box()
+                    self.assertGreaterEqual(box['x'],0);self.assertLessEqual(box['x']+box['width'],width)
+                    self.assertGreaterEqual(box['y'],0)
+                    self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+                    if width>=1100:
+                        self.assertGreater(box['y'],20)
+                        self.assertLess(abs(box['x']+box['width']/2-width/2),1)
+                    self.page.keyboard.press('Escape')
+                self.canvas_route('section-study');self.select();self.click('open-add-change')
+                self.settled_sheet();self.assertEqual(self.page.locator('[data-action="choose-change"]').count(),8)
+                self.page.keyboard.press('Escape');self.context.close()
+        # Intermediate widths use the same fluid canvas rather than device-specific widths.
+        self.open(width=1000,data=self.canvas_fixture(),pointer=True)
+        previous=0
+        for width in [1000,1099,1100,1280,1600,1800]:
+            self.page.set_viewport_size({'width':width,'height':1000})
+            current=self.page.locator('#app').bounding_box()['width']
+            self.assertGreater(current,previous);previous=current
+            self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),width)
+
+    def assert_hover_stable(self, locator):
+        locator.scroll_into_view_if_needed();before=locator.bounding_box()
+        locator.hover()
+        self.assertEqual(locator.bounding_box(),before)
+        self.assertNotEqual(locator.evaluate('el=>getComputedStyle(el).cursor'),'default')
+
+    def test_mouse_hover_click_and_sheet_keyboard_focus(self):
+        for width in [1180,1440,1728]:
+            with self.subTest(width=width):
+                self.open('projects',width=width,data=self.canvas_fixture(),pointer=True)
+                self.assertTrue(self.page.evaluate("matchMedia('(hover:hover) and (pointer:fine)').matches"))
+                self.assert_hover_stable(self.page.locator('.project-open').first)
+                self.assert_hover_stable(self.page.locator('.project-menu').first)
+                self.click('project-menu','[data-id="p1"]');self.settled_sheet()
+                self.page.keyboard.press('Tab');expect(self.page.locator('[data-action="delete-project"]')).to_be_focused()
+                self.page.keyboard.press('Shift+Tab');expect(self.page.locator('[data-action="close-sheet"]')).to_be_focused()
+                self.page.keyboard.press('Escape');expect(self.page.locator('.project-menu').first).to_be_focused()
+                self.click('open-project','[data-id="p1"]');self.page.locator('.quick-card[data-route="roadmap"]').click();self.click('go','[data-route="map"]')
+                self.page.locator('#tempoInput').fill('128.5');expect(self.page.locator('#tempoInput')).to_be_focused()
+                self.click('go','[data-route="structure"]');self.click('open-add-section');self.settled_sheet()
+                self.assert_hover_stable(self.page.locator('[data-name="Verse"]'))
+                self.click('choose-section-type','[data-name="Verse"]')
+                self.assert_hover_stable(self.page.locator('[data-bars="8"]'))
+                self.click('set-new-section-bars','[data-bars="8"]')
+                self.page.keyboard.press('Escape')
+                self.assertEqual(self.project()['map']['setup']['tempo'],'128.5')
+                self.context.close()
+
+    def test_mouse_arrangement_placement_boundary_drag_cancel_and_undo(self):
+        for width in [1180,1440,1728]:
+            with self.subTest(width=width):
+                self.open(width=width,data=self.canvas_fixture(),pointer=True);self.select()
+                self.assert_hover_stable(self.page.locator('[data-presence-handle][data-edge="start"]'))
+                self.click('place-boundary','[data-kind="presence"][data-edge="end"]');self.settled_sheet()
+                slider=self.page.locator('#placementPosition');box=slider.bounding_box()
+                slider.click(position={'x':box['width']*.43,'y':box['height']/2})
+                expect(self.page.locator('#placementLabel')).to_have_text('After bar 4')
+                self.click('commit-placement')
+                self.assertEqual(next(r for r in self.project()['map']['timeline']['presence'] if r['id']=='r1')['end']['bar'],4)
+                handle=self.page.locator('[data-presence-handle][data-edge="end"]')
+                handle.scroll_into_view_if_needed();box=handle.bounding_box();lane=handle.locator('xpath=..').bounding_box()
+                self.page.mouse.move(box['x']+22,box['y']+22);self.page.mouse.down()
+                self.page.mouse.move(lane['x']+lane['width']*.75,box['y']+22,steps=8);self.page.mouse.up()
+                self.assertEqual(next(r for r in self.project()['map']['timeline']['presence'] if r['id']=='r1')['end']['bar'],6)
+                before=self.db()
+                handle=self.page.locator('[data-presence-handle][data-edge="end"]');box=handle.bounding_box()
+                self.page.mouse.move(box['x']+22,box['y']+22);self.page.mouse.down()
+                self.page.mouse.move(lane['x']+lane['width']*.5,box['y']+22,steps=4)
+                # Native capture loss represents OS/browser interruption of the mouse gesture.
+                handle.evaluate('el=>el.releasePointerCapture(1)')
+                self.page.mouse.move(lane['x']+lane['width']*.4,box['y']+22);self.page.mouse.up()
+                self.assertEqual(self.db(),before)
+                self.assertFalse(self.page.locator('body').evaluate('el=>el.classList.contains("is-dragging")'))
+                self.page.locator('#undoEdit').click()
+                self.assertEqual(next(r for r in self.project()['map']['timeline']['presence'] if r['id']=='r1')['end']['bar'],4)
+                self.context.close()
+
+    def test_desktop_disclosure_click_activation_and_wheel_scrolling(self):
+        self.open('skeleton-draft',width=1440,data=self.canvas_fixture(),pointer=True)
+        summary=self.page.locator('[data-draft-section="s0"] summary');self.assert_hover_stable(summary)
+        history_length=self.page.evaluate('history.length');summary.click()
+        self.click('toggle-draft-part','[data-section-id="s0"][data-track-id="t1"]')
+        expect(self.page.locator('#draftCoverage')).to_contain_text('15 of 16 mapped parts')
+        self.assertEqual(self.page.evaluate('history.length'),history_length)
+        summary.focus();self.page.keyboard.press('Space')
+        self.assertNotEqual(summary.evaluate('el=>getComputedStyle(el).outlineStyle'),'none')
+        self.assertFalse(self.page.locator('[data-draft-section="s0"]').evaluate('el=>el.open'))
+        self.page.keyboard.press('Enter')
+        self.assertTrue(self.page.locator('[data-draft-section="s0"]').evaluate('el=>el.open'))
+        self.canvas_route('notes');self.page.set_viewport_size({'width':1440,'height':520})
+        self.page.mouse.move(700,350);self.page.mouse.wheel(0,700)
+        self.page.wait_for_function('scrollY>0')
+        self.canvas_route('structure');self.click('open-add-section');self.settled_sheet()
+        sheet=self.page.locator('.sheet');box=sheet.bounding_box();page_scroll=self.page.evaluate('scrollY')
+        self.page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2)
+        self.page.mouse.wheel(0,500)
+        self.page.wait_for_function('document.querySelector(".sheet").scrollTop>0')
+        self.assertEqual(self.page.evaluate('scrollY'),page_scroll)
+        self.page.keyboard.press('Escape')
+        self.page.set_viewport_size({'width':768,'height':700})
+        self.canvas_route('section-study')
+        nav=self.page.locator('.horizontal-nav');box=nav.bounding_box()
+        self.page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2)
+        self.page.mouse.wheel(600,0)
+        self.page.wait_for_function('document.querySelector(".horizontal-nav").scrollLeft>0')
 
 
 if __name__ == '__main__':

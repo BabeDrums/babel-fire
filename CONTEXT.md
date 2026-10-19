@@ -811,6 +811,12 @@ For the current timeline, keep the implementation **crisp rather than foggy/fros
 - neutral accents reserved for selection, progress, and active editing
 - no decorative blur/glow just because Apple-inspired styling is desired
 
+## Adaptive canvas and input
+
+Same FIRE, different canvas: phone, tablet, laptop, and desktop share one workflow and data model. Choose fluid content widths by screen purpose: focused forms/checkpoints, medium project/overview lists, and wider Arrangement/Draft workspaces. Use side-by-side regions only when the content benefits; do not stretch every form or add filler dashboards. Large-screen editing panels may be centered dialogs while compact layouts retain bottom sheets.
+
+Mouse, touch, and normal keyboard accessibility are first-class. Keep important controls visible without hover, provide stable non-geometric hover/press feedback and visible focus, and preserve native scrolling, Tab/Shift+Tab, Enter/Space activation, and safe Escape dismissal. Custom productivity shortcuts remain outside the current scope.
+
 ## Apple-like rules that have emerged
 - avoid unnecessary hairlines
 - use spacing/grouping before separators

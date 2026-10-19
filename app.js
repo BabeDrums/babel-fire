@@ -761,6 +761,11 @@
     return `<button class="nav-btn left" data-action="history-back" data-fallback-route="${fallbackRoute}"><span class="arrow">‹</span>${esc(label)}</button>`;
   }
   function topbar(left = "", center = "", right = "") {
+    // Canvas size follows content, not the user's device or input method.
+    app.dataset.route = ui.route;
+    app.dataset.layout = ui.route === "section-study" ? "arrangement"
+      : ui.route === "skeleton-draft" ? "draft"
+      : ["new-project", "original-spark", "skeleton-bounce", "skeleton"].includes(ui.route) ? "focused" : "overview";
     return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`;
   }
   function savedMark() {
@@ -1374,7 +1379,7 @@
         phaseTag("FIRE"),
         `<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`,
       ) +
-      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div>${
+      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div><div class="projects-grid">${
         db.projects.length
           ? db.projects
               .map((p) => {
@@ -1388,7 +1393,7 @@
               })
               .join("")
           : `<div class="empty">No projects yet. Tap + to start one.</div>`
-      }<footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
+      }</div><footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
     showBuildStamp();
   }
   function renderProject() {
@@ -1443,8 +1448,7 @@
         `<button class="phase-pill" data-action="go" data-route="project">Recreation</button>`,
         savedMark(),
       ) +
-      `<h2>${STUDY_PHASES[index].title}</h2>` + beforeHtml +
-      `<div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div>`
+      `<h2>${STUDY_PHASES[index].title}</h2><div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div></section></div>`
     );
   }
   function renderMapHome() {
@@ -1676,19 +1680,19 @@
       presentIds = trackIdsInSection(p, index),
       focusOptions = presentIds.map((id) => trackById(p, id)).filter(Boolean),
       done = sectionComplete(p, index);
-    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
+    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="study-workspace"><section class="arrangement-region" aria-label="Arrangement"><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
       p,
     )
       .map((t) => timelineTrackRow(p, t, index))
       .join(
         "",
-      )}${mixTimelineRow(p, index)}</div>${!presentIds.length ? `<div class="spacer-12"></div><button class="choice quiet ${d.silence ? "selected" : ""}" data-action="toggle-section-silence">No active tracks</button>` : ""}<div class="study-block"><div class="block-head"><strong>Feel</strong></div><div class="segment-stack">${Object.keys(
+      )}${mixTimelineRow(p, index)}</div>${!presentIds.length ? `<div class="spacer-12"></div><button class="choice quiet ${d.silence ? "selected" : ""}" data-action="toggle-section-silence">No active tracks</button>` : ""}</section><aside class="study-observations" aria-label="Section observations"><div class="study-block"><div class="block-head"><strong>Feel</strong></div><div class="segment-stack">${Object.keys(
       FEEL_SCALES,
     )
       .map((k) => renderScale(k, d))
       .join(
         "",
-      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}" aria-pressed="${d.focusIds.includes(t.id)}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none" aria-pressed="${d.focusState === "none"}">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details><div class="action-row"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
+      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}" aria-pressed="${d.focusIds.includes(t.id)}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none" aria-pressed="${d.focusState === "none"}">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details></aside></div><div class="action-row study-actions"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
   }
   function renderScale(key, d) {
     const value = d.feel?.[key];
@@ -1802,7 +1806,7 @@
         .map((t) => `<span class="chip">${esc(t.name)}</span>`)
         .join(
           "",
-        )}</div>${unused.length ? `<div class="spacer-18"></div><button class="warning-card" data-action="go" data-route="tracks" style="width:100%;text-align:left"><strong>Unused tracks</strong><p>${esc(unused.map((t) => t.name).join(" · "))} ${unused.length === 1 ? "does" : "do"} not appear in any section.</p></button>` : ""}<div class="section-kicker">Sections</div><div class="group-card" style="padding:0 14px">${sections(
+        )}</div>${unused.length ? `<div class="spacer-18"></div><button class="warning-card" data-action="go" data-route="tracks" style="width:100%;text-align:left"><strong>Unused tracks</strong><p>${esc(unused.map((t) => t.name).join(" · "))} ${unused.length === 1 ? "does" : "do"} not appear in any section.</p></button>` : ""}<div class="section-kicker">Sections</div><div class="review-sections">${sections(
         p,
       )
         .map((s, i) => renderSummaryCard(p, i, labels[i]))
@@ -1889,7 +1893,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<div class="work-position">1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
+      `<div class="work-position">1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="session-groups"><section><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
         p,
       )
         .map(
@@ -1898,7 +1902,7 @@
         )
         .join(
           "",
-        )}</div><div class="section-kicker">Markers</div><div class="group-card list">${sections(
+        )}</div></section><section><div class="section-kicker">Markers</div><div class="group-card list">${sections(
         p,
       )
         .map(
@@ -1907,7 +1911,7 @@
         )
         .join(
           "",
-        )}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-draft" ${sessionDone(p) ? "" : "disabled"}>Next</button>`;
+        )}</div></section></div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-draft" ${sessionDone(p) ? "" : "disabled"}>Next</button>`;
   }
   function draftSectionHtml(p, s, i) {
     const req = draftRequirements(p, i), state = p.skeleton.draft.parts[s.id] || {},
@@ -1922,7 +1926,7 @@
   function renderSkeletonDraft() {
     const p = project();
     app.innerHTML = topbar(historyBackButton("skeleton", "The Skeleton"), phasePill(1), savedMark()) +
-      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div>${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div><div class="draft-sections">${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
   }
   function refreshDraftChecks() {
     const p = project();
@@ -1961,19 +1965,19 @@
           phaseTag("Roadmap"),
           "",
         ) +
-        `<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph, i) => `<div class="road-phase ${i === 0 ? "current" : "future"}"><div class="road-top"><div class="road-num">${i + 1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join("")}`;
+        `<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div><div class="roadmap-grid">${ORIGINAL_PHASES.map((ph, i) => `<div class="road-phase ${i === 0 ? "current" : "future"}"><div class="road-top"><div class="road-num">${i + 1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join("")}</div>`;
       return;
     }
     app.innerHTML =
       topbar(backButton("project", "Recreation"), phaseTag("Roadmap"), "") +
-      `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map(
+      `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div><div class="roadmap-grid">${STUDY_PHASES.map(
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
             unlocked = studyPhaseUnlocked(p, i),
             tag = unlocked ? "button" : "div";
           return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p><span class="micro">${st === "unimplemented" ? "Coming later · Not implemented" : st === "done" ? "Completed" : st === "current" ? "Current" : st === "available" ? "Available" : "Locked"}</span></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
         },
-      ).join("")}`;
+      ).join("")}</div>`;
   }
   function renderNotes() {
     const p = project();
@@ -1995,7 +1999,7 @@
     });
     app.innerHTML =
       topbar(backButton("project", "Recreation"), phaseTag("Notes"), "") +
-      `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}<div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}`;
+      `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>`;
   }
   function noteCard(ctx, text) {
     return `<div class="card card-pad" style="margin-bottom:9px"><div class="micro" style="margin-bottom:6px">${esc(ctx)}</div><div style="font-size:14px;line-height:1.5">${esc(text)}</div></div>`;
