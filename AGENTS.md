@@ -7,7 +7,7 @@ Babel FIRE is an iPhone/iPad-first music-production workflow app. Production run
 Apply this hierarchy when sources conflict:
 
 1. **AGENTS.md** — repository workflow, engineering, maintenance, review, and documentation rules.
-2. **Active version specification, currently V5.md** — approved requirements for the active product generation; supersedes older UI/product descriptions where they conflict.
+2. **Active version specification, currently V6.md** — approved requirements for the active product generation; supersedes older UI/product descriptions where they conflict.
 3. **CONTEXT.md** — durable product philosophy, architecture, learning/workflow context, and decisions intended to survive across versions.
 4. **Current code and tests** — implementation evidence; they do not override explicit approved product requirements.
 
@@ -27,7 +27,7 @@ Normal sequence: task branch → implementation → tests → commit → push �
 
 ## Engineering and product rules
 
-- Read `CONTEXT.md`, the active specification, and relevant code/tests before product work. This task remains **V5**.
+- Read `CONTEXT.md`, the active specification, and relevant code/tests before product work. The active approved implementation scope is **V6**.
 - Preserve existing user data and the localStorage key `production-projects-v1`. Schema changes require a tested forward migration; never wipe projects.
 - Preserve stable section, track, presence-range, and change IDs. When a genuine split/merge needs new identities, retain surviving identities wherever possible.
 - The continuous timeline is the source of truth. Do not recreate duplicate Parts / Enters / Leaves state. Preserve downstream Skeleton Session → Draft → Bounce dependencies and browser-history behavior.
@@ -67,8 +67,8 @@ An implementation task is not complete until:
 - Documentation is updated only when durable rules changed, with milestones recorded in the changelog when appropriate.
 - Remaining risks are explicitly stated, and completed work is committed, pushed, and opened as a PR for review.
 
-For V5, verify section add/edit/reorder/remove; open presence through existing and newly added sections; boundary/internal trimming; change creation/selection/trimming/removal/supersession; section slides; collapsed/expanded track states; forgiving hit targets; migration/data safety; history; and downstream invalidation.
+For V6, verify section add/edit/reorder/remove; open presence through existing and newly added sections; boundary/internal trimming; change creation/selection/trimming/removal/supersession; section slides; collapsed/expanded track states; forgiving hit targets; migration/data safety; history; and downstream invalidation.
 
-Serve the checkout with `python3 -m http.server 8000 --bind 127.0.0.1`. Run `node --check app.js` and `python3 -B -m unittest discover -s tests -v`; repeat the browser suite with `FIRE_TEST_WIDTH=820`. Test tools require Python Playwright and Chromium (`CHROMIUM_PATH` can override the executable); they are not application dependencies.
+Serve the checkout with `python3 scripts/serve.py`. Run `node --check app.js` and `python3 -B -m unittest discover -s tests -v`; repeat the browser suite with `FIRE_TEST_WIDTH=820`. Test tools require Python Playwright and Chromium (`CHROMIUM_PATH` can override the executable); they are not application dependencies.
 
-Testing reports must distinguish **automated tests**, **responsive viewport testing**, **browser interaction testing**, and **physical-device Safari testing**. Chromium touch injection and iPhone/iPad-sized viewports are simulated/browser tests, not physical-device evidence. Never claim physical iPhone/iPad Safari verification unless it actually occurred on physical hardware. Physical iOS Safari remains unverified for this V5 work.
+Testing reports must distinguish **automated tests**, **responsive viewport testing**, **browser interaction testing**, and **physical-device Safari testing**. Chromium touch injection and iPhone/iPad-sized viewports are simulated/browser tests, not physical-device evidence. Never claim physical iPhone/iPad Safari verification unless it actually occurred on physical hardware. Physical iOS Safari verification must be reported separately.

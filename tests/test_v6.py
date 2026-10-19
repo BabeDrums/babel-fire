@@ -1,4 +1,4 @@
-"""V5 browser regressions. Run against a static server:
+"""V6 browser regressions (including retained V5 musical/data invariants). Run against a static server:
 FIRE_URL=http://127.0.0.1:8000 python3 -B -m unittest discover -s tests -v
 Requires Python Playwright and Chromium (CHROMIUM_PATH may override its location).
 Tests use disposable contexts and never read a user's browser storage.
@@ -49,7 +49,7 @@ def fixture():
                   'anchor': 'Bass'}, 'notes': []}]}
 
 
-class V5Browser(unittest.TestCase):
+class V6Browser(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.pw = sync_playwright().start()
@@ -117,6 +117,11 @@ class V5Browser(unittest.TestCase):
         cdp.send('Input.dispatchTouchEvent', {'type': 'touchCancel' if cancel else 'touchEnd', 'touchPoints': []})
         cdp.detach()
 
+    def place(self, edge, value, kind='presence'):
+        self.click('place-boundary', f'[data-kind="{kind}"][data-edge="{edge}"]')
+        self.page.locator('#placementPosition').fill(str(value))
+        self.click('commit-placement')
+
     def test_v4_migration_and_reload_preserve_identity_progress_and_fractional_offsets(self):
         original = fixture()
         self.open()
@@ -141,7 +146,7 @@ class V5Browser(unittest.TestCase):
         expect(self.page.locator('[data-action="save-new-section"]')).to_be_disabled()
         self.click('choose-section-type', '[data-name="Verse"]')
         self.click('set-new-section-bars', '[data-bars="4"]')
-        self.assertEqual(self.page.locator('#newSectionBars').count(), 0)
+        expect(self.page.locator('#newSectionBars')).to_be_hidden()
         self.click('save-new-section')
         expect(self.page.locator('.structure-row').filter(has_text='Verse 2')).to_be_visible()
         self.click('open-add-section');self.click('choose-section-type', '[data-name="Custom"]')
@@ -167,7 +172,7 @@ class V5Browser(unittest.TestCase):
         self.assertFalse(self.project()['skeleton']['draft']['parts']['s2']['t2'])
         self.assertFalse(self.project()['map']['sectionData']['s2']['silence'])
         # Route to Structure through the normal phase navigator.
-        self.click('phase-nav');self.click('open-phase', '[data-index="0"]')
+        self.click('go', '[data-route="map"]')
         self.click('go', '[data-route="structure"]')
         self.click('open-add-section');self.click('choose-section-type', '[data-name="Outro"]')
         self.click('set-new-section-bars', '[data-bars="4"]');self.click('save-new-section')
@@ -181,12 +186,13 @@ class V5Browser(unittest.TestCase):
 
     def test_touch_presence_end_inside_and_boundary_and_continue_undo(self):
         self.open();self.select()
-        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), .5)
+        self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(), 0)
+        self.place('end',4)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'], {'sectionId':'s0','bar':4})
         self.assertEqual(self.event('e1')['end'], {'sectionId':'s0','bar':4})
         self.page.locator('#undoEdit').click()
         self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
-        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), 1.08)
+        self.place('end',8)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'], {'sectionId':'s0','bar':'end'})
         self.click('continue-range', '[data-kind="presence"]')
         self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
@@ -194,7 +200,7 @@ class V5Browser(unittest.TestCase):
 
     def test_touch_cancel_leaves_database_and_listeners_clean(self):
         self.open();self.select();before=self.db()
-        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), .5, cancel=True)
+        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="start"]'), .25, cancel=True)
         self.assertEqual(self.db(), before)
         self.assertFalse(self.page.locator('body').evaluate('(e)=>e.classList.contains("is-dragging")'))
         self.touch_drag(self.page.locator('[data-presence-handle][data-edge="start"]'), .25)
@@ -232,9 +238,9 @@ class V5Browser(unittest.TestCase):
 
     def test_touch_change_range_trim_and_marker_move_and_tap_timing(self):
         self.open();self.select();self.click('select-event','[data-event-id="e1"]')
-        self.touch_drag(self.page.locator('[data-event-handle][data-edge="end"]'), .75)
+        self.place('end',6,'event')
         self.assertEqual(self.event('e1')['end'], {'sectionId':'s0','bar':6})
-        self.click('nudge-timing','[data-kind="event"][data-edge="end"][data-delta="-1"]')
+        self.place('end',5,'event')
         self.assertEqual(self.event('e1')['end']['bar'], 5)
         self.click('select-event','[data-event-id="e2"]')
         self.touch_drag(self.page.locator('[data-event-marker]'), .5)
@@ -242,21 +248,20 @@ class V5Browser(unittest.TestCase):
         self.assertFalse(self.project()['skeleton']['draft']['parts']['s0']['t1'])
         self.assertTrue(self.project()['skeleton']['draft']['parts']['s1']['t1'])
 
-    def test_split_reentry_adjacent_merge_and_undo(self):
-        self.open();self.select();self.click('split-presence')
-        self.page.locator('#gapStart').fill('4');self.page.locator('#gapEnd').fill('4')
-        self.click('apply-split')
+    def test_stop_resume_adjacent_merge_and_undo(self):
+        self.open();self.select();self.place('end',4)
+        self.click('start-track','[data-track-id="t1"]')
+        self.page.locator('#placementPosition').fill('6');self.click('commit-placement')
         ranges=self.project()['map']['timeline']['presence']
         self.assertEqual(len(ranges),2);self.assertEqual(ranges[0]['id'],'r1')
-        self.assertEqual(ranges[0]['end']['bar'],3);self.assertEqual(ranges[1]['start']['bar'],4)
-        widths=[e for e in self.project()['map']['timeline']['events'] if e['label']=='Widens']
-        self.assertEqual(len(widths),2)
-        self.assertEqual(widths[0]['id'],'e1')
-        self.assertIsNone(widths[1]['end'])
-        self.click('add-another-presence')
+        self.assertEqual(ranges[0]['end']['bar'],4);self.assertEqual(ranges[1]['start']['bar'],6)
+        self.assertIsNone(ranges[1]['end'])
+        self.page.locator('#undoEdit').click()
         self.assertEqual(len(self.project()['map']['timeline']['presence']),1)
-        self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
-        self.assertEqual(self.project()['map']['timeline']['presence'][0]['id'],'r1')
+        self.click('start-track','[data-track-id="t1"]')
+        self.page.locator('#placementPosition').fill('4');self.click('commit-placement')
+        ranges=self.project()['map']['timeline']['presence']
+        self.assertEqual(len(ranges),1);self.assertEqual(ranges[0]['id'],'r1');self.assertIsNone(ranges[0]['end'])
 
     def test_structure_touch_reorder_preserves_section_notes_and_open_ranges(self):
         self.open('structure')
@@ -292,7 +297,7 @@ class V5Browser(unittest.TestCase):
 
     def test_touch_targets(self):
         self.open();self.select();self.click('select-event','[data-event-id="e1"]')
-        for selector in ['.presence-hit','.change-chip','.event-handle','.step','.mix-toggle']:
+        for selector in ['.presence-hit','.change-chip','.event-handle','.mini-btn','.mix-toggle']:
             for box in self.page.locator(selector).all():
                 size=box.bounding_box()
                 self.assertGreaterEqual(size['height'],44,selector)
@@ -314,8 +319,8 @@ class V5Browser(unittest.TestCase):
         self.click('go','[data-route="tracks"]')
         self.click('start-section-study')
         self.click('next-section');expect(self.page.locator('.section-tab.current')).to_have_text('Verse')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Identify the tracks')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Map the form')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Tracks')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Structure')
         self.page.go_back();expect(self.page.locator('[data-route="structure"]')).to_be_visible()
 
     def test_finite_cross_section_reorder_remove_preserves_unaffected_coverage_and_ids(self):
@@ -390,9 +395,209 @@ class V5Browser(unittest.TestCase):
         self.page.locator('#undoEdit').click()
         self.assertEqual({r['id'] for r in self.project()['map']['timeline']['presence']},{'r1','r2'})
         self.page.locator('.presence-choice[data-range-id="r2"]').click()
-        self.click('nudge-timing','[data-kind="presence"][data-edge="start"][data-delta="-1"]')
+        self.place('start',1)
         self.assertEqual([r['id'] for r in self.project()['map']['timeline']['presence']],['r1'])
         self.assertEqual(self.page.locator('[data-presence-handle][data-edge="start"]').get_attribute('data-range-id'),'r1')
+
+    def complete_fixture(self):
+        data=fixture()
+        data['projects'][0]['map']['timeline']['presence'].append(
+            {'id':'bass','trackId':'t2','start':{'sectionId':'s0','bar':0},'end':None})
+        return data
+
+    def test_live_bpm_validation_progress_caret_and_route_guards(self):
+        self.open('map', data=self.complete_fixture())
+        inp=self.page.locator('#tempoInput'); inp.focus()
+        original=self.project()['skeleton']
+        for value,valid in [('',False),(' ',False),('abc',False),('Infinity',False),('0',False),('-2',False),('120.5',True),('1.',True),('1..2',False),('120',True)]:
+            inp.fill(value)
+            expect(inp).to_be_focused()
+            self.assertEqual(self.project()['map']['setup']['tempo'],value)
+            self.assertEqual(self.page.locator('[data-route="structure"]').is_enabled(),valid)
+            expect(self.page.locator('.checkpoint-count')).to_have_text('3 of 3' if valid else '0 of 3')
+            self.assertEqual(self.project()['skeleton'],original)
+        # Guard history restoration even if stored completion records are true.
+        inp.fill('')
+        self.page.evaluate("history.pushState({route:'skeleton-bounce',projectId:'p1'},'');dispatchEvent(new PopStateEvent('popstate',{state:history.state}))")
+        expect(self.page.locator('h2')).to_have_text('The Map')
+        self.assertEqual(self.page.evaluate('history.state.route'),'map')
+        self.assertEqual(self.project()['skeleton'],original)
+        inp.fill('128.25');self.click('go','[data-route="structure"]')
+        expect(self.page.locator('h2')).to_have_text('Structure')
+
+    def test_each_setup_prerequisite_locks_and_restores_without_losing_work(self):
+        self.open('map', data=self.complete_fixture()); original=self.project()['skeleton']
+        for field in ['reference','grid','firstListen']:
+            self.click('toggle-setup',f'[data-field="{field}"]')
+            expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
+            expect(self.page.locator('.checkpoint-count')).to_have_text('0 of 3')
+            self.click('toggle-setup',f'[data-field="{field}"]')
+            expect(self.page.locator('[data-route="structure"]')).to_be_enabled()
+            expect(self.page.locator('.checkpoint-count')).to_have_text('3 of 3')
+            self.assertEqual(self.project()['skeleton'],original)
+        self.page.locator('#meterInput').evaluate("el=>{el.add(new Option('Choose',''));el.value='';el.dispatchEvent(new Event('change',{bubbles:true}))}")
+        expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
+        self.page.locator('#meterInput').select_option('3/4')
+        expect(self.page.locator('[data-route="structure"]')).to_be_enabled()
+
+    def test_sheet_selection_preserves_nodes_geometry_focus_and_edit_keyboard(self):
+        self.open('structure');self.click('edit-section','[data-section-id="s0"]')
+        self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+        expect(self.page.locator('#sheetRoot')).to_have_attribute('role','dialog')
+        self.click('close-sheet');self.click('open-add-section')
+        self.page.evaluate("window.originalChoice=document.querySelector('[data-name=Verse]');window.originalSheet=document.querySelector('.section-builder')")
+        verse=self.page.locator('[data-name="Verse"]')
+        self.page.locator('.sheet').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
+        before=verse.bounding_box()
+        self.click('choose-section-type','[data-name="Verse"]')
+        self.click('set-new-section-bars','[data-bars="12"]')
+        self.assertTrue(self.page.evaluate("window.originalChoice===document.querySelector('[data-name=Verse]') && window.originalSheet===document.querySelector('.section-builder')"))
+        self.assertEqual(verse.bounding_box(),before)
+        self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+        self.page.keyboard.press('Escape');expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+        expect(self.page.locator('[data-action="open-add-section"]')).to_be_focused()
+
+    def test_tracks_and_feel_selection_keep_geometry_and_focus(self):
+        self.open('tracks');choice=self.page.locator('[data-name="Guitar"]');before=choice.bounding_box()
+        choice.click();expect(choice).to_be_focused();self.assertEqual(choice.bounding_box(),before)
+        self.click('start-section-study')
+        choice=self.page.locator('[data-scale="depth"][data-value="Distant"]');before=choice.bounding_box()
+        choice.click();expect(choice).to_be_focused();self.assertEqual(choice.bounding_box(),before)
+        expect(choice).to_have_attribute('aria-pressed','true')
+
+    def test_draft_inline_progress_history_and_legacy_route(self):
+        self.open('skeleton-draft',data=self.complete_fixture())
+        expect(self.page.locator('h2')).to_have_text('Draft')
+        self.assertEqual(self.page.locator('[data-draft-section]').count(),3)
+        before=self.page.evaluate('history.length')
+        for sid in ['s0','s1']:
+            self.page.locator(f'[data-draft-section="{sid}"] > summary').click()
+        self.click('toggle-draft-part','[data-section-id="s0"][data-track-id="t1"]')
+        expect(self.page.locator('#draftCoverage')).to_contain_text('5 of 6 mapped parts')
+        self.assertEqual(self.page.evaluate('history.length'),before)
+        self.assertTrue(self.page.locator('[data-draft-section="s1"]').evaluate('el=>el.open'))
+        expect(self.page.locator('[data-route="skeleton-bounce"]')).to_be_disabled()
+        self.click('toggle-draft-part','[data-section-id="s0"][data-track-id="t1"]')
+        self.click('go','[data-route="skeleton-bounce"]')
+        expect(self.page.locator('h2')).to_have_text('Bounce')
+        expect(self.page.locator('[data-route="roadmap"]')).to_have_text('View Roadmap')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Draft')
+        self.page.evaluate("history.replaceState({route:'draft-section',projectId:'p1',sectionIndex:2},'')")
+        self.page.reload()
+        expect(self.page.locator('h2')).to_have_text('Draft')
+        self.assertTrue(self.page.locator('[data-draft-section="s2"]').evaluate('el=>el.open'))
+        self.assertEqual(self.page.evaluate('history.state.route'),'skeleton-draft')
+
+    def test_dependency_completion_and_restored_future_routes(self):
+        cases=[('structureVerified',False,'structure'),('mapVerified',False,'section-study'),('teachBack',False,'section-study')]
+        for field,value,expected in cases:
+            with self.subTest(field=field):
+                data=self.complete_fixture();data['projects'][0]['map'][field]=value
+                self.open('skeleton-bounce',data=data)
+                self.assertEqual(self.page.evaluate('history.state.route'),expected)
+                self.assertTrue(self.project()['skeleton']['bounce']['listened'])
+                self.context.close()
+        data=self.complete_fixture();data['projects'][0]['skeleton']['session']['tracks']['t1']=False
+        self.open('skeleton-bounce',data=data)
+        expect(self.page.locator('h2')).to_have_text('Session')
+        self.click('toggle-session-track','[data-track-id="t1"]')
+        self.click('go','[data-route="skeleton-draft"]')
+        self.assertTrue(self.project()['skeleton']['draft']['parts']['s0']['t1'])
+        self.page.evaluate("history.pushState({route:'sounds',projectId:'p1'},'');dispatchEvent(new PopStateEvent('popstate',{state:history.state}))")
+        expect(self.page.locator('h2')).to_have_text('Roadmap')
+        self.assertEqual(self.page.locator('.road-phase.unimplemented').count(),5)
+        self.assertEqual(self.page.locator('.road-phase.unimplemented[data-action]').count(),0)
+
+    def test_parent_pills_and_back_follow_distinct_destinations(self):
+        self.open('map');self.click('go','[data-route="tracks"]');self.click('start-section-study')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Tracks')
+        self.page.go_forward();expect(self.page.locator('.study-pane')).to_be_visible()
+        self.page.locator('.phase-pill').click();expect(self.page.locator('h2')).to_have_text('The Map')
+        self.page.locator('.phase-pill').click();expect(self.page.locator('h1')).to_have_text('Migration song')
+        self.click('go','[data-route="roadmap"]');expect(self.page.locator('h2')).to_have_text('Roadmap')
+        self.context.close()
+        self.open('skeleton',data=self.complete_fixture());self.click('go','[data-route="skeleton-session"]')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('The Skeleton')
+        self.click('go','[data-route="skeleton-session"]');self.click('go','[data-route="skeleton-draft"]')
+        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Session')
+
+    def test_boundary_truth_across_viewports_and_placement_cancel_noop(self):
+        self.open();self.select()
+        self.assertEqual(self.page.locator('[data-presence-handle]').count(),1)
+        self.assertEqual(self.page.locator('.presence-segment.real-stop').count(),0)
+        original=self.db();self.click('place-boundary','[data-edge="end"]')
+        self.page.locator('#placementPosition').fill('4');self.click('close-sheet')
+        self.assertEqual(self.db(),original)
+        self.place('start',0);self.assertEqual(self.db(),original)
+        self.assertTrue(self.page.locator('#undoNotice').is_hidden())
+        self.click('next-section');expect(self.page.locator('.section-tab.current')).to_have_text('Verse')
+        self.select();self.assertEqual(self.page.locator('[data-presence-handle]').count(),0)
+        self.place('end',4)
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'],{'sectionId':'s1','bar':4})
+        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), .75)
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['end']['bar'],6)
+
+    def test_newer_edits_retire_undo_and_notes_do_not_invalidate(self):
+        self.open();self.select();self.place('end',4)
+        expect(self.page.locator('#undoNotice')).to_be_visible()
+        self.page.locator('.note-disclosure summary').click()
+        self.page.locator('[data-input="section-parking"]').fill('Newer note')
+        expect(self.page.locator('#undoNotice')).to_be_hidden()
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['end']['bar'],4)
+        self.assertEqual(self.project()['map']['sectionData']['s0']['parking'],'Newer note')
+
+    def test_responsive_text_enlargement_and_no_press_scale(self):
+        for width,height in [(320,740),(390,844),(820,1180),(1180,820)]:
+            with self.subTest(width=width):
+                data=self.complete_fixture();data['projects'][0]['map']['tracks'][0]['name']='A very long custom instrument name with harmonies'
+                self.open(width=width,data=data,reduced=True)
+                self.page.set_viewport_size({'width':width,'height':height})
+                self.page.add_style_tag(content='body {font-size:21px}')
+                self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),width)
+                self.select();button=self.page.locator('[data-action="place-boundary"]').first
+                box=button.bounding_box();button.dispatch_event('pointerdown')
+                self.assertEqual(button.bounding_box(),box)
+                self.assertEqual(self.page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"),True)
+                self.context.close()
+
+    def test_revisioned_assets_and_development_stamp(self):
+        self.open('projects')
+        stamp=self.page.locator('#buildStamp')
+        expect(stamp).to_have_text(__import__('re').compile(r'FIRE V6 DEV · [0-9a-f]{7}'))
+        revision=self.page.request.get(URL+'/build-info.json').json()['commit']
+        self.assertIn('?v='+revision,self.page.locator('script[src]').get_attribute('src'))
+        self.assertIn('?v='+revision,self.page.locator('link[rel="stylesheet"]').get_attribute('href'))
+
+    def test_real_stop_touch_cancel_and_resize_restore_canonical_data(self):
+        self.open();self.select();self.place('end',4)
+        before=self.db()
+        self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), .75, cancel=True)
+        self.assertEqual(self.db(),before)
+        handle=self.page.locator('[data-presence-handle][data-edge="end"]');handle.scroll_into_view_if_needed()
+        box=handle.bounding_box();self.page.mouse.move(box['x']+22,box['y']+22);self.page.mouse.down()
+        self.page.mouse.move(box['x']+42,box['y']+22)
+        self.page.set_viewport_size({'width':390 if self.page.viewport_size['width']==820 else 820,'height':1000});self.page.mouse.up()
+        self.assertEqual(self.db(),before)
+        self.assertFalse(self.page.locator('body').evaluate('el=>el.classList.contains("is-dragging")'))
+
+    def test_each_change_taxonomy_action_is_immediate_and_undoable(self):
+        self.open();self.select()
+        for label in ['Widens','Narrows','Louder','Softer','Doubles','Pattern shift','Register shift','Effect shift']:
+            before=self.db();self.add_change(label)
+            self.assertTrue(any(e['label']==label for e in self.project()['map']['timeline']['events']))
+            expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+            self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+
+    def test_draft_silent_section_and_current_requirements(self):
+        data=self.complete_fixture();p=data['projects'][0]
+        p['map']['timeline']['presence'][0]['end']={'sectionId':'s1','bar':'end'}
+        p['map']['timeline']['presence'][1]['end']={'sectionId':'s1','bar':'end'}
+        p['map']['sectionData']['s2']['silence']=True
+        p['map']['sectionData']['s2']['focusState']='none';p['map']['sectionData']['s2']['focusIds']=[]
+        self.open('skeleton-draft',data=data)
+        expect(self.page.locator('#draftCoverage')).to_have_text('4 of 4 mapped parts · 3 of 3 sections')
+        expect(self.page.locator('[data-draft-section="s2"] summary')).to_contain_text('No active tracks · Complete')
+        expect(self.page.locator('[data-route="skeleton-bounce"]')).to_be_enabled()
 
 
 if __name__ == '__main__':

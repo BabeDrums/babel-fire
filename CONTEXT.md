@@ -1,7 +1,7 @@
 # Babel FIRE — Project Continuity / Handoff Context
 
 ## Purpose of this file
-This is the durable product/design context for Babel FIRE, not a changelog or a report of what has shipped. Begin continuations with `START_HERE.md` and follow the source-of-truth order in `AGENTS.md`: repository rules, active version specification (currently `V5.md`), this context, then current code/tests. The active specification supersedes older product/UI descriptions here where they conflict.
+This is the durable product/design context for Babel FIRE, not a changelog or a report of what has shipped. Begin continuations with `START_HERE.md` and follow the source-of-truth order in `AGENTS.md`: repository rules, active version specification (currently `V6.md`), this context, then current code/tests. The active specification supersedes older product/UI descriptions here where they conflict.
 
 Inspect current `main`, open PRs, relevant branches, and local changes without overwriting unfinished work. Distinguish shipped, unmerged, and planned work; continue from the latest verified state rather than asking the user to repeat documented decisions.
 
@@ -288,7 +288,7 @@ Notes/analysis must stay attached if sections are reordered.
 
 Each Structure section also has a **bar length**. Use quick values such as 4 / 8 / 12 / 16 plus custom whole-bar entry. Do not silently assume a length that was never identified. Structure Verified confirms order, lengths, and boundaries.
 
-**V5 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length pills. Custom fields appear only for Custom. Insert only after a valid name/type and length are selected. A selected length pill is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
+**V6 interaction:** Structure has one **+ Add section** action opening one cohesive sheet with section type and bar-length segmented controls. Custom fields appear only for Custom. Insert only after a valid name/type and length are selected. A selected length pill is sufficient confirmation; do not repeat its value in another field. Repeated types may prefill their last used length. Permanent drag handles remain, with tap-based Move earlier / Move later alternatives inside the compact edit sheet.
 
 #### Structure row interaction — LOCKED direction
 Permanent drag handle is visible at all times.
@@ -384,7 +384,7 @@ A track's presence is represented visually by one or more ranges.
 
 **Open-ended presence / continuity rule:** adding a track starts presence at that musical position and assumes it **continues indefinitely through every later section until explicitly cut**. Internally, an open presence range has no fixed end. Adding new sections later automatically extends that open presence into them. FIRE should ask the user to document the exception — where something stops — instead of repeatedly asking whether it continues.
 
-In V5, selecting the generous presence/row target reveals neutral start/end handles directly on the current timeline viewport, including edges of continuing ranges. Whole-bar dragging trims or extends presence. Compact inline timing steppers provide a tap-based alternative. Continue restores an open end. There is no dedicated Cut button or cut-bar modal. Contextual Split exposes an inline gap editor; a later re-entry remains open by default.
+In V6, selecting a generous presence/row target reveals only real musical boundaries. Whole-bar dragging edits an actual start/stop. Discoverable Stop placement creates a real stop; Start resumes in an off portion. Accessible position selection uses the same mutation path. Continuing edges do not gain fake handles; the normal workflow has no Split/gap form or persistent timing steppers. Routine edits offer Undo.
 
 Visual grammar:
 - uninterrupted line = continuous presence
@@ -427,9 +427,9 @@ The visualization should carry the timing information instead of repeating it as
 
 Only one Track expands at a time. Expanded state reveals large change chips and **+ Change**. Selecting a chip reveals one editable visual lane and Remove, without a timing/details modal. Collapsing the Track preserves all duration/marker information on the compact rail. Change properties occupy distinct subordinate positions so simultaneous categories remain legible. Routine timeline edits/removal offer Undo; another saved edit replaces that Undo opportunity.
 
-Tap/drag is the primary interaction. Inline tap-based timing controls provide precision without opening a redundant sheet. No essential edit relies on a skinny line or an undiscoverable gesture.
+Tap/drag is the primary interaction. Contextual bar-position placement provides a forgiving tap/keyboard alternative without persistent timing steppers. No essential edit relies on a skinny line or an undiscoverable gesture.
 
-A Mix row may provide section-wide changes, but keep it visually quiet. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
+Mix belongs to the Arrangement header; reveal a global grouping only when expanded or populated. Track lanes keep a fixed vertical order across sections so Verse → Chorus motion feels spatially continuous rather than making instruments jump between rows.
 
 ## Current FIRE / timeline visual language
 FIRE itself is no longer themed around Smithereens. The product chrome should use a neutral, premium graphite/near-black palette with crisp light type and restrained borders. Smithereens is a project inside FIRE, not FIRE's brand identity.
@@ -614,62 +614,11 @@ The user previously wanted Map Summary top-button clutter reduced. Navigation sh
 
 ---
 
-# 16. Phase navigation — current intended design
+# 16. Navigation and progress — V6
 
-The phase title pill itself should become the universal phase navigator.
+Back follows actual eligible browser history. The center pill opens the hierarchical parent: Map work → The Map, Skeleton work → The Skeleton, phase home → Recreation project home. Roadmap is explicitly labeled on the project home. Section movement and inline disclosures do not add route depth. Every route, including restored browser history, rechecks current canonical eligibility.
 
-Example normal state:
-**The Map**
-or
-**The Skeleton**
-
-Tap it → compact phase navigation sheet titled **Roadmap**.
-
-It should make it easy to:
-- see Roadmap
-- jump to completed previous phases
-- see current phase
-- see future locked phases
-- move backward easily
-- move forward only if unlocked
-
-The user floated `< The Map >`; current preferred interpretation is a tappable phase pill that opens navigation rather than permanent arrows.
-
-
-The phase sheet itself is the compact phase navigator; do not add a redundant Roadmap button inside that sheet. The full Roadmap remains available from the project dashboard.
-
-Important:
-Summary is **inside a phase**, not a peer navigation destination.
-
-Navigation model should be globally understood as:
-> **Project → Phase → Checkpoint → Step**
-
-Screens should not invent their own navigation logic.
-
----
-
-### Phase pill affordance
-The phase title pill (for example **The Map** or **The Skeleton**) remains tappable and opens the universal phase navigator, but **do not show a dropdown chevron/caret beside the phase name**. Keep the pill visually quiet.
-
-
-
-### Navigation grammar — LOCKED
-The in-app top-left Back button on workflow/detail screens must mirror the browser Back behavior and use the browser history stack.
-
-Examples:
-- The Map → Tracks → Back returns to **The Map**
-- The Map → Structure → Next → Tracks → Back returns to **Structure**
-- Tracks → Next → Section Study → Back returns to **Tracks**
-- The Skeleton → Session → Next → Draft → Back returns to **Session**
-
-When FIRE pushes a new route, store the previous route/label in that browser-history entry so the top-left label can reflect the actual prior screen. Internal movement within one screen (for example moving between Section Study sections) must not replace that remembered entry route.
-
-The phase pill remains the hierarchy/roadmap shortcut. Back and the phase pill should not duplicate one another.
-
-Button semantics:
-- **Back** = actual previous screen
-- **Next** = advance the workflow
-- **Done** = close/dismiss a sheet or editing state only
+Progress is contextual: seven-phase journey on Recreation home, valid checkpoint completion on phase homes, quiet checkpoint position on work screens, and local section position in Section Study. Review Map concludes the three-checkpoint Map flow. Retain stored work separately from current valid completion when a prerequisite is temporarily invalid.
 
 ---
 
@@ -681,7 +630,7 @@ The Map and Skeleton previously looked too different.
 A phase home is an **overview**, not a workspace.
 
 Default structure:
-- interactive phase pill
+- parent phase/project pill
 - phase progress
 - checkpoint list
 - at most one compact utility/details row when the phase genuinely needs it
@@ -742,7 +691,7 @@ Tracks and Markers use the same left-aligned circular completion language.
 ### Draft
 Build the complete rough arrangement.
 
-The main Draft screen is section-based and clean. Each section row shows automatic completion state. Tap a section to see the Tracks that The Map says actually exist there.
+Draft is one page with whole-song coverage. Each section discloses its mapped Track checks inline and shows automatic completion; routine checks never need a separate detail route.
 
 Inside a Draft section:
 - check each required Track individually
@@ -914,7 +863,7 @@ Do not reintroduce:
 
 # 23. Current refactor direction / code architecture
 
-FIRE retains the **continuous timeline architecture originally introduced in V3**, while **V5 is the active interaction generation**.
+FIRE retains the **continuous timeline architecture originally introduced in V3**, while **V6 is the active interaction generation**.
 
 FIRE uses three plain static files: `index.html` is the document shell, `styles.css` owns visual styles, and `app.js` owns the application. Deploy all three together from the GitHub Pages root. There is no framework, package installation, bundler, or backend. Within the application, keep concerns separated:
 - schema/migration
@@ -1133,16 +1082,16 @@ NOT:
 
 # 32. Latest state / likely next move
 
-The active approved interaction generation is V5, specified in `V5.md`, retaining the continuous timeline engine. An active specification does not imply that its implementation has shipped; verify `main` and open PRs for release status. Stored schema version is 5; the storage key remains `production-projects-v1`. Startup and imported backups share normalization/migration. V4 projects, stable identities, fractional timing, notes, and valid downstream progress survive migration. Legacy cue observations remain stored even though new cues are no longer offered.
+The active approved interaction generation is V6, specified in `V6.md`, retaining the continuous timeline engine. An active specification does not imply that its implementation has shipped; verify `main` and open PRs for release status. Stored schema version is 5; the storage key remains `production-projects-v1`. Startup and imported backups share normalization/migration. V4 projects, stable identities, fractional timing, notes, and valid downstream progress survive migration. Legacy cue observations remain stored even though new cues are no longer offered.
 
-Durable V5 interaction and architecture rules:
+Durable interaction and architecture rules:
 - Structure sections have bar lengths
 - Section Study uses the visual timeline model
 - Presence is represented by continuous ranges with clear start/end boundaries
 - uninterrupted ranges may cross section boundaries
 - timed production changes are ranges or markers internally; those classifications are not exposed in creation UI
 - only one Track expands at a time; changes are selected through large chips
-- presence and change editing is direct, with inline timing alternatives and Undo
+- presence and change editing is direct, with contextual position alternatives and Undo
 - section-to-section navigation slides through the song
 - stable Track IDs replace name-as-identity logic
 - old Map data migrates into the new model where possible
@@ -1182,6 +1131,6 @@ A future chat should not need a giant pasted prompt. The user can simply say:
 That is the intended long-term handoff method.
 
 
-# 35. V5 regression workflow
+# 35. Regression workflow
 
-`tests/test_v5.py` is a browser regression suite using Python Playwright and a local Chromium installation. Serve the repository with `python3 -m http.server 8000 --bind 127.0.0.1`, then run `python3 -B -m unittest discover -s tests -v`. `CHROMIUM_PATH`, `FIRE_URL`, and `FIRE_TEST_WIDTH` can override the browser, server, and viewport. Test dependencies are development tools only; the shipped app remains dependency-free. Tests use disposable browser contexts, representative V4/legacy saved data, actual Chromium touch input, and imported backups. Physical iOS Safari verification remains a separate device check.
+`tests/test_v6.py` is a browser regression suite using Python Playwright and a local Chromium installation. Serve the repository with `python3 scripts/serve.py`, then run `python3 -B -m unittest discover -s tests -v`. `CHROMIUM_PATH`, `FIRE_URL`, and `FIRE_TEST_WIDTH` can override the browser, server, and viewport. Test dependencies are development tools only; the shipped app remains dependency-free. Tests use disposable browser contexts, representative V4/legacy saved data, actual Chromium touch input, and imported backups. Physical iOS Safari verification remains a separate device check.

@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,7 +10,7 @@
     />
     <meta name="theme-color" content="#090a0d" />
     <title>Babel FIRE</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v={{ site.github.build_revision }}" />
   </head>
   <body>
     <div class="app-shell" id="app"></div>
@@ -16,6 +18,6 @@
     <div id="undoNotice" class="undo-notice" role="status" hidden></div>
     <output id="dragPosition" class="drag-position" hidden></output>
     <input id="importFile" type="file" accept="application/json" hidden />
-    <script src="app.js" defer></script>
+    <script src="app.js?v={{ site.github.build_revision }}" defer></script>
   </body>
 </html>
