@@ -86,8 +86,6 @@ class V6Browser(unittest.TestCase):
 
     def click(self, action, extra=''):
         button=self.page.locator(f'[data-action="{action}"]{extra}')
-        if action in ['place-boundary','continue-range','start-track'] and not button.is_visible():
-            button.locator('xpath=ancestor::details[1]').locator('summary').click()
         button.click()
 
     def db(self):
@@ -124,10 +122,27 @@ class V6Browser(unittest.TestCase):
         cdp.send('Input.dispatchTouchEvent', {'type': 'touchCancel' if cancel else 'touchEnd', 'touchPoints': []})
         cdp.detach()
 
-    def place(self, edge, value, kind='presence'):
-        self.click('place-boundary', f'[data-kind="{kind}"][data-edge="{edge}"]')
-        self.page.locator('#placementPosition').fill(str(value))
-        self.click('commit-placement')
+    def place(self, edge, value, kind='presence', touch=False):
+        handle=self.page.locator(f'[data-{kind}-handle][data-edge="{edge}"]')
+        self.tap_handle(handle,touch)
+        lane=handle.locator('xpath=ancestor::*[contains(@class,"timeline-lane")][1]')
+        box=lane.bounding_box();bars=int(lane.evaluate('el=>getComputedStyle(el).getPropertyValue("--bars")'))
+        x=box['x']+max(2,min(box['width']-2,box['width']*value/bars));y=box['y']+58
+        self.pointer_tap(x,y,touch)
+
+    def pointer_tap(self,x,y,touch=False,cancel=False):
+        if touch:
+            cdp=self.context.new_cdp_session(self.page)
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchCancel' if cancel else 'touchEnd','touchPoints':[]});cdp.detach()
+        else:
+            self.page.mouse.move(x,y);self.page.mouse.down()
+            if cancel:self.page.keyboard.press('Escape')
+            self.page.mouse.up()
+
+    def tap_handle(self,handle,touch=False):
+        handle.scroll_into_view_if_needed();box=handle.bounding_box()
+        self.pointer_tap(box['x']+22,box['y']+22,touch)
 
     def direct_boundary(self, track, boundary, touch=False, cancel=False):
         surface=self.page.locator(f'[data-presence-surface][data-track-id="{track}"]')
@@ -147,8 +162,7 @@ class V6Browser(unittest.TestCase):
             self.page.mouse.move(x,y)
             self.page.mouse.down()
             if cancel:
-                surface.evaluate('el=>el.releasePointerCapture(1)')
-                self.page.mouse.move(x+.1,y)
+                self.page.keyboard.press('Escape')
             self.page.mouse.up()
 
     def test_v4_migration_and_reload_preserve_identity_progress_and_fractional_offsets(self):
@@ -190,7 +204,7 @@ class V6Browser(unittest.TestCase):
         self.click('save-section')
         self.assertEqual(self.project()['map']['sections'][-1], {'id': sid, 'name': 'Break', 'lengthBars': 12})
         self.click('edit-section', f'[data-section-id="{sid}"]')
-        self.page.once('dialog', lambda d: d.accept());self.click('remove-section')
+        self.click('close-sheet');self.click('delete-section',f'[data-id="{sid}"]')
         self.assertNotIn(sid, [s['id'] for s in self.project()['map']['sections']])
         self.assertNotIn('Bars bars', self.page.locator('body').inner_text())
 
@@ -213,9 +227,9 @@ class V6Browser(unittest.TestCase):
         expect(self.page.locator('.section-tab.current')).to_have_text('Outro')
         self.assertEqual(self.page.locator('.presence-segment.continue-in.continue-out').count(),2)
 
-    def test_touch_presence_end_inside_and_boundary_and_continue_undo(self):
+    def test_touch_presence_stop_inside_section_edge_and_open_undo(self):
         self.open();self.select()
-        self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(), 0)
+        self.assertEqual(self.page.locator('[data-open-tail]').count(), 1)
         self.place('end',4)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'], {'sectionId':'s0','bar':4})
         self.assertEqual(self.event('e1')['end'], {'sectionId':'s0','bar':4})
@@ -223,9 +237,8 @@ class V6Browser(unittest.TestCase):
         self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
         self.place('end',8)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'], {'sectionId':'s0','bar':'end'})
-        self.click('continue-range', '[data-kind="presence"]')
+        self.page.locator('#undoEdit').click()
         self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
-        self.assertFalse(self.project()['skeleton']['bounce']['exported'])
 
     def test_touch_cancel_leaves_database_and_listeners_clean(self):
         self.open();self.select();before=self.db()
@@ -235,7 +248,7 @@ class V6Browser(unittest.TestCase):
         self.touch_drag(self.page.locator('[data-presence-handle][data-edge="start"]'), .25)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['start']['bar'], 2)
 
-    def test_one_screen_add_change_and_direct_chip_selection_removal_undo(self):
+    def test_one_screen_add_change_and_aligned_selection_removal_undo(self):
         self.open();self.select();self.click('open-add-change')
         for label in ['Widens','Narrows','Louder','Softer','Doubles','Pattern shift','Register shift','Effect shift']:
             expect(self.page.locator(f'[data-action="choose-change"][data-label="{label}"]')).to_be_visible()
@@ -246,7 +259,7 @@ class V6Browser(unittest.TestCase):
         self.assertIsNone(louder['end'])
         self.assertTrue(self.project()['skeleton']['draft']['parts']['s0']['t1'])
         self.click('select-event',f'[data-event-id="{louder["id"]}"]')
-        self.assertEqual(self.page.locator('.change-editor').count(), 1)
+        self.assertEqual(self.page.locator('.event-line.selected').count(), 1)
         self.click('remove-selected', '[data-kind="event"]')
         self.assertFalse(any(e['id']==louder['id'] for e in self.project()['map']['timeline']['events']))
         self.page.locator('#undoEdit').click()
@@ -279,16 +292,14 @@ class V6Browser(unittest.TestCase):
 
     def test_stop_resume_adjacent_merge_and_undo(self):
         self.open();self.select();self.place('end',4)
-        self.click('start-track','[data-track-id="t1"]')
-        self.page.locator('#placementPosition').fill('6');self.click('commit-placement')
+        self.direct_boundary('t1',6)
         ranges=self.project()['map']['timeline']['presence']
         self.assertEqual(len(ranges),2);self.assertEqual(ranges[0]['id'],'r1')
         self.assertEqual(ranges[0]['end']['bar'],4);self.assertEqual(ranges[1]['start']['bar'],6)
         self.assertIsNone(ranges[1]['end'])
         self.page.locator('#undoEdit').click()
         self.assertEqual(len(self.project()['map']['timeline']['presence']),1)
-        self.click('start-track','[data-track-id="t1"]')
-        self.page.locator('#placementPosition').fill('4');self.click('commit-placement')
+        self.direct_boundary('t1',4)
         ranges=self.project()['map']['timeline']['presence']
         self.assertEqual(len(ranges),1);self.assertEqual(ranges[0]['id'],'r1');self.assertIsNone(ranges[0]['end'])
 
@@ -315,7 +326,7 @@ class V6Browser(unittest.TestCase):
                 self.open(width=width,reduced=reduced);self.select()
                 self.click('toggle-timeline-track','[data-track-id="t1"]')
                 self.assertEqual(self.page.locator('.track-detail').count(),0)
-                self.assertGreater(self.page.locator('.event-summary-range').count(),0)
+                self.assertGreater(self.page.locator('.change-range').count(),0)
                 self.assertEqual(self.page.locator('.timeline-row').evaluate_all('(els)=>els.map(e=>e.dataset.trackRow)'),['t1','t2'])
                 self.click('next-section');expect(self.page.locator('.section-tab.current')).to_have_text('Verse')
                 self.assertEqual(self.page.locator('.timeline-row.expanded').count(),0)
@@ -326,7 +337,7 @@ class V6Browser(unittest.TestCase):
 
     def test_touch_targets(self):
         self.open();self.select();self.click('select-event','[data-event-id="e1"]')
-        for selector in ['.presence-hit','.change-chip','.event-handle','.mini-btn','.mix-toggle']:
+        for selector in ['.presence-hit','.change-marker','.event-handle','.mini-btn','.mix-toggle']:
             for box in self.page.locator(selector+':visible').all():
                 size=box.bounding_box()
                 self.assertGreaterEqual(size['height'],44,selector)
@@ -357,18 +368,15 @@ class V6Browser(unittest.TestCase):
         timeline['presence'][0]['end']={'sectionId':'s1','bar':'end'}
         timeline['events'][0]['end']={'sectionId':'s1','bar':4}
         self.open('structure',data=data)
-        self.click('edit-section','[data-section-id="s0"]')
-        self.click('move-section','[data-delta="1"]')
-        self.click('move-section','[data-delta="1"]')
-        self.click('close-sheet')
+        self.page.locator('[data-section-id="s0"] [data-drag-handle]').focus()
+        self.page.keyboard.press('ArrowDown');self.page.keyboard.press('ArrowDown')
         p=self.project();ranges=p['map']['timeline']['presence']
         self.assertEqual([x['id'] for x in p['map']['sections']],['s1','s2','s0'])
         self.assertEqual({r['start']['sectionId'] for r in ranges},{'s1','s0'})
         self.assertIn('r1',[r['id'] for r in ranges])
         self.assertNotIn('s2',{r['start']['sectionId'] for r in ranges})
         surviving_id=next(r['id'] for r in ranges if r['start']['sectionId']=='s0')
-        self.click('edit-section','[data-section-id="s1"]')
-        self.page.once('dialog',lambda d:d.accept());self.click('remove-section')
+        self.click('delete-section','[data-id="s1"]')
         p=self.project();ranges=p['map']['timeline']['presence']
         self.assertEqual(len(ranges),1)
         self.assertEqual(ranges[0]['id'],surviving_id)
@@ -409,21 +417,21 @@ class V6Browser(unittest.TestCase):
         self.assertEqual(self.db()['projects'],[])
 
 
-    def test_short_presence_pieces_have_large_explicit_selectors(self):
+    def test_short_presence_blocks_select_remove_merge_and_undo(self):
         data=fixture();timeline=data['projects'][0]['map']['timeline']
         timeline['presence']=[{'id':'r1','trackId':'t1','start':{'sectionId':'s0','bar':0},'end':{'sectionId':'s0','bar':1}},
                               {'id':'r2','trackId':'t1','start':{'sectionId':'s0','bar':2},'end':None}]
         self.open(data=data);self.select()
-        expect(self.page.locator('.presence-choice')).to_have_count(2)
-        target=self.page.locator('.presence-choice[data-range-id="r2"]')
-        box=target.bounding_box();self.assertGreaterEqual(box['height'],44);self.assertGreaterEqual(box['width'],44)
+        expect(self.page.locator('.presence-hit')).to_have_count(2)
+        target=self.page.locator('.presence-hit[data-range-id="r2"]')
+        box=target.bounding_box();self.assertGreaterEqual(box['height'],44)
         target.click()
         self.assertEqual(self.page.locator('[data-presence-handle][data-edge="start"]').get_attribute('data-range-id'),'r2')
         self.click('remove-selected','[data-kind="presence"][data-id="r2"]')
         self.assertEqual([r['id'] for r in self.project()['map']['timeline']['presence']],['r1'])
         self.page.locator('#undoEdit').click()
         self.assertEqual({r['id'] for r in self.project()['map']['timeline']['presence']},{'r1','r2'})
-        self.page.locator('.presence-choice[data-range-id="r2"]').click()
+        self.page.locator('.presence-hit[data-range-id="r2"]').click()
         self.place('start',1)
         self.assertEqual([r['id'] for r in self.project()['map']['timeline']['presence']],['r1'])
         self.assertEqual(self.page.locator('[data-presence-handle][data-edge="start"]').get_attribute('data-range-id'),'r1')
@@ -550,17 +558,16 @@ class V6Browser(unittest.TestCase):
         self.click('go','[data-route="skeleton-session"]');self.click('go','[data-route="skeleton-draft"]')
         self.click('history-back');expect(self.page.locator('h2')).to_have_text('Session')
 
-    def test_boundary_truth_across_viewports_and_placement_cancel_noop(self):
+    def test_boundary_truth_across_viewports_and_selection_cancel_noop(self):
         self.open();self.select()
-        self.assertEqual(self.page.locator('[data-presence-handle]').count(),1)
+        self.assertEqual(self.page.locator('[data-presence-handle]:not([data-open-tail])').count(),1)
         self.assertEqual(self.page.locator('.presence-segment.real-stop').count(),0)
-        original=self.db();self.click('place-boundary','[data-edge="end"]')
-        self.page.locator('#placementPosition').fill('4');self.click('close-sheet')
-        self.assertEqual(self.db(),original)
+        original=self.db();self.tap_handle(self.page.locator('[data-open-tail]'))
+        self.page.keyboard.press('Escape');self.assertEqual(self.db(),original)
         self.place('start',0);self.assertEqual(self.db(),original)
         self.assertTrue(self.page.locator('#undoNotice').is_hidden())
         self.click('next-section');expect(self.page.locator('.section-tab.current')).to_have_text('Verse')
-        self.select();self.assertEqual(self.page.locator('[data-presence-handle]').count(),0)
+        self.select();self.assertEqual(self.page.locator('[data-presence-handle]:not([data-open-tail])').count(),0)
         self.place('end',4)
         self.assertEqual(self.project()['map']['timeline']['presence'][0]['end'],{'sectionId':'s1','bar':4})
         self.touch_drag(self.page.locator('[data-presence-handle][data-edge="end"]'), .75)
@@ -660,7 +667,7 @@ class V6Browser(unittest.TestCase):
                             self.assertLessEqual(self.page.locator('#app').bounding_box()['width'],760)
                         if route=='section-study':
                             self.select()
-                            self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(),0)
+                            self.assertEqual(self.page.locator('.presence-segment.real-stop').count(),0)
                             lane=self.page.locator('.timeline-lane').first.bounding_box()
                             self.assertGreater(lane['width'],width*.5 if width>=1440 else 100)
                             arrangement=self.page.locator('.arrangement-region').bounding_box()
@@ -727,11 +734,7 @@ class V6Browser(unittest.TestCase):
             with self.subTest(width=width):
                 self.open(width=width,data=self.canvas_fixture(),pointer=True);self.select()
                 self.assert_hover_stable(self.page.locator('[data-presence-handle][data-edge="start"]'))
-                self.click('place-boundary','[data-kind="presence"][data-edge="end"]');self.settled_sheet()
-                slider=self.page.locator('#placementPosition');box=slider.bounding_box()
-                slider.click(position={'x':box['width']*.43,'y':box['height']/2})
-                expect(self.page.locator('#placementLabel')).to_have_text('After bar 4')
-                self.click('commit-placement')
+                self.place('end',4)
                 self.assertEqual(next(r for r in self.project()['map']['timeline']['presence'] if r['id']=='r1')['end']['bar'],4)
                 handle=self.page.locator('[data-presence-handle][data-edge="end"]')
                 handle.scroll_into_view_if_needed();box=handle.bounding_box();lane=handle.locator('xpath=..').bounding_box()
@@ -815,7 +818,7 @@ class V6Browser(unittest.TestCase):
                 with self.subTest(width=width,touch=touch):
                     self.open(width=width,pointer=not touch);self.select()
                     old=self.project();original_id=old['map']['timeline']['presence'][0]['id']
-                    self.direct_boundary('t1',2,touch=touch)
+                    self.place('end',2,touch=touch)
                     p=self.project();first=next(r for r in p['map']['timeline']['presence'] if r['id']==original_id)
                     self.assertEqual(first['end'],{'sectionId':'s0','bar':2})
                     expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
@@ -853,40 +856,33 @@ class V6Browser(unittest.TestCase):
         self.assertIsNone(ranges['r3']['end'])
         self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
 
-    def test_direct_preview_cancel_and_existing_start_noop_do_not_consume_undo(self):
+    def test_block_body_never_splits_and_cancel_does_not_consume_undo(self):
         for touch in [False,True]:
-            with self.subTest(touch=touch):
-                self.open(pointer=not touch);self.select();before=self.db()
-                self.direct_boundary('t1',2,touch=touch,cancel=True)
-                self.assertEqual(self.db(),before)
-                expect(self.page.locator('#undoNotice')).to_be_hidden()
-                self.direct_boundary('t1',0,touch=touch)
-                self.assertEqual(self.db(),before)
-                self.assertEqual(self.page.locator('[data-presence-handle][data-edge="end"]').count(),0)
-                self.direct_boundary('t1',4,touch=touch)
-                before=self.db();self.direct_boundary('t1',2,touch=touch,cancel=True)
-                self.assertEqual(self.db(),before)
-                expect(self.page.locator('#undoNotice')).to_be_visible()
-                self.page.locator('#undoEdit').click()
-                self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
-                self.context.close()
+            self.open(pointer=not touch);self.select();before=self.db()
+            self.direct_boundary('t1',2,touch=touch)
+            self.assertEqual(self.db(),before)
+            self.direct_boundary('t2',4,touch=touch,cancel=True)
+            self.assertEqual(self.db(),before)
+            expect(self.page.locator('#undoNotice')).to_be_hidden()
+            self.place('end',4,touch=touch)
+            before=self.db();self.direct_boundary('t2',2,touch=touch,cancel=True)
+            self.assertEqual(self.db(),before)
+            self.page.locator('#undoEdit').click()
+            self.assertIsNone(self.project()['map']['timeline']['presence'][0]['end'])
+            self.context.close()
 
-    def test_direct_duration_stop_and_point_move_preserve_fractional_data_until_edited(self):
+    def test_aligned_changes_and_fractional_data_until_intentional_edit(self):
         self.open(width=1440,pointer=True);self.select()
         self.assertEqual(self.event('e2')['point']['bar'],2.5)
-        self.click('select-event','[data-event-id="e1"]')
-        surface=self.page.locator('[data-event-surface]');box=surface.bounding_box()
-        self.page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.95)
-        expect(self.page.locator('.change-editor .lane-feedback')).to_have_text('Stop after bar 4')
-        self.assertIsNone(self.event('e1')['end'])
-        self.page.mouse.click(box['x']+box['width']*.5,box['y']+box['height']*.95)
+        self.click('select-event','[data-event-id="e1"]');self.place('end',4,'event')
         self.assertEqual(self.event('e1')['end'],{'sectionId':'s0','bar':4})
         self.assertEqual(self.event('e2')['point']['bar'],2.5)
-        expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
+        self.assertEqual(self.page.locator('.change-editor,.change-lane,.timing-options').count(),0)
+        lane=self.page.locator('[data-track-row="t1"] .timeline-lane').bounding_box()
+        for line in self.page.locator('[data-track-row="t1"] .event-line').all():
+            box=line.bounding_box();self.assertAlmostEqual(box['x'],lane['x']);self.assertAlmostEqual(box['width'],lane['width'])
         self.page.locator('#undoEdit').click();self.assertIsNone(self.event('e1')['end'])
-        self.click('select-event','[data-event-id="e2"]')
-        surface=self.page.locator('[data-event-surface]');box=surface.bounding_box()
-        self.page.mouse.click(box['x']+box['width']*.5,box['y']+box['height']*.95)
+        self.touch_drag(self.page.locator('[data-event-marker]'),.5)
         self.assertEqual(self.event('e2')['point']['bar'],4)
         self.page.locator('#undoEdit').click();self.assertEqual(self.event('e2')['point']['bar'],2.5)
 
@@ -921,25 +917,26 @@ class V6Browser(unittest.TestCase):
         expect(self.page.locator('.sheet')).to_have_css('border-radius','18px')
         self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
 
-    def test_dense_lane_precision_fallback_keyboard_and_touch_scroll_cancellation(self):
+    def test_dense_lane_scroll_keyboard_precision_and_touch_scroll_cancellation(self):
         data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=256
         self.open(width=320,data=data);self.select();before=self.db()
-        self.assertLessEqual(self.page.locator('.ruler-label').count(),12)
-        self.assertLessEqual(self.page.locator('.boundary-target').count(),33)
-        surface=self.page.locator('[data-presence-surface][data-track-id="t1"]')
-        surface.focus();self.page.keyboard.press('Enter')
-        self.assertTrue(self.page.locator('.timing-options').evaluate('el=>el.open'))
-        self.assertEqual(self.db(),before)
-        self.click('place-boundary','[data-kind="presence"][data-edge="end"]')
-        expect(self.page.locator('#placementPosition')).to_have_attribute('aria-valuetext','After bar 128')
-        self.click('adjust-placement','[data-delta="-1"]')
-        expect(self.page.locator('#placementLabel')).to_have_text('After bar 127')
-        self.click('adjust-placement','[data-delta="1"]');self.click('commit-placement')
-        self.assertEqual(self.project()['map']['timeline']['presence'][0]['end']['bar'],128)
+        scroll=self.page.locator('.timeline-scroll')
+        self.assertGreater(scroll.evaluate('el=>el.scrollWidth'),scroll.evaluate('el=>el.clientWidth'))
+        self.assertGreaterEqual(self.page.locator('.timeline-lane').first.bounding_box()['width']/256,44)
+        handle=self.page.locator('[data-presence-handle][data-edge="start"]');handle.focus();self.page.keyboard.press('ArrowRight')
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['start']['bar'],1)
         self.assertEqual(self.event('e2')['point']['bar'],2.5)
-        surface=self.page.locator('[data-presence-surface][data-track-id="t1"]');surface.scroll_into_view_if_needed()
-        box=surface.bounding_box();x=box['x']+box['width']*.3;y=box['y']+box['height']*.9
-        before=self.db();cdp=self.context.new_cdp_session(self.page)
+        self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+        label=self.page.locator('[data-track-row="t1"] .timeline-label');label_x=label.bounding_box()['x']
+        scroll.evaluate('el=>el.scrollLeft=2000');self.assertGreater(scroll.evaluate('el=>el.scrollLeft'),1000)
+        self.assertAlmostEqual(label.bounding_box()['x'],label_x,delta=1)
+        add=self.page.locator('[data-action="open-add-change"][data-target-type="track"]')
+        self.assertLessEqual(add.bounding_box()['x']+add.bounding_box()['width'],320)
+        self.page.set_viewport_size({'width':820,'height':1000})
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),820)
+        scroll.evaluate('el=>el.scrollLeft=0')
+        surface=self.page.locator('[data-presence-surface][data-track-id="t2"]');box=surface.bounding_box()
+        x=box['x']+30;y=box['y']+58;before=self.db();cdp=self.context.new_cdp_session(self.page)
         cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
         cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':x,'y':y+35}]})
         cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});cdp.detach()
@@ -955,6 +952,181 @@ class V6Browser(unittest.TestCase):
         self.page.keyboard.press('Escape')
         expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','true')
         self.assertEqual(len(self.project()['map']['sections']),initial+1)
+
+    def test_structure_delete_undo_and_edit_responsibilities(self):
+        self.open('structure');before=self.db();dialogs=[]
+        self.page.on('dialog',lambda d:(dialogs.append(d.message),d.dismiss()))
+        delete=self.page.get_by_role('button',name='Delete Intro',exact=True)
+        box=delete.bounding_box();self.assertGreaterEqual(box['width'],44);self.assertGreaterEqual(box['height'],44)
+        delete.click();self.assertEqual(dialogs,[])
+        self.assertNotIn('s0',[x['id'] for x in self.project()['map']['sections']])
+        self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+        self.click('edit-section','[data-section-id="s0"]')
+        self.assertEqual(self.page.locator('.sheet [data-action*="delete"],.sheet [data-action*="remove"],.sheet [data-action="move-section"]').count(),0)
+        self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+        self.click('set-sheet-bars','[data-bars="12"]');self.page.locator('#renameSection').fill('Bridge');self.click('save-section')
+        self.assertEqual(self.project()['map']['sections'][0],{'id':'s0','name':'Bridge','lengthBars':12})
+        self.assertEqual(self.project()['map']['sectionData']['s0']['parking'],'Note s0')
+
+    def test_segment_selected_and_keyboard_focus_are_distinct_without_geometry_changes(self):
+        self.open('structure',width=390,pointer=True);self.click('open-add-section')
+        self.click('choose-section-type','[data-name="Intro"]');self.settled_sheet()
+        group=self.page.locator('.length-segmented');buttons=group.locator('button')
+        widths=[b.bounding_box()['width'] for b in buttons.all()]
+        self.assertLess(max(widths)-min(widths),1)
+        target=buttons.nth(1);before=target.bounding_box();target.click()
+        self.assertEqual(target.bounding_box(),before)
+        self.assertEqual(target.evaluate('el=>getComputedStyle(el).outlineStyle'),'none')
+        self.assertEqual(target.evaluate('el=>getComputedStyle(el).boxShadow'),'none')
+        self.page.keyboard.press('Tab');self.page.keyboard.press('Shift+Tab')
+        self.assertEqual(target.evaluate('el=>getComputedStyle(el).outlineStyle'),'solid')
+        self.assertEqual(target.bounding_box(),before)
+
+    def test_drag_keeps_nodes_and_canonical_state_until_one_commit_without_snapback(self):
+        self.open(width=1180,pointer=True);self.select();before=self.db()
+        handle=self.page.locator('[data-presence-handle][data-edge="start"]');handle.scroll_into_view_if_needed()
+        handle.evaluate('''el=>{window.dragNode=el;window.laneNode=el.closest('.timeline-lane');window.laneMutations=0;
+          window.laneObserver=new MutationObserver(ms=>window.laneMutations+=ms.filter(m=>m.type==='childList').length);
+          window.laneObserver.observe(window.laneNode,{childList:true,subtree:true});
+          window.savedWrites=0;const old=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='production-projects-v1')window.savedWrites++;return old.call(this,k,v)};}''')
+        box=handle.bounding_box();lane=handle.locator('xpath=..').bounding_box();y=box['y']+22
+        self.page.mouse.move(box['x']+22,y);self.page.mouse.down()
+        self.page.mouse.move(lane['x']+lane['width']*.25,y,steps=8)
+        self.assertEqual(self.db(),before)
+        self.assertTrue(handle.evaluate('el=>el===window.dragNode && el.closest(".timeline-lane")===window.laneNode'))
+        self.assertEqual(self.page.evaluate('window.laneMutations'),0)
+        self.assertEqual(self.page.evaluate('window.savedWrites'),0)
+        self.assertAlmostEqual(handle.bounding_box()['x']+22,lane['x']+lane['width']*.25,delta=1)
+        expect(self.page.locator('.snap-guide:visible')).to_have_count(1)
+        self.page.mouse.up()
+        self.assertEqual(self.page.evaluate('window.savedWrites'),1)
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['start']['bar'],2)
+        handle=self.page.locator('[data-presence-handle][data-edge="start"]')
+        self.assertAlmostEqual(handle.bounding_box()['x']+22,lane['x']+lane['width']*.25,delta=1)
+        expect(self.page.locator('#dragPosition')).to_be_hidden()
+        self.assertEqual(self.page.locator('.snap-guide:visible').count(),0)
+        self.page.locator('#undoEdit').click();self.assertEqual(self.db(),before)
+
+    def test_boundary_crossing_is_rejected_without_id_churn_or_unrelated_gap_mutation(self):
+        data=fixture();tl=data['projects'][0]['map']['timeline']
+        tl['presence']=[{'id':'r1','trackId':'t1','start':{'sectionId':'s0','bar':1},'end':{'sectionId':'s0','bar':3}},
+                        {'id':'r2','trackId':'t1','start':{'sectionId':'s0','bar':5},'end':{'sectionId':'s0','bar':7}}]
+        self.open(data=data,width=1180,pointer=True);self.select();before=self.db()
+        self.place('end',6);self.assertEqual(self.db(),before)
+        self.select();self.place('start',4);self.assertEqual(self.db(),before)
+        self.select('r2');self.place('start',0);self.assertEqual(self.db(),before)
+        self.select('r2');self.place('end',4);self.assertEqual(self.db(),before)
+        self.select('r1');self.place('end',4)
+        ranges=self.project()['map']['timeline']['presence']
+        self.assertEqual([r['id'] for r in ranges],['r1','r2'])
+        self.assertEqual(ranges[1],before['projects'][0]['map']['timeline']['presence'][1])
+        self.assertEqual(ranges[0]['end']['bar'],4)
+
+    def test_keyboard_real_boundaries_and_point_share_bar_semantics(self):
+        self.open(width=820);self.select();before=self.db()
+        handle=self.page.locator('[data-presence-handle][data-edge="start"]');handle.focus()
+        self.assertIn('Start at bar 1',handle.get_attribute('aria-label'))
+        self.page.keyboard.press('ArrowRight')
+        self.assertEqual(self.project()['map']['timeline']['presence'][0]['start']['bar'],1)
+        expect(self.page.locator('[data-presence-handle][data-edge="start"]')).to_be_focused()
+        self.page.keyboard.press('ArrowLeft');self.assertEqual(self.project()['map']['timeline']['presence'][0]['start']['bar'],0)
+        self.place('end',2)
+        self.assertIn('Stop after bar 2',self.page.locator('[data-presence-handle][data-edge="end"]').get_attribute('aria-label'))
+        self.page.locator('#undoEdit').click()
+        marker=self.page.locator('[data-event-marker]');marker.focus();self.page.keyboard.press('Enter')
+        expect(self.page.locator('[data-action="remove-selected"][data-kind="event"]')).to_be_visible()
+        self.page.keyboard.press('Escape');marker=self.page.locator('[data-event-marker]');marker.focus();self.page.keyboard.press('ArrowRight')
+        self.assertEqual(self.event('e2')['point']['bar'],3)
+        self.page.locator('#undoEdit').click();self.assertEqual(self.event('e2')['point']['bar'],2.5)
+
+    def test_drag_cancel_escape_vertical_capture_resize_route_and_layout(self):
+        for mode in ['escape','vertical','capture','resize','route','layout']:
+            with self.subTest(mode=mode):
+                self.open(width=1180,pointer=True);self.select();before=self.db()
+                handle=self.page.locator('[data-presence-handle][data-edge="start"]');handle.scroll_into_view_if_needed()
+                box=handle.bounding_box();lane=handle.locator('xpath=..').bounding_box();y=box['y']+22
+                self.page.mouse.move(box['x']+22,y);self.page.mouse.down();self.page.mouse.move(lane['x']+lane['width']*.25,y,steps=4)
+                if mode=='escape':self.page.keyboard.press('Escape')
+                if mode=='vertical':self.page.mouse.move(box['x']+24,y+45,steps=3)
+                if mode=='capture':handle.evaluate('el=>el.releasePointerCapture(1)');self.page.mouse.move(lane['x']+lane['width']*.3,y)
+                if mode=='resize':self.page.set_viewport_size({'width':820,'height':1000})
+                if mode=='route':self.page.locator('.phase-pill').evaluate('el=>el.click()')
+                if mode=='layout':
+                    handle.locator('xpath=..').evaluate('el=>el.style.width="75%"')
+                    self.page.wait_for_timeout(40)
+                self.page.mouse.up();self.assertEqual(self.db(),before)
+                expect(self.page.locator('#dragPosition')).to_be_hidden()
+                self.assertFalse(self.page.locator('body').evaluate('el=>el.classList.contains("is-dragging")'))
+                self.context.close()
+
+    def test_no_hover_tooltip_or_retired_timing_architecture(self):
+        self.open(width=1440,pointer=True);self.select()
+        forbidden='.timing-options,.placement-sheet,.change-editor,.change-lane,.lane-feedback,.presence-selectors,input[type="range"]'
+        self.assertEqual(self.page.locator(forbidden).count(),0)
+        for node in [self.page.locator('.presence-hit').first,self.page.locator('[data-presence-handle]').first,self.page.locator('[data-event-marker]').first]:
+            node.hover();expect(self.page.locator('#dragPosition')).to_be_hidden()
+        text=self.page.locator('.timeline-card').inner_text()
+        for copy in ['Timing options','Earlier','Later','Move start','Move stop','Continue','Tap a boundary']:
+            self.assertNotIn(copy,text)
+
+    def test_review_map_reuses_chip_disclosure_and_verify_geometry(self):
+        for width in [320,820,1440]:
+            self.open('map-summary',width=width,data=self.complete_fixture())
+            chips=self.page.locator('.chip');heights=[x.bounding_box()['height'] for x in chips.all()]
+            self.assertLess(max(heights)-min(heights),1)
+            summaries=self.page.locator('.review-sections summary');boxes=[x.bounding_box() for x in summaries.all()]
+            self.assertLess(max(x['height'] for x in boxes)-min(x['height'] for x in boxes),1)
+            summaries.first.click();card=self.page.locator('.review-sections .workflow-disclosure').first.bounding_box()
+            body=self.page.locator('.review-sections .summary-lines').first.bounding_box()
+            self.assertGreaterEqual(body['x'],card['x']);self.assertLessEqual(body['x']+body['width'],card['x']+card['width'])
+            verify=self.page.locator('.action-card');self.assertEqual(verify.count(),2)
+            self.assertEqual(verify.nth(0).bounding_box()['height'],verify.nth(1).bounding_box()['height'])
+            self.context.close()
+
+
+    def test_dense_native_horizontal_navigation_and_touch_vertical_boundary_cancel(self):
+        data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=64
+        self.open(width=820,data=data);before=self.db()
+        scroll=self.page.locator('.timeline-scroll');box=scroll.bounding_box()
+        self.page.mouse.move(box['x']+box['width']*.7,box['y']+45)
+        self.page.mouse.wheel(350,0)
+        expect(scroll).to_have_js_property('scrollLeft',350)
+        self.assertEqual(self.db(),before)
+        scroll.evaluate('el=>el.scrollLeft=0')
+        surface=self.page.locator('[data-presence-surface][data-track-id="t2"]');box=surface.bounding_box()
+        x=min(650,box['x']+250);y=box['y']+58
+        cdp=self.context.new_cdp_session(self.page)
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
+        for i in range(1,6):
+            cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':x-i*25,'y':y}]})
+            self.page.wait_for_timeout(20)
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});cdp.detach()
+        self.assertGreater(scroll.evaluate('el=>el.scrollLeft'),50)
+        self.assertEqual(self.db(),before)
+        # On a normal fitted section, vertical handle contact yields to page scroll.
+        self.open(width=390);self.select();self.place('end',4);before=self.db()
+        handle=self.page.locator('[data-presence-handle][data-edge="end"]');handle.scroll_into_view_if_needed();box=handle.bounding_box()
+        x=box['x']+22;y=box['y']+22;cdp=self.context.new_cdp_session(self.page)
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':x+2,'y':y+50}]})
+        cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});cdp.detach()
+        self.assertEqual(self.db(),before);expect(self.page.locator('#dragPosition')).to_be_hidden()
+
+
+    def test_change_uses_effective_parent_stop_instead_of_false_open_grip(self):
+        data=fixture();data['projects'][0]['map']['timeline']['presence'][0]['end']={'sectionId':'s0','bar':4}
+        self.open(width=820,data=data);self.select();self.click('select-event','[data-event-id="e1"]')
+        end=self.page.locator('[data-event-handle][data-edge="end"]')
+        self.assertIsNone(self.event('e1')['end'])
+        self.assertIsNone(end.get_attribute('data-open-tail'))
+        self.assertIn('Stop after bar 4',end.get_attribute('aria-label'))
+        end.focus();self.page.keyboard.press('ArrowLeft')
+        self.assertEqual(self.event('e1')['end']['bar'],3)
+        self.page.locator('#undoEdit').click();self.assertIsNone(self.event('e1')['end'])
+        # A finite parent stop outside this section must not invent a local handle.
+        data=fixture();data['projects'][0]['map']['timeline']['presence'][0]['end']={'sectionId':'s1','bar':4}
+        self.open(width=820,data=data);self.select();self.click('select-event','[data-event-id="e1"]')
+        self.assertEqual(self.page.locator('[data-event-handle][data-edge="end"]').count(),0)
 
 
 if __name__ == '__main__':
