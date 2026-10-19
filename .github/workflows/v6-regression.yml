@@ -1,0 +1,77 @@
+name: FIRE V6 regression
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check JavaScript syntax
+        run: node --check app.js
+      - name: Check whitespace
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --check "${{ github.event.pull_request.base.sha }}...${{ github.sha }}"
+          else
+            git diff --check HEAD^
+          fi
+
+  browser:
+    name: Chromium regression (${{ matrix.width }}px)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [390, 820]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tests/test_v6.py
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Resolve Chromium path
+        run: |
+          echo "CHROMIUM_PATH=$(python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          p = sync_playwright().start()
+          print(p.chromium.executable_path)
+          p.stop()
+          PY
+          )" >> "$GITHUB_ENV"
+      - name: Start FIRE static server
+        run: |
+          python -m http.server 8000 > /tmp/fire-http.log 2>&1 &
+          echo $! > /tmp/fire-http.pid
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 0.25
+          done
+          cat /tmp/fire-http.log
+          exit 1
+      - name: Run V6 browser regressions
+        env:
+          FIRE_URL: http://127.0.0.1:8000
+          FIRE_TEST_WIDTH: ${{ matrix.width }}
+        run: python -B -m unittest discover -s tests -v
+      - name: Show server log on failure
+        if: failure()
+        run: cat /tmp/fire-http.log || true
