@@ -596,6 +596,39 @@ class V6Browser(unittest.TestCase):
                 self.assertEqual(self.page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"),True)
                 self.context.close()
 
+    def test_projects_foundation_and_new_project_keyboard_flow(self):
+        for width in [320, 390, 430, 820, 1180]:
+            with self.subTest(width=width):
+                self.open('projects', width=width, pointer=width >= 1180)
+                self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                add = self.page.locator('[data-action="new-project"]')
+                box = add.bounding_box()
+                self.assertGreaterEqual(box['width'], 44)
+                self.assertGreaterEqual(box['height'], 44)
+                card = self.page.locator('.project-card').first.bounding_box()
+                self.assertLessEqual(card['height'], 140)
+                if width >= 1180:
+                    self.assertLessEqual(self.page.locator('#app').bounding_box()['width'], 880)
+                self.context.close()
+
+        self.open('projects', width=390)
+        self.click('new-project')
+        self.click('set-new-type', '[data-type="study"]')
+        title = self.page.locator('#newTitle')
+        artist = self.page.locator('#newArtist')
+        self.assertEqual(title.get_attribute('enterkeyhint'), 'next')
+        self.assertEqual(artist.get_attribute('enterkeyhint'), 'done')
+        title.fill('Enter Flow')
+        title.press('Enter')
+        expect(artist).to_be_focused()
+        artist.fill('Babel')
+        artist.press('Enter')
+        expect(self.page.locator('h1')).to_have_text('Enter Flow')
+        saved = self.db()
+        created = next(p for p in saved['projects'] if p['title'] == 'Enter Flow')
+        self.assertEqual(created['artist'], 'Babel')
+        self.assertEqual(created['schemaVersion'], 5)
+
     def test_revisioned_assets_and_development_stamp(self):
         self.open('projects')
         stamp=self.page.locator('#buildStamp')
