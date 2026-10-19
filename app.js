@@ -1545,7 +1545,7 @@
     const { range: r, portion: x } = item,
       selected =
         expanded && ui.selectedPresenceId === r.id && !ui.selectedEventId;
-    return `<div data-graphic="${r.id}" class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" tabindex="0" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
+    return `<div data-graphic="${r.id}" class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" tabindex="0" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} block"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
   }
   function boundaryLabel(edge, value) {
     if(edge === "end") return value === 0 ? "Stop before bar 1" : `Stop after bar ${value}`;
@@ -1554,8 +1554,8 @@
   }
   function rangeHandles(id, type, x) {
     const p = project(), obj = selectedObject(type,id), len = Number(sections(p)[ui.sectionIndex].lengthBars);
-    return ["start","end"].filter(edge=> edge === "start" ? x.startHere : x.endHere || obj.end == null).map(edge=>{
-      const open = edge === "end" && obj.end == null, value = Math.round((edge === "start" ? x.left : 100-x.right)/100*len);
+    return ["start","end"].filter(edge=> edge === "start" ? x.startHere : x.endHere || x.openEnd).map(edge=>{
+      const open = edge === "end" && x.openEnd, value = Math.round((edge === "start" ? x.left : 100-x.right)/100*len);
       return `<button class="${type}-handle ${edge === "start" ? "left" : "right"} ${open ? "open-continuation" : ""}" data-${type}-handle data-${type === "presence" ? "range" : "event"}-id="${id}" data-edge="${edge}" ${open ? 'data-open-tail' : ''} style="left:${edge === "start" ? x.left : 100-x.right}%" aria-label="${esc(type === "presence" ? trackById(p,obj.trackId).name : obj.label)}, ${open ? `Open continuation after bar ${value}; set stop` : boundaryLabel(edge,value)}" aria-pressed="false"></button>`;
     }).join("");
   }
@@ -1659,7 +1659,7 @@
       presentIds = trackIdsInSection(p, index),
       focusOptions = presentIds.map((id) => trackById(p, id)).filter(Boolean),
       done = sectionComplete(p, index);
-    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="study-workspace"><section class="arrangement-region" aria-label="Arrangement"><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-scroll" tabindex="0" aria-label="Section timeline"><div class="timeline-content" style="--dense-width:${Number(s.lengthBars)>16 ? 168+Number(s.lengthBars)*44 : 0}px"><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
+    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="study-workspace"><section class="arrangement-region" aria-label="Arrangement"><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-scroll" tabindex="0" aria-label="Section timeline"><div class="timeline-content" style="--dense-width:${Number(s.lengthBars)>16 ? 168+Number(s.lengthBars)*44 : 0}px"><div class="ruler-gutter" aria-hidden="true"></div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
       p,
     )
       .map((t) => timelineTrackRow(p, t, index))
@@ -2476,7 +2476,7 @@
         if(!['ArrowLeft','ArrowRight'].includes(e.key)) return;
         e.preventDefault();
         const ref=boundaryRef(handle),obj=selectedObject(ref.type,ref.id),p=project(),base=sectionStarts(p)[ui.sectionIndex],len=Number(sections(p)[ui.sectionIndex].lengthBars);
-        const pos=ref.edge==='point' ? anchorAbs(p,obj.point)-base : ref.edge==='end' && obj.end==null ? len : anchorAbs(p,obj[ref.edge])-base;
+        const pos=ref.edge==='point' ? anchorAbs(p,obj.point)-base : ref.edge==='end' ? rangeAbs(p,obj).end-base : anchorAbs(p,obj[ref.edge])-base;
         moveBoundary(ref,e.key==='ArrowLeft' ? Math.ceil(pos)-1 : Math.floor(pos)+1);
       };
     });
@@ -2515,13 +2515,15 @@
     const finish=(cancel,ev)=>{
       if(finished || ev && ev.pointerId!==e.pointerId)return;
       finished=true;controller.abort();cancelGesture=null;
-      if(cancel || cancelled || !lane.isConnected || lane.getBoundingClientRect().width!==rect.width || scroll?.scrollLeft!==scrollLeft)return;
+      const current=lane.getBoundingClientRect();
+      if(cancel || cancelled || !lane.isConnected || current.width!==rect.width || current.height!==rect.height || current.left!==rect.left || current.top!==rect.top || scroll?.scrollLeft!==scrollLeft)return;
       if(ref)moveBoundary(ref,value);else commitPresenceTransition(surface.dataset.trackId,value);
     };
     cancelGesture=()=>finish(true);
     window.addEventListener('pointermove',ev=>{if(ev.pointerId===e.pointerId && (Math.abs(ev.clientY-origin.y)>10 || Math.abs(ev.clientX-origin.x)>10))cancelled=true;},opts);
     window.addEventListener('pointerup',ev=>finish(false,ev),opts);
     window.addEventListener('pointercancel',ev=>finish(true,ev),opts);
+    surface.addEventListener('lostpointercapture',()=>finish(true),opts);
     window.addEventListener('resize',()=>finish(true),opts);
     window.addEventListener('blur',()=>finish(true),opts);
   }

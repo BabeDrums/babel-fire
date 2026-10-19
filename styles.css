@@ -738,6 +738,7 @@ p {
   padding: 0;
 }
 .study-transition-stage .timeline-card {
+  --label-width: 88px;
   border-left-color: transparent;
   border-right-color: transparent;
   border-radius: 0;
@@ -1178,6 +1179,7 @@ details.note-disclosure summary::-webkit-details-marker {
   padding: 0 12px 8px;
 }
 .timeline-scroll {
+  container-type: inline-size;
   border-radius: var(--radius-control);
   overflow-x: auto;
   overflow-y: hidden;
@@ -1186,6 +1188,7 @@ details.note-disclosure summary::-webkit-details-marker {
   padding: 0 12px 8px 0;
 }
 .timeline-content { width: max(100%, var(--dense-width)); }
+.ruler-gutter { position: sticky; left: 0; width: var(--label-width); height: 28px; background: #101216; z-index: 6; }
 .event-line { position: absolute; left: 0; right: 0; height: 44px; }
 .event-label {
   position: absolute;
@@ -1224,7 +1227,8 @@ details.note-disclosure summary::-webkit-details-marker {
 .timeline-ruler {
   position: relative;
   height: 28px;
-  margin-left: 88px;
+  margin-left: var(--label-width);
+  margin-top: -28px;
   margin-right: 12px;
 }
 .ruler-label {
@@ -1239,7 +1243,7 @@ details.note-disclosure summary::-webkit-details-marker {
 }
 .timeline-row {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: var(--label-width) minmax(0, 1fr);
   min-height: 64px;
   border-radius: var(--radius-control);
   margin-bottom: 2px;
@@ -1247,10 +1251,18 @@ details.note-disclosure summary::-webkit-details-marker {
 .timeline-row.expanded {
   background: #181b20;
 }
+.timeline-row.expanded .timeline-label { background: #181b20; }
 .timeline-label {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  background: #101216;
   min-width: 0;
   min-height: 64px;
-  padding: 0 12px 0 2px;
+  padding: 22px 12px 0 2px;
   text-align: left;
   cursor: pointer;
   border-radius: var(--radius-control);
@@ -1339,6 +1351,9 @@ details.note-disclosure summary::-webkit-details-marker {
   background: var(--change-other) !important;
 }
 .track-detail {
+  width: 100cqw;
+  position: sticky;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1414,9 +1429,10 @@ details.note-disclosure summary::-webkit-details-marker {
   color: #858b95;
   cursor: pointer;
 }
-.mix-utility .track-detail {
-  width: 100%;
-  padding: 0 0 12px;
+.mix-utility:not(.timeline-row) {
+  position: sticky;
+  left: 0;
+  width: 100cqw;
 }
 .change-groups {
   display: grid;
@@ -1759,16 +1775,11 @@ from {
   .scale-row {
     grid-template-columns: 68px 1fr;
   }
-  .timeline-row {
-    grid-template-columns: 76px minmax(0, 1fr);
-  }
-  .timeline-ruler {
-    margin-left: 76px;
-  }
   .timeline-label {
     padding-right: 8px;
   }
   .timeline-card {
+    --label-width: 76px;
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -1786,11 +1797,8 @@ from {
     grid-template-columns: 1fr 1fr;
     gap: 8px 28px;
   }
-  .timeline-row {
-    grid-template-columns: 128px minmax(0, 1fr);
-  }
-  .timeline-ruler {
-    margin-left: 128px;
+  .timeline-card {
+    --label-width: 128px;
   }
 }
 
@@ -1906,11 +1914,8 @@ from {
   .study-actions {
     margin-top: 24px;
   }
-  .timeline-row {
-    grid-template-columns: 144px minmax(0, 1fr);
-  }
-  .timeline-ruler {
-    margin-left: 144px;
+  .timeline-card {
+    --label-width: 144px;
   }
   .sheet-backdrop {
     align-items: center;
