@@ -11,6 +11,26 @@
     <meta name="theme-color" content="#090a0d" />
     <title>Babel FIRE</title>
     <link rel="stylesheet" href="styles.css?v={{ site.github.build_revision }}" />
+    <style>
+      /* Keep 44px boundary hit targets inside the musical lane at their edge. */
+      .presence-handle.left,
+      .event-handle.left {
+        transform: none;
+      }
+      .presence-handle.left::after,
+      .event-handle.left::after {
+        left: 0;
+      }
+      .presence-handle.right,
+      .event-handle.right {
+        transform: translateX(-100%);
+      }
+      .presence-handle.right::after,
+      .event-handle.right::after {
+        left: auto;
+        right: 0;
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell" id="app"></div>
