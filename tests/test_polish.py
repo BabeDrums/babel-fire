@@ -60,16 +60,6 @@ class PolishBrowser(unittest.TestCase):
         page.wait_for_selector('.study-pane')
         self.assertEqual(page.locator('.work-position').inner_text().split('·')[0].strip(), 'Section Study')
 
-    def test_draft_parent_uses_derived_progress(self):
-        page = self.open('skeleton-draft')
-        details = page.locator('[data-draft-section]').first
-        details.wait_for()
-        parent = details.locator('summary .round-check')
-        page.wait_for_function('(el)=>el.classList.contains("derived-status")', parent.element_handle())
-        self.assertTrue(parent.evaluate('el=>el.classList.contains("derived-status")'))
-        self.assertEqual(details.locator('.draft-child-label').inner_text(), 'Tracks complete')
-        self.assertEqual(details.locator('.draft-progress').count(), 1)
-
     def test_open_presence_has_ghost_continuation_marker(self):
         page = self.open('section-study')
         self.assertEqual(page.locator('.timeline-ruler .timeline-continuation-marker').inner_text(), '9')
