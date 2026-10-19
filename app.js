@@ -691,7 +691,9 @@
     if (count) count.textContent = `${done} of 3`;
     if (bar) bar.style.width = `${done / 3 * 100}%`;
   }
+  let cancelGesture = null;
   function go(route, extra = {}, push = true) {
+    cancelGesture?.();
     route = resolveRoute(route);
     ui.animating = false;
     ui.selectedEventId = null;
@@ -719,6 +721,8 @@
     window.scrollTo(0, 0);
   }
   window.addEventListener("popstate", (e) => {
+    cancelGesture?.();
+    closeSheet();
     const st = e.state || {};
     if (st.projectId && db.projects.some((p) => p.id === st.projectId))
       db.currentProjectId = st.projectId;
@@ -1335,8 +1339,6 @@
         return renderSkeletonSession();
       case "skeleton-draft":
         return renderSkeletonDraft();
-      case "draft-section":
-        return renderDraftSection();
       case "skeleton-bounce":
         return renderSkeletonBounce();
       case "original-spark":
@@ -1537,35 +1539,62 @@
     const { range: r, portion: x } = item,
       selected =
         expanded && ui.selectedPresenceId === r.id && !ui.selectedEventId;
-    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
+    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
   }
   function rangeHandles(id, type, x) {
-    return ["start", "end"]
+    return ["start", "end"].filter((edge) => edge === "start" ? x.startHere : x.endHere)
       .map(
         (edge) =>
-          `<button class="${type === "presence" ? "presence" : "event"}-handle ${edge === "start" ? "left" : "right"}" data-${type === "presence" ? "presence" : "event"}-handle data-${type === "presence" ? "range" : "event"}-id="${id}" data-edge="${edge}" style="left:${edge === "start" ? x.left : 100 - x.right}%" aria-label="Drag ${edge}"></button>`,
+          `<button class="${type === "presence" ? "presence" : "event"}-handle ${edge === "start" ? "left" : "right"}" data-${type === "presence" ? "presence" : "event"}-handle data-${type === "presence" ? "range" : "event"}-id="${id}" data-edge="${edge}" style="left:${edge === "start" ? x.left : 100 - x.right}%" aria-label="Move ${edge === "end" ? "stop" : "start"}"></button>`,
       )
       .join("");
   }
-  function timingControls(obj, type) {
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      a = obj.kind === "marker" ? obj.point : obj.start;
+  function boundaryActions(obj, type) {
+    const portion = obj.kind === "marker" ? null : rangePortion(project(), obj, ui.sectionIndex);
     const attrs = `data-kind="${type}" data-id="${obj.id}"`;
-    const edges = obj.kind === "marker" ? ["point"] : ["start", "end"];
-    return `<div class="timing-controls">${edges
-      .map((edge) => {
-        const anchor = edge === "point" ? a : obj[edge],
-          index = anchor
-            ? sectionIndexById(p, anchor.sectionId)
-            : ui.sectionIndex,
-          sec = sections(p)[index],
-          val = anchor
-            ? anchorValueInSection(sec, anchor) + (edge === "end" ? 0 : 1)
-            : "∞";
-        return `<div class="timing-step"><span>${edge === "point" ? "Bar" : edge === "start" ? "Start" : "End"} <b>${index === ui.sectionIndex ? val : esc(sectionLabels(p)[index]) + " · " + val}</b></span><button class="step" data-action="nudge-timing" ${attrs} data-edge="${edge}" data-delta="-1" aria-label="${edge} earlier">−</button><button class="step" data-action="nudge-timing" ${attrs} data-edge="${edge}" data-delta="1" aria-label="${edge} later">+</button></div>`;
-      })
-      .join("")}</div>`;
+    if (obj.kind === "marker") return `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="point">Move point</button>`;
+    return `${portion?.startHere ? `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="start">Move start</button>` : ""}${portion?.endHere ? `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="end">Move stop</button>` : `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="end">Stop</button>`}`;
+  }
+  let placement = null;
+  function openBoundaryPlacement(type, id, edge, trackId) {
+    const p = project(), sec = sections(p)[ui.sectionIndex], len = Number(sec.lengthBars),
+      obj = id ? selectedObject(type, id) : null;
+    let value = edge === "end" ? Math.round(len / 2) : 0;
+    if (obj?.[edge]?.sectionId === sec.id) value = Math.round(anchorValueInSection(sec, obj[edge]));
+    if (edge === "resume") {
+      const gap = presenceGapInSection(p, trackId, ui.sectionIndex);
+      if (!gap) return;
+      value = Math.ceil(gap.start - sectionStarts(p)[ui.sectionIndex]);
+    }
+    const min = edge === "end" ? 1 : 0, max = edge === "end" ? len : len - 1;
+    placement = { type, id, edge, trackId, value: clamp(value, min, max), sectionId: sec.id };
+    const title = edge === "end" ? "Stop" : edge === "resume" ? "Start" : edge === "point" ? "Move point" : "Move start";
+    sheetRoot.innerHTML = `<div class="sheet placement-sheet"><div class="grabber"></div><h3>${title}</h3><p class="sub">${esc(sectionLabels(p)[ui.sectionIndex])}</p><output id="placementLabel" aria-live="polite"></output><div class="placement-lane"><input id="placementPosition" aria-label="${title} position" type="range" min="${min}" max="${max}" step="1" value="${placement.value}"></div><p class="micro">Slide to a bar, or use the arrow keys.</p><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="commit-placement">${title === "Stop" ? "Stop here" : title === "Start" ? "Start here" : "Done"}</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    updatePlacementLabel();
+    openSheet();
+  }
+  function updatePlacementLabel() {
+    const label = document.getElementById("placementLabel");
+    if (label && placement) label.textContent = placement.edge === "end" ? `After bar ${placement.value}` : `Bar ${placement.value + 1}`;
+  }
+  function commitPlacement() {
+    if (!placement) return;
+    const p = project(), { type, id, edge, trackId, value, sectionId } = placement;
+    if (sections(p)[ui.sectionIndex]?.id !== sectionId) return closeSheet();
+    const before = copyProject();
+    if (edge === "resume") {
+      const absolute = sectionStarts(p)[ui.sectionIndex] + value;
+      if (presenceForTrack(p, trackId).some((r) => { const a = rangeAbs(p, r); return absolute >= a.start && absolute < a.end; })) return sheetError("Choose a bar where this track is silent.");
+      const r = { id: uid(), trackId, start: { sectionId, bar: value }, end: null };
+      p.map.timeline.presence.push(r);
+      ui.selectedPresenceId = r.id;
+      closeSheet();
+      return finishTimelineEdit(before, r, "presence", "Track started");
+    }
+    const obj = selectedObject(type, id);
+    if (!obj || !applyTiming(obj, type, edge, value)) return sheetError("Choose a position within the musical span.");
+    closeSheet();
+    finishTimelineEdit(before, obj, type, edge === "end" ? "Stop placed" : "Position changed");
   }
   function compactEventsHtml(p, targetType, targetId, index) {
     return visibleEvents(p, targetType, targetId, index)
@@ -1577,7 +1606,7 @@
           ),
         );
         return e.kind === "range"
-          ? `<span class="event-summary-range tone-${eventTone(e)} ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""}" style="left:${x.left}%;right:${x.right}%;top:${33 + row * 4}px"></span>`
+          ? `<span class="event-summary-range tone-${eventTone(e)} ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%;top:${33 + row * 4}px"></span>`
           : `<span class="event-summary-marker tone-${eventTone(e)}" style="left:${x.left}%;top:${31 + row * 4}px"></span>`;
       })
       .join("");
@@ -1589,14 +1618,11 @@
     return `<div class="change-selectors">${events.map(({ event: e }) => `<button class="change-chip ${e.id === ui.selectedEventId ? "selected" : ""}" data-action="select-event" data-event-id="${e.id}" aria-pressed="${e.id === ui.selectedEventId}"><span class="change-swatch tone-${eventTone(e)}"></span>${esc(e.label)}</button>`).join("")}<button class="change-chip add-change" data-action="open-add-change" data-target-type="${targetType}" ${targetId ? `data-target-id="${targetId}"` : ""}>+ Change</button></div>${selected ? selectedEventHtml(selected, bars) : ""}`;
   }
   function selectedEventHtml({ event: e, portion: x }, bars) {
-    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}">${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div>${timingControls(e, "event")}<div class="selection-actions">${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
+    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}">${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div><div class="selection-actions">${boundaryActions(e, "event")}${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
   }
   function trackDetailHtml(p, track, index) {
-    const selected = visiblePresence(p, track.id, index).find(
-        (x) => x.range.id === ui.selectedPresenceId,
-      ),
-      r = selected?.range;
-    return `<div class="track-detail">${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="presence-editor">${timingControls(r, "presence")}<div class="selection-actions">${r.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}<button class="mini-btn" data-action="split-presence" data-id="${r.id}">Split</button><button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div></div>` : ""}${ui.splitRangeId === r?.id && r ? splitEditor(r) : ""}${eventDetailRows(p, "track", track.id, index)}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="add-another-presence" data-track-id="${track.id}">+ Presence</button>` : ""}</div>`;
+    const selected = visiblePresence(p, track.id, index).find((x) => x.range.id === ui.selectedPresenceId), r = selected?.range;
+    return `<div class="track-detail">${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="presence-editor"><div class="selection-actions">${boundaryActions(r, "presence")}${r.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div></div>` : ""}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="start-track" data-track-id="${track.id}">Start</button>` : ""}${eventDetailRows(p, "track", track.id, index)}</div>`;
   }
   function presenceSelectors(p, trackId, index) {
     const ranges = visiblePresence(p, trackId, index);
@@ -1611,10 +1637,14 @@
       absent = !ranges.length;
     return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars}"><button class="lane-select" data-action="${absent ? "add-presence-section" : "select-presence"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${absent ? "Add" : "Select"} ${esc(track.name)}">${absent ? "+" : ""}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}</div>${expanded && ranges.length ? trackDetailHtml(p, track, index) : ""}</div>`;
   }
+  function mixControl(p, index) {
+    const expanded = ui.expandedTrackId === "__mix__";
+    return `<button class="mix-toggle" data-action="toggle-timeline-track" data-track-id="__mix__" aria-expanded="${expanded}" aria-label="Mix changes">Mix${visibleEvents(p, "mix", null, index).length ? " •" : ""}</button>`;
+  }
   function mixTimelineRow(p, index) {
-    const events = visibleEvents(p, "mix", null, index),
-      expanded = ui.expandedTrackId === "__mix__";
-    return `<div class="mix-utility ${events.length ? "has-changes" : ""}"><button class="mix-toggle" data-action="toggle-timeline-track" data-track-id="__mix__" aria-expanded="${expanded}">Mix${events.length ? '<span class="mix-dot"></span>' : " +"}</button>${!expanded && events.length ? `<div class="mix-overview">${compactEventsHtml(p, "mix", null, index)}</div>` : ""}${expanded ? `<div class="track-detail">${eventDetailRows(p, "mix", null, index)}</div>` : ""}</div>`;
+    const events = visibleEvents(p, "mix", null, index), expanded = ui.expandedTrackId === "__mix__";
+    if (!events.length && !expanded) return "";
+    return `<div class="mix-utility" aria-label="Global Mix changes"><div class="micro">Global changes</div>${!expanded ? `<div class="mix-overview">${compactEventsHtml(p, "mix", null, index)}</div>` : eventDetailRows(p, "mix", null, index)}</div>`;
   }
   function sectionStudyPaneHtml(p, index) {
     const s = sections(p)[index],
@@ -1623,7 +1653,7 @@
       presentIds = trackIdsInSection(p, index),
       focusOptions = presentIds.map((id) => trackById(p, id)).filter(Boolean),
       done = sectionComplete(p, index);
-    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong></div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
+    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
       p,
     )
       .map((t) => timelineTrackRow(p, t, index))
@@ -1650,6 +1680,8 @@
       return;
     }
     ui.sectionIndex = clamp(ui.sectionIndex, 0, sections(p).length - 1);
+    const firstIncomplete = sections(p).findIndex((_, i) => !sectionComplete(p, i));
+    if (firstIncomplete >= 0) ui.sectionIndex = Math.min(ui.sectionIndex, firstIncomplete);
     const labels = sectionLabels(p);
     app.innerHTML =
       topbar(
@@ -1674,7 +1706,6 @@
   function animateSectionTo(newIndex) {
     ui.selectedEventId = null;
     ui.selectedPresenceId = null;
-    ui.splitRangeId = null;
     const p = project();
     newIndex = clamp(newIndex, 0, sections(p).length - 1);
     if (!tracksDone(p) || sections(p).slice(0, newIndex).some((_, i) => !sectionComplete(p, i))) return;
@@ -1779,7 +1810,7 @@
               .map((id) => focusName(p, id))
               .filter(Boolean)
               .join(" · ");
-    return `<button class="summary-card" data-action="summary-jump" data-index="${index}"><div class="summary-title"><strong>${esc(label)}</strong><span>Edit ›</span></div><div class="summary-lines"><div class="summary-line"><b>Length</b><span>${s.lengthBars} bars</span></div><div class="summary-line"><b>Tracks</b><span>${d.silence ? "No active tracks" : esc(names.join(" · ") || "Not mapped")}</span></div><div class="summary-line"><b>Changes</b><span>${eventCount ? `${eventCount} mapped` : "None mapped"}</span></div><div class="summary-line"><b>Feel</b><span>${esc(feel || "Not mapped")}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus || "Not mapped")}</span></div>${d.parking ? `<div class="summary-line"><b>Parking Lot</b><span>${esc(d.parking)}</span></div>` : ""}${d.takeaway ? `<div class="summary-line"><b>Takeaway</b><span>${esc(d.takeaway)}</span></div>` : ""}</div></button>`;
+    return `<details class="workflow-disclosure"><summary><strong>${esc(label)}</strong><span class="micro">${s.lengthBars} bars · ${esc(names.join(" · ") || "No active tracks")}</span><span class="chev">⌄</span></summary><button class="mini-btn" data-action="summary-jump" data-index="${index}">Edit ${esc(label)}</button><div class="summary-lines"><div class="summary-line"><b>Length</b><span>${s.lengthBars} bars</span></div><div class="summary-line"><b>Tracks</b><span>${d.silence ? "No active tracks" : esc(names.join(" · ") || "Not mapped")}</span></div><div class="summary-line"><b>Changes</b><span>${eventCount ? `${eventCount} mapped` : "None mapped"}</span></div><div class="summary-line"><b>Feel</b><span>${esc(feel || "Not mapped")}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus || "Not mapped")}</span></div>${d.parking ? `<div class="summary-line"><b>Parking Lot</b><span>${esc(d.parking)}</span></div>` : ""}${d.takeaway ? `<div class="summary-line"><b>Takeaway</b><span>${esc(d.takeaway)}</span></div>` : ""}</div></details>`;
   }
 
   function renderSkeletonHome() {
@@ -1838,57 +1869,37 @@
           "",
         )}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-draft" ${sessionDone(p) ? "" : "disabled"}>Next</button>`;
   }
+  function draftSectionHtml(p, s, i) {
+    const req = draftRequirements(p, i), state = p.skeleton.draft.parts[s.id] || {},
+      count = req.filter((id) => state[id]).length, done = draftSectionDone(p, i);
+    return `<details class="workflow-disclosure" data-draft-section="${s.id}" ${ui.draftOpenId === s.id ? "open" : ""}><summary><span class="round-check ${done ? "on" : ""}"></span><span><strong>${esc(sectionLabels(p)[i])}</strong><span class="copy">${req.length ? `${count} of ${req.length} tracks` : "No active tracks · Complete"}</span></span><span class="chev">⌄</span></summary><div class="draft-checks">${req.map((id) => `<button class="list-row" data-action="toggle-draft-part" data-section-id="${s.id}" data-track-id="${id}" aria-pressed="${!!state[id]}"><span class="round-check ${state[id] ? "on" : ""}"></span><div><div class="title">${esc(trackById(p, id)?.name)}</div><div class="desc">${esc(timingSummary(p, id, i))}${relevantTrackEvents(p, id, i).length ? ` · ${esc(relevantTrackEvents(p, id, i).join(" · "))}` : ""}</div></div></button>`).join("")}${!req.length ? '<p class="micro">Intentionally silent in The Map.</p>' : ""}</div></details>`;
+  }
+  function draftCoverage(p) {
+    const total = sections(p).reduce((n, _, i) => n + draftRequirements(p, i).length, 0);
+    const done = sections(p).reduce((n, s, i) => n + draftRequirements(p, i).filter((id) => p.skeleton.draft.parts[s.id]?.[id]).length, 0);
+    return `${done} of ${total} mapped parts · ${sections(p).filter((_, i) => draftSectionDone(p, i)).length} of ${sections(p).length} sections`;
+  }
   function renderSkeletonDraft() {
-    const p = project(),
-      labels = sectionLabels(p);
-    app.innerHTML =
-      topbar(
-        historyBackButton("skeleton", "The Skeleton"),
-        phasePill(1),
-        savedMark(),
-      ) +
-      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
-        p,
-      )
-        .map((s, i) => {
-          const req = draftRequirements(p, i),
-            state = p.skeleton.draft.parts[s.id] || {},
-            count = req.filter((id) => state[id]).length,
-            done = draftSectionDone(p, i);
-          return `<button class="list-row draft-section-row" data-action="open-draft-section" data-index="${i}"><span class="round-check ${done ? "on" : ""}"></span><div><div class="title">${esc(labels[i])}</div><div class="desc">${req.length ? `${count} of ${req.length} tracks` : "No active tracks"}</div></div><span class="chev">›</span></button>`;
-        })
-        .join(
-          "",
-        )}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+    const p = project();
+    app.innerHTML = topbar(historyBackButton("skeleton", "The Skeleton"), phasePill(1), savedMark()) +
+      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div>${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+  }
+  function refreshDraftChecks() {
+    const p = project();
+    app.querySelectorAll("[data-draft-section]").forEach((details, i) => {
+      const sid = details.dataset.draftSection, req = draftRequirements(p, i), state = p.skeleton.draft.parts[sid] || {};
+      details.querySelector("summary .round-check").classList.toggle("on", draftSectionDone(p, i));
+      details.querySelector("summary .copy").textContent = req.length ? `${req.filter((id) => state[id]).length} of ${req.length} tracks` : "No active tracks · Complete";
+      details.querySelectorAll('[data-action="toggle-draft-part"]').forEach((el) => {
+        el.setAttribute("aria-pressed", String(!!state[el.dataset.trackId]));
+        el.querySelector(".round-check").classList.toggle("on", !!state[el.dataset.trackId]);
+      });
+    });
+    document.getElementById("draftCoverage").textContent = draftCoverage(p);
+    app.querySelector('[data-route="skeleton-bounce"]').disabled = !draftDone(p);
   }
   function relevantTrackEvents(p, trackId, index) {
     return visibleEvents(p, "track", trackId, index).map((x) => x.event.label);
-  }
-  function renderDraftSection() {
-    const p = project(),
-      index = clamp(ui.sectionIndex, 0, sections(p).length - 1),
-      s = sections(p)[index],
-      labels = sectionLabels(p),
-      req = draftRequirements(p, index),
-      state = p.skeleton.draft.parts[s.id] || {};
-    app.innerHTML =
-      topbar(
-        historyBackButton("skeleton-draft", "Draft"),
-        phasePill(1),
-        savedMark(),
-      ) +
-      `<h2>${esc(labels[index])}</h2><p class="sub">Build the parts The Map says belong here.</p><div class="section-kicker">Tracks</div><div class="group-card list">${
-        req.length
-          ? req
-              .map((id) => {
-                const t = trackById(p, id),
-                  events = relevantTrackEvents(p, id, index),
-                  summary = timingSummary(p, id, index);
-                return `<button class="list-row" data-action="toggle-draft-part" data-track-id="${id}"><span class="round-check ${state[id] ? "on" : ""}"></span><div><div class="title">${esc(t?.name || "Track")}</div><div class="desc">${esc(summary)}${events.length ? ` · ${esc(events.join(" · "))}` : ""}</div></div><span></span></button>`;
-              })
-              .join("")
-          : `<div class="empty" style="padding:18px 14px">No active tracks in this section.</div>`
-      }</div>`;
   }
   function renderSkeletonBounce() {
     const p = project();
@@ -2219,6 +2230,7 @@
     save();
   }
   function addPresenceSection(p, trackId, index) {
+    const before = copyProject();
     const s = sections(p)[index],
       r = { id: uid(), trackId, start: { sectionId: s.id, bar: 0 }, end: null };
     p.map.timeline.presence.push(r);
@@ -2233,6 +2245,7 @@
         .map((s) => s.id),
     );
     save();
+    offerUndo(before, "Track started");
   }
   function presenceGapInSection(p, trackId, index) {
     if (!lengthsComplete(p)) return null;
@@ -2254,23 +2267,6 @@
       cursor = Math.max(cursor, x.end);
     }
     return cursor < a1 - 1e-6 ? { start: cursor, end: a1 } : null;
-  }
-  function createAdditionalPresence(p, trackId, index) {
-    const gap = presenceGapInSection(p, trackId, index);
-    if (!gap) return null;
-    const future = presenceForTrack(p, trackId)
-        .map((r) => rangeAbs(p, r))
-        .filter((x) => x.start > gap.start + 1e-6)
-        .sort((a, b) => a.start - b.start)[0],
-      r = {
-        id: uid(),
-        trackId,
-        start: anchorAtAbs(p, gap.start, false),
-        end: future ? anchorAtAbs(p, future.start, true) : null,
-      };
-    p.map.timeline.presence.push(r);
-    sectionData(p, sections(p)[index].id).silence = false;
-    return r;
   }
   function subtractSectionFromTrack(p, trackId, index) {
     if (!lengthsComplete(p)) return;
@@ -2386,6 +2382,7 @@
           document.body.classList.add("is-sorting");
           const finish = (cancel) => {
             controller.abort();
+            cancelGesture = null;
             const target = [...container.children].indexOf(placeholder);
             ghost.remove();
             placeholder.replaceWith(row);
@@ -2393,6 +2390,8 @@
             if (!cancel) moveSection(project(), row.dataset.sectionId, target);
             renderStructure();
           };
+          cancelGesture = () => finish(true);
+          window.addEventListener("resize", () => finish(true), opts);
           window.addEventListener(
             "pointermove",
             (ev) => {
@@ -2490,6 +2489,7 @@
     } catch (_) {}
     const finish = (cancel) => {
       controller.abort();
+      cancelGesture = null;
       document.body.classList.remove("is-dragging");
       position.hidden = true;
       if (cancel || !moved) {
@@ -2499,6 +2499,9 @@
       }
       finishTimelineEdit(before, obj, type, "Timing changed");
     };
+    cancelGesture = () => finish(true);
+    handle.addEventListener("lostpointercapture", () => finish(true), opts);
+    window.addEventListener("resize", () => finish(true), opts);
     window.addEventListener(
       "pointermove",
       (ev) => {
@@ -2567,6 +2570,8 @@
     if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
+    if (action === "place-boundary") return openBoundaryPlacement(b.dataset.kind, b.dataset.id, b.dataset.edge);
+    if (action === "start-track") return openBoundaryPlacement("presence", null, "resume", b.dataset.trackId);
     if (action === "history-back") {
       if (history.state?.fromRoute) {
         history.back();
@@ -2673,25 +2678,6 @@
       ui.selectedEventId = null;
       return renderSectionStudy();
     }
-    if (action === "add-another-presence") {
-      const r = createAdditionalPresence(p, b.dataset.trackId, ui.sectionIndex);
-      if (r) {
-        mergePresenceForTrack(p, r.trackId, false);
-        invalidateMapVerification(p);
-        invalidateDraftTrack(p, r.trackId, sectionIdsForRange(p, r));
-        normalizeAllFocus(p);
-        save();
-        ui.expandedTrackId = r.trackId;
-        ui.selectedPresenceId = visiblePresence(
-          p,
-          r.trackId,
-          ui.sectionIndex,
-        )[0]?.range.id;
-        ui.selectedEventId = null;
-        return renderSectionStudy();
-      }
-      return;
-    }
     if (action === "open-add-change")
       return openAddChangeSheet(
         b.dataset.targetType,
@@ -2774,18 +2760,15 @@
       save();
       return renderSkeletonSession();
     }
-    if (action === "open-draft-section") {
-      ui.sectionIndex = Number(b.dataset.index);
-      return go("draft-section");
-    }
     if (action === "toggle-draft-part") {
-      const s = sections(p)[ui.sectionIndex],
+      const s = sections(p).find((sec) => sec.id === b.dataset.sectionId),
         id = b.dataset.trackId;
+      if (!s || !sessionDone(p)) return;
       p.skeleton.draft.parts[s.id] = p.skeleton.draft.parts[s.id] || {};
       p.skeleton.draft.parts[s.id][id] = !p.skeleton.draft.parts[s.id][id];
       invalidateBounce(p);
       save();
-      return renderDraftSection();
+      return refreshDraftChecks();
     }
     if (action === "toggle-bounce-export") {
       p.skeleton.bounce.exported = !p.skeleton.bounce.exported;
@@ -2852,6 +2835,14 @@
     }
   });
   app.addEventListener("keydown", (e) => {
+    const handle = e.target.closest("[data-presence-handle], [data-event-handle], [data-event-marker]");
+    if (handle && ["Enter", " ", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      e.preventDefault();
+      const type = handle.hasAttribute("data-presence-handle") ? "presence" : "event";
+      const id = handle.dataset.rangeId || handle.dataset.eventId;
+      return openBoundaryPlacement(type, id, handle.dataset.edge || "point");
+    }
+
     if (
       (e.key === "Enter" || e.key === " ") &&
       e.target.matches(".structure-row, [data-drag-handle]")
@@ -2873,6 +2864,7 @@
     const action = b.dataset.action,
       p = project();
     if (action === "close-sheet") return closeSheet();
+    if (action === "commit-placement") return commitPlacement();
     if (action === "move-section") {
       moveSection(
         p,
@@ -3123,6 +3115,7 @@
         type === "presence"
           ? before.map.timeline.presence.find((x) => x.id === obj.id)
           : before.map.timeline.events.find((x) => x.id === obj.id);
+    if (JSON.stringify(old) === JSON.stringify(obj)) return renderSectionStudy();
     if (type === "presence") {
       const ids = [
         ...sectionIdsForRange(before, old),
@@ -3240,38 +3233,6 @@
     }
     return true;
   }
-  function nudgeTiming(type, id, edge, delta) {
-    const obj = selectedObject(type, id);
-    if (!obj) return;
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      len = Number(s.lengthBars),
-      before = copyProject();
-    const anchor = obj[edge],
-      same = anchor?.sectionId === s.id;
-    let value = same
-      ? anchorValueInSection(s, anchor)
-      : edge === "end"
-        ? len
-        : 0;
-    // The first edit of a continuing edge establishes a local boundary; subsequent
-    // taps move it by one whole bar, just like the drag handle.
-    if (same) value += delta;
-    if (applyTiming(obj, type, edge, value))
-      finishTimelineEdit(before, obj, type, "Timing changed");
-  }
-  function splitEditor(r) {
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      a = rangeAbs(p, r),
-      start = sectionStarts(p)[ui.sectionIndex],
-      lo = Math.max(0, a.start - start),
-      hi = Math.min(Number(s.lengthBars), a.end - start);
-    if (hi - lo < 3)
-      return '<p class="micro">Trim an edge to make room for a gap.</p>';
-    const middle = Math.floor((lo + hi) / 2);
-    return `<div class="gap-editor"><label>From bar<input id="gapStart" type="number" min="${lo + 2}" max="${hi - 1}" value="${middle + 1}"></label><label>Through bar<input id="gapEnd" type="number" min="${lo + 2}" max="${hi - 1}" value="${middle + 1}"></label><button class="mini-btn" data-action="apply-split" data-id="${r.id}">Add gap</button><button class="mini-btn" data-action="cancel-split">Cancel</button></div>`;
-  }
   app.addEventListener("click", (e) => {
     const b = e.target.closest("[data-action]");
     if (!b || b.disabled || ui.animating) return;
@@ -3281,24 +3242,15 @@
       ui.expandedTrackId = b.dataset.trackId;
       ui.selectedPresenceId = b.dataset.rangeId;
       ui.selectedEventId = null;
-      ui.splitRangeId = null;
-      return renderSectionStudy();
+        return renderSectionStudy();
     }
     if (action === "select-event") {
       const ev = p.map.timeline.events.find((x) => x.id === b.dataset.eventId);
       if (!ev) return;
       ui.selectedEventId = ev.id;
       ui.selectedPresenceId = null;
-      ui.splitRangeId = null;
-      return renderSectionStudy();
+        return renderSectionStudy();
     }
-    if (action === "nudge-timing")
-      return nudgeTiming(
-        b.dataset.kind,
-        b.dataset.id,
-        b.dataset.edge,
-        Number(b.dataset.delta),
-      );
     if (action === "continue-range") {
       const type = b.dataset.kind,
         obj = selectedObject(type, b.dataset.id);
@@ -3337,48 +3289,10 @@
       );
       return renderSectionStudy();
     }
-    if (action === "split-presence") {
-      ui.splitRangeId = b.dataset.id;
-      return renderSectionStudy();
-    }
-    if (action === "cancel-split") {
-      ui.splitRangeId = null;
-      return renderSectionStudy();
-    }
-    if (action === "apply-split") {
-      const r = selectedObject("presence", b.dataset.id);
-      if (!r) return;
-      const s = sections(p)[ui.sectionIndex],
-        base = sectionStarts(p)[ui.sectionIndex],
-        a = Number(document.getElementById("gapStart").value) - 1,
-        z = Number(document.getElementById("gapEnd").value),
-        span = rangeAbs(p, r);
-      if (
-        !Number.isInteger(a) ||
-        !Number.isInteger(z) ||
-        a < 0 ||
-        z > Number(s.lengthBars) ||
-        z <= a ||
-        base + a <= span.start ||
-        base + z >= span.end
-      )
-        return;
-      const before = copyProject(),
-        right = {
-          ...r,
-          id: uid(),
-          start: { sectionId: s.id, bar: z },
-          end: r.end,
-        };
-      r.end = { sectionId: s.id, bar: a };
-      p.map.timeline.presence.push(right);
-      ui.splitRangeId = null;
-      // Invalidate the original span, including the new right-hand piece.
-      finishTimelineEdit(before, r, "presence", "Gap added");
-      return;
-    }
+
   });
   sheetRoot.addEventListener("input", (e) => {
+    if (e.target.id === "placementPosition" && placement) { placement.value = Number(e.target.value); updatePlacementLabel(); return; }
     if (!sectionDraft) return;
     if (e.target.id === "newSectionName")
       sectionDraft.typedName = e.target.value;
