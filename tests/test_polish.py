@@ -26,10 +26,10 @@ class PolishBrowser(unittest.TestCase):
         self.context = self.browser.new_context(viewport={'width': width, 'height': 1000})
         self.addCleanup(self.context.close)
         data = data if data is not None else fixture()
-        self.context.add_init_script('''
-          localStorage.setItem(%s,%s);
+        self.context.add_init_script('''if(!sessionStorage.getItem('polish-seeded')){
+          localStorage.setItem(%s,%s);sessionStorage.setItem('polish-seeded','1');
           history.replaceState({route:%s,projectId:'p1',fromRoute:'tracks',fromLabel:'Tracks',sectionIndex:%s},'');
-        ''' % (json.dumps(KEY), json.dumps(json.dumps(data)), json.dumps(route), section_index))
+        }''' % (json.dumps(KEY), json.dumps(json.dumps(data)), json.dumps(route), section_index))
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
         errors = []
