@@ -4,6 +4,8 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- Coherent shared shapes, spacing and interaction tokens; rapid repeated section entry and direct timeline Start/Stop/Resume, with secondary accessible precision controls.
+
 - Shared stable controls and sheets, intentional text focus, tonal selection, and reduced-motion support.
 - Current canonical prerequisites govern completion, progress, route entry, and restored browser history.
 - Back follows eligible history; parent pills open the phase/project parent; Roadmap remains explicit.
