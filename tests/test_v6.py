@@ -613,7 +613,8 @@ class V6Browser(unittest.TestCase):
                 self.assertLess(abs((box['x'] + box['width']) - (card['x'] + card['width'])), 1.1)
                 self.assertLess(abs((heading['x'] + heading['width']) - (card['x'] + card['width'])), 1.1)
                 if width >= 1180:
-                    self.assertLessEqual(self.page.locator('#app').bounding_box()['width'], 880)
+                    self.assertLessEqual(heading['width'], 760.1)
+                    self.assertLessEqual(card['width'], 760.1)
                 self.context.close()
 
         self.open('projects', width=390)
