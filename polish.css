@@ -1,0 +1,351 @@
+/* FIRE V6 polish layer: calm, cohesive, direct. */
+
+/* Projects — minimal, but composed instead of floating in empty space. */
+#app[data-route="projects"] {
+  --canvas-width: 1040px;
+}
+#app[data-route="projects"] .topbar {
+  margin-bottom: 18px;
+}
+#app[data-route="projects"] h1 {
+  margin-top: 2px;
+}
+#app[data-route="projects"] .projects-grid {
+  grid-template-columns: 1fr;
+  gap: 14px;
+  max-width: 820px;
+}
+#app[data-route="projects"] .project-card {
+  border-color: rgba(255,255,255,.075);
+  background: rgba(17,19,24,.92);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.018);
+}
+#app[data-route="projects"] .project-open {
+  padding: 18px 54px 18px 20px;
+}
+#app[data-route="projects"] .project-open .foot {
+  margin-top: 12px;
+}
+#app[data-route="projects"] .top-icon-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--accent-text);
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+  font-size: 22px;
+  line-height: 1;
+}
+@media (hover:hover) and (pointer:fine) {
+  #app[data-route="projects"] .top-icon-btn:hover {
+    background: rgba(255,255,255,.07);
+    filter: none;
+  }
+}
+
+/* Structure — selected bar length is neutral, not tinted or focus-looking. */
+.length-segmented .choice,
+.sheet .length-segmented .choice {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.length-segmented .choice.selected,
+.sheet .length-segmented .choice.selected {
+  background: var(--state-selected);
+  border-color: transparent !important;
+  color: var(--text);
+  box-shadow: none;
+}
+.length-segmented .choice:focus:not(:focus-visible),
+.sheet .length-segmented .choice:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none;
+}
+
+/* Structure deletion — tiny visual icon, full touch target. */
+.delete-section {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #777b83;
+  background: transparent;
+}
+.delete-section svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.35;
+  opacity: .88;
+}
+@media (hover:hover) and (pointer:fine) {
+  .delete-section:hover {
+    color: var(--danger);
+    background: rgba(255,143,154,.07);
+    filter: none;
+  }
+}
+
+/* Arrangement — quieter blocks, cleaner real caps, room for ghost next bar. */
+.timeline-card {
+  border-color: rgba(255,255,255,.07);
+  background: #101216;
+}
+.timeline-lane,
+.timeline-ruler {
+  margin-right: 52px;
+}
+.timeline-lane {
+  overflow: visible;
+}
+.presence-segment {
+  top: 19px;
+  height: 20px;
+  background: #c8cbd1;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.presence-segment.selected {
+  background: #e2e4e8;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.presence-segment.real-start::before,
+.presence-segment.real-stop::after {
+  width: 1.5px;
+  top: -2px;
+  bottom: -2px;
+  opacity: .9;
+}
+.presence-segment.continue-out {
+  right: -28px !important;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  background: linear-gradient(90deg,#c8cbd1 0%,#c8cbd1 72%,rgba(200,203,209,.35) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.presence-segment.selected.continue-out {
+  background: linear-gradient(90deg,#e2e4e8 0%,#e2e4e8 72%,rgba(226,228,232,.38) 100%);
+}
+.presence-handle::after,
+.event-handle::after {
+  width: 3px;
+  height: 18px;
+  background: #d9dce2;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+.presence-handle.open-continuation::after,
+.event-handle.open-continuation::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(226,228,232,.72);
+  box-shadow: 0 0 0 4px rgba(226,228,232,.07);
+}
+.timeline-continuation-marker {
+  position: absolute;
+  left: calc(100% + 23px);
+  top: 50%;
+  transform: translate(-50%,-50%);
+  color: #5f646d;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  user-select: none;
+  opacity: .78;
+}
+.timeline-ruler .timeline-continuation-marker {
+  top: 14px;
+  color: #696e77;
+}
+.timeline-row.expanded .track-detail {
+  min-height: 44px;
+  padding-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.track-detail .mini-btn.remove,
+.selection-actions .mini-btn.remove {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  color: #8b8f97;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.06);
+}
+.track-detail .mini-btn.remove svg,
+.selection-actions .mini-btn.remove svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@media (hover:hover) and (pointer:fine) {
+  .track-detail .mini-btn.remove:hover,
+  .selection-actions .mini-btn.remove:hover {
+    color: var(--danger);
+    background: rgba(255,143,154,.07);
+    border-color: rgba(255,143,154,.12);
+    filter: none;
+  }
+}
+
+/* Mix + Notes — same restrained hover language as every other utility. */
+.mix-toggle,
+.note-disclosure > summary {
+  background: transparent;
+  box-shadow: none;
+}
+@media (hover:hover) and (pointer:fine) {
+  .mix-toggle:hover,
+  .note-disclosure > summary:hover {
+    background: rgba(255,255,255,.035) !important;
+    filter: none !important;
+  }
+}
+
+/* Feel / Focus — one selection language, no checkmark treatment. */
+.study-observations .choice-wrap {
+  gap: 7px;
+}
+.study-observations .choice {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+}
+.study-observations .choice::before,
+.study-observations .choice::after {
+  content: none !important;
+}
+.study-observations .choice.selected {
+  color: var(--text);
+  background: var(--state-selected);
+  border-color: rgba(255,255,255,.11);
+  box-shadow: none;
+}
+.study-observations .choice.quiet {
+  width: auto;
+}
+
+/* Review Map — top chips are direct navigation, detail cards avoid repetition. */
+#app[data-route="map-summary"] .chip-list {
+  gap: 8px;
+}
+#app[data-route="map-summary"] .summary-nav-chip {
+  min-height: 44px;
+  padding: 0 11px;
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--accent-text);
+  font-size: 12px;
+}
+@media (hover:hover) and (pointer:fine) {
+  #app[data-route="map-summary"] .summary-nav-chip:hover {
+    background: var(--state-hover);
+    filter: none;
+  }
+}
+#app[data-route="map-summary"] .review-sections .workflow-disclosure > .mini-btn[data-action="summary-jump"] {
+  display: none;
+}
+#app[data-route="map-summary"] .review-sections .summary-line:nth-child(1),
+#app[data-route="map-summary"] .review-sections .summary-line:nth-child(2) {
+  display: none;
+}
+#app[data-route="map-summary"] .review-sections {
+  align-items: start;
+}
+#app[data-route="map-summary"] .workflow-disclosure {
+  border-color: rgba(255,255,255,.07);
+}
+
+/* Draft — parent status is derived; children are the actionable checklist. */
+#app[data-route="skeleton-draft"] .draft-sections {
+  gap: 12px;
+}
+#app[data-route="skeleton-draft"] [data-draft-section] > summary {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+#app[data-route="skeleton-draft"] .derived-status {
+  position: relative;
+  background: transparent;
+  border-color: rgba(255,255,255,.18);
+  box-shadow: inset 0 0 0 4px var(--surface);
+}
+#app[data-route="skeleton-draft"] .derived-status:not(.on) {
+  background: conic-gradient(var(--accent) var(--draft-progress,0%),rgba(255,255,255,.08) 0);
+}
+#app[data-route="skeleton-draft"] .derived-status:not(.on)::after {
+  content: "";
+}
+#app[data-route="skeleton-draft"] .draft-progress {
+  display: block;
+  height: 3px;
+  width: min(180px,100%);
+  margin-top: 7px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.07);
+  overflow: hidden;
+}
+#app[data-route="skeleton-draft"] .draft-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+#app[data-route="skeleton-draft"] .draft-child-label {
+  margin: 6px 12px 2px 43px;
+  color: var(--quiet);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+#app[data-route="skeleton-draft"] .draft-checks {
+  position: relative;
+  padding-bottom: 4px;
+}
+#app[data-route="skeleton-draft"] .draft-checks .list-row {
+  padding-left: 42px;
+}
+#app[data-route="skeleton-draft"] .draft-checks .list-row::before {
+  content: "";
+  position: absolute;
+  left: 27px;
+  width: 8px;
+  height: 1px;
+  background: rgba(255,255,255,.09);
+}
+
+/* Extra desktop width should compose the workspace, never scatter it. */
+@media (min-width:1100px) {
+  #app[data-route="skeleton-draft"] .draft-sections,
+  #app[data-route="map-summary"] .review-sections {
+    column-gap: 18px;
+    row-gap: 12px;
+  }
+}
+@media (max-width:700px) {
+  .timeline-lane,
+  .timeline-ruler {
+    margin-right: 42px;
+  }
+  .timeline-continuation-marker {
+    left: calc(100% + 18px);
+  }
+}

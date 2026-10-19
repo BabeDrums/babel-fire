@@ -5,7 +5,7 @@ Meaningful product milestones only; Git history records detailed technical chang
 ## V6
 
 - Coherent shared shapes and states, rapid repeated section entry, separate row delete/Undo, and direct musical blocks with drag, tap-boundary/tap-destination and keyboard edits. Aligned changes and horizontal dense-section navigation replace separate timing editors.
-
+- Apple-minimal polish tightens Projects composition, neutralizes selection color drift, softens section deletion, simplifies Focus states, cleans Review Map navigation, clarifies derived Draft completion, and adds a ghost next-bar continuation affordance for open Arrangement regions.
 - Shared stable controls and sheets, intentional text focus, tonal selection, and reduced-motion support.
 - Current canonical prerequisites govern completion, progress, route entry, and restored browser history.
 - Back follows eligible history; parent pills open the phase/project parent; Roadmap remains explicit.
