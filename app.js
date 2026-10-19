@@ -1376,12 +1376,8 @@
   }
   function renderProjects() {
     app.innerHTML =
-      topbar(
-        "",
-        phaseTag("FIRE"),
-        `<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`,
-      ) +
-      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div><div class="projects-grid">${
+      topbar("", phaseTag("FIRE"), "") +
+      `<header class="projects-heading"><div><h1>Projects</h1><p class="sub">Original songs and recreations.</p></div><button class="top-icon-btn" data-action="new-project" aria-label="New project"><span aria-hidden="true">+</span></button></header><div class="projects-grid">${
         db.projects.length
           ? db.projects
               .map((p) => {
@@ -1433,7 +1429,7 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), phaseTag("New Project"), "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" aria-label="Project title" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" aria-label="Project title" enterkeyhint="${ui.newType === "study" ? "next" : "done"}" autocomplete="off" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
   }
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
@@ -2618,7 +2614,9 @@
       ui.newType = b.dataset.type;
       app.querySelectorAll('[data-action="set-new-type"]').forEach((el) => setSelected(el, el.dataset.type === ui.newType));
       document.getElementById("newArtist").hidden = ui.newType !== "study";
-      document.getElementById("newTitle").placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      const titleInput = document.getElementById("newTitle");
+      titleInput.placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      titleInput.setAttribute("enterkeyhint", ui.newType === "study" ? "next" : "done");
       return;
     }
     if (action === "create-project") {
@@ -2874,7 +2872,19 @@
       e.preventDefault();
       return openSectionSheet(e.target.closest("[data-section-id]").dataset.sectionId);
     }
-    if (e.key !== "Enter" || e.shiftKey) return;
+    if (e.key !== "Enter" || e.shiftKey || e.isComposing) return;
+    if (e.target.id === "newTitle") {
+      e.preventDefault();
+      const artist = document.getElementById("newArtist");
+      if (ui.newType === "study" && artist && !artist.hidden) artist.focus();
+      else app.querySelector('[data-action="create-project"]')?.click();
+      return;
+    }
+    if (e.target.id === "newArtist") {
+      e.preventDefault();
+      app.querySelector('[data-action="create-project"]')?.click();
+      return;
+    }
     if (e.target.id === "customTrack") {
       e.preventDefault();
       document.querySelector('[data-action="add-custom-track"]')?.click();
