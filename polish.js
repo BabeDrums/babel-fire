@@ -8,18 +8,20 @@
 
   const trashSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 7.5h13M9.5 7.5V5.25h5v2.25M8 9.5l.7 9.25h6.6L16 9.5M10.5 10.5v5.75M13.5 10.5v5.75"/></svg>';
 
-  function currentSectionIndex() {
+  function sectionPosition() {
     const text = app.querySelector(".work-position")?.textContent || "";
-    const match = text.match(/Section Study\s*·\s*(\d+)\s+of/i);
-    return match ? Math.max(0, Number(match[1]) - 1) : Number(history.state?.sectionIndex || 0);
+    const match = text.match(/Section Study\s*·\s*(\d+)\s+of\s+(\d+)/i);
+    if (!match) return { index: Number(history.state?.sectionIndex || 0), total: 0 };
+    return { index: Math.max(0, Number(match[1]) - 1), total: Number(match[2]) };
   }
 
   function navigate(route, extra = {}) {
+    const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
     const state = {
       ...(history.state || {}),
       route,
       ...extra,
-      projectId: JSON.parse(localStorage.getItem(KEY) || "{}")?.currentProjectId || history.state?.projectId,
+      projectId: saved.currentProjectId || history.state?.projectId,
       fromRoute: app.dataset.route || history.state?.route || null,
       fromLabel: app.dataset.route === "map-summary" ? "Review Map" : history.state?.fromLabel || null,
     };
@@ -65,6 +67,13 @@
 
   function enhanceContinuationMarkers() {
     if (app.dataset.route !== "section-study") return;
+    const position = sectionPosition();
+    const shouldShow = position.total > 0 && position.index < position.total - 1;
+    if (!shouldShow) {
+      app.querySelectorAll(".timeline-continuation-marker").forEach((marker) => marker.remove());
+      return;
+    }
+
     const firstLane = app.querySelector(".timeline-lane");
     const bars = Number(firstLane ? getComputedStyle(firstLane).getPropertyValue("--bars") : 0) ||
       Number((app.querySelector(".study-pane > .sub")?.textContent || "").match(/\d+/)?.[0] || 0);
@@ -97,7 +106,7 @@
     structure?.querySelectorAll(":scope > .chip").forEach((chip, index) => {
       if (chip.tagName === "BUTTON") return;
       const button = document.createElement("button");
-      button.className = "summary-nav-chip";
+      button.className = "chip summary-nav-chip";
       button.type = "button";
       button.textContent = chip.textContent;
       button.setAttribute("aria-label", `Open ${chip.textContent}`);
@@ -108,7 +117,7 @@
     tracks?.querySelectorAll(":scope > .chip").forEach((chip) => {
       if (chip.tagName === "BUTTON") return;
       const button = document.createElement("button");
-      button.className = "summary-nav-chip";
+      button.className = "chip summary-nav-chip";
       button.type = "button";
       button.textContent = chip.textContent;
       button.setAttribute("aria-label", `Open Tracks for ${chip.textContent}`);
@@ -126,31 +135,36 @@
       const status = summary?.querySelector(".round-check");
       const copy = summary?.querySelector(".copy");
       if (!summary || !status || !copy) return;
+
       status.classList.add("derived-status");
       status.setAttribute("aria-hidden", "true");
       const match = copy.textContent.match(/(\d+)\s+of\s+(\d+)\s+tracks/i);
-      if (match) {
-        const done = Number(match[1]), total = Math.max(1, Number(match[2]));
-        status.style.setProperty("--draft-progress", `${Math.round(done / total * 100)}%`);
-        const holder = copy.parentElement;
-        if (holder && !holder.querySelector(".draft-progress")) {
-          const bar = document.createElement("span");
-          bar.className = "draft-progress";
-          bar.setAttribute("aria-hidden", "true");
-          bar.innerHTML = `<span style="width:${Math.round(done / total * 100)}%"></span>`;
-          holder.appendChild(bar);
-        } else {
-          holder?.querySelector(".draft-progress > span")?.setAttribute("style", `width:${Math.round(done / total * 100)}%`);
-        }
-        const checks = details.querySelector(".draft-checks");
-        if (checks && !checks.querySelector(".draft-child-label")) {
-          const label = document.createElement("div");
-          label.className = "draft-child-label";
-          label.textContent = done === total ? "Tracks complete" : "Complete tracks below";
-          checks.prepend(label);
-        } else if (checks?.querySelector(".draft-child-label")) {
-          checks.querySelector(".draft-child-label").textContent = done === total ? "Tracks complete" : "Complete tracks below";
-        }
+      if (!match) return;
+
+      const done = Number(match[1]);
+      const total = Math.max(1, Number(match[2]));
+      const percent = Math.round((done / total) * 100);
+      status.style.setProperty("--draft-progress", `${percent}%`);
+
+      const holder = copy.parentElement;
+      if (holder && !holder.querySelector(".draft-progress")) {
+        const bar = document.createElement("span");
+        bar.className = "draft-progress";
+        bar.setAttribute("aria-hidden", "true");
+        bar.innerHTML = `<span style="width:${percent}%"></span>`;
+        holder.appendChild(bar);
+      } else {
+        holder?.querySelector(".draft-progress > span")?.setAttribute("style", `width:${percent}%`);
+      }
+
+      const checks = details.querySelector(".draft-checks");
+      if (checks && !checks.querySelector(".draft-child-label")) {
+        const label = document.createElement("div");
+        label.className = "draft-child-label";
+        label.textContent = done === total ? "Tracks complete" : "Complete tracks below";
+        checks.prepend(label);
+      } else if (checks?.querySelector(".draft-child-label")) {
+        checks.querySelector(".draft-child-label").textContent = done === total ? "Tracks complete" : "Complete tracks below";
       }
     });
   }
@@ -202,6 +216,8 @@
     if (!handle || app.dataset.route !== "section-study") return;
     const lane = handle.closest(".timeline-lane");
     if (!lane) return;
+    const position = sectionPosition();
+    if (!position.total || position.index >= position.total - 1) return;
     drag = {
       pointerId: event.pointerId,
       rangeId: handle.dataset.rangeId,
@@ -211,6 +227,7 @@
       crossed: false,
       before: localStorage.getItem(KEY),
       lane,
+      sectionIndex: position.index,
     };
   }, true);
 
@@ -228,12 +245,14 @@
     state.lane?.classList.remove("continuation-armed");
     drag = null;
     if (cancelled || !state.crossed || !state.before) return;
+
     setTimeout(() => {
       try {
         const db = JSON.parse(localStorage.getItem(KEY) || "null");
         const project = db?.projects?.find((item) => item.id === db.currentProjectId);
         const range = project?.map?.timeline?.presence?.find((item) => item.id === state.rangeId);
         if (!range || range.end == null) return;
+
         sessionStorage.setItem("fire-polish-undo", state.before);
         range.end = null;
         if (project.map) {
@@ -250,7 +269,7 @@
           project.skeleton.bounce.listened = false;
         }
         localStorage.setItem(KEY, JSON.stringify(db));
-        history.replaceState({ ...(history.state || {}), sectionIndex: currentSectionIndex() }, "", location.pathname + location.search);
+        history.replaceState({ ...(history.state || {}), sectionIndex: state.sectionIndex }, "", location.pathname + location.search);
         location.reload();
       } catch (_) {}
     }, 0);
