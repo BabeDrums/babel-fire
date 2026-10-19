@@ -1486,12 +1486,12 @@
       done = structureDone(p);
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Structure</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
+      `<div class="work-position">1 of 3</div><h2>Structure</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
         sections(p).length
           ? sections(p)
               .map(
                 (s, i) =>
-                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><div class="drag-handle" data-drag-handle aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
+                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><div class="drag-handle" data-drag-handle role="button" tabindex="0" aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
@@ -1505,7 +1505,7 @@
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+      `<div class="work-position">2 of 3</div><h2>Tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
   }
 
   function rulerHtml(bars) {
@@ -1623,7 +1623,7 @@
       presentIds = trackIdsInSection(p, index),
       focusOptions = presentIds.map((id) => trackById(p, id)).filter(Boolean),
       done = sectionComplete(p, index);
-    return `<div class="study-pane"><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong></div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
+    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong></div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
       p,
     )
       .map((t) => timelineTrackRow(p, t, index))
@@ -1635,11 +1635,11 @@
       .map((k) => renderScale(k, d))
       .join(
         "",
-      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details><div class="action-row"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
+      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}" aria-pressed="${d.focusIds.includes(t.id)}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none" aria-pressed="${d.focusState === "none"}">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details><div class="action-row"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
   }
   function renderScale(key, d) {
     const value = d.feel?.[key];
-    return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map((opt) => `<button class="segment ${value === opt ? "selected" : ""}" data-action="set-feel" data-scale="${key}" data-value="${opt}">${opt}</button>`).join("")}</div></div>`;
+    return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map((opt) => `<button class="segment ${value === opt ? "selected" : ""}" data-action="set-feel" data-scale="${key}" data-value="${opt}" aria-pressed="${value === opt}">${opt}</button>`).join("")}</div></div>`;
   }
   function renderSectionStudy() {
     const p = project();
@@ -1655,7 +1655,7 @@
       topbar(
         historyBackButton("map", "The Map"),
         phasePill(0),
-        `<span class="micro">${ui.sectionIndex + 1} of ${sections(p).length}</span>`,
+        savedMark(),
       ) +
       `<div class="horizontal-nav">${sections(p)
         .map((s, i) => {
@@ -1818,7 +1818,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
+      `<div class="work-position">1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
         p,
       )
         .map(
@@ -1847,7 +1847,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
+      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
         p,
       )
         .map((s, i) => {
@@ -1898,7 +1898,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
+      `<div class="work-position">3 of 3</div><h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
   }
 
   function renderRoadmap() {
@@ -1979,16 +1979,43 @@
       customName: false,
       customBars: false,
     };
+    sheetRoot.replaceChildren();
     renderSectionBuilder();
     openSheet();
   }
   let sectionDraft = null;
   function lengthChoices(value, action) {
-    return `<div class="choice-wrap">${[4, 8, 12, 16].map((n) => `<button class="choice ${Number(value) === n ? "selected" : ""}" data-action="${action}" data-bars="${n}" aria-pressed="${Number(value) === n}">${n}</button>`).join("")}<button class="choice ${value === "custom" ? "selected" : ""}" data-action="${action}" data-bars="custom">Custom</button></div>`;
+    return `<div class="length-segmented" role="group" aria-label="Bar length">${[4, 8, 12, 16].map((n) => `<button class="choice ${Number(value) === n ? "selected" : ""}" data-action="${action}" data-bars="${n}" aria-pressed="${Number(value) === n}">${n}</button>`).join("")}<button class="choice ${value === "custom" ? "selected" : ""}" data-action="${action}" data-bars="custom">Custom</button></div>`;
   }
   function renderSectionBuilder() {
     const d = sectionDraft;
-    sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add section</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice ${d.name === name ? "selected" : ""}" data-action="choose-section-type" data-name="${name}" aria-pressed="${d.name === name}">${name}</button>`).join("")}</div>${d.customName ? `<div class="spacer-12"></div><input class="field" id="newSectionName" aria-label="Section name" placeholder="Section name" value="${esc(d.typedName || "")}">` : ""}<div class="section-kicker">Bars</div>${lengthChoices(d.customBars ? "custom" : d.bars, "set-new-section-bars")}${d.customBars ? `<div class="spacer-12"></div><input class="field" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars" value="${d.bars || ""}">` : ""}<div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section" ${!d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName)) ? "disabled" : ""}>Add Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    // Build once per opening. Selection only updates properties on existing nodes.
+    if (!sheetRoot.querySelector(".section-builder")) {
+      sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add section</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice" data-action="choose-section-type" data-name="${name}">${name}</button>`).join("")}</div><input hidden class="field custom-length" id="newSectionName" aria-label="Section name" placeholder="Section name"><div class="section-kicker">Bars</div>${lengthChoices(null, "set-new-section-bars")}<input hidden class="field custom-length" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars"><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section">Add Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    }
+    sheetRoot.querySelectorAll('[data-action="choose-section-type"]').forEach((el) => setSelected(el, el.dataset.name === d.name));
+    sheetRoot.querySelectorAll('[data-action="set-new-section-bars"]').forEach((el) => setSelected(el, d.customBars ? el.dataset.bars === "custom" : Number(el.dataset.bars) === d.bars));
+    const name = document.getElementById("newSectionName"), bars = document.getElementById("newSectionBars");
+    name.hidden = !d.customName;
+    bars.hidden = !d.customBars;
+    if (document.activeElement !== bars) bars.value = d.bars || "";
+    sheetRoot.querySelector('[data-action="save-new-section"]').disabled = !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
+  }
+  function setSelected(el, selected) {
+    el.classList.toggle("selected", selected);
+    el.setAttribute("aria-pressed", String(selected));
+  }
+  function refreshStudySelections() {
+    const p = project(), d = sectionData(p, sections(p)[ui.sectionIndex].id);
+    app.querySelectorAll('[data-action="set-feel"]').forEach((el) => setSelected(el, d.feel[el.dataset.scale] === el.dataset.value));
+    app.querySelectorAll('[data-action="toggle-focus"]').forEach((el) => setSelected(el, d.focusIds.includes(el.dataset.trackId)));
+    app.querySelectorAll('[data-action="focus-none"]').forEach((el) => setSelected(el, d.focusState === "none"));
+    const next = app.querySelector('[data-action="next-section"]');
+    if (next) next.disabled = !sectionComplete(p, ui.sectionIndex);
+    app.querySelectorAll(".section-tab").forEach((el, i) => {
+      el.classList.toggle("done", sectionComplete(p, i));
+      el.disabled = sections(p).slice(0, i).some((_, j) => !sectionComplete(p, j));
+    });
   }
   function suggestedBarsFor(p, name) {
     const found = [...sections(p)]
@@ -2073,11 +2100,13 @@
     sheetClearTimer = null;
     sheetRoot.classList.add("open");
     sheetRoot.setAttribute("aria-hidden", "false");
-    sheetRoot
-      .querySelector("button:not(:disabled),input")
-      ?.focus({ preventScroll: true });
+    app.inert = true;
+    document.getElementById("undoNotice").inert = true;
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
   }
   function closeSheet() {
+    app.inert = false;
+    document.getElementById("undoNotice").inert = false;
     document.body.classList.remove("sheet-open");
     sheetRoot.classList.remove("open");
     if (sheetOpener?.isConnected) sheetOpener.focus({ preventScroll: true });
@@ -2593,7 +2622,10 @@
         t = tracks(p).find((x) => x.name === name);
       if (t) removeTrack(p, t.id);
       else addTrack(name);
-      return renderTracks();
+      const names = new Set(tracks(p).map((t) => t.name));
+      app.querySelectorAll('[data-action="toggle-track-choice"]').forEach((el) => setSelected(el, names.has(el.dataset.name)));
+      app.querySelector('[data-action="start-section-study"]').disabled = !tracksDone(p);
+      return;
     }
     if (action === "add-custom-track") {
       const input = document.getElementById("customTrack"),
@@ -2689,7 +2721,7 @@
       d.feel[b.dataset.scale] = b.dataset.value;
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "toggle-focus") {
       const d = sectionData(p, sections(p)[ui.sectionIndex].id),
@@ -2700,7 +2732,7 @@
       d.focusState = d.focusIds.length ? "selected" : "";
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "focus-none") {
       const d = sectionData(p, sections(p)[ui.sectionIndex].id);
@@ -2708,7 +2740,7 @@
       d.focusState = d.focusState === "none" ? "" : "none";
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "summary-jump") {
       ui.sectionIndex = Number(b.dataset.index);
@@ -2822,10 +2854,10 @@
   app.addEventListener("keydown", (e) => {
     if (
       (e.key === "Enter" || e.key === " ") &&
-      e.target.matches(".structure-row")
+      e.target.matches(".structure-row, [data-drag-handle]")
     ) {
       e.preventDefault();
-      return openSectionSheet(e.target.dataset.sectionId);
+      return openSectionSheet(e.target.closest("[data-section-id]").dataset.sectionId);
     }
     if (e.key !== "Enter" || e.shiftKey) return;
     if (e.target.id === "customTrack") {
@@ -2881,11 +2913,10 @@
     if (action === "set-sheet-bars") {
       const input = document.getElementById("sectionBars");
       input.hidden = b.dataset.bars !== "custom";
-      if (!input.hidden) input.focus();
-      else input.value = b.dataset.bars;
+      if (input.hidden) input.value = b.dataset.bars;
       sheetRoot
         .querySelectorAll('[data-action="set-sheet-bars"]')
-        .forEach((x) => x.classList.toggle("selected", x === b));
+        .forEach((x) => setSelected(x, x === b));
       return;
     }
     if (action === "save-section") {
@@ -3377,7 +3408,7 @@
     if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
       last?.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
+    } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === sheetRoot.querySelector("h3"))) {
       e.preventDefault();
       first?.focus();
     }
