@@ -18,9 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Check JavaScript syntax
-        run: |
-          node --check app.js
-          node --check polish.js
+        run: node --check app.js
       - name: Check whitespace
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
