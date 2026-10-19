@@ -1347,9 +1347,6 @@ details.note-disclosure summary::-webkit-details-marker {
   height: 16px;
   top: 15px;
 }
-.tone-other, .tone-cue {
-  background: var(--change-other) !important;
-}
 .track-detail {
   width: 100cqw;
   position: sticky;
@@ -1433,6 +1430,13 @@ details.note-disclosure summary::-webkit-details-marker {
   position: sticky;
   left: 0;
   width: 100cqw;
+}
+.change-swatch {
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 .change-groups {
   display: grid;
