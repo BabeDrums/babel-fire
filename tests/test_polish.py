@@ -21,15 +21,15 @@ class PolishBrowser(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def open(self, route='section-study', width=None, data=None):
+    def open(self, route='section-study', width=None, data=None, section_index=0):
         width = width or int(os.environ.get('FIRE_TEST_WIDTH', '390'))
         self.context = self.browser.new_context(viewport={'width': width, 'height': 1000})
         self.addCleanup(self.context.close)
         data = data if data is not None else fixture()
         self.context.add_init_script('''
           localStorage.setItem(%s,%s);
-          history.replaceState({route:%s,projectId:'p1',fromRoute:'tracks',fromLabel:'Tracks',sectionIndex:0},'');
-        ''' % (json.dumps(KEY), json.dumps(json.dumps(data)), json.dumps(route)))
+          history.replaceState({route:%s,projectId:'p1',fromRoute:'tracks',fromLabel:'Tracks',sectionIndex:%s},'');
+        ''' % (json.dumps(KEY), json.dumps(json.dumps(data)), json.dumps(route), section_index))
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
         errors = []
@@ -54,21 +54,21 @@ class PolishBrowser(unittest.TestCase):
 
     def test_review_map_chips_are_navigation(self):
         page = self.open('map-summary')
-        structure = page.locator('.summary-nav-chip').first
+        structure = page.locator('.chip.summary-nav-chip').first
         self.assertIn('Intro', structure.inner_text())
         structure.click()
-        page.wait_for_selector('[data-route="section-study"], .study-pane')
+        page.wait_for_selector('.study-pane')
         self.assertEqual(page.locator('.work-position').inner_text().split('·')[0].strip(), 'Section Study')
 
     def test_draft_parent_uses_derived_progress(self):
-        data = fixture()
-        project = data['projects'][0]
-        project['skeleton']['draft']['parts']['s0']['t1'] = False
-        page = self.open('skeleton-draft', data=data)
-        parent = page.locator('[data-draft-section="s0"] summary .round-check')
+        page = self.open('skeleton-draft')
+        details = page.locator('[data-draft-section]').first
+        details.wait_for()
+        parent = details.locator('summary .round-check')
+        page.wait_for_function('(el)=>el.classList.contains("derived-status")', parent.element_handle())
         self.assertTrue(parent.evaluate('el=>el.classList.contains("derived-status")'))
-        self.assertEqual(page.locator('[data-draft-section="s0"] .draft-child-label').inner_text(), 'Complete tracks below')
-        self.assertEqual(page.locator('[data-draft-section="s0"] .draft-progress').count(), 1)
+        self.assertEqual(details.locator('.draft-child-label').inner_text(), 'Tracks complete')
+        self.assertEqual(details.locator('.draft-progress').count(), 1)
 
     def test_open_presence_has_ghost_continuation_marker(self):
         page = self.open('section-study')
@@ -77,6 +77,10 @@ class PolishBrowser(unittest.TestCase):
         self.assertEqual(segment.count(), 1)
         right = segment.evaluate('el=>getComputedStyle(el).right')
         self.assertTrue(right.startswith('-'))
+
+    def test_final_section_has_no_ghost_next_bar(self):
+        page = self.open('section-study', section_index=2)
+        self.assertEqual(page.locator('.timeline-continuation-marker').count(), 0)
 
 
 if __name__ == '__main__':
