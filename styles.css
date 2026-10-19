@@ -42,6 +42,7 @@
   --motion-section: 340ms;
   --state-hover: rgba(201, 205, 213, 0.065);
   --state-selected: rgba(201, 205, 213, 0.12);
+  --state-selected-border: rgba(201, 205, 213, 0.36);
   --state-pressed: rgba(201, 205, 213, 0.18);
   --focus-ring: #d2d7df;
   --disabled-opacity: 0.58;
@@ -506,8 +507,8 @@ p {
   color: var(--muted);
 }
 .state-control.on {
-  background: var(--accent-soft);
-  border-color: rgba(201, 205, 213, 0.28);
+  background: var(--state-selected);
+  border-color: var(--state-selected-border);
 }
 .state-control.on span:first-child {
   color: var(--accent-text);
@@ -582,7 +583,7 @@ p {
 }
 .choice.selected {
   background: var(--state-selected);
-  border-color: rgba(201, 205, 213, 0.36);
+  border-color: var(--state-selected-border);
   color: var(--accent-text);
 }
 .choice.quiet {
@@ -700,8 +701,8 @@ p {
   cursor: pointer;
 }
 .section-tab.current {
-  background: var(--accent-soft);
-  border-color: rgba(201, 205, 213, 0.32);
+  background: var(--state-selected);
+  border-color: var(--state-selected-border);
   color: var(--accent-text);
 }
 .section-tab.done:before {
@@ -846,7 +847,7 @@ p {
   font-weight: 600;
 }
 .segment.selected {
-  background: #353b46;
+  background: var(--state-selected);
   color: var(--text);
   font-weight: 600;
 }
@@ -1062,8 +1063,8 @@ details.note-disclosure summary::-webkit-details-marker {
   cursor: pointer;
 }
 .type-card.selected {
-  border-color: rgba(201, 205, 213, 0.44);
-  background: var(--accent-soft);
+  border-color: var(--state-selected-border);
+  background: var(--state-selected);
 }
 .type-card strong {
   display: block;
@@ -1177,6 +1178,7 @@ details.note-disclosure summary::-webkit-details-marker {
   padding: 0 12px 8px;
 }
 .timeline-scroll {
+  border-radius: var(--radius-control);
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
@@ -1695,10 +1697,7 @@ body.sheet-open .undo-notice {
 button:not(:disabled), [role="button"], summary, select {
   cursor: pointer;
 }
-input[type="range"] {
-  cursor: ew-resize;
-}
-summary:focus-visible, [role="button"]:focus-visible {
+summary:focus-visible, [role="button"]:focus-visible, .timeline-scroll:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -1708,7 +1707,7 @@ summary:focus-visible, [role="button"]:focus-visible {
 .list-row:focus-visible, .quick-card:focus-visible {
   outline-offset: -3px;
 }
-.setup-value:focus-within {
+.setup-value:has(:focus-visible) {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }

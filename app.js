@@ -1532,7 +1532,7 @@
       x = pieces[0].portion;
     const startBar = Math.floor((x.left / 100) * len) + 1,
       endBar = Math.round(((100 - x.right) / 100) * len);
-    if (pieces.length > 1) return `${pieces.length} ranges`;
+    if (pieces.length > 1) return "Stops and resumes";
     if (x.continuesIn && x.continuesOut) return "Continues through";
     if (x.left < 0.01 && x.right < 0.01) return "Full section";
     if (x.continuesIn) return `Continues · through bar ${endBar}`;
@@ -1566,6 +1566,7 @@
   }
   function trackDetailHtml(p, track, index) {
     const r = visiblePresence(p, track.id, index).find((x) => x.range.id === ui.selectedPresenceId)?.range;
+    if(!visiblePresence(p,track.id,index).length)return "";
     return `<div class="track-detail">${r && !ui.selectedEventId ? `<button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}" aria-label="Remove ${esc(track.name)} block">Remove</button>` : ""}${eventDetailRows(p, "track", track.id, index)}</div>`;
   }
   function alignedEventsHtml(p, targetType, targetId, index) {
@@ -1617,6 +1618,8 @@
     return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars};min-height:${64+eventHeight}px">${presenceLaneHtml(p, track, index, expanded)}</div>${expanded ? trackDetailHtml(p, track, index) : ""}</div>`;
   }
   function refreshArrangement() {
+    cancelGesture?.();
+    clearBoundarySelection();
     const p = project(), index = ui.sectionIndex, active = document.activeElement;
     const focusData = active?.dataset ? { ...active.dataset } : null;
     app.querySelectorAll("[data-track-row]").forEach((row) => {
@@ -1646,7 +1649,7 @@
   }
   function mixTimelineRow(p, index) {
     const events = visibleEvents(p, "mix", null, index), expanded = ui.expandedTrackId === "__mix__";
-    if (!events.length && !expanded) return "";
+    if (!events.length) return expanded ? `<div class="mix-utility">${eventDetailRows(p,"mix",null,index)}</div>` : "";
     return `<div class="mix-utility timeline-row" aria-label="Mix changes"><span class="timeline-label">Mix</span><div class="timeline-lane" style="min-height:${64+events.length*44}px;--bars:${sections(p)[index].lengthBars}">${alignedEventsHtml(p,"mix",null,index)}<span class="snap-guide" hidden></span></div>${expanded ? `<div class="track-detail">${eventDetailRows(p,"mix",null,index)}</div>` : ""}</div>`;
   }
   function sectionStudyPaneHtml(p, index) {
@@ -1675,6 +1678,8 @@
     return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map((opt) => `<button class="segment ${value === opt ? "selected" : ""}" data-action="set-feel" data-scale="${key}" data-value="${opt}" aria-pressed="${value === opt}">${opt}</button>`).join("")}</div></div>`;
   }
   function renderSectionStudy() {
+    cancelGesture?.();
+    clearBoundarySelection();
     const p = project();
     if (!structureDone(p) || !tracksDone(p)) {
       app.innerHTML =
@@ -1707,6 +1712,8 @@
     installTimelineInteractions();
   }
   function animateSectionTo(newIndex) {
+    cancelGesture?.();
+    clearBoundarySelection();
     ui.selectedEventId = null;
     ui.selectedPresenceId = null;
     const p = project();
@@ -2459,7 +2466,11 @@
   function installTimelineInteractions() {
     app.querySelectorAll('[data-presence-handle],[data-event-handle],[data-event-marker]').forEach(handle=>{
       handle.onpointerdown=e=>startBoundaryGesture(e,handle);
-      handle.onclick=e=>{ e.preventDefault();e.stopPropagation(); if(e.detail===0) selectBoundary(handle); };
+      handle.onclick=e=>{ e.preventDefault();e.stopPropagation(); if(e.detail===0) {
+        const ref=boundaryRef(handle);
+        if(ref.edge==='point'){const obj=selectedObject('event',ref.id);ui.selectedEventId=ref.id;ui.selectedPresenceId=null;ui.expandedTrackId=obj.targetType==='mix'?'__mix__':obj.targetId;refreshArrangement();handle=boundaryHandle(ref);}
+        selectBoundary(handle);
+      } };
       handle.onkeydown=e=>{
         if(e.key==='Escape'){e.preventDefault();cancelGesture?.();clearBoundarySelection();return;}
         if(!['ArrowLeft','ArrowRight'].includes(e.key)) return;
@@ -2570,8 +2581,9 @@
     window.addEventListener('pointercancel',ev=>finish(true,ev),opts);
     window.addEventListener('resize',()=>finish(true),opts);
     scroll.addEventListener('scroll',()=>finish(true),opts);
+    window.addEventListener('scroll',()=>finish(true),{...opts,capture:true});
     window.addEventListener('blur',()=>finish(true),opts);
-    const observer=new ResizeObserver(()=>{if(lane.getBoundingClientRect().width!==rect.width)finish(true);});observer.observe(lane);controller.signal.addEventListener('abort',()=>observer.disconnect(),{once:true});
+    const observer=new ResizeObserver(()=>{if(lane.getBoundingClientRect().width!==rect.width || lane.getBoundingClientRect().height!==rect.height)finish(true);});observer.observe(lane);controller.signal.addEventListener('abort',()=>observer.disconnect(),{once:true});
   }
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){cancelGesture?.();clearBoundarySelection();}});
   document.addEventListener('pointerdown',e=>{
