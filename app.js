@@ -641,10 +641,61 @@
     };
     return labels[route] || "Back";
   }
+  function canonicalState(p) {
+    if (!p || p.type !== "study") return null;
+    const setup = mapSetupComplete(p), structure = structureDone(p), palette = tracksDone(p),
+      study = sectionStudyDone(p), map = mapDone(p), session = sessionDone(p),
+      draft = draftDone(p), bounce = bounceDone(p);
+    return { setup, structure, palette, study, map, session, draft, bounce,
+      eligible: { map: true, structure: setup, tracks: structure,
+        "section-study": palette, "map-summary": palette && sectionStudyCoreDone(p),
+        skeleton: map, "skeleton-session": map, "skeleton-draft": session,
+        "draft-section": session, "skeleton-bounce": draft } };
+  }
+  function resolveRoute(route, p = project()) {
+    if (["projects", "new-project"].includes(route)) return route;
+    if (!p) return "projects";
+    if (["project", "roadmap", "notes"].includes(route)) return route;
+    if (p.type === "original") return route === "original-spark" ? route : "project";
+    const state = canonicalState(p);
+    if (state.eligible[route]) return route === "draft-section" ? "skeleton-draft" : route;
+    if (!(route in state.eligible)) return "roadmap";
+    if (!state.setup) return "map";
+    if (!state.structure) return "structure";
+    if (!state.palette) return "tracks";
+    if (!state.map) return "section-study";
+    if (!state.session) return "skeleton-session";
+    return "skeleton-draft";
+  }
+  function repairRoute() {
+    const route = resolveRoute(ui.route);
+    if (ui.route === "draft-section") ui.draftOpenId = sections()[ui.sectionIndex]?.id;
+    if (route !== ui.route) {
+      ui.route = route;
+      history.replaceState({ ...history.state, route }, "", location.pathname + location.search);
+    }
+  }
+  // Live Setup updates replace only derived controls, preserving text/caret/IME.
+  function refreshMapProgress() {
+    if (ui.route !== "map") return;
+    const p = project(), state = canonicalState(p), done = mapCheckpointCount(p);
+    const destinations = ["structure", "tracks", sectionStudyCoreDone(p) ? "map-summary" : "section-study"];
+    const completed = [state.structure, state.palette, state.study];
+    app.querySelectorAll(".checkpoint-head + .progress + .list > .list-row").forEach((row, i) => {
+      const html = checkpointRow(["Structure", "Tracks", "Section Study"][i],
+        ["Map the form.", "Identify what plays.", "Map each section in time."][i],
+        destinations[i], completed[i], !!state.eligible[destinations[i]]);
+      row.outerHTML = html;
+    });
+    const count = app.querySelector(".checkpoint-count"), bar = app.querySelector(".checkpoint-progress span");
+    if (count) count.textContent = `${done} of 3`;
+    if (bar) bar.style.width = `${done / 3 * 100}%`;
+  }
   function go(route, extra = {}, push = true) {
+    route = resolveRoute(route);
+    ui.animating = false;
     ui.selectedEventId = null;
     ui.selectedPresenceId = null;
-    ui.splitRangeId = null;
     const fromRoute = ui.route,
       fromLabel = routeLabel(fromRoute);
     ui = { ...ui, ...extra, route };
@@ -695,14 +746,14 @@
     }
   }
   function backButton(target = "project", label = "Back") {
-    return `<button class="nav-btn left" data-action="go" data-route="${target}"><span class="arrow">‹</span>${esc(label)}</button>`;
+    return historyBackButton(target, label);
   }
   function historyBackButton(
     fallbackRoute = "project",
     fallbackLabel = "Back",
   ) {
     const state = history.state || {},
-      label = state.fromLabel || fallbackLabel;
+      label = state.fromRoute ? routeLabel(resolveRoute(state.fromRoute)) : fallbackLabel;
     return `<button class="nav-btn left" data-action="history-back" data-fallback-route="${fallbackRoute}"><span class="arrow">‹</span>${esc(label)}</button>`;
   }
   function topbar(left = "", center = "", right = "") {
@@ -716,7 +767,7 @@
   }
   function phasePill(index) {
     const ph = STUDY_PHASES[index];
-    return `<button class="phase-pill" data-action="phase-nav" data-phase-index="${index}" aria-label="Open roadmap">${esc(ph.title)}</button>`;
+    return `<button class="phase-pill" data-action="go" data-route="${ph.route}" aria-label="Open ${esc(ph.title)}">${esc(ph.title)}</button>`;
   }
   function progressBar(done, total) {
     const pct = total ? Math.round((done / total) * 100) : 0;
@@ -754,7 +805,7 @@
   function lengthsComplete(p) {
     return (
       sections(p).length > 0 &&
-      sections(p).every((s) => validBars(s.lengthBars))
+      sections(p).every((s) => !!s.id && !!clean(s.name) && validBars(s.lengthBars))
     );
   }
   function sectionStarts(p) {
@@ -1062,14 +1113,14 @@
     const presenceDone = present.length > 0 || d.silence;
     const focusDone =
       d.focusState === "none" ||
-      (d.focusState === "selected" && d.focusIds.length > 0);
-    return presenceDone && feelComplete(d) && focusDone;
+      (d.focusState === "selected" && d.focusIds.length > 0 && d.focusIds.every((id) => present.includes(id)));
+    return presenceDone && feelComplete(d) && focusDone && !(present.length && d.silence);
   }
   function structureDone(p) {
-    return lengthsComplete(p) && !!p.map.structureVerified;
+    return mapSetupComplete(p) && lengthsComplete(p) && !!p.map.structureVerified;
   }
   function tracksDone(p) {
-    return tracks(p).length > 0;
+    return structureDone(p) && tracks(p).length > 0;
   }
   function tracksUsedDone(p) {
     return (
@@ -1083,13 +1134,13 @@
     );
   }
   function sectionStudyDone(p) {
-    return sectionStudyCoreDone(p) && tracksUsedDone(p);
+    return tracksDone(p) && sectionStudyCoreDone(p) && tracksUsedDone(p);
   }
   function mapSetupComplete(p) {
     const s = p.map.setup || {};
     return !!(
       s.reference &&
-      clean(s.tempo) &&
+      clean(s.tempo) && Number.isFinite(Number(s.tempo)) && Number(s.tempo) > 0 &&
       s.meter &&
       s.grid &&
       s.firstListen
@@ -1107,6 +1158,7 @@
   }
   function sessionDone(p) {
     return (
+      mapDone(p) &&
       tracks(p).length > 0 &&
       sections(p).length > 0 &&
       tracks(p).every((t) => p.skeleton.session.tracks[t.id]) &&
@@ -1124,12 +1176,13 @@
   }
   function draftDone(p) {
     return (
+      sessionDone(p) &&
       sections(p).length > 0 &&
       sections(p).every((_, i) => draftSectionDone(p, i))
     );
   }
   function bounceDone(p) {
-    return !!p.skeleton.bounce.exported && !!p.skeleton.bounce.listened;
+    return draftDone(p) && !!p.skeleton.bounce.exported && !!p.skeleton.bounce.listened;
   }
   function skeletonDone(p) {
     return sessionDone(p) && draftDone(p) && bounceDone(p);
@@ -1153,12 +1206,13 @@
     return false;
   }
   function studyPhaseUnlocked(p, index) {
-    return index === 0 || index <= currentStudyPhaseIndex(p);
+    return index < 2 && (index === 0 || mapDone(p));
   }
   function studyPhaseStatus(p, i) {
     if (studyPhaseDone(p, i)) return "done";
+    if (i >= 2) return "unimplemented";
     if (currentStudyPhaseIndex(p) === i) return "current";
-    return "future";
+    return studyPhaseUnlocked(p, i) ? "available" : "locked";
   }
   function originalSparkDone(p) {
     return (
@@ -1255,6 +1309,7 @@
   }
 
   function render() {
+    repairRoute();
     switch (ui.route) {
       case "projects":
         return renderProjects();
@@ -1327,7 +1382,7 @@
                     : originalSparkDone(p)
                       ? "The Direction"
                       : "The Spark";
-                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type === "study" ? "Recreation" : "Original Song"}</div><strong>${esc(p.title)}</strong>${p.artist ? `<div class="artist">${esc(p.artist)}</div>` : ""}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
+                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type === "study" ? "Recreation" : "Original Song"}</div><strong>${esc(p.title)}</strong>${p.artist ? `<div class="artist">${esc(p.artist)}</div>` : ""}<div class="foot"><span>${esc(phase)}</span><span aria-hidden="true">›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
               })
               .join("")
           : `<div class="empty">No projects yet. Tap + to start one.</div>`
@@ -1350,10 +1405,10 @@
     app.innerHTML =
       topbar(
         `<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,
-        `<button class="pill-tag" data-action="phase-nav" data-phase-index="${phaseIndex}" aria-label="Open roadmap">Recreation</button>`,
+        phaseTag("Recreation"),
         `<button class="text-btn" data-action="settings">•••</button>`,
       ) +
-      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${phaseIndex < 2 ? progressBar(done, 3) : ""}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div>${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div>`;
+      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div>${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div>`;
   }
   function renderOriginalOverview() {
     const p = project(),
@@ -1383,10 +1438,10 @@
     return (
       topbar(
         backButton("project", "Recreation"),
-        phasePill(index),
+        `<button class="phase-pill" data-action="go" data-route="project">Recreation</button>`,
         savedMark(),
       ) +
-      beforeHtml +
+      `<h2>${STUDY_PHASES[index].title}</h2>` + beforeHtml +
       `<div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div>`
     );
   }
@@ -1395,13 +1450,11 @@
       m = p.map,
       done = mapCheckpointCount(p),
       setupDone = mapSetupComplete(p),
-      structureUnlocked = setupDone || structureDone(p),
-      tracksUnlocked =
-        structureDone(p) || tracksDone(p) || sectionStudyCoreDone(p),
-      studyUnlocked =
-        (structureDone(p) && tracksDone(p)) || sectionStudyCoreDone(p),
+      structureUnlocked = setupDone,
+      tracksUnlocked = structureDone(p),
+      studyUnlocked = tracksDone(p),
       studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
-    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`;
+    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`;
     const checkpoints =
       checkpointRow(
         "Structure",
@@ -1433,7 +1486,7 @@
       done = structureDone(p);
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Map the form</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
+      `<h2>Structure</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
         sections(p).length
           ? sections(p)
               .map(
@@ -1452,7 +1505,7 @@
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Identify the tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+      `<h2>Tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
   }
 
   function rulerHtml(bars) {
@@ -1624,6 +1677,7 @@
     ui.splitRangeId = null;
     const p = project();
     newIndex = clamp(newIndex, 0, sections(p).length - 1);
+    if (!tracksDone(p) || sections(p).slice(0, newIndex).some((_, i) => !sectionComplete(p, i))) return;
     if (newIndex === ui.sectionIndex || ui.animating) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       ui.sectionIndex = newIndex;
@@ -1639,6 +1693,7 @@
       return renderSectionStudy();
     }
     ui.animating = true;
+    const entry = history.state;
     const forward = newIndex > ui.sectionIndex,
       stage = document.createElement("div");
     stage.className = "study-transition-stage";
@@ -1664,7 +1719,7 @@
       ),
     );
     setTimeout(() => {
-      if (ui.route !== "section-study") return;
+      if (ui.route !== "section-study" || history.state !== entry) { ui.animating = false; return; }
       ui.sectionIndex = newIndex;
       ui.expandedTrackId = null;
       ui.animating = false;
@@ -1678,7 +1733,7 @@
       unused = tracks(p).filter((t) => !trackUsedAnywhere(p, t.id));
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Review the map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p><div class="section-kicker">Structure</div><div class="chip-list">${sections(
+      `<h2>Review Map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p><div class="section-kicker">Structure</div><div class="chip-list">${sections(
         p,
       )
         .map(
@@ -1736,21 +1791,21 @@
           "Create tracks and section markers.",
           "skeleton-session",
           sessionDone(p),
-          mapDone(p) || sessionDone(p),
+          mapDone(p),
         ) +
         checkpointRow(
           "Draft",
           "Build every mapped part end to end.",
           "skeleton-draft",
           draftDone(p),
-          sessionDone(p) || draftDone(p) || bounceDone(p),
+          sessionDone(p),
         ) +
         checkpointRow(
           "Bounce",
           "Export and hear the complete draft.",
           "skeleton-bounce",
           bounceDone(p),
-          draftDone(p) || bounceDone(p),
+          draftDone(p),
         );
     app.innerHTML = phaseHome(1, done, 3, checkpoints);
   }
@@ -1763,7 +1818,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Set up the session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
+      `<h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
         p,
       )
         .map(
@@ -1792,7 +1847,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Build the draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
+      `<h2>Draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
         p,
       )
         .map((s, i) => {
@@ -1843,7 +1898,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Bounce the draft</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>Next Phase</button>`;
+      `<h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
   }
 
   function renderRoadmap() {
@@ -1860,12 +1915,12 @@
     }
     app.innerHTML =
       topbar(backButton("project", "Recreation"), phaseTag("Roadmap"), "") +
-      `<h2>Recreation roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map(
+      `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map(
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
             unlocked = studyPhaseUnlocked(p, i),
             tag = unlocked ? "button" : "div";
-          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
+          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p><span class="micro">${st === "unimplemented" ? "Coming later · Not implemented" : st === "done" ? "Completed" : st === "current" ? "Current" : st === "available" ? "Available" : "Locked"}</span></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
         },
       ).join("")}`;
   }
@@ -1994,20 +2049,6 @@
   function openSettings() {
     const p = project();
     sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
-    openSheet();
-  }
-  function openPhaseNavigator(index) {
-    const p = project();
-    if (!p || p.type !== "study") return;
-    sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>Roadmap</h3><button class="phase-nav-project" data-action="open-project-overview"><div><strong>${esc(p.title)}</strong><span class="copy">Project overview</span></div><span class="phase-nav-arrow">›</span></button><div class="phase-nav-list">${STUDY_PHASES.map(
-      (ph, i) => {
-        const st = studyPhaseStatus(p, i),
-          unlocked = studyPhaseUnlocked(p, i);
-        return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked ? "" : "disabled"}>${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked ? "›" : ""}</span></button>`;
-      },
-    ).join(
-      "",
-    )}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
     openSheet();
   }
   function openProjectMenu(id) {
@@ -2494,7 +2535,7 @@
 
   app.addEventListener("click", (e) => {
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
     if (action === "history-back") {
@@ -2532,9 +2573,7 @@
     }
     if (action === "project-menu") return openProjectMenu(b.dataset.id);
     if (action === "settings") return openSettings();
-    if (action === "phase-nav")
-      return openPhaseNavigator(Number(b.dataset.phaseIndex));
-    if (action === "toggle-setup") {
+        if (action === "toggle-setup") {
       p.map.setup[b.dataset.field] = !p.map.setup[b.dataset.field];
       invalidateMapVerification(p);
       save();
@@ -2742,9 +2781,10 @@
   app.addEventListener("input", (e) => {
     const p = project();
     if (e.target.id === "tempoInput") {
-      p.map.setup.tempo = e.target.value.replace(/[^0-9.]/g, "");
+      p.map.setup.tempo = e.target.value;
       invalidateMapVerification(p);
       save();
+      refreshMapProgress();
     }
     if (e.target.dataset.input === "phase-parking") {
       p.map.phaseParking = e.target.value;
@@ -2776,6 +2816,7 @@
       project().map.setup.meter = e.target.value;
       invalidateMapVerification(project());
       save();
+      refreshMapProgress();
     }
   });
   app.addEventListener("keydown", (e) => {
@@ -2796,7 +2837,7 @@
   sheetRoot.addEventListener("click", (e) => {
     if (e.target === sheetRoot) return closeSheet();
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
     if (action === "close-sheet") return closeSheet();
@@ -2923,18 +2964,6 @@
       save();
       offerUndo(before, "Change added");
       return renderSectionStudy();
-    }
-    if (action === "open-project-overview") {
-      closeSheet();
-      return go("project");
-    }
-    if (action === "open-phase") {
-      const i = Number(b.dataset.index);
-      if (studyPhaseUnlocked(p, i)) {
-        closeSheet();
-        return go(STUDY_PHASES[i].route);
-      }
-      return;
     }
     if (action === "export-backup") return exportBackup();
     if (action === "import-backup") {
@@ -3214,7 +3243,7 @@
   }
   app.addEventListener("click", (e) => {
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
     if (action === "select-presence") {
