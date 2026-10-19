@@ -2033,6 +2033,8 @@
       bars: null,
       customName: false,
       customBars: false,
+      canAdd: true,
+      added: 0,
     };
     sheetRoot.replaceChildren();
     renderSectionBuilder();
@@ -2046,7 +2048,7 @@
     const d = sectionDraft;
     // Build once per opening. Selection only updates properties on existing nodes.
     if (!sheetRoot.querySelector(".section-builder")) {
-      sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add section</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice" data-action="choose-section-type" data-name="${name}">${name}</button>`).join("")}</div><input hidden class="field custom-length" id="newSectionName" aria-label="Section name" placeholder="Section name"><div class="section-kicker">Bars</div>${lengthChoices(null, "set-new-section-bars")}<input hidden class="field custom-length" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars"><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section">Add Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+      sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add sections</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice" data-action="choose-section-type" data-name="${name}">${name}</button>`).join("")}</div><input hidden class="field custom-length" id="newSectionName" aria-label="Section name" placeholder="Section name"><div class="section-kicker">Bars</div>${lengthChoices(null, "set-new-section-bars")}<input hidden class="field custom-length" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars"><div class="builder-status" id="builderStatus" role="status" aria-live="polite"></div><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section">Add Section</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
     }
     sheetRoot.querySelectorAll('[data-action="choose-section-type"]').forEach((el) => setSelected(el, el.dataset.name === d.name));
     sheetRoot.querySelectorAll('[data-action="set-new-section-bars"]').forEach((el) => setSelected(el, d.customBars ? el.dataset.bars === "custom" : Number(el.dataset.bars) === d.bars));
@@ -2054,7 +2056,7 @@
     name.hidden = !d.customName;
     bars.hidden = !d.customBars;
     if (document.activeElement !== bars) bars.value = d.bars || "";
-    sheetRoot.querySelector('[data-action="save-new-section"]').disabled = !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
+    sheetRoot.querySelector('[data-action="save-new-section"]').disabled = !d.canAdd || !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
   }
   function setSelected(el, selected) {
     el.classList.toggle("selected", selected);
@@ -2164,7 +2166,8 @@
     document.getElementById("undoNotice").inert = false;
     document.body.classList.remove("sheet-open");
     sheetRoot.classList.remove("open");
-    if (sheetOpener?.isConnected) sheetOpener.focus({ preventScroll: true });
+    const opener = sheetOpener?.isConnected ? sheetOpener : ui.route === "structure" ? app.querySelector('[data-action="open-add-section"]') : null;
+    opener?.focus({ preventScroll: true });
     sheetRoot.setAttribute("aria-hidden", "true");
     clearTimeout(sheetClearTimer);
     sheetClearTimer = setTimeout(() => {
@@ -2903,12 +2906,14 @@
     if (action === "choose-section-type") {
       const d = sectionDraft;
       d.name = b.dataset.name;
+      d.canAdd = true;
       d.customName = d.name === "Custom";
       if (!d.bars) d.bars = suggestedBarsFor(p, d.name);
       renderSectionBuilder();
       return;
     }
     if (action === "set-new-section-bars") {
+      sectionDraft.canAdd = true;
       sectionDraft.customBars = b.dataset.bars === "custom";
       sectionDraft.bars = sectionDraft.customBars
         ? null
@@ -2917,15 +2922,19 @@
       return;
     }
     if (action === "save-new-section") {
-      const d = sectionDraft,
-        name = d.customName ? clean(d.typedName) : d.name;
-      if (!name || !validBars(d.bars)) {
-        sheetError("Choose a section and bar length.");
-        return;
-      }
-      addSection(name, d.bars);
-      closeSheet();
-      return renderStructure();
+      const d = sectionDraft, name = d.customName ? clean(d.typedName) : d.name;
+      if (!d.canAdd) return;
+      if (!name || !validBars(d.bars)) return sheetError("Choose a section and bar length.");
+      // A new intentional choice/input re-arms Add; a double click cannot add twice.
+      d.canAdd = false;
+      const added = addSection(name, d.bars);
+      if (!added) { d.canAdd = true; return; }
+      d.added++;
+      renderStructure();
+      renderSectionBuilder();
+      document.getElementById("builderStatus").textContent = `Added ${name} · ${d.bars} bars`;
+      document.getElementById("sheetError").textContent = "";
+      return;
     }
     if (action === "set-sheet-bars") {
       const input = document.getElementById("sectionBars");
@@ -3319,15 +3328,19 @@
   sheetRoot.addEventListener("input", (e) => {
     if (e.target.id === "placementPosition" && placement) { placement.value = Number(e.target.value); updatePlacementLabel(); return; }
     if (!sectionDraft) return;
-    if (e.target.id === "newSectionName")
+    if (e.target.id === "newSectionName") {
       sectionDraft.typedName = e.target.value;
-    if (e.target.id === "newSectionBars")
+      sectionDraft.canAdd = true;
+    }
+    if (e.target.id === "newSectionBars") {
       sectionDraft.bars = Number(e.target.value);
+      sectionDraft.canAdd = true;
+    }
     const d = sectionDraft,
       button = sheetRoot.querySelector('[data-action="save-new-section"]');
     if (button)
       button.disabled =
-        !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
+        !d.canAdd || !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
   });
 
   sheetRoot.addEventListener("keydown", (e) => {

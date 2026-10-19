@@ -1812,6 +1812,13 @@ from {
   }
 }
 
+.builder-status {
+  min-height: 32px;
+  margin-top: var(--space-4);
+  color: var(--accent-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
 /* Adaptive composition and input capabilities. */
 @media (max-width: 390px) {
   .quick-grid, .new-type {
