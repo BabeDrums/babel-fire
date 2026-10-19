@@ -16,14 +16,23 @@ class Handler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def do_GET(self):
-        if urlsplit(self.path).path != "/build-info.json":
+        path = urlsplit(self.path).path
+        if path not in ("/build-info.json", "/", "/index.html"):
             return super().do_GET()
         commit = subprocess.check_output(
             ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True
         ).strip()
-        data = json.dumps({"commit": commit}).encode()
+        if path == "/build-info.json":
+            data = json.dumps({"commit": commit}).encode()
+            content_type = "application/json"
+        else:
+            source = (ROOT / "index.html").read_text()
+            if source.startswith("---\n---\n"):
+                source = source[8:]
+            data = source.replace("{{ site.github.build_revision }}", commit).encode()
+            content_type = "text/html; charset=utf-8"
         self.send_response(200)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", content_type)
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()

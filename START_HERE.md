@@ -2,7 +2,7 @@
 
 - **Repository:** BabeDrums/babel-fire
 - **Production branch:** `main`
-- **Current active product generation/specification:** [V5.md](V5.md)
+- **Current active product generation/specification:** [V6.md](V6.md)
 
 When a new ChatGPT/Codex conversation begins with or clearly refers to **Babel FIRE**, resume this project; do not ask the user to explain FIRE again.
 
@@ -21,4 +21,4 @@ Fallback continuation phrase:
 
 > Babel FIRE — continue from GitHub repo BabeDrums/babel-fire. Read START_HERE.md.
 
-When a future generation such as V6 becomes active, update this entry point to reference its approved specification, alongside the specification and changelog updates. This file is an entry point, not a duplicate product context.
+V6 implementation uses the approved specification on a dedicated branch. Determine shipped state from `main` and PR review; activation of this entry point does not authorize a merge. Use `python3 scripts/serve.py` for local development and asset revision handling.

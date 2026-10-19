@@ -641,10 +641,63 @@
     };
     return labels[route] || "Back";
   }
+  function canonicalState(p) {
+    if (!p || p.type !== "study") return null;
+    const setup = mapSetupComplete(p), structure = structureDone(p), palette = tracksDone(p),
+      study = sectionStudyDone(p), map = mapDone(p), session = sessionDone(p),
+      draft = draftDone(p), bounce = bounceDone(p);
+    return { setup, structure, palette, study, map, session, draft, bounce,
+      eligible: { map: true, structure: setup, tracks: structure,
+        "section-study": palette, "map-summary": palette && sectionStudyCoreDone(p),
+        skeleton: map, "skeleton-session": map, "skeleton-draft": session,
+        "draft-section": session, "skeleton-bounce": draft } };
+  }
+  function resolveRoute(route, p = project()) {
+    if (["projects", "new-project"].includes(route)) return route;
+    if (!p) return "projects";
+    if (["project", "roadmap", "notes"].includes(route)) return route;
+    if (p.type === "original") return route === "original-spark" ? route : "project";
+    const state = canonicalState(p);
+    if (state.eligible[route]) return route === "draft-section" ? "skeleton-draft" : route;
+    if (!(route in state.eligible)) return "roadmap";
+    if (!state.setup) return "map";
+    if (!state.structure) return "structure";
+    if (!state.palette) return "tracks";
+    if (!state.map) return "section-study";
+    if (!state.session) return "skeleton-session";
+    return "skeleton-draft";
+  }
+  function repairRoute() {
+    const route = resolveRoute(ui.route);
+    if (ui.route === "draft-section") ui.draftOpenId = sections()[ui.sectionIndex]?.id;
+    if (route !== ui.route) {
+      ui.route = route;
+      history.replaceState({ ...history.state, route }, "", location.pathname + location.search);
+    }
+  }
+  // Live Setup updates replace only derived controls, preserving text/caret/IME.
+  function refreshMapProgress() {
+    if (ui.route !== "map") return;
+    const p = project(), state = canonicalState(p), done = mapCheckpointCount(p);
+    const destinations = ["structure", "tracks", sectionStudyCoreDone(p) ? "map-summary" : "section-study"];
+    const completed = [state.structure, state.palette, state.study];
+    app.querySelectorAll(".checkpoint-head + .progress + .list > .list-row").forEach((row, i) => {
+      const html = checkpointRow(["Structure", "Tracks", "Section Study"][i],
+        ["Map the form.", "Identify what plays.", "Map each section in time."][i],
+        destinations[i], completed[i], !!state.eligible[destinations[i]]);
+      row.outerHTML = html;
+    });
+    const count = app.querySelector(".checkpoint-count"), bar = app.querySelector(".checkpoint-progress span");
+    if (count) count.textContent = `${done} of 3`;
+    if (bar) bar.style.width = `${done / 3 * 100}%`;
+  }
+  let cancelGesture = null;
   function go(route, extra = {}, push = true) {
+    cancelGesture?.();
+    route = resolveRoute(route);
+    ui.animating = false;
     ui.selectedEventId = null;
     ui.selectedPresenceId = null;
-    ui.splitRangeId = null;
     const fromRoute = ui.route,
       fromLabel = routeLabel(fromRoute);
     ui = { ...ui, ...extra, route };
@@ -668,6 +721,8 @@
     window.scrollTo(0, 0);
   }
   window.addEventListener("popstate", (e) => {
+    cancelGesture?.();
+    closeSheet();
     const st = e.state || {};
     if (st.projectId && db.projects.some((p) => p.id === st.projectId))
       db.currentProjectId = st.projectId;
@@ -695,17 +750,22 @@
     }
   }
   function backButton(target = "project", label = "Back") {
-    return `<button class="nav-btn left" data-action="go" data-route="${target}"><span class="arrow">‹</span>${esc(label)}</button>`;
+    return historyBackButton(target, label);
   }
   function historyBackButton(
     fallbackRoute = "project",
     fallbackLabel = "Back",
   ) {
     const state = history.state || {},
-      label = state.fromLabel || fallbackLabel;
+      label = state.fromRoute ? routeLabel(resolveRoute(state.fromRoute)) : fallbackLabel;
     return `<button class="nav-btn left" data-action="history-back" data-fallback-route="${fallbackRoute}"><span class="arrow">‹</span>${esc(label)}</button>`;
   }
   function topbar(left = "", center = "", right = "") {
+    // Canvas size follows content, not the user's device or input method.
+    app.dataset.route = ui.route;
+    app.dataset.layout = ui.route === "section-study" ? "arrangement"
+      : ui.route === "skeleton-draft" ? "draft"
+      : ["new-project", "original-spark", "skeleton-bounce", "skeleton"].includes(ui.route) ? "focused" : "overview";
     return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`;
   }
   function savedMark() {
@@ -716,7 +776,7 @@
   }
   function phasePill(index) {
     const ph = STUDY_PHASES[index];
-    return `<button class="phase-pill" data-action="phase-nav" data-phase-index="${index}" aria-label="Open roadmap">${esc(ph.title)}</button>`;
+    return `<button class="phase-pill" data-action="go" data-route="${ph.route}" aria-label="Open ${esc(ph.title)}">${esc(ph.title)}</button>`;
   }
   function progressBar(done, total) {
     const pct = total ? Math.round((done / total) * 100) : 0;
@@ -754,7 +814,7 @@
   function lengthsComplete(p) {
     return (
       sections(p).length > 0 &&
-      sections(p).every((s) => validBars(s.lengthBars))
+      sections(p).every((s) => !!s.id && !!clean(s.name) && validBars(s.lengthBars))
     );
   }
   function sectionStarts(p) {
@@ -1052,7 +1112,7 @@
     return trackById(p, id)?.name || "";
   }
   function feelComplete(d) {
-    return Object.keys(FEEL_SCALES).every((k) => !!d.feel?.[k]);
+    return Object.keys(FEEL_SCALES).every((k) => FEEL_SCALES[k].includes(d.feel?.[k]));
   }
   function sectionComplete(p, index) {
     const s = sections(p)[index];
@@ -1062,14 +1122,14 @@
     const presenceDone = present.length > 0 || d.silence;
     const focusDone =
       d.focusState === "none" ||
-      (d.focusState === "selected" && d.focusIds.length > 0);
-    return presenceDone && feelComplete(d) && focusDone;
+      (d.focusState === "selected" && d.focusIds.length > 0 && d.focusIds.every((id) => present.includes(id)));
+    return presenceDone && feelComplete(d) && focusDone && !(present.length && d.silence);
   }
   function structureDone(p) {
-    return lengthsComplete(p) && !!p.map.structureVerified;
+    return mapSetupComplete(p) && lengthsComplete(p) && !!p.map.structureVerified;
   }
   function tracksDone(p) {
-    return tracks(p).length > 0;
+    return structureDone(p) && tracks(p).length > 0;
   }
   function tracksUsedDone(p) {
     return (
@@ -1083,13 +1143,13 @@
     );
   }
   function sectionStudyDone(p) {
-    return sectionStudyCoreDone(p) && tracksUsedDone(p);
+    return tracksDone(p) && sectionStudyCoreDone(p) && tracksUsedDone(p);
   }
   function mapSetupComplete(p) {
     const s = p.map.setup || {};
     return !!(
       s.reference &&
-      clean(s.tempo) &&
+      /^(?:\d+\.?\d*|\.\d+)$/.test(clean(s.tempo)) && Number.isFinite(Number(s.tempo)) && Number(s.tempo) > 0 &&
       s.meter &&
       s.grid &&
       s.firstListen
@@ -1107,6 +1167,7 @@
   }
   function sessionDone(p) {
     return (
+      mapDone(p) &&
       tracks(p).length > 0 &&
       sections(p).length > 0 &&
       tracks(p).every((t) => p.skeleton.session.tracks[t.id]) &&
@@ -1124,12 +1185,13 @@
   }
   function draftDone(p) {
     return (
+      sessionDone(p) &&
       sections(p).length > 0 &&
       sections(p).every((_, i) => draftSectionDone(p, i))
     );
   }
   function bounceDone(p) {
-    return !!p.skeleton.bounce.exported && !!p.skeleton.bounce.listened;
+    return draftDone(p) && !!p.skeleton.bounce.exported && !!p.skeleton.bounce.listened;
   }
   function skeletonDone(p) {
     return sessionDone(p) && draftDone(p) && bounceDone(p);
@@ -1153,12 +1215,13 @@
     return false;
   }
   function studyPhaseUnlocked(p, index) {
-    return index === 0 || index <= currentStudyPhaseIndex(p);
+    return index < 2 && (index === 0 || mapDone(p));
   }
   function studyPhaseStatus(p, i) {
     if (studyPhaseDone(p, i)) return "done";
+    if (i >= 2) return "unimplemented";
     if (currentStudyPhaseIndex(p) === i) return "current";
-    return "future";
+    return studyPhaseUnlocked(p, i) ? "available" : "locked";
   }
   function originalSparkDone(p) {
     return (
@@ -1255,6 +1318,7 @@
   }
 
   function render() {
+    repairRoute();
     switch (ui.route) {
       case "projects":
         return renderProjects();
@@ -1280,8 +1344,6 @@
         return renderSkeletonSession();
       case "skeleton-draft":
         return renderSkeletonDraft();
-      case "draft-section":
-        return renderDraftSection();
       case "skeleton-bounce":
         return renderSkeletonBounce();
       case "original-spark":
@@ -1317,7 +1379,7 @@
         phaseTag("FIRE"),
         `<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`,
       ) +
-      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div>${
+      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div><div class="projects-grid">${
         db.projects.length
           ? db.projects
               .map((p) => {
@@ -1327,11 +1389,11 @@
                     : originalSparkDone(p)
                       ? "The Direction"
                       : "The Spark";
-                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type === "study" ? "Recreation" : "Original Song"}</div><strong>${esc(p.title)}</strong>${p.artist ? `<div class="artist">${esc(p.artist)}</div>` : ""}<div class="foot"><span>${esc(phase)}</span><span>Open ›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
+                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type === "study" ? "Recreation" : "Original Song"}</div><strong>${esc(p.title)}</strong>${p.artist ? `<div class="artist">${esc(p.artist)}</div>` : ""}<div class="foot"><span>${esc(phase)}</span><span aria-hidden="true">›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">•••</button></div>`;
               })
               .join("")
           : `<div class="empty">No projects yet. Tap + to start one.</div>`
-      }<footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
+      }</div><footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
     showBuildStamp();
   }
   function renderProject() {
@@ -1350,10 +1412,10 @@
     app.innerHTML =
       topbar(
         `<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,
-        `<button class="pill-tag" data-action="phase-nav" data-phase-index="${phaseIndex}" aria-label="Open roadmap">Recreation</button>`,
+        phaseTag("Recreation"),
         `<button class="text-btn" data-action="settings">•••</button>`,
       ) +
-      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${phaseIndex < 2 ? progressBar(done, 3) : ""}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div>${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div>`;
+      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div>${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div>`;
   }
   function renderOriginalOverview() {
     const p = project(),
@@ -1369,25 +1431,24 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), phaseTag("New Project"), "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}">${ui.newType === "study" ? `<div class="spacer-10"></div><input class="field" id="newArtist" placeholder="Artist">` : ""}<div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" aria-label="Project title" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
   }
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
     return `<button class="list-row" data-action="go" data-route="${route}" ${unlocked ? "" : "disabled"}>${done ? `<span class="round-check on"></span>` : unlocked ? `<span class="status-dot"></span>` : `<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked ? "›" : ""}</span></button>`;
   }
   function actionCard(title, copy, on, action, disabled = false, attrs = "") {
-    return `<button class="action-card ${on ? "on" : ""}" data-action="${action}" ${attrs} ${disabled ? "disabled" : ""}><div><strong>${esc(title)}</strong>${copy ? `<span class="copy">${esc(copy)}</span>` : ""}</div><span class="round-check ${on ? "on" : ""}"></span></button>`;
+    return `<button class="action-card ${on ? "on" : ""}" data-action="${action}" aria-pressed="${!!on}" ${attrs} ${disabled ? "disabled" : ""}><div><strong>${esc(title)}</strong>${copy ? `<span class="copy">${esc(copy)}</span>` : ""}</div><span class="round-check ${on ? "on" : ""}"></span></button>`;
   }
   function phaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
     const pct = total ? Math.round((done / total) * 100) : 0;
     return (
       topbar(
         backButton("project", "Recreation"),
-        phasePill(index),
+        `<button class="phase-pill" data-action="go" data-route="project">Recreation</button>`,
         savedMark(),
       ) +
-      beforeHtml +
-      `<div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div>`
+      `<h2>${STUDY_PHASES[index].title}</h2><div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div></section></div>`
     );
   }
   function renderMapHome() {
@@ -1395,13 +1456,11 @@
       m = p.map,
       done = mapCheckpointCount(p),
       setupDone = mapSetupComplete(p),
-      structureUnlocked = setupDone || structureDone(p),
-      tracksUnlocked =
-        structureDone(p) || tracksDone(p) || sectionStudyCoreDone(p),
-      studyUnlocked =
-        (structureDone(p) && tracksDone(p)) || sectionStudyCoreDone(p),
+      structureUnlocked = setupDone,
+      tracksUnlocked = structureDone(p),
+      studyUnlocked = tracksDone(p),
       studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
-    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" inputmode="numeric" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`;
+    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`;
     const checkpoints =
       checkpointRow(
         "Structure",
@@ -1433,12 +1492,12 @@
       done = structureDone(p);
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Map the form</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
+      `<div class="work-position">1 of 3</div><h2>Structure</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
         sections(p).length
           ? sections(p)
               .map(
                 (s, i) =>
-                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><div class="drag-handle" data-drag-handle aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
+                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><div class="drag-handle" data-drag-handle role="button" tabindex="0" aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
@@ -1452,7 +1511,7 @@
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Identify the tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+      `<div class="work-position">2 of 3</div><h2>Tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
   }
 
   function rulerHtml(bars) {
@@ -1484,35 +1543,62 @@
     const { range: r, portion: x } = item,
       selected =
         expanded && ui.selectedPresenceId === r.id && !ui.selectedEventId;
-    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
+    return `<div class="presence-segment ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"} ${selected ? "selected" : ""}" style="left:${x.left}%;right:${x.right}%"></div><button class="presence-hit" data-action="select-presence" data-track-id="${r.trackId}" data-range-id="${r.id}" style="left:${x.left}%;width:${100 - x.left - x.right}%" aria-label="Select ${esc(trackById(p, r.trackId)?.name)} presence"></button>${selected ? rangeHandles(r.id, "presence", x) : ""}`;
   }
   function rangeHandles(id, type, x) {
-    return ["start", "end"]
+    return ["start", "end"].filter((edge) => edge === "start" ? x.startHere : x.endHere)
       .map(
         (edge) =>
-          `<button class="${type === "presence" ? "presence" : "event"}-handle ${edge === "start" ? "left" : "right"}" data-${type === "presence" ? "presence" : "event"}-handle data-${type === "presence" ? "range" : "event"}-id="${id}" data-edge="${edge}" style="left:${edge === "start" ? x.left : 100 - x.right}%" aria-label="Drag ${edge}"></button>`,
+          `<button class="${type === "presence" ? "presence" : "event"}-handle ${edge === "start" ? "left" : "right"}" data-${type === "presence" ? "presence" : "event"}-handle data-${type === "presence" ? "range" : "event"}-id="${id}" data-edge="${edge}" style="left:${edge === "start" ? x.left : 100 - x.right}%" aria-label="Move ${edge === "end" ? "stop" : "start"}"></button>`,
       )
       .join("");
   }
-  function timingControls(obj, type) {
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      a = obj.kind === "marker" ? obj.point : obj.start;
+  function boundaryActions(obj, type) {
+    const portion = obj.kind === "marker" ? null : rangePortion(project(), obj, ui.sectionIndex);
     const attrs = `data-kind="${type}" data-id="${obj.id}"`;
-    const edges = obj.kind === "marker" ? ["point"] : ["start", "end"];
-    return `<div class="timing-controls">${edges
-      .map((edge) => {
-        const anchor = edge === "point" ? a : obj[edge],
-          index = anchor
-            ? sectionIndexById(p, anchor.sectionId)
-            : ui.sectionIndex,
-          sec = sections(p)[index],
-          val = anchor
-            ? anchorValueInSection(sec, anchor) + (edge === "end" ? 0 : 1)
-            : "∞";
-        return `<div class="timing-step"><span>${edge === "point" ? "Bar" : edge === "start" ? "Start" : "End"} <b>${index === ui.sectionIndex ? val : esc(sectionLabels(p)[index]) + " · " + val}</b></span><button class="step" data-action="nudge-timing" ${attrs} data-edge="${edge}" data-delta="-1" aria-label="${edge} earlier">−</button><button class="step" data-action="nudge-timing" ${attrs} data-edge="${edge}" data-delta="1" aria-label="${edge} later">+</button></div>`;
-      })
-      .join("")}</div>`;
+    if (obj.kind === "marker") return `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="point">Move point</button>`;
+    return `${portion?.startHere ? `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="start">Move start</button>` : ""}${portion?.endHere ? `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="end">Move stop</button>` : `<button class="mini-btn" data-action="place-boundary" ${attrs} data-edge="end">Stop</button>`}`;
+  }
+  let placement = null;
+  function openBoundaryPlacement(type, id, edge, trackId) {
+    const p = project(), sec = sections(p)[ui.sectionIndex], len = Number(sec.lengthBars),
+      obj = id ? selectedObject(type, id) : null;
+    let value = edge === "end" ? Math.round(len / 2) : 0;
+    if (obj?.[edge]?.sectionId === sec.id) value = Math.round(anchorValueInSection(sec, obj[edge]));
+    if (edge === "resume") {
+      const gap = presenceGapInSection(p, trackId, ui.sectionIndex);
+      if (!gap) return;
+      value = Math.ceil(gap.start - sectionStarts(p)[ui.sectionIndex]);
+    }
+    const min = edge === "end" ? 1 : 0, max = edge === "end" ? len : len - 1;
+    placement = { type, id, edge, trackId, value: clamp(value, min, max), sectionId: sec.id };
+    const title = edge === "end" ? "Stop" : edge === "resume" ? "Start" : edge === "point" ? "Move point" : "Move start";
+    sheetRoot.innerHTML = `<div class="sheet placement-sheet"><div class="grabber"></div><h3>${title}</h3><p class="sub">${esc(sectionLabels(p)[ui.sectionIndex])}</p><output id="placementLabel" aria-live="polite"></output><div class="placement-lane"><input id="placementPosition" aria-label="${title} position" type="range" min="${min}" max="${max}" step="1" value="${placement.value}"></div><p class="micro">Slide to a bar, or use the arrow keys.</p><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="commit-placement">${title === "Stop" ? "Stop here" : title === "Start" ? "Start here" : "Done"}</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    updatePlacementLabel();
+    openSheet();
+  }
+  function updatePlacementLabel() {
+    const label = document.getElementById("placementLabel");
+    if (label && placement) label.textContent = placement.edge === "end" ? `After bar ${placement.value}` : `Bar ${placement.value + 1}`;
+  }
+  function commitPlacement() {
+    if (!placement) return;
+    const p = project(), { type, id, edge, trackId, value, sectionId } = placement;
+    if (sections(p)[ui.sectionIndex]?.id !== sectionId) return closeSheet();
+    const before = copyProject();
+    if (edge === "resume") {
+      const absolute = sectionStarts(p)[ui.sectionIndex] + value;
+      if (presenceForTrack(p, trackId).some((r) => { const a = rangeAbs(p, r); return absolute >= a.start && absolute < a.end; })) return sheetError("Choose a bar where this track is silent.");
+      const r = { id: uid(), trackId, start: { sectionId, bar: value }, end: null };
+      p.map.timeline.presence.push(r);
+      ui.selectedPresenceId = r.id;
+      closeSheet();
+      return finishTimelineEdit(before, r, "presence", "Track started");
+    }
+    const obj = selectedObject(type, id);
+    if (!obj || !applyTiming(obj, type, edge, value)) return sheetError("Choose a position within the musical span.");
+    closeSheet();
+    finishTimelineEdit(before, obj, type, edge === "end" ? "Stop placed" : "Position changed");
   }
   function compactEventsHtml(p, targetType, targetId, index) {
     return visibleEvents(p, targetType, targetId, index)
@@ -1524,7 +1610,7 @@
           ),
         );
         return e.kind === "range"
-          ? `<span class="event-summary-range tone-${eventTone(e)} ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""}" style="left:${x.left}%;right:${x.right}%;top:${33 + row * 4}px"></span>`
+          ? `<span class="event-summary-range tone-${eventTone(e)} ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%;top:${33 + row * 4}px"></span>`
           : `<span class="event-summary-marker tone-${eventTone(e)}" style="left:${x.left}%;top:${31 + row * 4}px"></span>`;
       })
       .join("");
@@ -1536,14 +1622,11 @@
     return `<div class="change-selectors">${events.map(({ event: e }) => `<button class="change-chip ${e.id === ui.selectedEventId ? "selected" : ""}" data-action="select-event" data-event-id="${e.id}" aria-pressed="${e.id === ui.selectedEventId}"><span class="change-swatch tone-${eventTone(e)}"></span>${esc(e.label)}</button>`).join("")}<button class="change-chip add-change" data-action="open-add-change" data-target-type="${targetType}" ${targetId ? `data-target-id="${targetId}"` : ""}>+ Change</button></div>${selected ? selectedEventHtml(selected, bars) : ""}`;
   }
   function selectedEventHtml({ event: e, portion: x }, bars) {
-    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}">${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : ""} ${x.continuesOut ? "continue-out" : ""}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div>${timingControls(e, "event")}<div class="selection-actions">${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
+    return `<div class="change-editor" style="--event-color:${eventColorVar(e)}"><div class="change-lane" style="--bars:${bars}">${e.kind === "range" ? `<div class="change-range ${x.continuesIn ? "continue-in" : "real-start"} ${x.continuesOut ? "continue-out" : "real-stop"}" style="left:${x.left}%;right:${x.right}%"></div>${rangeHandles(e.id, "event", x)}` : `<button class="change-marker" data-event-marker data-event-id="${e.id}" style="left:${x.left}%" aria-label="Move ${esc(e.label)}"></button>`}</div><div class="selection-actions">${boundaryActions(e, "event")}${e.kind === "range" && e.end ? `<button class="mini-btn" data-action="continue-range" data-kind="event" data-id="${e.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="event" data-id="${e.id}">Remove</button></div></div>`;
   }
   function trackDetailHtml(p, track, index) {
-    const selected = visiblePresence(p, track.id, index).find(
-        (x) => x.range.id === ui.selectedPresenceId,
-      ),
-      r = selected?.range;
-    return `<div class="track-detail">${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="presence-editor">${timingControls(r, "presence")}<div class="selection-actions">${r.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}<button class="mini-btn" data-action="split-presence" data-id="${r.id}">Split</button><button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div></div>` : ""}${ui.splitRangeId === r?.id && r ? splitEditor(r) : ""}${eventDetailRows(p, "track", track.id, index)}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="add-another-presence" data-track-id="${track.id}">+ Presence</button>` : ""}</div>`;
+    const selected = visiblePresence(p, track.id, index).find((x) => x.range.id === ui.selectedPresenceId), r = selected?.range;
+    return `<div class="track-detail">${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="presence-editor"><div class="selection-actions">${boundaryActions(r, "presence")}${r.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}<button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div></div>` : ""}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="start-track" data-track-id="${track.id}">Start</button>` : ""}${eventDetailRows(p, "track", track.id, index)}</div>`;
   }
   function presenceSelectors(p, trackId, index) {
     const ranges = visiblePresence(p, trackId, index);
@@ -1558,10 +1641,37 @@
       absent = !ranges.length;
     return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars}"><button class="lane-select" data-action="${absent ? "add-presence-section" : "select-presence"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${absent ? "Add" : "Select"} ${esc(track.name)}">${absent ? "+" : ""}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}</div>${expanded && ranges.length ? trackDetailHtml(p, track, index) : ""}</div>`;
   }
+  function refreshArrangement() {
+    const p = project(), index = ui.sectionIndex, active = document.activeElement;
+    const focusData = active?.dataset ? { ...active.dataset } : null;
+    app.querySelectorAll("[data-track-row]").forEach((row) => {
+      const track = trackById(p, row.dataset.trackRow), expanded = ui.expandedTrackId === track.id,
+        ranges = visiblePresence(p, track.id, index), lane = row.querySelector(".timeline-lane");
+      row.classList.toggle("expanded", expanded);
+      row.querySelector(".timeline-label").setAttribute("aria-expanded", String(expanded));
+      // The label/row and all unrelated Feel/Focus/Notes nodes survive selection.
+      lane.innerHTML = `<button class="lane-select" data-action="${ranges.length ? "select-presence" : "add-presence-section"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${ranges.length ? "Select" : "Add"} ${esc(track.name)}">${ranges.length ? "" : "+"}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}`;
+      row.querySelector(".track-detail")?.remove();
+      if (expanded && ranges.length) row.insertAdjacentHTML("beforeend", trackDetailHtml(p, track, index));
+    });
+    app.querySelector(".mix-utility")?.remove();
+    app.querySelector(".timeline-card").insertAdjacentHTML("beforeend", mixTimelineRow(p, index));
+    const mix = app.querySelector(".mix-toggle");
+    mix.setAttribute("aria-expanded", String(ui.expandedTrackId === "__mix__"));
+    installTimelineInteractions();
+    if (focusData && !active.isConnected) {
+      const match = [...app.querySelectorAll("button")].find((el) => Object.entries(focusData).every(([key, value]) => el.dataset[key] === value));
+      match?.focus({ preventScroll: true });
+    }
+  }
+  function mixControl(p, index) {
+    const expanded = ui.expandedTrackId === "__mix__";
+    return `<button class="mix-toggle" data-action="toggle-timeline-track" data-track-id="__mix__" aria-expanded="${expanded}" aria-label="Mix changes">Mix${visibleEvents(p, "mix", null, index).length ? " •" : ""}</button>`;
+  }
   function mixTimelineRow(p, index) {
-    const events = visibleEvents(p, "mix", null, index),
-      expanded = ui.expandedTrackId === "__mix__";
-    return `<div class="mix-utility ${events.length ? "has-changes" : ""}"><button class="mix-toggle" data-action="toggle-timeline-track" data-track-id="__mix__" aria-expanded="${expanded}">Mix${events.length ? '<span class="mix-dot"></span>' : " +"}</button>${!expanded && events.length ? `<div class="mix-overview">${compactEventsHtml(p, "mix", null, index)}</div>` : ""}${expanded ? `<div class="track-detail">${eventDetailRows(p, "mix", null, index)}</div>` : ""}</div>`;
+    const events = visibleEvents(p, "mix", null, index), expanded = ui.expandedTrackId === "__mix__";
+    if (!events.length && !expanded) return "";
+    return `<div class="mix-utility" aria-label="Global Mix changes"><div class="micro">Global changes</div>${!expanded ? `<div class="mix-overview">${compactEventsHtml(p, "mix", null, index)}</div>` : eventDetailRows(p, "mix", null, index)}</div>`;
   }
   function sectionStudyPaneHtml(p, index) {
     const s = sections(p)[index],
@@ -1570,23 +1680,23 @@
       presentIds = trackIdsInSection(p, index),
       focusOptions = presentIds.map((id) => trackById(p, id)).filter(Boolean),
       done = sectionComplete(p, index);
-    return `<div class="study-pane"><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong></div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
+    return `<div class="study-pane"><div class="work-position">Section Study · ${index + 1} of ${sections(p).length}</div><h2>${esc(labels[index])}</h2><p class="sub">${s.lengthBars} bars</p><div class="study-workspace"><section class="arrangement-region" aria-label="Arrangement"><div class="timeline-card"><div class="timeline-head"><strong>Arrangement</strong>${mixControl(p, index)}</div><div class="timeline-ruler">${rulerHtml(Number(s.lengthBars))}</div>${tracks(
       p,
     )
       .map((t) => timelineTrackRow(p, t, index))
       .join(
         "",
-      )}${mixTimelineRow(p, index)}</div>${!presentIds.length ? `<div class="spacer-12"></div><button class="choice quiet ${d.silence ? "selected" : ""}" data-action="toggle-section-silence">No active tracks</button>` : ""}<div class="study-block"><div class="block-head"><strong>Feel</strong></div><div class="segment-stack">${Object.keys(
+      )}${mixTimelineRow(p, index)}</div>${!presentIds.length ? `<div class="spacer-12"></div><button class="choice quiet ${d.silence ? "selected" : ""}" data-action="toggle-section-silence">No active tracks</button>` : ""}</section><aside class="study-observations" aria-label="Section observations"><div class="study-block"><div class="block-head"><strong>Feel</strong></div><div class="segment-stack">${Object.keys(
       FEEL_SCALES,
     )
       .map((k) => renderScale(k, d))
       .join(
         "",
-      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details><div class="action-row"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
+      )}</div></div><div class="study-block"><div class="block-head"><strong>Focus</strong></div><div class="choice-wrap">${focusOptions.map((t) => `<button class="choice ${d.focusIds.includes(t.id) ? "selected" : ""}" data-action="toggle-focus" data-track-id="${t.id}" aria-pressed="${d.focusIds.includes(t.id)}">${esc(t.name)}</button>`).join("")}</div><div class="spacer-8"></div><button class="choice quiet ${d.focusState === "none" ? "selected" : ""}" data-action="focus-none" aria-pressed="${d.focusState === "none"}">No clear focus</button></div><details class="note-disclosure"><summary>Notes</summary><div class="note-grid"><div><label>Parking Lot</label><textarea class="textarea" data-input="section-parking" placeholder="Question or mystery for later">${esc(d.parking)}</textarea></div><div><label>Takeaway</label><textarea class="textarea" data-input="section-takeaway" placeholder="Something worth remembering">${esc(d.takeaway)}</textarea></div></div></details></aside></div><div class="action-row study-actions"><button class="secondary" data-action="prev-section" ${index === 0 ? "disabled" : ""}>Previous</button><button class="primary" data-action="next-section" ${done ? "" : "disabled"}>${index === sections(p).length - 1 ? "Review Map" : "Next"}</button></div></div>`;
   }
   function renderScale(key, d) {
     const value = d.feel?.[key];
-    return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map((opt) => `<button class="segment ${value === opt ? "selected" : ""}" data-action="set-feel" data-scale="${key}" data-value="${opt}">${opt}</button>`).join("")}</div></div>`;
+    return `<div class="scale-row"><div class="scale-label">${FEEL_LABELS[key]}</div><div class="segmented">${FEEL_SCALES[key].map((opt) => `<button class="segment ${value === opt ? "selected" : ""}" data-action="set-feel" data-scale="${key}" data-value="${opt}" aria-pressed="${value === opt}">${opt}</button>`).join("")}</div></div>`;
   }
   function renderSectionStudy() {
     const p = project();
@@ -1597,12 +1707,14 @@
       return;
     }
     ui.sectionIndex = clamp(ui.sectionIndex, 0, sections(p).length - 1);
+    const firstIncomplete = sections(p).findIndex((_, i) => !sectionComplete(p, i));
+    if (firstIncomplete >= 0) ui.sectionIndex = Math.min(ui.sectionIndex, firstIncomplete);
     const labels = sectionLabels(p);
     app.innerHTML =
       topbar(
         historyBackButton("map", "The Map"),
         phasePill(0),
-        `<span class="micro">${ui.sectionIndex + 1} of ${sections(p).length}</span>`,
+        savedMark(),
       ) +
       `<div class="horizontal-nav">${sections(p)
         .map((s, i) => {
@@ -1621,9 +1733,9 @@
   function animateSectionTo(newIndex) {
     ui.selectedEventId = null;
     ui.selectedPresenceId = null;
-    ui.splitRangeId = null;
     const p = project();
     newIndex = clamp(newIndex, 0, sections(p).length - 1);
+    if (!tracksDone(p) || sections(p).slice(0, newIndex).some((_, i) => !sectionComplete(p, i))) return;
     if (newIndex === ui.sectionIndex || ui.animating) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       ui.sectionIndex = newIndex;
@@ -1639,6 +1751,7 @@
       return renderSectionStudy();
     }
     ui.animating = true;
+    const entry = history.state;
     const forward = newIndex > ui.sectionIndex,
       stage = document.createElement("div");
     stage.className = "study-transition-stage";
@@ -1664,7 +1777,7 @@
       ),
     );
     setTimeout(() => {
-      if (ui.route !== "section-study") return;
+      if (ui.route !== "section-study" || history.state !== entry) { ui.animating = false; return; }
       ui.sectionIndex = newIndex;
       ui.expandedTrackId = null;
       ui.animating = false;
@@ -1678,7 +1791,7 @@
       unused = tracks(p).filter((t) => !trackUsedAnywhere(p, t.id));
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<h2>Review the map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p><div class="section-kicker">Structure</div><div class="chip-list">${sections(
+      `<h2>Review Map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p><div class="section-kicker">Structure</div><div class="chip-list">${sections(
         p,
       )
         .map(
@@ -1693,7 +1806,7 @@
         .map((t) => `<span class="chip">${esc(t.name)}</span>`)
         .join(
           "",
-        )}</div>${unused.length ? `<div class="spacer-18"></div><button class="warning-card" data-action="go" data-route="tracks" style="width:100%;text-align:left"><strong>Unused tracks</strong><p>${esc(unused.map((t) => t.name).join(" · "))} ${unused.length === 1 ? "does" : "do"} not appear in any section.</p></button>` : ""}<div class="section-kicker">Sections</div><div class="group-card" style="padding:0 14px">${sections(
+        )}</div>${unused.length ? `<div class="spacer-18"></div><button class="warning-card" data-action="go" data-route="tracks" style="width:100%;text-align:left"><strong>Unused tracks</strong><p>${esc(unused.map((t) => t.name).join(" · "))} ${unused.length === 1 ? "does" : "do"} not appear in any section.</p></button>` : ""}<div class="section-kicker">Sections</div><div class="review-sections">${sections(
         p,
       )
         .map((s, i) => renderSummaryCard(p, i, labels[i]))
@@ -1724,7 +1837,7 @@
               .map((id) => focusName(p, id))
               .filter(Boolean)
               .join(" · ");
-    return `<button class="summary-card" data-action="summary-jump" data-index="${index}"><div class="summary-title"><strong>${esc(label)}</strong><span>Edit ›</span></div><div class="summary-lines"><div class="summary-line"><b>Length</b><span>${s.lengthBars} bars</span></div><div class="summary-line"><b>Tracks</b><span>${d.silence ? "No active tracks" : esc(names.join(" · ") || "Not mapped")}</span></div><div class="summary-line"><b>Changes</b><span>${eventCount ? `${eventCount} mapped` : "None mapped"}</span></div><div class="summary-line"><b>Feel</b><span>${esc(feel || "Not mapped")}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus || "Not mapped")}</span></div>${d.parking ? `<div class="summary-line"><b>Parking Lot</b><span>${esc(d.parking)}</span></div>` : ""}${d.takeaway ? `<div class="summary-line"><b>Takeaway</b><span>${esc(d.takeaway)}</span></div>` : ""}</div></button>`;
+    return `<details class="workflow-disclosure"><summary><strong>${esc(label)}</strong><span class="micro">${s.lengthBars} bars · ${esc(names.join(" · ") || "No active tracks")}</span><span class="chev">⌄</span></summary><button class="mini-btn" data-action="summary-jump" data-index="${index}">Edit ${esc(label)}</button><div class="summary-lines"><div class="summary-line"><b>Length</b><span>${s.lengthBars} bars</span></div><div class="summary-line"><b>Tracks</b><span>${d.silence ? "No active tracks" : esc(names.join(" · ") || "Not mapped")}</span></div><div class="summary-line"><b>Changes</b><span>${eventCount ? `${eventCount} mapped` : "None mapped"}</span></div><div class="summary-line"><b>Feel</b><span>${esc(feel || "Not mapped")}</span></div><div class="summary-line"><b>Focus</b><span>${esc(focus || "Not mapped")}</span></div>${d.parking ? `<div class="summary-line"><b>Parking Lot</b><span>${esc(d.parking)}</span></div>` : ""}${d.takeaway ? `<div class="summary-line"><b>Takeaway</b><span>${esc(d.takeaway)}</span></div>` : ""}</div></details>`;
   }
 
   function renderSkeletonHome() {
@@ -1736,23 +1849,40 @@
           "Create tracks and section markers.",
           "skeleton-session",
           sessionDone(p),
-          mapDone(p) || sessionDone(p),
+          mapDone(p),
         ) +
         checkpointRow(
           "Draft",
           "Build every mapped part end to end.",
           "skeleton-draft",
           draftDone(p),
-          sessionDone(p) || draftDone(p) || bounceDone(p),
+          sessionDone(p),
         ) +
         checkpointRow(
           "Bounce",
           "Export and hear the complete draft.",
           "skeleton-bounce",
           bounceDone(p),
-          draftDone(p) || bounceDone(p),
+          draftDone(p),
         );
     app.innerHTML = phaseHome(1, done, 3, checkpoints);
+  }
+  function refreshSkeletonChecks() {
+    const p = project();
+    app.querySelectorAll('[data-action="toggle-session-track"], [data-action="toggle-session-marker"]').forEach((el) => {
+      const on = el.dataset.trackId ? p.skeleton.session.tracks[el.dataset.trackId] : p.skeleton.session.markers[el.dataset.sectionId];
+      el.setAttribute("aria-pressed", String(!!on));
+      el.querySelector(".round-check").classList.toggle("on", !!on);
+    });
+    const next = app.querySelector('[data-route="skeleton-draft"]');
+    if (next) next.disabled = !sessionDone(p);
+    for (const [action, on] of [["toggle-bounce-export", p.skeleton.bounce.exported], ["toggle-bounce-listen", p.skeleton.bounce.listened]]) {
+      const el = app.querySelector(`[data-action="${action}"]`);
+      if (el) { el.classList.toggle("on", !!on); el.setAttribute("aria-pressed", String(!!on)); el.querySelector(".round-check").classList.toggle("on", !!on); }
+    }
+    const listen = app.querySelector('[data-action="toggle-bounce-listen"]'), roadmap = app.querySelector('[data-route="roadmap"]');
+    if (listen) listen.disabled = !p.skeleton.bounce.exported;
+    if (roadmap) roadmap.disabled = !skeletonDone(p);
   }
   function renderSkeletonSession() {
     const p = project(),
@@ -1763,7 +1893,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Set up the session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
+      `<div class="work-position">1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="session-groups"><section><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
         p,
       )
         .map(
@@ -1772,7 +1902,7 @@
         )
         .join(
           "",
-        )}</div><div class="section-kicker">Markers</div><div class="group-card list">${sections(
+        )}</div></section><section><div class="section-kicker">Markers</div><div class="group-card list">${sections(
         p,
       )
         .map(
@@ -1781,59 +1911,39 @@
         )
         .join(
           "",
-        )}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-draft" ${sessionDone(p) ? "" : "disabled"}>Next</button>`;
+        )}</div></section></div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-draft" ${sessionDone(p) ? "" : "disabled"}>Next</button>`;
+  }
+  function draftSectionHtml(p, s, i) {
+    const req = draftRequirements(p, i), state = p.skeleton.draft.parts[s.id] || {},
+      count = req.filter((id) => state[id]).length, done = draftSectionDone(p, i);
+    return `<details class="workflow-disclosure" data-draft-section="${s.id}" ${ui.draftOpenId === s.id ? "open" : ""}><summary><span class="round-check ${done ? "on" : ""}"></span><span><strong>${esc(sectionLabels(p)[i])}</strong><span class="copy">${req.length ? `${count} of ${req.length} tracks` : "No active tracks · Complete"}</span></span><span class="chev">⌄</span></summary><div class="draft-checks">${req.map((id) => `<button class="list-row" data-action="toggle-draft-part" data-section-id="${s.id}" data-track-id="${id}" aria-pressed="${!!state[id]}"><span class="round-check ${state[id] ? "on" : ""}"></span><div><div class="title">${esc(trackById(p, id)?.name)}</div><div class="desc">${esc(timingSummary(p, id, i))}${relevantTrackEvents(p, id, i).length ? ` · ${esc(relevantTrackEvents(p, id, i).join(" · "))}` : ""}</div></div></button>`).join("")}${!req.length ? '<p class="micro">Intentionally silent in The Map.</p>' : ""}</div></details>`;
+  }
+  function draftCoverage(p) {
+    const total = sections(p).reduce((n, _, i) => n + draftRequirements(p, i).length, 0);
+    const done = sections(p).reduce((n, s, i) => n + draftRequirements(p, i).filter((id) => p.skeleton.draft.parts[s.id]?.[id]).length, 0);
+    return `${done} of ${total} mapped parts · ${sections(p).filter((_, i) => draftSectionDone(p, i)).length} of ${sections(p).length} sections`;
   }
   function renderSkeletonDraft() {
-    const p = project(),
-      labels = sectionLabels(p);
-    app.innerHTML =
-      topbar(
-        historyBackButton("skeleton", "The Skeleton"),
-        phasePill(1),
-        savedMark(),
-      ) +
-      `<h2>Build the draft</h2><p class="sub">Complete each mapped part in the song.</p><div class="section-kicker">Sections</div><div class="group-card list">${sections(
-        p,
-      )
-        .map((s, i) => {
-          const req = draftRequirements(p, i),
-            state = p.skeleton.draft.parts[s.id] || {},
-            count = req.filter((id) => state[id]).length,
-            done = draftSectionDone(p, i);
-          return `<button class="list-row draft-section-row" data-action="open-draft-section" data-index="${i}"><span class="round-check ${done ? "on" : ""}"></span><div><div class="title">${esc(labels[i])}</div><div class="desc">${req.length ? `${count} of ${req.length} tracks` : "No active tracks"}</div></div><span class="chev">›</span></button>`;
-        })
-        .join(
-          "",
-        )}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+    const p = project();
+    app.innerHTML = topbar(historyBackButton("skeleton", "The Skeleton"), phasePill(1), savedMark()) +
+      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div><div class="draft-sections">${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+  }
+  function refreshDraftChecks() {
+    const p = project();
+    app.querySelectorAll("[data-draft-section]").forEach((details, i) => {
+      const sid = details.dataset.draftSection, req = draftRequirements(p, i), state = p.skeleton.draft.parts[sid] || {};
+      details.querySelector("summary .round-check").classList.toggle("on", draftSectionDone(p, i));
+      details.querySelector("summary .copy").textContent = req.length ? `${req.filter((id) => state[id]).length} of ${req.length} tracks` : "No active tracks · Complete";
+      details.querySelectorAll('[data-action="toggle-draft-part"]').forEach((el) => {
+        el.setAttribute("aria-pressed", String(!!state[el.dataset.trackId]));
+        el.querySelector(".round-check").classList.toggle("on", !!state[el.dataset.trackId]);
+      });
+    });
+    document.getElementById("draftCoverage").textContent = draftCoverage(p);
+    app.querySelector('[data-route="skeleton-bounce"]').disabled = !draftDone(p);
   }
   function relevantTrackEvents(p, trackId, index) {
     return visibleEvents(p, "track", trackId, index).map((x) => x.event.label);
-  }
-  function renderDraftSection() {
-    const p = project(),
-      index = clamp(ui.sectionIndex, 0, sections(p).length - 1),
-      s = sections(p)[index],
-      labels = sectionLabels(p),
-      req = draftRequirements(p, index),
-      state = p.skeleton.draft.parts[s.id] || {};
-    app.innerHTML =
-      topbar(
-        historyBackButton("skeleton-draft", "Draft"),
-        phasePill(1),
-        savedMark(),
-      ) +
-      `<h2>${esc(labels[index])}</h2><p class="sub">Build the parts The Map says belong here.</p><div class="section-kicker">Tracks</div><div class="group-card list">${
-        req.length
-          ? req
-              .map((id) => {
-                const t = trackById(p, id),
-                  events = relevantTrackEvents(p, id, index),
-                  summary = timingSummary(p, id, index);
-                return `<button class="list-row" data-action="toggle-draft-part" data-track-id="${id}"><span class="round-check ${state[id] ? "on" : ""}"></span><div><div class="title">${esc(t?.name || "Track")}</div><div class="desc">${esc(summary)}${events.length ? ` · ${esc(events.join(" · "))}` : ""}</div></div><span></span></button>`;
-              })
-              .join("")
-          : `<div class="empty" style="padding:18px 14px">No active tracks in this section.</div>`
-      }</div>`;
   }
   function renderSkeletonBounce() {
     const p = project();
@@ -1843,7 +1953,7 @@
         phasePill(1),
         savedMark(),
       ) +
-      `<h2>Bounce the draft</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>Next Phase</button>`;
+      `<div class="work-position">3 of 3</div><h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
   }
 
   function renderRoadmap() {
@@ -1855,19 +1965,19 @@
           phaseTag("Roadmap"),
           "",
         ) +
-        `<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div>${ORIGINAL_PHASES.map((ph, i) => `<div class="road-phase ${i === 0 ? "current" : "future"}"><div class="road-top"><div class="road-num">${i + 1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join("")}`;
+        `<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div><div class="roadmap-grid">${ORIGINAL_PHASES.map((ph, i) => `<div class="road-phase ${i === 0 ? "current" : "future"}"><div class="road-top"><div class="road-num">${i + 1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join("")}</div>`;
       return;
     }
     app.innerHTML =
       topbar(backButton("project", "Recreation"), phaseTag("Roadmap"), "") +
-      `<h2>Recreation roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div>${STUDY_PHASES.map(
+      `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div><div class="roadmap-grid">${STUDY_PHASES.map(
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
             unlocked = studyPhaseUnlocked(p, i),
             tag = unlocked ? "button" : "div";
-          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
+          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p><span class="micro">${st === "unimplemented" ? "Coming later · Not implemented" : st === "done" ? "Completed" : st === "current" ? "Current" : st === "available" ? "Available" : "Locked"}</span></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
         },
-      ).join("")}`;
+      ).join("")}</div>`;
   }
   function renderNotes() {
     const p = project();
@@ -1889,7 +1999,7 @@
     });
     app.innerHTML =
       topbar(backButton("project", "Recreation"), phaseTag("Notes"), "") +
-      `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}<div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}`;
+      `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>`;
   }
   function noteCard(ctx, text) {
     return `<div class="card card-pad" style="margin-bottom:9px"><div class="micro" style="margin-bottom:6px">${esc(ctx)}</div><div style="font-size:14px;line-height:1.5">${esc(text)}</div></div>`;
@@ -1924,16 +2034,43 @@
       customName: false,
       customBars: false,
     };
+    sheetRoot.replaceChildren();
     renderSectionBuilder();
     openSheet();
   }
   let sectionDraft = null;
   function lengthChoices(value, action) {
-    return `<div class="choice-wrap">${[4, 8, 12, 16].map((n) => `<button class="choice ${Number(value) === n ? "selected" : ""}" data-action="${action}" data-bars="${n}" aria-pressed="${Number(value) === n}">${n}</button>`).join("")}<button class="choice ${value === "custom" ? "selected" : ""}" data-action="${action}" data-bars="custom">Custom</button></div>`;
+    return `<div class="length-segmented" role="group" aria-label="Bar length">${[4, 8, 12, 16].map((n) => `<button class="choice ${Number(value) === n ? "selected" : ""}" data-action="${action}" data-bars="${n}" aria-pressed="${Number(value) === n}">${n}</button>`).join("")}<button class="choice ${value === "custom" ? "selected" : ""}" data-action="${action}" data-bars="custom">Custom</button></div>`;
   }
   function renderSectionBuilder() {
     const d = sectionDraft;
-    sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add section</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice ${d.name === name ? "selected" : ""}" data-action="choose-section-type" data-name="${name}" aria-pressed="${d.name === name}">${name}</button>`).join("")}</div>${d.customName ? `<div class="spacer-12"></div><input class="field" id="newSectionName" aria-label="Section name" placeholder="Section name" value="${esc(d.typedName || "")}">` : ""}<div class="section-kicker">Bars</div>${lengthChoices(d.customBars ? "custom" : d.bars, "set-new-section-bars")}${d.customBars ? `<div class="spacer-12"></div><input class="field" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars" value="${d.bars || ""}">` : ""}<div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section" ${!d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName)) ? "disabled" : ""}>Add Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    // Build once per opening. Selection only updates properties on existing nodes.
+    if (!sheetRoot.querySelector(".section-builder")) {
+      sheetRoot.innerHTML = `<div class="sheet section-builder"><div class="grabber"></div><h3>Add section</h3><div class="section-kicker">Section</div><div class="choice-wrap">${[...SECTION_TYPES, "Custom"].map((name) => `<button class="choice" data-action="choose-section-type" data-name="${name}">${name}</button>`).join("")}</div><input hidden class="field custom-length" id="newSectionName" aria-label="Section name" placeholder="Section name"><div class="section-kicker">Bars</div>${lengthChoices(null, "set-new-section-bars")}<input hidden class="field custom-length" id="newSectionBars" type="number" inputmode="numeric" min="1" max="256" aria-label="Custom bar length" placeholder="Number of bars"><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="save-new-section">Add Section</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    }
+    sheetRoot.querySelectorAll('[data-action="choose-section-type"]').forEach((el) => setSelected(el, el.dataset.name === d.name));
+    sheetRoot.querySelectorAll('[data-action="set-new-section-bars"]').forEach((el) => setSelected(el, d.customBars ? el.dataset.bars === "custom" : Number(el.dataset.bars) === d.bars));
+    const name = document.getElementById("newSectionName"), bars = document.getElementById("newSectionBars");
+    name.hidden = !d.customName;
+    bars.hidden = !d.customBars;
+    if (document.activeElement !== bars) bars.value = d.bars || "";
+    sheetRoot.querySelector('[data-action="save-new-section"]').disabled = !d.name || !validBars(d.bars) || (d.customName && !clean(d.typedName));
+  }
+  function setSelected(el, selected) {
+    el.classList.toggle("selected", selected);
+    el.setAttribute("aria-pressed", String(selected));
+  }
+  function refreshStudySelections() {
+    const p = project(), d = sectionData(p, sections(p)[ui.sectionIndex].id);
+    app.querySelectorAll('[data-action="set-feel"]').forEach((el) => setSelected(el, d.feel[el.dataset.scale] === el.dataset.value));
+    app.querySelectorAll('[data-action="toggle-focus"]').forEach((el) => setSelected(el, d.focusIds.includes(el.dataset.trackId)));
+    app.querySelectorAll('[data-action="focus-none"]').forEach((el) => setSelected(el, d.focusState === "none"));
+    const next = app.querySelector('[data-action="next-section"]');
+    if (next) next.disabled = !sectionComplete(p, ui.sectionIndex);
+    app.querySelectorAll(".section-tab").forEach((el, i) => {
+      el.classList.toggle("done", sectionComplete(p, i));
+      el.disabled = sections(p).slice(0, i).some((_, j) => !sectionComplete(p, j));
+    });
   }
   function suggestedBarsFor(p, name) {
     const found = [...sections(p)]
@@ -1996,20 +2133,6 @@
     sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
     openSheet();
   }
-  function openPhaseNavigator(index) {
-    const p = project();
-    if (!p || p.type !== "study") return;
-    sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>Roadmap</h3><button class="phase-nav-project" data-action="open-project-overview"><div><strong>${esc(p.title)}</strong><span class="copy">Project overview</span></div><span class="phase-nav-arrow">›</span></button><div class="phase-nav-list">${STUDY_PHASES.map(
-      (ph, i) => {
-        const st = studyPhaseStatus(p, i),
-          unlocked = studyPhaseUnlocked(p, i);
-        return `<button class="phase-nav-row" data-action="open-phase" data-index="${i}" ${unlocked ? "" : "disabled"}>${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<span class="lock-dot">•</span>`}<div><strong>${esc(ph.title)}</strong><span class="copy">${esc(ph.desc)}</span></div><span class="phase-nav-arrow">${unlocked ? "›" : ""}</span></button>`;
-      },
-    ).join(
-      "",
-    )}</div><button class="sheet-close" data-action="close-sheet">Done</button></div>`;
-    openSheet();
-  }
   function openProjectMenu(id) {
     const p = db.projects.find((x) => x.id === id);
     if (!p) return;
@@ -2032,11 +2155,13 @@
     sheetClearTimer = null;
     sheetRoot.classList.add("open");
     sheetRoot.setAttribute("aria-hidden", "false");
-    sheetRoot
-      .querySelector("button:not(:disabled),input")
-      ?.focus({ preventScroll: true });
+    app.inert = true;
+    document.getElementById("undoNotice").inert = true;
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
   }
   function closeSheet() {
+    app.inert = false;
+    document.getElementById("undoNotice").inert = false;
     document.body.classList.remove("sheet-open");
     sheetRoot.classList.remove("open");
     if (sheetOpener?.isConnected) sheetOpener.focus({ preventScroll: true });
@@ -2149,6 +2274,7 @@
     save();
   }
   function addPresenceSection(p, trackId, index) {
+    const before = copyProject();
     const s = sections(p)[index],
       r = { id: uid(), trackId, start: { sectionId: s.id, bar: 0 }, end: null };
     p.map.timeline.presence.push(r);
@@ -2163,6 +2289,7 @@
         .map((s) => s.id),
     );
     save();
+    offerUndo(before, "Track started");
   }
   function presenceGapInSection(p, trackId, index) {
     if (!lengthsComplete(p)) return null;
@@ -2184,23 +2311,6 @@
       cursor = Math.max(cursor, x.end);
     }
     return cursor < a1 - 1e-6 ? { start: cursor, end: a1 } : null;
-  }
-  function createAdditionalPresence(p, trackId, index) {
-    const gap = presenceGapInSection(p, trackId, index);
-    if (!gap) return null;
-    const future = presenceForTrack(p, trackId)
-        .map((r) => rangeAbs(p, r))
-        .filter((x) => x.start > gap.start + 1e-6)
-        .sort((a, b) => a.start - b.start)[0],
-      r = {
-        id: uid(),
-        trackId,
-        start: anchorAtAbs(p, gap.start, false),
-        end: future ? anchorAtAbs(p, future.start, true) : null,
-      };
-    p.map.timeline.presence.push(r);
-    sectionData(p, sections(p)[index].id).silence = false;
-    return r;
   }
   function subtractSectionFromTrack(p, trackId, index) {
     if (!lengthsComplete(p)) return;
@@ -2316,6 +2426,7 @@
           document.body.classList.add("is-sorting");
           const finish = (cancel) => {
             controller.abort();
+            cancelGesture = null;
             const target = [...container.children].indexOf(placeholder);
             ghost.remove();
             placeholder.replaceWith(row);
@@ -2323,6 +2434,8 @@
             if (!cancel) moveSection(project(), row.dataset.sectionId, target);
             renderStructure();
           };
+          cancelGesture = () => finish(true);
+          window.addEventListener("resize", () => finish(true), opts);
           window.addEventListener(
             "pointermove",
             (ev) => {
@@ -2365,33 +2478,9 @@
     });
   }
   function installTimelineInteractions() {
-    app
-      .querySelectorAll("[data-presence-handle]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "presence", el.dataset.edge),
-          { passive: false },
-        ),
-      );
-    app
-      .querySelectorAll("[data-event-handle]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "event", el.dataset.edge),
-          { passive: false },
-        ),
-      );
-    app
-      .querySelectorAll("[data-event-marker]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "event", "point"),
-          { passive: false },
-        ),
-      );
+    app.querySelectorAll("[data-presence-handle], [data-event-handle], [data-event-marker]").forEach((el) => {
+      el.onpointerdown = (e) => startTimelineDrag(e, el.hasAttribute("data-presence-handle") ? "presence" : "event", el.dataset.edge || "point");
+    });
   }
   function startTimelineDrag(e, type, edge) {
     if ((e.button !== undefined && e.button !== 0) || ui.animating) return;
@@ -2408,6 +2497,7 @@
         type === "presence" ? ".timeline-lane" : ".change-lane",
       ),
       rect = lane.getBoundingClientRect(),
+      viewportWidth = innerWidth, viewportHeight = innerHeight,
       s = sections()[ui.sectionIndex],
       len = Number(s.lengthBars),
       position = document.getElementById("dragPosition");
@@ -2419,7 +2509,9 @@
       handle.setPointerCapture(e.pointerId);
     } catch (_) {}
     const finish = (cancel) => {
+      cancel ||= innerWidth !== viewportWidth || innerHeight !== viewportHeight || lane.getBoundingClientRect().width !== rect.width;
       controller.abort();
+      cancelGesture = null;
       document.body.classList.remove("is-dragging");
       position.hidden = true;
       if (cancel || !moved) {
@@ -2429,6 +2521,9 @@
       }
       finishTimelineEdit(before, obj, type, "Timing changed");
     };
+    cancelGesture = () => finish(true);
+    handle.addEventListener("lostpointercapture", () => finish(true), opts);
+    window.addEventListener("resize", () => finish(true), opts);
     window.addEventListener(
       "pointermove",
       (ev) => {
@@ -2494,9 +2589,11 @@
 
   app.addEventListener("click", (e) => {
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
+    if (action === "place-boundary") return openBoundaryPlacement(b.dataset.kind, b.dataset.id, b.dataset.edge);
+    if (action === "start-track") return openBoundaryPlacement("presence", null, "resume", b.dataset.trackId);
     if (action === "history-back") {
       if (history.state?.fromRoute) {
         history.back();
@@ -2508,7 +2605,10 @@
     if (action === "new-project") return go("new-project");
     if (action === "set-new-type") {
       ui.newType = b.dataset.type;
-      return renderNewProject();
+      app.querySelectorAll('[data-action="set-new-type"]').forEach((el) => setSelected(el, el.dataset.type === ui.newType));
+      document.getElementById("newArtist").hidden = ui.newType !== "study";
+      document.getElementById("newTitle").placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      return;
     }
     if (action === "create-project") {
       const title =
@@ -2532,9 +2632,7 @@
     }
     if (action === "project-menu") return openProjectMenu(b.dataset.id);
     if (action === "settings") return openSettings();
-    if (action === "phase-nav")
-      return openPhaseNavigator(Number(b.dataset.phaseIndex));
-    if (action === "toggle-setup") {
+        if (action === "toggle-setup") {
       p.map.setup[b.dataset.field] = !p.map.setup[b.dataset.field];
       invalidateMapVerification(p);
       save();
@@ -2554,7 +2652,10 @@
         t = tracks(p).find((x) => x.name === name);
       if (t) removeTrack(p, t.id);
       else addTrack(name);
-      return renderTracks();
+      const names = new Set(tracks(p).map((t) => t.name));
+      app.querySelectorAll('[data-action="toggle-track-choice"]').forEach((el) => setSelected(el, names.has(el.dataset.name)));
+      app.querySelector('[data-action="start-section-study"]').disabled = !tracksDone(p);
+      return;
     }
     if (action === "add-custom-track") {
       const input = document.getElementById("customTrack"),
@@ -2589,7 +2690,7 @@
         b.dataset.trackId,
         ui.sectionIndex,
       )[0]?.range.id;
-      return renderSectionStudy();
+      return refreshArrangement();
     }
     if (action === "add-presence-section") {
       addPresenceSection(p, b.dataset.trackId, ui.sectionIndex);
@@ -2601,25 +2702,6 @@
       )[0]?.range.id;
       ui.selectedEventId = null;
       return renderSectionStudy();
-    }
-    if (action === "add-another-presence") {
-      const r = createAdditionalPresence(p, b.dataset.trackId, ui.sectionIndex);
-      if (r) {
-        mergePresenceForTrack(p, r.trackId, false);
-        invalidateMapVerification(p);
-        invalidateDraftTrack(p, r.trackId, sectionIdsForRange(p, r));
-        normalizeAllFocus(p);
-        save();
-        ui.expandedTrackId = r.trackId;
-        ui.selectedPresenceId = visiblePresence(
-          p,
-          r.trackId,
-          ui.sectionIndex,
-        )[0]?.range.id;
-        ui.selectedEventId = null;
-        return renderSectionStudy();
-      }
-      return;
     }
     if (action === "open-add-change")
       return openAddChangeSheet(
@@ -2650,7 +2732,7 @@
       d.feel[b.dataset.scale] = b.dataset.value;
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "toggle-focus") {
       const d = sectionData(p, sections(p)[ui.sectionIndex].id),
@@ -2661,7 +2743,7 @@
       d.focusState = d.focusIds.length ? "selected" : "";
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "focus-none") {
       const d = sectionData(p, sections(p)[ui.sectionIndex].id);
@@ -2669,7 +2751,7 @@
       d.focusState = d.focusState === "none" ? "" : "none";
       invalidateMapVerification(p);
       save();
-      return renderSectionStudy();
+      return refreshStudySelections();
     }
     if (action === "summary-jump") {
       ui.sectionIndex = Number(b.dataset.index);
@@ -2694,39 +2776,36 @@
         !p.skeleton.session.tracks[b.dataset.trackId];
       invalidateBounce(p);
       save();
-      return renderSkeletonSession();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-session-marker") {
       p.skeleton.session.markers[b.dataset.sectionId] =
         !p.skeleton.session.markers[b.dataset.sectionId];
       invalidateBounce(p);
       save();
-      return renderSkeletonSession();
-    }
-    if (action === "open-draft-section") {
-      ui.sectionIndex = Number(b.dataset.index);
-      return go("draft-section");
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-draft-part") {
-      const s = sections(p)[ui.sectionIndex],
+      const s = sections(p).find((sec) => sec.id === b.dataset.sectionId),
         id = b.dataset.trackId;
+      if (!s || !sessionDone(p)) return;
       p.skeleton.draft.parts[s.id] = p.skeleton.draft.parts[s.id] || {};
       p.skeleton.draft.parts[s.id][id] = !p.skeleton.draft.parts[s.id][id];
       invalidateBounce(p);
       save();
-      return renderDraftSection();
+      return refreshDraftChecks();
     }
     if (action === "toggle-bounce-export") {
       p.skeleton.bounce.exported = !p.skeleton.bounce.exported;
       if (!p.skeleton.bounce.exported) p.skeleton.bounce.listened = false;
       save();
-      return renderSkeletonBounce();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-bounce-listen") {
       if (!p.skeleton.bounce.exported) return;
       p.skeleton.bounce.listened = !p.skeleton.bounce.listened;
       save();
-      return renderSkeletonBounce();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-spark-start") {
       toggleArray(p.spark.starts, b.dataset.name);
@@ -2742,9 +2821,10 @@
   app.addEventListener("input", (e) => {
     const p = project();
     if (e.target.id === "tempoInput") {
-      p.map.setup.tempo = e.target.value.replace(/[^0-9.]/g, "");
+      p.map.setup.tempo = e.target.value;
       invalidateMapVerification(p);
       save();
+      refreshMapProgress();
     }
     if (e.target.dataset.input === "phase-parking") {
       p.map.phaseParking = e.target.value;
@@ -2776,15 +2856,24 @@
       project().map.setup.meter = e.target.value;
       invalidateMapVerification(project());
       save();
+      refreshMapProgress();
     }
   });
   app.addEventListener("keydown", (e) => {
+    const handle = e.target.closest("[data-presence-handle], [data-event-handle], [data-event-marker]");
+    if (handle && ["Enter", " ", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      e.preventDefault();
+      const type = handle.hasAttribute("data-presence-handle") ? "presence" : "event";
+      const id = handle.dataset.rangeId || handle.dataset.eventId;
+      return openBoundaryPlacement(type, id, handle.dataset.edge || "point");
+    }
+
     if (
       (e.key === "Enter" || e.key === " ") &&
-      e.target.matches(".structure-row")
+      e.target.matches(".structure-row, [data-drag-handle]")
     ) {
       e.preventDefault();
-      return openSectionSheet(e.target.dataset.sectionId);
+      return openSectionSheet(e.target.closest("[data-section-id]").dataset.sectionId);
     }
     if (e.key !== "Enter" || e.shiftKey) return;
     if (e.target.id === "customTrack") {
@@ -2796,10 +2885,11 @@
   sheetRoot.addEventListener("click", (e) => {
     if (e.target === sheetRoot) return closeSheet();
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
     if (action === "close-sheet") return closeSheet();
+    if (action === "commit-placement") return commitPlacement();
     if (action === "move-section") {
       moveSection(
         p,
@@ -2840,11 +2930,10 @@
     if (action === "set-sheet-bars") {
       const input = document.getElementById("sectionBars");
       input.hidden = b.dataset.bars !== "custom";
-      if (!input.hidden) input.focus();
-      else input.value = b.dataset.bars;
+      if (input.hidden) input.value = b.dataset.bars;
       sheetRoot
         .querySelectorAll('[data-action="set-sheet-bars"]')
-        .forEach((x) => x.classList.toggle("selected", x === b));
+        .forEach((x) => setSelected(x, x === b));
       return;
     }
     if (action === "save-section") {
@@ -2923,18 +3012,6 @@
       save();
       offerUndo(before, "Change added");
       return renderSectionStudy();
-    }
-    if (action === "open-project-overview") {
-      closeSheet();
-      return go("project");
-    }
-    if (action === "open-phase") {
-      const i = Number(b.dataset.index);
-      if (studyPhaseUnlocked(p, i)) {
-        closeSheet();
-        return go(STUDY_PHASES[i].route);
-      }
-      return;
     }
     if (action === "export-backup") return exportBackup();
     if (action === "import-backup") {
@@ -3063,6 +3140,7 @@
         type === "presence"
           ? before.map.timeline.presence.find((x) => x.id === obj.id)
           : before.map.timeline.events.find((x) => x.id === obj.id);
+    if (JSON.stringify(old) === JSON.stringify(obj)) return renderSectionStudy();
     if (type === "presence") {
       const ids = [
         ...sectionIdsForRange(before, old),
@@ -3180,65 +3258,24 @@
     }
     return true;
   }
-  function nudgeTiming(type, id, edge, delta) {
-    const obj = selectedObject(type, id);
-    if (!obj) return;
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      len = Number(s.lengthBars),
-      before = copyProject();
-    const anchor = obj[edge],
-      same = anchor?.sectionId === s.id;
-    let value = same
-      ? anchorValueInSection(s, anchor)
-      : edge === "end"
-        ? len
-        : 0;
-    // The first edit of a continuing edge establishes a local boundary; subsequent
-    // taps move it by one whole bar, just like the drag handle.
-    if (same) value += delta;
-    if (applyTiming(obj, type, edge, value))
-      finishTimelineEdit(before, obj, type, "Timing changed");
-  }
-  function splitEditor(r) {
-    const p = project(),
-      s = sections(p)[ui.sectionIndex],
-      a = rangeAbs(p, r),
-      start = sectionStarts(p)[ui.sectionIndex],
-      lo = Math.max(0, a.start - start),
-      hi = Math.min(Number(s.lengthBars), a.end - start);
-    if (hi - lo < 3)
-      return '<p class="micro">Trim an edge to make room for a gap.</p>';
-    const middle = Math.floor((lo + hi) / 2);
-    return `<div class="gap-editor"><label>From bar<input id="gapStart" type="number" min="${lo + 2}" max="${hi - 1}" value="${middle + 1}"></label><label>Through bar<input id="gapEnd" type="number" min="${lo + 2}" max="${hi - 1}" value="${middle + 1}"></label><button class="mini-btn" data-action="apply-split" data-id="${r.id}">Add gap</button><button class="mini-btn" data-action="cancel-split">Cancel</button></div>`;
-  }
   app.addEventListener("click", (e) => {
     const b = e.target.closest("[data-action]");
-    if (!b || ui.animating) return;
+    if (!b || b.disabled || ui.animating) return;
     const action = b.dataset.action,
       p = project();
     if (action === "select-presence") {
       ui.expandedTrackId = b.dataset.trackId;
       ui.selectedPresenceId = b.dataset.rangeId;
       ui.selectedEventId = null;
-      ui.splitRangeId = null;
-      return renderSectionStudy();
+        return refreshArrangement();
     }
     if (action === "select-event") {
       const ev = p.map.timeline.events.find((x) => x.id === b.dataset.eventId);
       if (!ev) return;
       ui.selectedEventId = ev.id;
       ui.selectedPresenceId = null;
-      ui.splitRangeId = null;
-      return renderSectionStudy();
+        return refreshArrangement();
     }
-    if (action === "nudge-timing")
-      return nudgeTiming(
-        b.dataset.kind,
-        b.dataset.id,
-        b.dataset.edge,
-        Number(b.dataset.delta),
-      );
     if (action === "continue-range") {
       const type = b.dataset.kind,
         obj = selectedObject(type, b.dataset.id);
@@ -3277,48 +3314,10 @@
       );
       return renderSectionStudy();
     }
-    if (action === "split-presence") {
-      ui.splitRangeId = b.dataset.id;
-      return renderSectionStudy();
-    }
-    if (action === "cancel-split") {
-      ui.splitRangeId = null;
-      return renderSectionStudy();
-    }
-    if (action === "apply-split") {
-      const r = selectedObject("presence", b.dataset.id);
-      if (!r) return;
-      const s = sections(p)[ui.sectionIndex],
-        base = sectionStarts(p)[ui.sectionIndex],
-        a = Number(document.getElementById("gapStart").value) - 1,
-        z = Number(document.getElementById("gapEnd").value),
-        span = rangeAbs(p, r);
-      if (
-        !Number.isInteger(a) ||
-        !Number.isInteger(z) ||
-        a < 0 ||
-        z > Number(s.lengthBars) ||
-        z <= a ||
-        base + a <= span.start ||
-        base + z >= span.end
-      )
-        return;
-      const before = copyProject(),
-        right = {
-          ...r,
-          id: uid(),
-          start: { sectionId: s.id, bar: z },
-          end: r.end,
-        };
-      r.end = { sectionId: s.id, bar: a };
-      p.map.timeline.presence.push(right);
-      ui.splitRangeId = null;
-      // Invalidate the original span, including the new right-hand piece.
-      finishTimelineEdit(before, r, "presence", "Gap added");
-      return;
-    }
+
   });
   sheetRoot.addEventListener("input", (e) => {
+    if (e.target.id === "placementPosition" && placement) { placement.value = Number(e.target.value); updatePlacementLabel(); return; }
     if (!sectionDraft) return;
     if (e.target.id === "newSectionName")
       sectionDraft.typedName = e.target.value;
@@ -3345,10 +3344,10 @@
     ].filter((el) => el.getClientRects().length);
     const first = controls[0],
       last = controls.at(-1);
-    if (e.shiftKey && document.activeElement === first) {
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetRoot.querySelector("h3"))) {
       e.preventDefault();
       last?.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
+    } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === sheetRoot.querySelector("h3"))) {
       e.preventDefault();
       first?.focus();
     }
