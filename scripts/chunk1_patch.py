@@ -1,0 +1,379 @@
+from pathlib import Path
+
+
+def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{label}: expected 1 match, found {count}")
+    return text.replace(old, new, 1)
+
+
+app = Path("app.js")
+s = app.read_text(encoding="utf-8")
+s = replace_once(
+    s,
+    '''  function renderProjects() {
+    app.innerHTML =
+      topbar(
+        "",
+        phaseTag("FIRE"),
+        `<button class="top-icon-btn" data-action="new-project" aria-label="New project">+</button>`,
+      ) +
+      `<h1>Projects</h1><p class="sub">Original songs and recreations.</p><div class="spacer-24"></div><div class="projects-grid">${''',
+    '''  function renderProjects() {
+    app.innerHTML =
+      topbar("", phaseTag("FIRE"), "") +
+      `<header class="projects-heading"><div><h1>Projects</h1><p class="sub">Original songs and recreations.</p></div><button class="top-icon-btn" data-action="new-project" aria-label="New project"><span aria-hidden="true">+</span></button></header><div class="projects-grid">${''',
+    "projects header",
+)
+s = replace_once(
+    s,
+    '''<input class="field" id="newTitle" aria-label="Project title" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}>''',
+    '''<input class="field" id="newTitle" aria-label="Project title" enterkeyhint="${ui.newType === "study" ? "next" : "done"}" autocomplete="off" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}>''',
+    "new project input semantics",
+)
+s = replace_once(
+    s,
+    '''      document.getElementById("newArtist").hidden = ui.newType !== "study";
+      document.getElementById("newTitle").placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      return;''',
+    '''      document.getElementById("newArtist").hidden = ui.newType !== "study";
+      const titleInput = document.getElementById("newTitle");
+      titleInput.placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      titleInput.setAttribute("enterkeyhint", ui.newType === "study" ? "next" : "done");
+      return;''',
+    "type switch input semantics",
+)
+s = replace_once(
+    s,
+    '''    if (e.key !== "Enter" || e.shiftKey) return;
+    if (e.target.id === "customTrack") {
+      e.preventDefault();
+      document.querySelector('[data-action="add-custom-track"]')?.click();
+    }''',
+    '''    if (e.key !== "Enter" || e.shiftKey || e.isComposing) return;
+    if (e.target.id === "newTitle") {
+      e.preventDefault();
+      const artist = document.getElementById("newArtist");
+      if (ui.newType === "study" && artist && !artist.hidden) artist.focus();
+      else app.querySelector('[data-action="create-project"]')?.click();
+      return;
+    }
+    if (e.target.id === "newArtist") {
+      e.preventDefault();
+      app.querySelector('[data-action="create-project"]')?.click();
+      return;
+    }
+    if (e.target.id === "customTrack") {
+      e.preventDefault();
+      document.querySelector('[data-action="add-custom-track"]')?.click();
+    }''',
+    "new project enter flow",
+)
+app.write_text(s, encoding="utf-8")
+
+css = Path("styles.css")
+s = css.read_text(encoding="utf-8")
+s = replace_once(
+    s,
+    "transition: background-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);",
+    "transition: background-color var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);",
+    "button transition",
+)
+s = replace_once(
+    s,
+    '''button:not(:disabled):active {
+  filter: brightness(0.92);
+}''',
+    '''button:not(:disabled):active {
+  filter: none;
+}
+:is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .type-card):not(:disabled):active {
+  background-color: var(--state-pressed);
+}
+.primary:not(:disabled):active {
+  background: #b9bdc5;
+}''',
+    "pressed states",
+)
+s = replace_once(
+    s,
+    '''.project-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.project-open {
+  width: 100%;
+  padding: var(--card-padding);
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+  height: 100%;
+  border-radius: inherit;
+  padding-right: 60px;
+}
+.project-open .type {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.project-open strong {
+  font-size: 19px;
+}
+.project-open .artist {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.project-open .foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.project-menu {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: var(--radius-control);
+}
+.top-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-control);
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text);
+  cursor: pointer;
+}''',
+    '''.project-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  margin: 0;
+  overflow: hidden;
+  transition: border-color var(--motion-fast) var(--ease), background-color var(--motion-fast) var(--ease);
+}
+.project-open {
+  width: 100%;
+  padding: 16px 58px 15px 18px;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+  min-height: 106px;
+  height: 100%;
+  border-radius: inherit;
+}
+.project-open .type {
+  font-size: 11px;
+  color: var(--quiet);
+  margin-bottom: 5px;
+}
+.project-open strong {
+  display: block;
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+}
+.project-open .artist {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.project-open .foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 11px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.project-menu {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: var(--radius-control);
+}
+.top-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-control);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 300;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.top-icon-btn > span {
+  transform: translateY(-1px);
+}''',
+    "project components",
+)
+s = replace_once(
+    s,
+    '''.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 12px 24px;
+}
+.projects-grid > .project-card {
+  margin-bottom: 0;
+}''',
+    '''#app[data-route="projects"] {
+  --canvas-width: 880px;
+}
+#app[data-route="projects"] .topbar {
+  margin-bottom: 28px;
+}
+.projects-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.projects-heading > div {
+  min-width: 0;
+}
+.projects-heading h1 {
+  margin: 0 0 7px;
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-width: 760px;
+}
+.projects-grid > .project-card {
+  margin-bottom: 0;
+}''',
+    "projects layout",
+)
+s = replace_once(
+    s,
+    '''@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    filter: brightness(1.18);
+  }
+  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle):not(:disabled):hover, summary:hover, .structure-row:hover {
+    background-color: var(--state-hover);
+  }''',
+    '''@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover {
+    filter: none;
+  }
+  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .type-card):not(:disabled):hover, summary:hover, .structure-row:hover {
+    background-color: var(--state-hover);
+  }
+  .primary:not(:disabled):hover {
+    background: #d4d7dd;
+  }
+  .secondary:not(:disabled):hover,
+  .type-card:not(:disabled):hover,
+  .top-icon-btn:not(:disabled):hover {
+    border-color: var(--line-strong);
+  }
+  .project-card:has(.project-open:hover) {
+    border-color: var(--line-strong);
+  }''',
+    "pointer hover system",
+)
+s = replace_once(
+    s,
+    '''@media (max-width: 390px) {
+  .quick-grid, .new-type {''',
+    '''@media (max-width: 430px) {
+  #app[data-route="projects"] .topbar {
+    margin-bottom: 22px;
+  }
+  .projects-heading {
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .projects-heading h1 {
+    font-size: 34px;
+    line-height: 1.04;
+  }
+  .project-open {
+    padding-left: 16px;
+    min-height: 102px;
+  }
+}
+
+@media (max-width: 390px) {
+  .quick-grid, .new-type {''',
+    "compact projects layout",
+)
+css.write_text(s, encoding="utf-8")
+
+tests = Path("tests/test_v6.py")
+s = tests.read_text(encoding="utf-8")
+s = replace_once(
+    s,
+    '''    def test_revisioned_assets_and_development_stamp(self):
+        self.open('projects')''',
+    '''    def test_projects_foundation_and_new_project_keyboard_flow(self):
+        for width in [320, 390, 430, 820, 1180]:
+            with self.subTest(width=width):
+                self.open('projects', width=width, pointer=width >= 1180)
+                self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                add = self.page.locator('[data-action="new-project"]')
+                box = add.bounding_box()
+                self.assertGreaterEqual(box['width'], 44)
+                self.assertGreaterEqual(box['height'], 44)
+                card = self.page.locator('.project-card').first.bounding_box()
+                self.assertLessEqual(card['height'], 140)
+                if width >= 1180:
+                    self.assertLessEqual(self.page.locator('#app').bounding_box()['width'], 880)
+                self.context.close()
+
+        self.open('projects', width=390)
+        self.click('new-project')
+        self.click('set-new-type', '[data-type="study"]')
+        title = self.page.locator('#newTitle')
+        artist = self.page.locator('#newArtist')
+        self.assertEqual(title.get_attribute('enterkeyhint'), 'next')
+        self.assertEqual(artist.get_attribute('enterkeyhint'), 'done')
+        title.fill('Enter Flow')
+        title.press('Enter')
+        expect(artist).to_be_focused()
+        artist.fill('Babel')
+        artist.press('Enter')
+        expect(self.page.locator('h1')).to_have_text('Enter Flow')
+        saved = self.db()
+        created = next(p for p in saved['projects'] if p['title'] == 'Enter Flow')
+        self.assertEqual(created['artist'], 'Babel')
+        self.assertEqual(created['schemaVersion'], 5)
+
+    def test_revisioned_assets_and_development_stamp(self):
+        self.open('projects')''',
+    "chunk1 browser tests",
+)
+tests.write_text(s, encoding="utf-8")
