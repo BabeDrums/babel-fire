@@ -1291,6 +1291,25 @@
     }
   }
 
+  // Pages supplies its deployed revision; the local server supplies Git HEAD.
+  let buildCommitRequest;
+  function showBuildStamp() {
+    buildCommitRequest ||= fetch("build-info.json", { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Build metadata unavailable");
+        return response.json();
+      })
+      .then((info) => {
+        if (!/^[0-9a-f]{40}$/i.test(info.commit))
+          throw new Error("Invalid build revision");
+        return info.commit.slice(0, 7);
+      })
+      .catch(() => "unavailable");
+    buildCommitRequest.then((commit) => {
+      const stamp = document.getElementById("buildStamp");
+      if (stamp) stamp.textContent = `FIRE V6 DEV · ${commit}`;
+    });
+  }
   function renderProjects() {
     app.innerHTML =
       topbar(
@@ -1312,7 +1331,8 @@
               })
               .join("")
           : `<div class="empty">No projects yet. Tap + to start one.</div>`
-      }`;
+      }<footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
+    showBuildStamp();
   }
   function renderProject() {
     const p = project();
