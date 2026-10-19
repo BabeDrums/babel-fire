@@ -11,8 +11,9 @@
     <meta name="theme-color" content="#090a0d" />
     <title>Babel FIRE</title>
     <link rel="stylesheet" href="styles.css?v={{ site.github.build_revision }}" />
-    <link rel="stylesheet" href="polish.css?v={{ site.github.build_revision }}" />
     <style>
+      @import url("polish.css?v={{ site.github.build_revision }}");
+
       /* Real timing boundaries and change markers stay directly manipulable beside sticky track labels. */
       .presence-handle,
       .event-handle,
@@ -28,6 +29,6 @@
     <output id="dragPosition" class="drag-position" hidden></output>
     <input id="importFile" type="file" accept="application/json" hidden />
     <script src="app.js?v={{ site.github.build_revision }}" defer></script>
-    <script src="polish.js?v={{ site.github.build_revision }}" defer></script>
+    <script type="module">import "./polish.js?v={{ site.github.build_revision }}";</script>
   </body>
 </html>
