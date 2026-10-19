@@ -1107,7 +1107,7 @@
     return trackById(p, id)?.name || "";
   }
   function feelComplete(d) {
-    return Object.keys(FEEL_SCALES).every((k) => !!d.feel?.[k]);
+    return Object.keys(FEEL_SCALES).every((k) => FEEL_SCALES[k].includes(d.feel?.[k]));
   }
   function sectionComplete(p, index) {
     const s = sections(p)[index];
@@ -1144,7 +1144,7 @@
     const s = p.map.setup || {};
     return !!(
       s.reference &&
-      clean(s.tempo) && Number.isFinite(Number(s.tempo)) && Number(s.tempo) > 0 &&
+      /^(?:\d+\.?\d*|\.\d+)$/.test(clean(s.tempo)) && Number.isFinite(Number(s.tempo)) && Number(s.tempo) > 0 &&
       s.meter &&
       s.grid &&
       s.firstListen
@@ -1426,14 +1426,14 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), phaseTag("New Project"), "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}">${ui.newType === "study" ? `<div class="spacer-10"></div><input class="field" id="newArtist" placeholder="Artist">` : ""}<div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="new-type"><button class="type-card ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}"><strong>Original Song</strong><span>Start with anything worth keeping.</span></button><button class="type-card ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}"><strong>Recreation</strong><span>Rebuild an existing song to learn how it works.</span></button></div><div class="section-kicker">Project</div><input class="field" id="newTitle" aria-label="Project title" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
   }
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
     return `<button class="list-row" data-action="go" data-route="${route}" ${unlocked ? "" : "disabled"}>${done ? `<span class="round-check on"></span>` : unlocked ? `<span class="status-dot"></span>` : `<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked ? "›" : ""}</span></button>`;
   }
   function actionCard(title, copy, on, action, disabled = false, attrs = "") {
-    return `<button class="action-card ${on ? "on" : ""}" data-action="${action}" ${attrs} ${disabled ? "disabled" : ""}><div><strong>${esc(title)}</strong>${copy ? `<span class="copy">${esc(copy)}</span>` : ""}</div><span class="round-check ${on ? "on" : ""}"></span></button>`;
+    return `<button class="action-card ${on ? "on" : ""}" data-action="${action}" aria-pressed="${!!on}" ${attrs} ${disabled ? "disabled" : ""}><div><strong>${esc(title)}</strong>${copy ? `<span class="copy">${esc(copy)}</span>` : ""}</div><span class="round-check ${on ? "on" : ""}"></span></button>`;
   }
   function phaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
     const pct = total ? Math.round((done / total) * 100) : 0;
@@ -1637,6 +1637,29 @@
       absent = !ranges.length;
     return `<div class="timeline-row ${expanded ? "expanded" : ""} ${absent ? "absent" : ""}" data-track-row="${track.id}"><button class="timeline-label" data-action="toggle-timeline-track" data-track-id="${track.id}" aria-expanded="${expanded}"><strong>${esc(track.name)}</strong></button><div class="timeline-lane" style="--bars:${bars}"><button class="lane-select" data-action="${absent ? "add-presence-section" : "select-presence"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${absent ? "Add" : "Select"} ${esc(track.name)}">${absent ? "+" : ""}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}</div>${expanded && ranges.length ? trackDetailHtml(p, track, index) : ""}</div>`;
   }
+  function refreshArrangement() {
+    const p = project(), index = ui.sectionIndex, active = document.activeElement;
+    const focusData = active?.dataset ? { ...active.dataset } : null;
+    app.querySelectorAll("[data-track-row]").forEach((row) => {
+      const track = trackById(p, row.dataset.trackRow), expanded = ui.expandedTrackId === track.id,
+        ranges = visiblePresence(p, track.id, index), lane = row.querySelector(".timeline-lane");
+      row.classList.toggle("expanded", expanded);
+      row.querySelector(".timeline-label").setAttribute("aria-expanded", String(expanded));
+      // The label/row and all unrelated Feel/Focus/Notes nodes survive selection.
+      lane.innerHTML = `<button class="lane-select" data-action="${ranges.length ? "select-presence" : "add-presence-section"}" data-track-id="${track.id}" ${ranges.length ? `data-range-id="${ranges[0].range.id}"` : ""} aria-label="${ranges.length ? "Select" : "Add"} ${esc(track.name)}">${ranges.length ? "" : "+"}</button>${ranges.map((item) => presenceSegmentHtml(p, item, index, expanded)).join("")}${compactEventsHtml(p, "track", track.id, index)}`;
+      row.querySelector(".track-detail")?.remove();
+      if (expanded && ranges.length) row.insertAdjacentHTML("beforeend", trackDetailHtml(p, track, index));
+    });
+    app.querySelector(".mix-utility")?.remove();
+    app.querySelector(".timeline-card").insertAdjacentHTML("beforeend", mixTimelineRow(p, index));
+    const mix = app.querySelector(".mix-toggle");
+    mix.setAttribute("aria-expanded", String(ui.expandedTrackId === "__mix__"));
+    installTimelineInteractions();
+    if (focusData && !active.isConnected) {
+      const match = [...app.querySelectorAll("button")].find((el) => Object.entries(focusData).every(([key, value]) => el.dataset[key] === value));
+      match?.focus({ preventScroll: true });
+    }
+  }
   function mixControl(p, index) {
     const expanded = ui.expandedTrackId === "__mix__";
     return `<button class="mix-toggle" data-action="toggle-timeline-track" data-track-id="__mix__" aria-expanded="${expanded}" aria-label="Mix changes">Mix${visibleEvents(p, "mix", null, index).length ? " •" : ""}</button>`;
@@ -1839,6 +1862,23 @@
           draftDone(p),
         );
     app.innerHTML = phaseHome(1, done, 3, checkpoints);
+  }
+  function refreshSkeletonChecks() {
+    const p = project();
+    app.querySelectorAll('[data-action="toggle-session-track"], [data-action="toggle-session-marker"]').forEach((el) => {
+      const on = el.dataset.trackId ? p.skeleton.session.tracks[el.dataset.trackId] : p.skeleton.session.markers[el.dataset.sectionId];
+      el.setAttribute("aria-pressed", String(!!on));
+      el.querySelector(".round-check").classList.toggle("on", !!on);
+    });
+    const next = app.querySelector('[data-route="skeleton-draft"]');
+    if (next) next.disabled = !sessionDone(p);
+    for (const [action, on] of [["toggle-bounce-export", p.skeleton.bounce.exported], ["toggle-bounce-listen", p.skeleton.bounce.listened]]) {
+      const el = app.querySelector(`[data-action="${action}"]`);
+      if (el) { el.classList.toggle("on", !!on); el.setAttribute("aria-pressed", String(!!on)); el.querySelector(".round-check").classList.toggle("on", !!on); }
+    }
+    const listen = app.querySelector('[data-action="toggle-bounce-listen"]'), roadmap = app.querySelector('[data-route="roadmap"]');
+    if (listen) listen.disabled = !p.skeleton.bounce.exported;
+    if (roadmap) roadmap.disabled = !skeletonDone(p);
   }
   function renderSkeletonSession() {
     const p = project(),
@@ -2434,33 +2474,9 @@
     });
   }
   function installTimelineInteractions() {
-    app
-      .querySelectorAll("[data-presence-handle]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "presence", el.dataset.edge),
-          { passive: false },
-        ),
-      );
-    app
-      .querySelectorAll("[data-event-handle]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "event", el.dataset.edge),
-          { passive: false },
-        ),
-      );
-    app
-      .querySelectorAll("[data-event-marker]")
-      .forEach((el) =>
-        el.addEventListener(
-          "pointerdown",
-          (e) => startTimelineDrag(e, "event", "point"),
-          { passive: false },
-        ),
-      );
+    app.querySelectorAll("[data-presence-handle], [data-event-handle], [data-event-marker]").forEach((el) => {
+      el.onpointerdown = (e) => startTimelineDrag(e, el.hasAttribute("data-presence-handle") ? "presence" : "event", el.dataset.edge || "point");
+    });
   }
   function startTimelineDrag(e, type, edge) {
     if ((e.button !== undefined && e.button !== 0) || ui.animating) return;
@@ -2477,6 +2493,7 @@
         type === "presence" ? ".timeline-lane" : ".change-lane",
       ),
       rect = lane.getBoundingClientRect(),
+      viewportWidth = innerWidth, viewportHeight = innerHeight,
       s = sections()[ui.sectionIndex],
       len = Number(s.lengthBars),
       position = document.getElementById("dragPosition");
@@ -2488,6 +2505,7 @@
       handle.setPointerCapture(e.pointerId);
     } catch (_) {}
     const finish = (cancel) => {
+      cancel ||= innerWidth !== viewportWidth || innerHeight !== viewportHeight || lane.getBoundingClientRect().width !== rect.width;
       controller.abort();
       cancelGesture = null;
       document.body.classList.remove("is-dragging");
@@ -2583,7 +2601,10 @@
     if (action === "new-project") return go("new-project");
     if (action === "set-new-type") {
       ui.newType = b.dataset.type;
-      return renderNewProject();
+      app.querySelectorAll('[data-action="set-new-type"]').forEach((el) => setSelected(el, el.dataset.type === ui.newType));
+      document.getElementById("newArtist").hidden = ui.newType !== "study";
+      document.getElementById("newTitle").placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
+      return;
     }
     if (action === "create-project") {
       const title =
@@ -2665,7 +2686,7 @@
         b.dataset.trackId,
         ui.sectionIndex,
       )[0]?.range.id;
-      return renderSectionStudy();
+      return refreshArrangement();
     }
     if (action === "add-presence-section") {
       addPresenceSection(p, b.dataset.trackId, ui.sectionIndex);
@@ -2751,14 +2772,14 @@
         !p.skeleton.session.tracks[b.dataset.trackId];
       invalidateBounce(p);
       save();
-      return renderSkeletonSession();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-session-marker") {
       p.skeleton.session.markers[b.dataset.sectionId] =
         !p.skeleton.session.markers[b.dataset.sectionId];
       invalidateBounce(p);
       save();
-      return renderSkeletonSession();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-draft-part") {
       const s = sections(p).find((sec) => sec.id === b.dataset.sectionId),
@@ -2774,13 +2795,13 @@
       p.skeleton.bounce.exported = !p.skeleton.bounce.exported;
       if (!p.skeleton.bounce.exported) p.skeleton.bounce.listened = false;
       save();
-      return renderSkeletonBounce();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-bounce-listen") {
       if (!p.skeleton.bounce.exported) return;
       p.skeleton.bounce.listened = !p.skeleton.bounce.listened;
       save();
-      return renderSkeletonBounce();
+      return refreshSkeletonChecks();
     }
     if (action === "toggle-spark-start") {
       toggleArray(p.spark.starts, b.dataset.name);
@@ -3242,14 +3263,14 @@
       ui.expandedTrackId = b.dataset.trackId;
       ui.selectedPresenceId = b.dataset.rangeId;
       ui.selectedEventId = null;
-        return renderSectionStudy();
+        return refreshArrangement();
     }
     if (action === "select-event") {
       const ev = p.map.timeline.events.find((x) => x.id === b.dataset.eventId);
       if (!ev) return;
       ui.selectedEventId = ev.id;
       ui.selectedPresenceId = null;
-        return renderSectionStudy();
+        return refreshArrangement();
     }
     if (action === "continue-range") {
       const type = b.dataset.kind,
@@ -3319,7 +3340,7 @@
     ].filter((el) => el.getClientRects().length);
     const first = controls[0],
       last = controls.at(-1);
-    if (e.shiftKey && document.activeElement === first) {
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === sheetRoot.querySelector("h3"))) {
       e.preventDefault();
       last?.focus();
     } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === sheetRoot.querySelector("h3"))) {
