@@ -1415,7 +1415,7 @@
         phaseTag("Recreation"),
         `<button class="text-btn" data-action="settings">•••</button>`,
       ) +
-      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div>${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div>`;
+      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="project-overview"><section class="project-current"><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
   }
   function renderOriginalOverview() {
     const p = project(),
@@ -1515,7 +1515,7 @@
   }
 
   function rulerHtml(bars) {
-    const step = bars <= 12 ? 1 : bars <= 24 ? 2 : 4,
+    const step = Math.max(1, 2 ** Math.ceil(Math.log2(bars / 12))),
       labels = [];
     for (let i = 0; i < bars; i += step)
       labels.push(
@@ -1573,13 +1573,18 @@
     const min = edge === "end" && (!obj || anchorAbs(p, obj.start) >= sectionStarts(p)[ui.sectionIndex]) ? 1 : 0, max = edge === "end" ? len : len - 1;
     placement = { type, id, edge, trackId, value: clamp(value, min, max), sectionId: sec.id };
     const title = edge === "end" ? "Stop" : edge === "resume" ? "Start" : edge === "point" ? "Move point" : "Move start";
-    sheetRoot.innerHTML = `<div class="sheet placement-sheet"><div class="grabber"></div><h3>${title}</h3><p class="sub">${esc(sectionLabels(p)[ui.sectionIndex])}</p><output id="placementLabel" aria-live="polite"></output><div class="placement-lane"><input id="placementPosition" aria-label="${title} position" type="range" min="${min}" max="${max}" step="1" value="${placement.value}"></div><p class="micro">Slide to a bar, or use the arrow keys.</p><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="commit-placement">${title === "Stop" ? "Stop here" : title === "Start" ? "Start here" : "Done"}</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    sheetRoot.innerHTML = `<div class="sheet placement-sheet"><div class="grabber"></div><h3>${title}</h3><p class="sub">${esc(sectionLabels(p)[ui.sectionIndex])}</p><output id="placementLabel" aria-live="polite"></output><div class="placement-lane"><input id="placementPosition" aria-label="${title} position" type="range" min="${min}" max="${max}" step="1" value="${placement.value}"></div><div class="position-adjustments"><button class="secondary" data-action="adjust-placement" data-delta="-1">Earlier</button><button class="secondary" data-action="adjust-placement" data-delta="1">Later</button></div><p class="micro">Slide to a bar, or use Earlier / Later.</p><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary full" data-action="commit-placement">${title === "Stop" ? "Stop here" : title === "Start" ? "Start here" : "Done"}</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
     updatePlacementLabel();
     openSheet();
   }
   function updatePlacementLabel() {
     const label = document.getElementById("placementLabel");
     if (label && placement) label.textContent = placement.edge === "end" ? placement.value ? `After bar ${placement.value}` : "Before bar 1" : `Bar ${placement.value + 1}`;
+    const input = document.getElementById("placementPosition");
+    if (input && placement) {
+      input.setAttribute("aria-valuetext", label.textContent);
+      sheetRoot.querySelectorAll('[data-action="adjust-placement"]').forEach((el) => el.disabled = Number(el.dataset.delta) < 0 ? placement.value <= Number(input.min) : placement.value >= Number(input.max));
+    }
   }
   function commitPlacement() {
     if (!placement) return;
@@ -1627,7 +1632,8 @@
     return `<div class="track-detail"><output class="lane-feedback" aria-live="polite">Tap a boundary to start or stop. Drag a handle to move it.</output>${presenceSelectors(p, track.id, index)}${r && !ui.selectedEventId ? `<div class="selection-actions"><button class="mini-btn remove" data-action="remove-selected" data-kind="presence" data-id="${r.id}">Remove</button></div>` : ""}<details class="timing-options"><summary>Timing options</summary><div class="selection-actions">${r ? boundaryActions(r, "presence") : ""}${r?.end ? `<button class="mini-btn" data-action="continue-range" data-kind="presence" data-id="${r.id}">Continue</button>` : ""}${presenceGapInSection(p, track.id, index) ? `<button class="mini-btn" data-action="start-track" data-track-id="${track.id}">Start at a position</button>` : ""}</div></details>${eventDetailRows(p, "track", track.id, index)}</div>`;
   }
   function boundaryTargetsHtml(bars) {
-    return `<span class="boundary-targets" aria-hidden="true">${Array.from({ length: bars + 1 }, (_, i) => `<span class="boundary-target" style="left:${i / bars * 100}%"></span>`).join("")}</span><span class="boundary-preview" hidden aria-hidden="true"></span>`;
+    const step = Math.max(1, 2 ** Math.ceil(Math.log2(bars / 24)));
+    return `<span class="boundary-targets" aria-hidden="true">${Array.from({ length: Math.ceil(bars / step) + 1 }, (_, i) => Math.min(bars, i * step)).map((i) => `<span class="boundary-target" style="left:${i / bars * 100}%"></span>`).join("")}</span><span class="boundary-preview" hidden aria-hidden="true"></span>`;
   }
   function presenceLaneHtml(p, track, index, expanded) {
     const ranges = visiblePresence(p, track.id, index), bars = Number(sections(p)[index].lengthBars), direct = expanded || !ranges.length;
@@ -2613,14 +2619,16 @@
       s = sections()[ui.sectionIndex],
       len = Number(s.lengthBars),
       position = document.getElementById("dragPosition");
-    let moved = false;
+    let moved = false, captureRequested = false;
     const controller = new AbortController(),
       opts = { signal: controller.signal };
     document.body.classList.add("is-dragging");
     try {
       handle.setPointerCapture(e.pointerId);
+      captureRequested = true;
     } catch (_) {}
     const finish = (cancel) => {
+      cancel ||= captureRequested && !handle.hasPointerCapture(e.pointerId);
       cancel ||= innerWidth !== viewportWidth || innerHeight !== viewportHeight || lane.getBoundingClientRect().width !== rect.width;
       controller.abort();
       cancelGesture = null;
@@ -2991,6 +2999,13 @@
       p = project();
     if (action === "close-sheet") return closeSheet();
     if (action === "commit-placement") return commitPlacement();
+    if (action === "adjust-placement" && placement) {
+      const input = document.getElementById("placementPosition");
+      placement.value = clamp(placement.value + Number(b.dataset.delta), Number(input.min), Number(input.max));
+      input.value = placement.value;
+      updatePlacementLabel();
+      return;
+    }
     if (action === "move-section") {
       moveSection(
         p,
@@ -3032,6 +3047,7 @@
       renderSectionBuilder();
       document.getElementById("builderStatus").textContent = `Added ${name} · ${d.bars} bars`;
       document.getElementById("sheetError").textContent = "";
+      sheetRoot.querySelector('[data-action="choose-section-type"][aria-pressed="true"]')?.focus({ preventScroll: true });
       return;
     }
     if (action === "set-sheet-bars") {

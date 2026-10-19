@@ -87,8 +87,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
-button:active {
-  filter: brightness(1.12);
+button:not(:disabled):active {
+  filter: brightness(0.92);
 }
 button:disabled {
   cursor: default;
@@ -320,9 +320,6 @@ p {
 .primary.full, .secondary.full, .destructive.full {
   width: 100%;
 }
-.primary:disabled, .secondary:disabled {
-  opacity: var(--disabled-opacity);
-}
 .quick-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -400,9 +397,6 @@ p {
 .chev {
   font-size: 23px;
   color: #6c707a;
-}
-.list-row:disabled {
-  opacity: var(--disabled-opacity);
 }
 .status-dot {
   width: 25px;
@@ -564,9 +558,6 @@ p {
 .action-card.on {
   border-color: rgba(201, 205, 213, 0.24);
 }
-.action-card:disabled {
-  opacity: var(--disabled-opacity);
-}
 .action-card + .action-card {
   margin-top: 8px;
 }
@@ -717,9 +708,6 @@ p {
 .section-tab.done:before {
   content: "✓ ";
   color: var(--accent);
-}
-.section-tab:disabled {
-  opacity: var(--disabled-opacity);
 }
 .study-viewport {
   overflow: hidden;
@@ -1164,7 +1152,7 @@ details.note-disclosure summary::-webkit-details-marker {
 }
 .sheet select {
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: #111318;
   color: var(--text);
   padding: 0 12px;
@@ -1185,7 +1173,7 @@ details.note-disclosure summary::-webkit-details-marker {
   margin-top: 8px;
 }
 .timeline-card {
-  margin-top: 22px;
+  margin-top: 0;
   background: #101216;
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -1308,7 +1296,7 @@ details.note-disclosure summary::-webkit-details-marker {
   touch-action: none;
   z-index: 3;
   cursor: ew-resize;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
 }
 .presence-handle:after, .event-handle:after {
   content: "";
@@ -1421,7 +1409,7 @@ details.note-disclosure summary::-webkit-details-marker {
   width: 44px;
   height: 44px;
   transform: translateX(-50%);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   touch-action: none;
   cursor: ew-resize;
 }
@@ -1560,7 +1548,7 @@ details.note-disclosure summary::-webkit-details-marker {
   z-index: 10002;
   transform: translateX(-50%);
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-chip);
   background: #dedfe3;
   color: #15171b;
   font-size: 12px;
@@ -1578,9 +1566,6 @@ details.note-disclosure summary::-webkit-details-marker {
 }
 body.sheet-open {
   overflow: hidden;
-}
-.presence-handle:active, .event-handle:active, .change-marker:active {
-  transform: translateX(-50%);
 }
 body.sheet-open .undo-notice {
   display: none;
@@ -1673,8 +1658,10 @@ body.sheet-open .undo-notice {
   min-height: 44px;
 }
 .workflow-disclosure {
-  border-bottom: 1px solid var(--line);
-  padding: 4px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: var(--space-1);
 }
 .workflow-disclosure > summary {
   display: flex;
@@ -1702,7 +1689,7 @@ body.sheet-open .undo-notice {
   transform: rotate(180deg);
 }
 .draft-checks {
-  padding: 0 0 12px 12px;
+  padding: 0 var(--space-4) var(--space-4);
 }
 .coverage {
   font-size: 13px;
@@ -1881,6 +1868,22 @@ from {
 .timing-options .selection-actions {
   justify-content: flex-start;
 }
+.study-workspace {
+  margin-top: var(--space-5);
+}
+.position-adjustments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.timing-options > summary::after {
+  content: "⌄";
+  margin-left: var(--space-2);
+}
+.timing-options[open] > summary::after {
+  transform: rotate(180deg);
+}
 /* Adaptive composition and input capabilities. */
 @media (max-width: 390px) {
   .quick-grid, .new-type {
@@ -1980,6 +1983,15 @@ from {
 }
 
 @media (min-width: 900px) {
+  .project-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .project-current, .project-support { min-width: 0; }
+  .project-support > .section-kicker:first-child { margin-top: 0; }
+
   .draft-sections {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1992,6 +2004,13 @@ from {
 }
 
 @media (min-width: 1100px) {
+  .study-observations {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+  }
+
   .study-workspace {
     display: grid;
     grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 352px);
