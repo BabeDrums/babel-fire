@@ -136,7 +136,7 @@ class V6Browser(unittest.TestCase):
             surface=self.page.locator(f'[data-presence-surface][data-track-id="{track}"]')
         surface.scroll_into_view_if_needed();box=surface.bounding_box()
         bars=int(surface.locator('xpath=..').evaluate('el=>getComputedStyle(el).getPropertyValue("--bars")'))
-        x=box['x']+max(.25,min(box['width']-.25,box['width']*boundary/bars))
+        x=box['x']+max(4,min(box['width']-4,box['width']*boundary/bars))
         y=box['y']+box['height']*.9
         if touch:
             cdp=self.context.new_cdp_session(self.page)
