@@ -707,6 +707,20 @@ class V6Browser(unittest.TestCase):
     def settled_sheet(self):
         self.page.locator('.sheet').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
 
+    def test_new_project_next_handoff_capitalizes_first_artist_keystroke(self):
+        self.open('new-project', width=390,
+                  data={'version': 5, 'currentProjectId': None, 'projects': []})
+        self.click('set-new-type', '[data-type="study"]')
+        title = self.page.locator('#newTitle')
+        artist = self.page.locator('#newArtist')
+        title.fill('Creep')
+        title.press('Enter')
+        expect(artist).to_be_focused()
+        self.page.keyboard.type('r')
+        self.assertEqual(artist.input_value(), 'R')
+        self.page.keyboard.type('adio head')
+        self.assertEqual(artist.input_value(), 'Radio head')
+
     def test_cross_platform_screen_canvases_and_fluid_widths(self):
         routes=['projects','new-project','project','roadmap','map','structure','tracks','section-study',
                 'map-summary','skeleton','skeleton-session','skeleton-draft','skeleton-bounce','notes']

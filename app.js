@@ -2856,6 +2856,25 @@
       refreshMapProgress();
     }
   });
+  app.addEventListener("beforeinput", (e) => {
+    const input = e.target;
+    if (input.id !== "newArtist" || input.dataset.capitalizeFirst !== "true")
+      return;
+    input.dataset.capitalizeFirst = "false";
+    if (
+      e.isComposing ||
+      e.inputType !== "insertText" ||
+      typeof e.data !== "string" ||
+      input.value ||
+      input.selectionStart !== 0 ||
+      input.selectionEnd !== 0 ||
+      !/^[a-z]$/.test(e.data)
+    )
+      return;
+    e.preventDefault();
+    input.setRangeText(e.data.toLocaleUpperCase(), 0, 0, "end");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
   app.addEventListener("keydown", (e) => {
     const reorder=e.target.closest('[data-drag-handle]');
     if(reorder && ['ArrowUp','ArrowDown'].includes(e.key)) {
@@ -2876,9 +2895,10 @@
       e.preventDefault();
       const artist = document.getElementById("newArtist");
       if (ui.newType === "study" && artist && !artist.hidden) {
-        // Give iOS a fresh text-input handoff so the Artist field can reapply
-        // its own keyboard traits (including autocapitalize="words").
-        e.target.blur();
+        // WebKit controls the software keyboard's Shift state. If iOS keeps the
+        // prior field's lowercase state during Next, correct only the first
+        // direct keystroke; normal autocapitalize="words" handles the rest.
+        artist.dataset.capitalizeFirst = "true";
         artist.focus({ preventScroll: true });
       } else app.querySelector('[data-action="create-project"]')?.click();
       return;
