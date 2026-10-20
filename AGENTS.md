@@ -20,10 +20,10 @@ If a genuine conflict remains after applying this hierarchy, ask rather than gue
 - Inspect and preserve unfinished local work before syncing or switching branches. Never reset, overwrite, or discard work to obtain a clean tree. Existing unfinished work takes priority over syncing first.
 - Commit and push completed task work, then open a pull request against `main`.
 - PRs are the review checkpoint before production. Include the PR link in the completion report; if access prevents opening it, report that blocker and do not claim completion.
-- Do not merge a PR or deploy production without explicit user approval. Stop after opening the PR for external/user review unless further action is explicitly authorized.
+- The user has granted standing permission to merge FIRE PRs once the diff is reviewed and required checks are green. Stop instead of merging when tests fail, data safety is uncertain, the change is risky/destructive, or a genuine product decision remains unresolved.
 - Preserve Git history. Do not erase old versions simply because a newer version exists.
 
-Normal sequence: task branch → implementation → tests → commit → push → PR → external/user review → explicit approval → merge to `main`.
+Normal sequence: task branch → implementation → tests → commit → push → PR → review/checks → merge under standing permission → Pages deploy → physical-device approval when visual/interaction work is involved.
 
 ## Engineering and product rules
 
@@ -37,6 +37,24 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Keep FIRE neutral and premium. Smithereens is a Recreation inside FIRE, not its visual identity.
 - Do not introduce features outside the active approved scope unless required for correctness.
 - Remove replaced/dead interactions. Do not commit screenshots, temporary/debug fixtures, browser artifacts, caches, or environment-only files. Permanent regression tests and their representative test data belong in `tests/`.
+
+
+## FIRE design-system operating rules — October 2026
+
+- **No Codex for FIRE.** Use the normal ChatGPT GitHub connector/direct repository tools for implementation and repository maintenance.
+- Projects + New Project are the current visual reference implementation. Extract their rules; do not copy one layout blindly onto every screen.
+- The current approved next step is a global FIRE Design System foundation pass. Do not continue route-by-route cosmetic micro-polish without first fixing shared typography, spacing, surfaces, controls, states, and adaptive presentation.
+- Use one coherent hierarchy for page title, subtitle, section title, row title, supporting text, and metadata/status. Remove redundant labels and excessive tracked uppercase when layout already communicates hierarchy.
+- Use one coherent interaction-state system: normal, hover (fine pointer only), pressed, selected, focus-visible, disabled, destructive, and completed. Geometry must not change between states.
+- Selection and completion are distinct semantics. Do not use completion checkmarks as generic selection decoration.
+- Prefer grouped rows/lists for structured text-heavy workflows; reserve cards for meaningful conceptual groups.
+- Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
+- Passive center pills are prohibited. Leading toolbar = navigation; trailing toolbar = contextual action; page title = current location.
+- iPad task sheets should prefer compact centered form/page-style presentation when appropriate; narrow phone layouts may use bottom-oriented sheets.
+- Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
+- Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
+- Visual work is not complete merely because CI is green. Physical iPhone/iPad Safari approval is required before locking a visual chunk.
+- Update `START_HERE.md`, `AGENTS.md`, `CONTEXT.md`, `V6.md`, and `CHANGELOG.md` whenever a durable design-system rule or major shipped milestone changes, so a new chat can resume without reconstructing decisions.
 
 ## Product versioning
 
