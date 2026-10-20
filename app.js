@@ -206,6 +206,7 @@
   }
   let saveFlashTimer = null;
   let sheetClearTimer = null;
+  let routeMotion = "";
   let ui = {
     route: "projects",
     sectionIndex: 0,
@@ -703,6 +704,12 @@
     ui.selectedPresenceId = null;
     const fromRoute = ui.route,
       fromLabel = routeLabel(fromRoute);
+    routeMotion =
+      fromRoute === "projects" && route === "new-project"
+        ? "route-forward"
+        : fromRoute === "new-project" && route === "projects"
+          ? "route-back"
+          : "";
     ui = { ...ui, ...extra, route };
     const state = {
       route,
@@ -727,10 +734,18 @@
     cancelGesture?.();
     clearBoundarySelection();
     closeSheet();
-    const st = e.state || {};
+    const st = e.state || {},
+      fromRoute = ui.route,
+      route = st.route || "projects";
     if (st.projectId && db.projects.some((p) => p.id === st.projectId))
       db.currentProjectId = st.projectId;
-    ui = { ...ui, ...st, route: st.route || "projects", animating: false };
+    routeMotion =
+      fromRoute === "new-project" && route === "projects"
+        ? "route-back"
+        : fromRoute === "projects" && route === "new-project"
+          ? "route-forward"
+          : "";
+    ui = { ...ui, ...st, route, animating: false };
     render();
     window.scrollTo(0, 0);
   });
@@ -771,6 +786,9 @@
       : ui.route === "skeleton-draft" ? "draft"
       : ["new-project", "original-spark", "skeleton-bounce", "skeleton"].includes(ui.route) ? "focused" : "overview";
     return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`;
+  }
+  function projectPageMotionClass() {
+    return routeMotion ? ` ${routeMotion}` : "";
   }
   function savedMark() {
     return `<span class="saved">Saved</span>`;
@@ -1378,7 +1396,12 @@
   }
   function renderProjects() {
     app.innerHTML =
-      `<header class="projects-heading"><div><h1>Projects</h1><p class="sub">Original songs and recreations.</p></div><button class="top-icon-btn" data-action="new-project" aria-label="New project"><span aria-hidden="true">+</span></button></header><div class="projects-grid">${
+      topbar(
+        "",
+        "",
+        `<button class="top-icon-btn" data-action="new-project" aria-label="New project"><span aria-hidden="true">+</span></button>`,
+      ) +
+      `<main class="project-page${projectPageMotionClass()}"><header class="page-heading"><h1>Projects</h1><p class="sub">Original songs and recreations.</p></header><div class="projects-grid">${
         db.projects.length
           ? db.projects
               .map((p) => {
@@ -1392,7 +1415,7 @@
               })
               .join("")
           : ""
-      }</div><footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
+      }</div></main><footer id="buildStamp" class="build-stamp">FIRE V6 DEV · …</footer>`;
     showBuildStamp();
   }
   function renderProject() {
@@ -1430,8 +1453,9 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), "", "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Song title" enterkeyhint="next" autocomplete="off" autocapitalize="words" placeholder="Song title"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist"><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<main class="project-page${projectPageMotionClass()}"><header class="page-heading"><h1>New project</h1><p class="sub">Start original or rebuild a reference.</p></header><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Song title" enterkeyhint="next" autocomplete="off" autocapitalize="words" placeholder="Song title"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist"><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button></main>`;
   }
+
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
     return `<button class="list-row" data-action="go" data-route="${route}" ${unlocked ? "" : "disabled"}>${done ? `<span class="round-check on"></span>` : unlocked ? `<span class="status-dot"></span>` : `<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked ? "›" : ""}</span></button>`;
