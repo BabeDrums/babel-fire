@@ -1090,6 +1090,30 @@ class V6Browser(unittest.TestCase):
         self.assertEqual(self.project()['map']['sections'][0],{'id':'s0','name':'Bridge','lengthBars':12})
         self.assertEqual(self.project()['map']['sectionData']['s0']['parking'],'Note s0')
 
+    def test_structure_polish_hierarchy_and_responsive_next(self):
+        for width in [390,820]:
+            with self.subTest(width=width):
+                self.open('structure',width=width,pointer=width>=820)
+                expect(self.page.locator('.structure-ready-label')).to_have_text('Ready?')
+                self.assertEqual(self.page.locator('[data-action="open-add-section"]').evaluate('el=>getComputedStyle(el).borderStyle'),'solid')
+                row=self.page.locator('.structure-row').first
+                self.assertGreaterEqual(row.bounding_box()['height'],68)
+                self.assertEqual(self.page.locator('.bars-badge').first.evaluate('el=>getComputedStyle(el).backgroundColor'),'rgba(0, 0, 0, 0)')
+                nxt=self.page.locator('[data-route="tracks"]');page=self.page.locator('.workflow-page')
+                if width>=640:
+                    self.assertLessEqual(nxt.bounding_box()['width'],280.5)
+                    self.assertAlmostEqual(nxt.bounding_box()['x']+nxt.bounding_box()['width'],page.bounding_box()['x']+page.bounding_box()['width'],delta=1)
+                else:
+                    self.assertAlmostEqual(nxt.bounding_box()['width'],page.bounding_box()['width'],delta=1)
+                self.click('open-add-section');self.click('choose-section-type','[data-name="Intro"]')
+                selected=self.page.locator('[data-action="choose-section-type"][data-name="Intro"]')
+                self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"),'none')
+                self.click('set-new-section-bars','[data-bars="8"]');self.click('save-new-section')
+                expect(self.page.locator('#builderStatus')).to_have_text('Added Intro · 8 bars')
+                expect(self.page.locator('[data-bars="8"]')).to_have_attribute('aria-pressed','true')
+                expect(self.page.locator('#sheetRoot')).to_have_attribute('aria-hidden','false')
+                self.context.close()
+
     def test_segment_selected_and_keyboard_focus_are_distinct_without_geometry_changes(self):
         self.open('structure',width=390,pointer=True);self.click('open-add-section')
         self.click('choose-section-type','[data-name="Intro"]');self.settled_sheet()
