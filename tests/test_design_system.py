@@ -27,9 +27,11 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('display: none;', self.css)
         self.assertIn('.round-check.on:after', self.css)
 
-    def test_passive_center_phase_chrome_is_visually_retired(self):
-        self.assertIn('.topbar .center .phase-pill', self.css)
-        self.assertIn('.topbar .center .pill-tag', self.css)
+    def test_parent_navigation_keeps_function_but_loses_pill_chrome(self):
+        self.assertIn('.topbar .center .phase-pill {', self.css)
+        self.assertIn('background: transparent;', self.css)
+        self.assertIn('border: 0;', self.css)
+        self.assertIn('.topbar .center .pill-tag {\n  display: none;', self.css)
 
     def test_structure_and_roadmap_share_grouped_list_language(self):
         self.assertIn('.structure-list {\n  display: block;', self.css)
