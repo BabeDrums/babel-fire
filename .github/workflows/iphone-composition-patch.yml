@@ -1,0 +1,32 @@
+name: FIRE iPhone composition patch
+
+on:
+  push:
+    branches:
+      - "sol/iphone-composition-pass"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/iphone-composition-pass
+          fetch-depth: 0
+      - name: Apply phone composition corrections
+        run: python .github/scripts/iphone_composition_patch.py
+      - name: Validate focused source checks
+        run: |
+          git diff --check
+          python -B -m unittest tests.test_design_system -v
+      - name: Commit correction
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add styles.css
+          git commit -m "Refine iPhone composition and intrinsic scrolling"
+          git push origin HEAD:sol/iphone-composition-pass
