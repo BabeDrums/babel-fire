@@ -456,7 +456,12 @@ class V6Browser(unittest.TestCase):
             inp.fill(value)
             expect(inp).to_be_focused()
             self.assertEqual(self.project()['map']['setup']['tempo'],value)
-            self.assertEqual(self.page.locator('[data-route="structure"]').is_enabled(),valid)
+            structure=self.page.locator('[data-route="structure"]')
+            if valid:
+                expect(structure).to_be_enabled()
+            else:
+                self.assertEqual(structure.count(),0)
+                expect(self.page.locator('.checkpoint-locked-message')).to_have_text('Available after Song Setup')
             expect(self.page.locator('.checkpoint-count')).to_have_text('3 of 3' if valid else '0 of 3')
             self.assertEqual(self.project()['skeleton'],original)
         # Guard history restoration even if stored completion records are true.
@@ -473,7 +478,8 @@ class V6Browser(unittest.TestCase):
         for field in ['reference','grid','firstListen']:
             self.expand_map_setup()
             self.click('toggle-setup',f'[data-field="{field}"]')
-            expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
+            self.assertEqual(self.page.locator('[data-route="structure"]').count(),0)
+            expect(self.page.locator('.checkpoint-locked-message')).to_have_text('Available after Song Setup')
             expect(self.page.locator('.checkpoint-count')).to_have_text('0 of 3')
             self.click('toggle-setup',f'[data-field="{field}"]')
             expect(self.page.locator('[data-route="structure"]')).to_be_enabled()
@@ -481,7 +487,8 @@ class V6Browser(unittest.TestCase):
             self.assertEqual(self.project()['skeleton'],original)
         self.expand_map_setup()
         self.page.locator('#meterInput').evaluate("el=>{el.add(new Option('Choose',''));el.value='';el.dispatchEvent(new Event('change',{bubbles:true}))}")
-        expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
+        self.assertEqual(self.page.locator('[data-route="structure"]').count(),0)
+        expect(self.page.locator('.checkpoint-locked-message')).to_have_text('Available after Song Setup')
         self.page.locator('#meterInput').select_option('3/4')
         expect(self.page.locator('[data-route="structure"]')).to_be_enabled()
 
@@ -1058,8 +1065,8 @@ class V6Browser(unittest.TestCase):
         self.assertEqual(self.page.locator('.road-phase').first.evaluate('el=>getComputedStyle(el).borderRadius'), '0px')
 
         self.canvas_route('structure')
-        kicker = self.page.locator('.section-kicker').first
-        self.assertEqual(kicker.evaluate('el=>getComputedStyle(el).textTransform'), 'none')
+        self.assertEqual(self.page.locator('.section-kicker:text-is("Structure")').count(), 0)
+        self.assertEqual(self.page.locator('h1').evaluate('el=>getComputedStyle(el).textTransform'), 'none')
         self.assertEqual(self.page.locator('.structure-list').evaluate('el=>getComputedStyle(el).display'), 'block')
         self.click('open-add-section'); self.settled_sheet()
         sheet = self.page.locator('.sheet'); box = sheet.bounding_box()
@@ -1131,7 +1138,8 @@ class V6Browser(unittest.TestCase):
         for width in [390,820]:
             with self.subTest(width=width):
                 self.open('structure',width=width,pointer=width>=820)
-                expect(self.page.locator('.structure-ready-label')).to_have_text('Finish structure')
+                self.assertEqual(self.page.locator('.structure-ready-label').count(),0)
+                self.assertEqual(self.page.locator('.section-kicker:text-is("Structure")').count(),0)
                 self.assertEqual(self.page.locator('[data-action="open-add-section"]').evaluate('el=>getComputedStyle(el).borderStyle'),'solid')
                 row=self.page.locator('.structure-row').first
                 self.assertGreaterEqual(row.bounding_box()['height'],62)
