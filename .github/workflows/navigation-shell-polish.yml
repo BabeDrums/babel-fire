@@ -1,0 +1,31 @@
+name: Apply navigation shell polish
+
+on:
+  push:
+    branches:
+      - sol/chunk1-2-navigation-shell
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, 'Apply navigation shell polish') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/chunk1-2-navigation-shell
+      - name: Apply focused polish
+        run: python scripts/navigation_shell_polish.py
+      - name: Verify syntax and whitespace
+        run: |
+          node --check app.js
+          git diff --check
+      - name: Commit polish
+        run: |
+          git config user.name "Babel"
+          git config user.email "110964546+BabeDrums@users.noreply.github.com"
+          git add app.js tests/test_v6.py
+          git commit -m "Apply navigation shell polish"
+          git push origin HEAD:sol/chunk1-2-navigation-shell
