@@ -788,7 +788,9 @@
     return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`;
   }
   function projectPageMotionClass() {
-    return routeMotion ? ` ${routeMotion}` : "";
+    const className = routeMotion ? ` ${routeMotion}` : "";
+    routeMotion = "";
+    return className;
   }
   function savedMark() {
     return `<span class="saved">Saved</span>`;

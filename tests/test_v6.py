@@ -626,6 +626,7 @@ class V6Browser(unittest.TestCase):
                 self.assertEqual(self.page.locator('.topbar .left [data-action="history-back"]').count(), 1)
                 self.assertEqual(self.page.locator('.topbar [data-action="new-project"]').count(), 0)
                 self.assertEqual(self.page.locator('.project-page.route-forward').count(), 1)
+                self.page.locator('.project-page').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
                 new_shell = self.page.locator('.project-page').bounding_box()
                 new_toolbar = self.page.locator('.topbar').bounding_box()
                 new_title = self.page.locator('.page-heading h1').bounding_box()
