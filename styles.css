@@ -1747,10 +1747,10 @@ body.sheet-open .undo-notice {
   margin-bottom: 0;
 }
 .project-page.route-forward {
-  animation: routeForwardIn var(--motion-standard) var(--ease);
+  animation: routeForwardIn var(--motion-fast) var(--ease);
 }
 .project-page.route-back {
-  animation: routeBackIn var(--motion-standard) var(--ease);
+  animation: routeBackIn var(--motion-fast) var(--ease);
 }
 .phase-setup, .phase-checkpoints, .arrangement-region, .study-observations {
   min-width: 0;
@@ -1792,22 +1792,18 @@ summary:focus-visible, [role="button"]:focus-visible, .timeline-scroll:focus-vis
 
 @keyframes routeForwardIn {
   from {
-    opacity: 0.82;
-    transform: translateX(8px);
+    opacity: 0.92;
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 @keyframes routeBackIn {
   from {
-    opacity: 0.82;
-    transform: translateX(-8px);
+    opacity: 0.92;
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
