@@ -41,6 +41,7 @@ class FireDesignSystemSource(unittest.TestCase):
     def test_short_pages_use_dynamic_viewport_without_root_bounce(self):
         self.assertGreaterEqual(self.css.count('min-height: 100dvh;'), 2)
         self.assertIn('overscroll-behavior-y: none;', self.css)
+        self.assertIn('padding-bottom: calc(24px + env(safe-area-inset-bottom));', self.css)
 
     def test_phone_map_and_roadmap_have_compact_density_rules(self):
         self.assertIn('#app[data-route="map"] .setup-row', self.css)
@@ -48,6 +49,13 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('#app[data-route="roadmap"] .road-phase:not(.current) .road-top p', self.css)
         self.assertIn('.section-builder .builder-status:empty', self.css)
         self.assertIn('.section-builder .sheet-error:empty', self.css)
+
+    def test_phone_map_uses_one_quieter_setup_surface(self):
+        self.assertIn('#app[data-route="map"] .setup-value,', self.css)
+        self.assertIn('#app[data-route="map"] .state-control {', self.css)
+        self.assertIn('#app[data-route="map"] .phase-setup .setup-panel {', self.css)
+        self.assertIn('border-bottom: 0;', self.css)
+        self.assertIn('border-radius: 0 0 var(--radius-card) var(--radius-card);', self.css)
 
 
 if __name__ == "__main__":
