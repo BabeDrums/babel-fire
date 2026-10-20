@@ -1039,6 +1039,32 @@ class V6Browser(unittest.TestCase):
         expect(self.page.locator('.sheet')).to_have_css('border-radius','18px')
         self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
 
+    def test_fire_design_system_foundation_across_representative_routes(self):
+        self.open('roadmap', width=820, data=self.complete_fixture())
+        self.assertEqual(self.page.locator('.topbar .center').inner_text().strip(), '')
+        roadmap = self.page.locator('.roadmap-grid')
+        self.assertEqual(roadmap.evaluate('el=>getComputedStyle(el).display'), 'block')
+        self.assertEqual(self.page.locator('.road-phase').first.evaluate('el=>getComputedStyle(el).borderRadius'), '0px')
+
+        self.canvas_route('structure')
+        kicker = self.page.locator('.section-kicker').first
+        self.assertEqual(kicker.evaluate('el=>getComputedStyle(el).textTransform'), 'none')
+        self.assertEqual(self.page.locator('.structure-list').evaluate('el=>getComputedStyle(el).display'), 'block')
+        self.click('open-add-section'); self.settled_sheet()
+        sheet = self.page.locator('.sheet'); box = sheet.bounding_box()
+        self.assertLessEqual(box['width'], 620)
+        self.assertGreater(box['y'], 20)
+        self.assertEqual(sheet.evaluate('el=>getComputedStyle(el).borderRadius'), '20px')
+        self.click('close-sheet')
+
+        self.canvas_route('tracks')
+        selected = self.page.locator('.choice[aria-pressed="true"]').first
+        self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"), 'none')
+        self.assertLessEqual(self.page.locator('.primary.full').bounding_box()['width'], 320.5)
+
+        self.canvas_route('skeleton-session')
+        self.assertLessEqual(self.page.locator('.primary.full').bounding_box()['width'], 320.5)
+
     def test_dense_lane_scroll_keyboard_precision_and_touch_scroll_cancellation(self):
         data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=256
         self.open(width=320,data=data);self.select();before=self.db()

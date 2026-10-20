@@ -22,7 +22,7 @@ Always distinguish shipped work on `main`, unmerged work, and planned work. Resu
 
 - **Projects + New Project are the visual north star.** Their cleaner page shell, spacing, typography, restrained controls, and stable geometry are the reference for the rest of FIRE.
 - The shared workflow shell has been carried through Project → The Map → Structure → Tracks, but the older interior component language still feels inconsistent across Map, Structure, Tracks, Roadmap, Notes, Review Map, Section Study, and Skeleton screens.
-- The next approved product pass is a **FIRE Design System foundation pass**, not another isolated Structure polish pass.
+- The first **FIRE Design System foundation batch** is now implemented across representative workflow screens (The Map, Structure, Tracks, Roadmap, and Skeleton/Session). Physical iPad/iPhone approval is required before broad rollout to the remaining routes.
 - The design-system pass should standardize typography, spacing, radii, grouped surfaces, rows, inputs, segmented controls, selections, completion states, primary/secondary/quiet/destructive actions, navigation placement, hover/pressed/focus/disabled states, and adaptive sheets.
 - **Selection is not completion.** Checkmarks/circles are reserved for genuine completion semantics, not generic selected state.
 - On iPad, task sheets such as Add Sections should use compact centered form/page-style presentation where practical; narrow iPhone layouts may remain bottom-oriented.
