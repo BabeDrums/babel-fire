@@ -99,9 +99,15 @@ class AdaptiveComposition(unittest.TestCase):
         expect(tempo).to_be_visible()
         tempo.fill("112")
         tempo.blur()
-        expect(page.locator('[data-action="toggle-setup-disclosure"]')).to_contain_text(
-            "Ready · 112 BPM · 4/4"
-        )
+        expect(tempo).to_be_visible()
+        expect(tempo).to_have_value("112")
+
+        page.locator('[data-action="go"][data-route="structure"]').click()
+        expect(page.locator("h1")).to_have_text("Structure")
+        page.go_back()
+        summary = page.locator('[data-action="toggle-setup-disclosure"]')
+        expect(summary).to_be_visible()
+        expect(summary).to_contain_text("Ready · 112 BPM · 4/4")
 
     def test_project_current_phase_is_the_action_without_progress_slab(self):
         page = self.open("project")
