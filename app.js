@@ -1493,7 +1493,7 @@
         : phaseIndex === 1
           ? `${skeletonCheckpointCount(p)} of 3 checkpoints`
           : "Open roadmap";
-    const body = `<div class="project-overview"><section class="project-current"><button class="hero-card project-open" style="border-radius:var(--radius-card);height:auto" data-action="go" data-route="${phase.route}" aria-label="Open ${esc(phase.title)}"><div class="phase-line"><div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p><div class="foot"><span>${esc(phaseProgress)}</span><span aria-hidden="true">›</span></div></button></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
+    const body = `<div class="project-overview"><section class="project-current"><button class="hero-card project-open" style="border-radius:var(--radius-card);height:auto" data-action="go" data-route="${phase.route}" aria-label="Open ${esc(phase.title)}"><div class="phase-line"><div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p><div class="foot"><span>${esc(phaseProgress)}</span><span aria-hidden="true">›</span></div></button></section><section class="project-support"><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
     app.innerHTML =
       topbar(
         backButton("projects", "Projects"),
@@ -1516,7 +1516,7 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), "", "") +
-      `<main class="project-page${projectPageMotionClass()}"><header class="page-heading"><h1>New project</h1><p class="sub">Start original or rebuild a reference.</p></header><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Song title" enterkeyhint="next" autocomplete="off" autocapitalize="words" placeholder="Song title"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist"><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button></main>`;
+      `<main class="project-page${projectPageMotionClass()}"><header class="page-heading"><h1>New project</h1><p class="sub">Start original or rebuild a reference.</p></header><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><input class="field" id="newTitle" aria-label="Song title" enterkeyhint="next" autocomplete="off" autocapitalize="words" placeholder="Song title"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist"><button class="primary create-project-action" data-action="create-project">Create Project</button></main>`;
   }
 
 
@@ -1550,7 +1550,7 @@
     const setup = setupExpanded
       ? `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`
       : `<div class="group-card list"><button class="list-row" data-action="toggle-setup-disclosure" aria-expanded="false"><span class="round-check on"></span><div><div class="title">Song Setup</div><div class="desc">Ready · ${esc(m.setup.tempo)} BPM · ${esc(m.setup.meter)}</div></div><span class="chev">›</span></button></div>`;
-    const checkpoints =
+    let checkpoints =
       checkpointRow(
         "Structure",
         "Map the form.",
@@ -1572,6 +1572,8 @@
         sectionStudyDone(p),
         studyUnlocked,
       );
+    if (!setupDone)
+      checkpoints = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
     app.innerHTML = workflowPhaseHome(0, done, 3, checkpoints, setup);
   }
 
@@ -1579,7 +1581,7 @@
     const p = project(),
       labels = sectionLabels(p),
       done = structureDone(p);
-    const body = `<div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
+    const body = `<div class="structure-list" id="sortList">${
         sections(p).length
           ? sections(p)
               .map(
@@ -1588,7 +1590,7 @@
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
-      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-ready-label">Finish structure</div><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div><div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button></div>`;
+      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div>${done ? `<div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks">Next</button></div>` : ""}`;
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), "", savedMark()) +
       workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
@@ -1599,7 +1601,7 @@
       selectedNames = new Set(tracks(p).map((t) => t.name)),
       custom = tracks(p).filter((t) => !COMMON_TRACKS.includes(t.name)),
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
-    const body = `<div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+    const body = `<div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div>${tracksDone(p) ? `<div class="tracks-next-wrap"><button class="primary" data-action="start-section-study">Next</button></div>` : ""}`;
     app.innerHTML =
       topbar(historyBackButton("structure", "Structure"), "", savedMark()) +
       workflowPage("Tracks", "Select everything that appears somewhere in the song.", body, "2 of 3");
