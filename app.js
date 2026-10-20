@@ -2963,20 +2963,19 @@
   });
   app.addEventListener("change", (e) => {
     if (e.target.id === "tempoInput") {
-      if (mapSetupComplete(project())) {
-        ui.setupExpanded = false;
-        renderMapHome();
-      }
+      // When setup is open because it is incomplete, completing the last field
+      // can collapse it. When the musician explicitly reopened a completed
+      // summary to edit, keep that edit session open so blur cannot swallow the
+      // next navigation tap by replacing the DOM underneath it.
+      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
       return;
     }
     if (e.target.id === "meterInput") {
       project().map.setup.meter = e.target.value;
       invalidateMapVerification(project());
       save();
-      if (mapSetupComplete(project())) {
-        ui.setupExpanded = false;
-        renderMapHome();
-      } else refreshMapProgress();
+      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
+      else refreshMapProgress();
     }
   });
   app.addEventListener("keydown", (e) => {
