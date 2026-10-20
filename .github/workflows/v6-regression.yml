@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        width: [390, 820]
+        width: [390, 440, 820]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -20,9 +20,10 @@ Always distinguish shipped work on `main`, unmerged work, and planned work. Resu
 
 ## Current verified direction — October 2026
 
-- **Projects + New Project are the visual north star.** Their cleaner page shell, spacing, typography, restrained controls, and stable geometry are the reference for the rest of FIRE.
+- **Projects + New Project are useful visual references, not untouchable templates.** Preserve their restraint, spacing, hierarchy, and stable geometry while improving them when a shared-system change makes FIRE calmer or clearer.
+- FIRE should lean roughly **70% calm Apple-like app hierarchy / 30% focused creative-tool density**. Navigation, setup, project, review, and checkpoint surfaces should stay simple and minimal; specialized musical workspaces may become denser only when the task genuinely requires it.
 - The shared workflow shell has been carried through Project → The Map → Structure → Tracks, but the older interior component language still feels inconsistent across Map, Structure, Tracks, Roadmap, Notes, Review Map, Section Study, and Skeleton screens.
-- The first **FIRE Design System foundation batch** is now implemented across representative workflow screens (The Map, Structure, Tracks, Roadmap, and Skeleton/Session). Physical iPad/iPhone approval is required before broad rollout to the remaining routes.
+- The representative **FIRE Design System foundation** is being consolidated in the core stylesheet so shared primitives carry the design instead of a second route-specific override layer. The Map, Structure, Tracks, Roadmap, and Skeleton/Session remain the approval set; physical iPhone/iPad approval is required before broad rollout to remaining routes.
 - The design-system pass should standardize typography, spacing, radii, grouped surfaces, rows, inputs, segmented controls, selections, completion states, primary/secondary/quiet/destructive actions, navigation placement, hover/pressed/focus/disabled states, and adaptive sheets.
 - **Selection is not completion.** Checkmarks/circles are reserved for genuine completion semantics, not generic selected state.
 - On iPad, task sheets such as Add Sections should use compact centered form/page-style presentation where practical; narrow iPhone layouts may remain bottom-oriented.

@@ -4,17 +4,18 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- FIRE Design System foundation consolidation: the temporary second visual-override layer was folded back into the core component rules; section hierarchy is calmer, primary actions are compact/dark rather than width-driven light slabs, selected options no longer borrow completion checks, Structure and Roadmap use coherent grouped-list language, passive center pills are visually retired, and responsive regression coverage now includes narrow/large iPhone plus iPad widths.
 - First FIRE Design System foundation batch: calmer type hierarchy, grouped progression/list surfaces, selection separated from completion, compact workflow actions, centered iPad task sheets, and shared styling across representative Map/Structure/Tracks/Roadmap/Skeleton screens.
-- Projects + New Project now establish the visual north star: stable shared page shell, aligned toolbar/title/subtitle/content guides, persistent Song title + Artist fields, restrained navigation, and geometry-stable transitions.
+- Projects + New Project now establish a useful visual reference: stable shared page shell, aligned toolbar/title/subtitle/content guides, persistent Song title + Artist fields, restrained navigation, and geometry-stable transitions. They are not immutable templates; shared-system improvements may refine them too.
 - Workflow shell continuity was extended through Project → The Map → Structure → Tracks; passive center pills were removed from those routes and page hierarchy was normalized.
 - Structure received an interim hierarchy/interaction cleanup while preserving rapid repeated section entry, bar persistence, row editing, delete + Undo, reorder, verification, and downstream gating.
-- A global FIRE Design System foundation is now the approved next refinement: shared typography, surfaces, rows, actions, selection/completion semantics, adaptive iPad sheets, and app-wide component consistency.
+- FIRE's approved visual target is roughly 70% calm Apple-like app hierarchy / 30% focused creative-tool density, with density reserved for genuinely musical workspaces.
 
 - Coherent shared shapes and states, rapid repeated section entry, separate row delete/Undo, and direct musical blocks with drag, tap-boundary/tap-destination and keyboard edits. Aligned changes and horizontal dense-section navigation replace separate timing editors.
 
 - Shared stable controls and sheets, intentional text focus, tonal selection, and reduced-motion support.
 - Current canonical prerequisites govern completion, progress, route entry, and restored browser history.
-- Back follows eligible history; parent pills open the phase/project parent; Roadmap remains explicit.
+- Back follows eligible history; hierarchical navigation and Roadmap remain distinct concepts while passive center labels are retired from the visual language.
 - Musical Stop/Start placement, real boundaries, open continuation, direct accessible boundary movement, and Undo preserve the continuous timeline engine.
 - Inline Draft disclosures and whole-song coverage retain Session → Draft → Bounce and honestly lead onward to Roadmap.
 - Revisioned static assets and the retained FIRE V6 DEV stamp identify deployed builds without a new runtime dependency or build pipeline.
