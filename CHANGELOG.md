@@ -4,6 +4,7 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- iPhone composition refinement: narrow-phone pages now let intrinsic content decide whether scrolling is needed instead of reserving a fake toolbar-height tail; The Map also uses a quieter grouped setup surface with less nested control chrome and a visually integrated First Listen row.
 - iPhone scroll/density refinement: short routes now use the dynamic visual viewport without unnecessary root bounce, while dense phone screens compact secondary detail instead of shrinking controls; Map checkpoints and Roadmap progression receive phone-specific density treatment and the Add Sections sheet wastes less vertical space.
 - FIRE Design System foundation consolidation: the temporary second visual-override layer was folded back into the core component rules; section hierarchy is calmer, primary actions are compact/dark rather than width-driven light slabs, selected options no longer borrow completion checks, Structure and Roadmap use coherent grouped-list language, passive center pills are visually retired, and responsive regression coverage now includes narrow/large iPhone plus iPad widths.
 - First FIRE Design System foundation batch: calmer type hierarchy, grouped progression/list surfaces, selection separated from completion, compact workflow actions, centered iPad task sheets, and shared styling across representative Map/Structure/Tracks/Roadmap/Skeleton screens.
