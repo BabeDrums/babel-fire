@@ -38,6 +38,17 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('.roadmap-grid {\n  display: block;', self.css)
         self.assertIn('.road-phase:last-child', self.css)
 
+    def test_short_pages_use_dynamic_viewport_without_root_bounce(self):
+        self.assertGreaterEqual(self.css.count('min-height: 100dvh;'), 2)
+        self.assertIn('overscroll-behavior-y: none;', self.css)
+
+    def test_phone_map_and_roadmap_have_compact_density_rules(self):
+        self.assertIn('#app[data-route="map"] .setup-row', self.css)
+        self.assertIn('#app[data-route="map"] .phase-checkpoints .list-row .desc', self.css)
+        self.assertIn('#app[data-route="roadmap"] .road-phase:not(.current) .road-top p', self.css)
+        self.assertIn('.section-builder .builder-status:empty', self.css)
+        self.assertIn('.section-builder .sheet-error:empty', self.css)
+
 
 if __name__ == "__main__":
     unittest.main()
