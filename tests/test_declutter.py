@@ -112,6 +112,21 @@ class CurrentTaskDeclutter(unittest.TestCase):
         self.assertEqual(page.locator('.phase-checkpoints [data-route="structure"]').count(), 0)
         self.assertEqual(page.locator('.phase-checkpoints [data-route="tracks"]').count(), 0)
 
+    def test_map_prerequisite_summary_stays_live_while_editing_setup(self):
+        page = self.open("map", project_data(setup_complete=True))
+        page.locator('[data-action="toggle-setup-disclosure"]').click()
+        meter = page.locator("#meterInput")
+        meter.evaluate(
+            "el=>{el.add(new Option('Choose',''));el.value='';"
+            "el.dispatchEvent(new Event('change',{bubbles:true}))}"
+        )
+        expect(page.locator(".checkpoint-locked-message")).to_have_text(
+            "Available after Song Setup"
+        )
+        self.assertEqual(page.locator('.phase-checkpoints [data-route="structure"]').count(), 0)
+        meter.select_option("3/4")
+        expect(page.locator('.phase-checkpoints [data-route="structure"]')).to_be_visible()
+
     def test_structure_hides_repeated_labels_and_unavailable_next(self):
         page = self.open("structure", project_data(setup_complete=True))
         self.assertEqual(page.locator(".structure-ready-label").count(), 0)
