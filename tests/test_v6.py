@@ -596,27 +596,56 @@ class V6Browser(unittest.TestCase):
                 self.assertEqual(self.page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"),True)
                 self.context.close()
 
-    def test_projects_foundation_and_new_project_keyboard_flow(self):
+    def test_projects_navigation_shell_and_new_project_keyboard_flow(self):
         for width in [320, 390, 430, 820, 1180]:
             with self.subTest(width=width):
                 self.open('projects', width=width, pointer=width >= 1180)
                 self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
-                self.assertEqual(self.page.locator('.topbar').count(), 0)
+                self.assertEqual(self.page.locator('.topbar').count(), 1)
                 self.assertEqual(self.page.locator('.pill-tag').count(), 0)
-                add = self.page.locator('[data-action="new-project"]')
+                add = self.page.locator('.topbar .right [data-action="new-project"]')
                 box = add.bounding_box()
                 self.assertGreaterEqual(box['width'], 44)
                 self.assertGreaterEqual(box['height'], 44)
                 card = self.page.locator('.project-card').first.bounding_box()
-                heading = self.page.locator('.projects-heading').bounding_box()
+                shell = self.page.locator('.project-page').bounding_box()
+                toolbar = self.page.locator('.topbar').bounding_box()
+                title = self.page.locator('.page-heading h1').bounding_box()
+                subtitle = self.page.locator('.page-heading .sub').bounding_box()
                 self.assertLessEqual(card['height'], 140)
                 self.assertLess(abs((box['x'] + box['width']) - (card['x'] + card['width'])), 1.1)
-                self.assertLess(abs((heading['x'] + heading['width']) - (card['x'] + card['width'])), 1.1)
+                self.assertLess(abs(shell['x'] - card['x']), 1.1)
+                self.assertLess(abs((shell['x'] + shell['width']) - (card['x'] + card['width'])), 1.1)
+                self.assertLess(abs(toolbar['x'] - shell['x']), 1.1)
+                self.assertLess(abs(toolbar['width'] - shell['width']), 1.1)
                 self.assertEqual(self.page.locator('.project-menu').first.text_content().strip(), '…')
                 self.assertEqual(self.page.locator('.project-open .foot > span:last-child').first.text_content().strip(), '›')
+
+                self.click('new-project')
+                expect(self.page.locator('.page-heading h1')).to_have_text('New project')
+                self.assertEqual(self.page.locator('.topbar .left [data-action="history-back"]').count(), 1)
+                self.assertEqual(self.page.locator('.topbar [data-action="new-project"]').count(), 0)
+                self.assertEqual(self.page.locator('.project-page.route-forward').count(), 1)
+                self.page.locator('.project-page').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
+                new_shell = self.page.locator('.project-page').bounding_box()
+                new_toolbar = self.page.locator('.topbar').bounding_box()
+                new_title = self.page.locator('.page-heading h1').bounding_box()
+                new_subtitle = self.page.locator('.page-heading .sub').bounding_box()
+                segmented = self.page.locator('.project-type-control').bounding_box()
+                self.assertLess(abs(new_shell['x'] - shell['x']), 1.1)
+                self.assertLess(abs(new_shell['width'] - shell['width']), 1.1)
+                self.assertLess(abs(new_toolbar['x'] - toolbar['x']), 1.1)
+                self.assertLess(abs(new_toolbar['width'] - toolbar['width']), 1.1)
+                self.assertLess(abs(new_title['y'] - title['y']), 1.1)
+                self.assertLess(abs(new_subtitle['y'] - subtitle['y']), 1.1)
+                self.assertLess(abs(segmented['y'] - card['y']), 1.1)
                 if width >= 1180:
-                    self.assertLessEqual(heading['width'], 760.1)
+                    self.assertLessEqual(shell['width'], 760.1)
                     self.assertLessEqual(card['width'], 760.1)
+
+                self.page.locator('[data-action="history-back"]').click()
+                expect(self.page.locator('.page-heading h1')).to_have_text('Projects')
+                self.assertEqual(self.page.locator('.project-page.route-back').count(), 1)
                 self.context.close()
 
         self.open('projects', width=390, data={'version':5,'currentProjectId':None,'projects':[]})
@@ -752,8 +781,10 @@ class V6Browser(unittest.TestCase):
                         self.assertEqual(self.page.evaluate('history.state.route'),route)
                         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),width)
                         self.assertGreater(self.page.locator('#app').bounding_box()['width'],width*.8 if width<1000 else 600)
-                        if route in ['new-project','skeleton-bounce','skeleton']:
+                        if route in ['skeleton-bounce','skeleton']:
                             self.assertLessEqual(self.page.locator('#app').bounding_box()['width'],760)
+                        if route=='new-project':
+                            self.assertLessEqual(self.page.locator('#app').bounding_box()['width'],880)
                         if route=='section-study':
                             self.select()
                             self.assertEqual(self.page.locator('.presence-segment.real-stop').count(),0)

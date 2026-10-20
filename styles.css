@@ -1718,32 +1718,39 @@ body.sheet-open .undo-notice {
 .projects-grid, .roadmap-grid, .notes-columns, .session-groups, .draft-sections, .phase-layout, .review-sections, .study-workspace {
   min-width: 0;
 }
-#app[data-route="projects"] {
+#app[data-route="projects"],
+#app[data-route="new-project"] {
   --canvas-width: 880px;
 }
-.projects-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-4);
+#app[data-route="projects"] > .topbar,
+#app[data-route="new-project"] > .topbar,
+.project-page {
   width: 100%;
   max-width: 760px;
-  margin-bottom: var(--space-5);
 }
-.projects-heading > div {
+.project-page {
   min-width: 0;
 }
-.projects-heading h1 {
+.project-page .page-heading {
+  margin: 0 0 var(--space-5);
+}
+.project-page .page-heading h1 {
   margin: 0 0 7px;
 }
 .projects-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
-  max-width: 760px;
+  max-width: none;
 }
 .projects-grid > .project-card {
   margin-bottom: 0;
+}
+.project-page.route-forward {
+  animation: routeForwardIn var(--motion-standard) var(--ease);
+}
+.project-page.route-back {
+  animation: routeBackIn var(--motion-standard) var(--ease);
 }
 .phase-setup, .phase-checkpoints, .arrangement-region, .study-observations {
   min-width: 0;
@@ -1781,6 +1788,27 @@ summary:focus-visible, [role="button"]:focus-visible, .timeline-scroll:focus-vis
 .setup-value:has(:focus-visible) {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+@keyframes routeForwardIn {
+  from {
+    opacity: 0.82;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes routeBackIn {
+  from {
+    opacity: 0.82;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes sheetIn {
@@ -1824,11 +1852,10 @@ from {
 }
 /* Adaptive composition and input capabilities. */
 @media (max-width: 430px) {
-  .projects-heading {
-    align-items: center;
+  .project-page .page-heading {
     margin-bottom: 20px;
   }
-  .projects-heading h1 {
+  .project-page .page-heading h1 {
     font-size: 34px;
     line-height: 1.04;
   }
