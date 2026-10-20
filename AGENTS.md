@@ -51,6 +51,8 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
 - Passive center pills are prohibited. Leading toolbar = navigation; trailing toolbar = contextual action; page title = current location.
 - iPad task sheets should prefer compact centered form/page-style presentation when appropriate; narrow phone layouts may use bottom-oriented sheets.
+- Short phone pages that fit within the visual viewport must not create unnecessary root scrolling or rubber-band drift. Use dynamic viewport sizing/overscroll containment while preserving natural scrolling when content genuinely exceeds the viewport.
+- Dense narrow-phone layouts should reduce redundant secondary copy and compact non-current states before shrinking controls. Preserve ~44px touch targets and progression/state clarity.
 - Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
 - Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
 - Visual work is not complete merely because CI is green. Physical iPhone/iPad Safari approval is required before locking a visual chunk.
