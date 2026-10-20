@@ -114,8 +114,8 @@ class CurrentTaskDeclutter(unittest.TestCase):
 
     def test_map_prerequisite_summary_stays_live_while_editing_setup(self):
         page = self.open("map", project_data(setup_complete=True))
-        page.locator('[data-action="toggle-setup-disclosure"]').click()
         meter = page.locator("#meterInput")
+        expect(meter).to_be_visible()
         meter.evaluate(
             "el=>{el.add(new Option('Choose',''));el.value='';"
             "el.dispatchEvent(new Event('change',{bubbles:true}))}"

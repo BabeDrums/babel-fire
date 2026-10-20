@@ -782,9 +782,10 @@
       done = mapCheckpointCount(p);
     if (count) count.textContent = `${done} of 3`;
     if (!holder) return queueViewportFit();
-    if (!setupDone) {
+    const currentlyLocked = !!holder.querySelector(".checkpoint-locked-message");
+    if (!setupDone && !currentlyLocked) {
       holder.innerHTML = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
-    } else {
+    } else if (setupDone && currentlyLocked) {
       const studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
       holder.innerHTML =
         checkpointRow("Structure", "Map the form.", "structure", structureDone(p), true) +

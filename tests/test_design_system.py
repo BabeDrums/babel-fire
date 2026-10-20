@@ -54,8 +54,9 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('#app[data-route="map"] .setup-value,', self.css)
         self.assertIn('#app[data-route="map"] .state-control {', self.css)
         self.assertIn('#app[data-route="map"] .phase-setup .setup-panel {', self.css)
-        self.assertIn('border-bottom: 0;', self.css)
-        self.assertIn('border-radius: 0 0 var(--radius-card) var(--radius-card);', self.css)
+        self.assertIn('border-radius: var(--radius-card);', self.css)
+        self.assertIn('border-bottom: 1px solid var(--line);', self.css)
+        self.assertIn('#app[data-route="map"] .phase-setup .setup-listen-row {', self.css)
 
 
 if __name__ == "__main__":

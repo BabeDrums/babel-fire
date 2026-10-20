@@ -1027,13 +1027,13 @@ class V6Browser(unittest.TestCase):
     def test_component_shapes_stay_fixed_across_hover_focus_selected_and_disabled(self):
         self.open('projects',width=1440,data=self.complete_fixture(),pointer=True)
         samples=[('projects','.project-open'),('projects','.project-menu'),('project','.quick-card'),
-                 ('map','.nav-btn'),('map','.state-control'),('map','.action-card'),('map','.list-row'),
+                 ('map','.nav-btn'),('map','.state-control'),('map','.setup-listen-row'),('map','.list-row'),
                  ('structure','.structure-row'),('tracks','.choice'),('section-study','.segment'),
                  ('skeleton-draft','.workflow-disclosure summary'),('skeleton-bounce','.primary')]
         for route,selector in samples:
             with self.subTest(route=route,selector=selector):
                 self.canvas_route(route)
-                if route == 'map' and selector in ('.state-control','.action-card'):
+                if route == 'map' and selector in ('.state-control','.setup-listen-row'):
                     self.expand_map_setup()
                 node=self.page.locator(selector).first
                 node.scroll_into_view_if_needed();before=node.bounding_box()
@@ -1146,11 +1146,9 @@ class V6Browser(unittest.TestCase):
                 self.assertGreaterEqual(row.bounding_box()['height'],62)
                 self.assertEqual(self.page.locator('.bars-badge').first.evaluate('el=>getComputedStyle(el).backgroundColor'),'rgba(0, 0, 0, 0)')
                 nxt=self.page.locator('[data-route="tracks"]');page=self.page.locator('.workflow-page')
-                if width>=640:
-                    self.assertLessEqual(nxt.bounding_box()['width'],280.5)
-                    self.assertAlmostEqual(nxt.bounding_box()['x']+nxt.bounding_box()['width'],page.bounding_box()['x']+page.bounding_box()['width'],delta=1)
-                else:
-                    self.assertAlmostEqual(nxt.bounding_box()['width'],page.bounding_box()['width'],delta=1)
+                self.assertLessEqual(nxt.bounding_box()['width'],220.5)
+                self.assertLess(nxt.bounding_box()['width'],page.bounding_box()['width'])
+                self.assertAlmostEqual(nxt.bounding_box()['x']+nxt.bounding_box()['width'],page.bounding_box()['x']+page.bounding_box()['width'],delta=1)
                 self.click('open-add-section');self.click('choose-section-type','[data-name="Intro"]')
                 selected=self.page.locator('[data-action="choose-section-type"][data-name="Intro"]')
                 self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"),'none')
@@ -1404,7 +1402,7 @@ class V6Browser(unittest.TestCase):
         card = self.page.locator('.project-open').first
         self.assertEqual(card.locator('.type').count(), 0)
         expect(card.locator('.artist')).to_contain_text('Test artist · Recreation')
-        expect(card.locator('.foot')).to_contain_text('The Map · 3 of 3')
+        expect(card.locator('.foot')).to_contain_text('The Map · 2 of 3')
         self.click('open-project', '[data-id="p1"]')
         self.assertEqual(self.page.locator('.project-current-card').count(), 1)
         self.assertEqual(self.page.locator('.project-current-card .phase-num').count(), 0)

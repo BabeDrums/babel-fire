@@ -86,17 +86,14 @@ class AdaptiveComposition(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
-    def test_completed_song_setup_collapses_and_can_be_edited(self):
+    def test_completed_song_setup_stays_visible_and_editable(self):
         page = self.open("map")
-        summary = page.locator('[data-action="toggle-setup-disclosure"]')
-        expect(summary).to_be_visible()
-        expect(summary).to_contain_text("Ready · 111 BPM · 4/4")
-        self.assertEqual(page.locator("#tempoInput").count(), 0)
-        self.assertEqual(page.locator(".checkpoint-progress").count(), 0)
-
-        summary.click()
+        expect(page.locator(".phase-setup .section-kicker")).to_have_text("Song Setup")
         tempo = page.locator("#tempoInput")
         expect(tempo).to_be_visible()
+        self.assertEqual(page.locator('[data-action="toggle-setup-disclosure"]').count(), 0)
+        self.assertEqual(page.locator(".checkpoint-progress").count(), 0)
+
         tempo.fill("112")
         tempo.blur()
         expect(tempo).to_be_visible()
@@ -105,13 +102,12 @@ class AdaptiveComposition(unittest.TestCase):
         page.locator('[data-action="go"][data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
         page.go_back()
-        summary = page.locator('[data-action="toggle-setup-disclosure"]')
-        expect(summary).to_be_visible()
-        expect(summary).to_contain_text("Ready · 112 BPM · 4/4")
+        expect(page.locator(".phase-setup .section-kicker")).to_have_text("Song Setup")
+        expect(page.locator("#tempoInput")).to_have_value("112")
 
     def test_project_current_phase_is_the_action_without_progress_slab(self):
         page = self.open("project")
-        current = page.locator('.project-current .hero-card[data-action="go"]')
+        current = page.locator('.project-current-card[data-action="go"]')
         expect(current).to_be_visible()
         expect(current).to_have_attribute("data-route", "map")
         expect(current).to_contain_text("The Map")
