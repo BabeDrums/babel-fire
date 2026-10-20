@@ -1036,8 +1036,34 @@ class V6Browser(unittest.TestCase):
                     self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
                     self.assertGreaterEqual(float(node.evaluate('el=>getComputedStyle(el).opacity')),.5)
         self.canvas_route('structure');self.click('edit-section','[data-section-id="s0"]');self.settled_sheet()
-        expect(self.page.locator('.sheet')).to_have_css('border-radius','18px')
+        expect(self.page.locator('.sheet')).to_have_css('border-radius','20px')
         self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
+
+    def test_fire_design_system_foundation_across_representative_routes(self):
+        self.open('roadmap', width=820, data=self.complete_fixture())
+        self.assertEqual(self.page.locator('.topbar .center').inner_text().strip(), '')
+        roadmap = self.page.locator('.roadmap-grid')
+        self.assertEqual(roadmap.evaluate('el=>getComputedStyle(el).display'), 'block')
+        self.assertEqual(self.page.locator('.road-phase').first.evaluate('el=>getComputedStyle(el).borderRadius'), '0px')
+
+        self.canvas_route('structure')
+        kicker = self.page.locator('.section-kicker').first
+        self.assertEqual(kicker.evaluate('el=>getComputedStyle(el).textTransform'), 'none')
+        self.assertEqual(self.page.locator('.structure-list').evaluate('el=>getComputedStyle(el).display'), 'block')
+        self.click('open-add-section'); self.settled_sheet()
+        sheet = self.page.locator('.sheet'); box = sheet.bounding_box()
+        self.assertLessEqual(box['width'], 620)
+        self.assertGreater(box['y'], 20)
+        self.assertEqual(sheet.evaluate('el=>getComputedStyle(el).borderRadius'), '20px')
+        self.click('close-sheet')
+
+        self.canvas_route('tracks')
+        selected = self.page.locator('.choice[aria-pressed="true"]').first
+        self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"), 'none')
+        self.assertLessEqual(self.page.locator('[data-action="start-section-study"]').bounding_box()['width'], 320.5)
+
+        self.canvas_route('skeleton-session')
+        self.assertLessEqual(self.page.locator('[data-route="skeleton-draft"]').bounding_box()['width'], 320.5)
 
     def test_dense_lane_scroll_keyboard_precision_and_touch_scroll_cancellation(self):
         data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=256
@@ -1094,10 +1120,10 @@ class V6Browser(unittest.TestCase):
         for width in [390,820]:
             with self.subTest(width=width):
                 self.open('structure',width=width,pointer=width>=820)
-                expect(self.page.locator('.structure-ready-label')).to_have_text('Ready?')
+                expect(self.page.locator('.structure-ready-label')).to_have_text('Finish structure')
                 self.assertEqual(self.page.locator('[data-action="open-add-section"]').evaluate('el=>getComputedStyle(el).borderStyle'),'solid')
                 row=self.page.locator('.structure-row').first
-                self.assertGreaterEqual(row.bounding_box()['height'],68)
+                self.assertGreaterEqual(row.bounding_box()['height'],62)
                 self.assertEqual(self.page.locator('.bars-badge').first.evaluate('el=>getComputedStyle(el).backgroundColor'),'rgba(0, 0, 0, 0)')
                 nxt=self.page.locator('[data-route="tracks"]');page=self.page.locator('.workflow-page')
                 if width>=640:

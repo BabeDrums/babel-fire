@@ -1539,7 +1539,7 @@
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
-      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="section-kicker structure-ready-label">Ready?</div><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div><div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button></div>`;
+      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-ready-label">Finish structure</div><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div><div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button></div>`;
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), "", savedMark()) +
       workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
@@ -1550,7 +1550,7 @@
       selectedNames = new Set(tracks(p).map((t) => t.name)),
       custom = tracks(p).filter((t) => !COMMON_TRACKS.includes(t.name)),
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
-    const body = `<div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+    const body = `<div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
     app.innerHTML =
       topbar(historyBackButton("structure", "Structure"), "", savedMark()) +
       workflowPage("Tracks", "Select everything that appears somewhere in the song.", body, "2 of 3");
@@ -1985,14 +1985,14 @@
       app.innerHTML =
         topbar(
           backButton("project", "Original Song"),
-          phaseTag("Roadmap"),
+          "",
           "",
         ) +
         `<h2>Original Song</h2><p class="sub">Anything worth keeping → finished record.</p><div class="spacer-18"></div><div class="roadmap-grid">${ORIGINAL_PHASES.map((ph, i) => `<div class="road-phase ${i === 0 ? "current" : "future"}"><div class="road-top"><div class="road-num">${i + 1}</div><div><h3>${esc(ph[0])}</h3><p>${esc(ph[1])}</p></div></div></div>`).join("")}</div>`;
       return;
     }
     app.innerHTML =
-      topbar(backButton("project", "Recreation"), phaseTag("Roadmap"), "") +
+      topbar(backButton("project", "Recreation"), "", "") +
       `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div><div class="roadmap-grid">${STUDY_PHASES.map(
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
@@ -2006,7 +2006,7 @@
     const p = project();
     if (p.type === "original") {
       app.innerHTML =
-        topbar(backButton("project", "Original Song"), phaseTag("Notes"), "") +
+        topbar(backButton("project", "Original Song"), "", "") +
         `<h2>Notes</h2><p class="sub">Keep project notes in one place.</p>`;
       return;
     }
@@ -2021,7 +2021,7 @@
       if (d.takeaway) takeaways.push([`The Map · ${labels[i]}`, d.takeaway]);
     });
     app.innerHTML =
-      topbar(backButton("project", "Recreation"), phaseTag("Notes"), "") +
+      topbar(backButton("project", "Recreation"), "", "") +
       `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>`;
   }
   function noteCard(ctx, text) {

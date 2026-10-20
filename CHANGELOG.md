@@ -4,6 +4,7 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- First FIRE Design System foundation batch: calmer type hierarchy, grouped progression/list surfaces, selection separated from completion, compact workflow actions, centered iPad task sheets, and shared styling across representative Map/Structure/Tracks/Roadmap/Skeleton screens.
 - Projects + New Project now establish the visual north star: stable shared page shell, aligned toolbar/title/subtitle/content guides, persistent Song title + Artist fields, restrained navigation, and geometry-stable transitions.
 - Workflow shell continuity was extended through Project → The Map → Structure → Tracks; passive center pills were removed from those routes and page hierarchy was normalized.
 - Structure received an interim hierarchy/interaction cleanup while preserving rapid repeated section entry, bar persistence, row editing, delete + Undo, reorder, verification, and downstream gating.
