@@ -787,6 +787,25 @@
       : ["new-project", "original-spark", "skeleton-bounce", "skeleton"].includes(ui.route) ? "focused" : "overview";
     return `<div class="topbar"><div class="left">${left}</div><div class="center">${center}</div><div class="right">${right}</div></div>`;
   }
+
+  function workflowHeading(title, subtitle = "", status = "") {
+    return `<header class="page-heading"><h1>${esc(title)}</h1>${subtitle ? `<p class="sub">${esc(subtitle)}</p>` : ""}${status ? `<div class="workflow-position">${esc(status)}</div>` : ""}</header>`;
+  }
+  function workflowPage(title, subtitle, body, status = "") {
+    return `<main class="workflow-page">${workflowHeading(title, subtitle, status)}${body}</main>`;
+  }
+  function workflowPhaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
+    const p = project(),
+      pct = total ? Math.round((done / total) * 100) : 0,
+      body = `<div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div></section></div>`;
+    return (
+      topbar(
+        backButton("project", p?.title || "Project"),
+        "",
+        savedMark(),
+      ) + workflowPage(STUDY_PHASES[index].title, STUDY_PHASES[index].desc, body)
+    );
+  }
   function projectPageMotionClass() {
     const className = routeMotion ? ` ${routeMotion}` : "";
     routeMotion = "";
@@ -1426,31 +1445,27 @@
     if (p.type === "original") return renderOriginalOverview();
     const phaseIndex = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[phaseIndex],
-      done =
-        phaseIndex === 0
-          ? mapCheckpointCount(p)
-          : phaseIndex === 1
-            ? skeletonCheckpointCount(p)
-            : 0,
-      next = STUDY_PHASES[phaseIndex + 1];
+      next = STUDY_PHASES[phaseIndex + 1],
+      context = [p.artist, "Recreation"].filter(Boolean).join(" · ");
+    const body = `<div class="project-overview"><section class="project-current"><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
     app.innerHTML =
       topbar(
-        `<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,
-        phaseTag("Recreation"),
-        `<button class="text-btn" data-action="settings">•••</button>`,
-      ) +
-      `<div class="eyebrow">${esc(p.artist || "Recreation")}</div><h1>${esc(p.title)}</h1><div class="spacer-18"></div><div class="project-overview"><section class="project-current"><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
+        backButton("projects", "Projects"),
+        "",
+        `<button class="text-btn" data-action="settings" aria-label="Project options">…</button>`,
+      ) + workflowPage(p.title, context, body);
   }
   function renderOriginalOverview() {
     const p = project(),
-      done = originalSparkDone(p);
+      done = originalSparkDone(p),
+      context = [p.artist, "Original"].filter(Boolean).join(" · ");
+    const body = `<div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>The Spark</h3></div><div class="phase-num">Phase 1 of 7</div></div><p class="sub">Capture the thing worth making before you overthink it.</p>${progressBar(done ? 1 : 0, 1)}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="original-spark">${done ? "Open The Spark" : "Start The Spark"}</button></div>`;
     app.innerHTML =
       topbar(
-        `<button class="nav-btn" data-action="go" data-route="projects"><span class="arrow">‹</span>Projects</button>`,
-        phaseTag("Original Song"),
-        `<button class="text-btn" data-action="settings">•••</button>`,
-      ) +
-      `<h1>${esc(p.title)}</h1><p class="sub">Take anything worth keeping and turn it into a finished record.</p><div class="spacer-24"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>The Spark</h3></div><div class="phase-num">Phase 1 of 7</div></div><p class="sub">Capture the thing worth making before you overthink it.</p>${progressBar(done ? 1 : 0, 1)}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="original-spark">${done ? "Open The Spark" : "Start The Spark"}</button></div>`;
+        backButton("projects", "Projects"),
+        "",
+        `<button class="text-btn" data-action="settings" aria-label="Project options">…</button>`,
+      ) + workflowPage(p.title, context, body);
   }
   function renderNewProject() {
     app.innerHTML =
@@ -1508,16 +1523,14 @@
         sectionStudyDone(p),
         studyUnlocked,
       );
-    app.innerHTML = phaseHome(0, done, 3, checkpoints, setup);
+    app.innerHTML = workflowPhaseHome(0, done, 3, checkpoints, setup);
   }
 
   function renderStructure() {
     const p = project(),
       labels = sectionLabels(p),
       done = structureDone(p);
-    app.innerHTML =
-      topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<div class="work-position">1 of 3</div><h2>Structure</h2><p class="sub">Build the song one section at a time.</p><div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
+    const body = `<div class="section-kicker">Structure</div><div class="structure-list" id="sortList">${
         sections(p).length
           ? sections(p)
               .map(
@@ -1527,6 +1540,9 @@
               .join("")
           : `<div class="empty">No sections yet.</div>`
       }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="section-kicker">Verify</div>${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button>`;
+    app.innerHTML =
+      topbar(historyBackButton("map", "The Map"), "", savedMark()) +
+      workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
     installSorting();
   }
   function renderTracks() {
@@ -1534,9 +1550,10 @@
       selectedNames = new Set(tracks(p).map((t) => t.name)),
       custom = tracks(p).filter((t) => !COMMON_TRACKS.includes(t.name)),
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
+    const body = `<div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
     app.innerHTML =
-      topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
-      `<div class="work-position">2 of 3</div><h2>Tracks</h2><p class="sub">Select everything that appears somewhere in the song.</p><div class="section-kicker">Tracks</div><div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div><div class="spacer-24"></div><button class="primary full" data-action="start-section-study" ${tracksDone(p) ? "" : "disabled"}>Next</button>`;
+      topbar(historyBackButton("structure", "Structure"), "", savedMark()) +
+      workflowPage("Tracks", "Select everything that appears somewhere in the song.", body, "2 of 3");
   }
 
   function rulerHtml(bars) {
