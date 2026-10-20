@@ -612,10 +612,17 @@ class V6Browser(unittest.TestCase):
                 self.assertLessEqual(card['height'], 140)
                 self.assertLess(abs((box['x'] + box['width']) - (card['x'] + card['width'])), 1.1)
                 self.assertLess(abs((heading['x'] + heading['width']) - (card['x'] + card['width'])), 1.1)
+                self.assertEqual(self.page.locator('.project-menu').first.text_content().strip(), '…')
+                self.assertEqual(self.page.locator('.project-open .foot > span:last-child').first.text_content().strip(), '›')
                 if width >= 1180:
                     self.assertLessEqual(heading['width'], 760.1)
                     self.assertLessEqual(card['width'], 760.1)
                 self.context.close()
+
+        self.open('projects', width=390, data={'version':5,'currentProjectId':None,'projects':[]})
+        self.assertEqual(self.page.locator('.empty').count(), 0)
+        self.assertEqual(self.page.get_by_text('No projects yet. Tap + to start one.').count(), 0)
+        self.context.close()
 
         self.open('projects', width=390)
         self.click('new-project')
@@ -631,6 +638,8 @@ class V6Browser(unittest.TestCase):
         artist = self.page.locator('#newArtist')
         self.assertEqual(title.get_attribute('enterkeyhint'), 'next')
         self.assertEqual(artist.get_attribute('enterkeyhint'), 'done')
+        self.assertEqual(title.get_attribute('autocapitalize'), 'words')
+        self.assertEqual(artist.get_attribute('autocapitalize'), 'words')
         title.fill('Enter Flow')
         title.press('Enter')
         expect(artist).to_be_focused()
