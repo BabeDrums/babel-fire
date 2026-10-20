@@ -28,6 +28,8 @@ Always distinguish shipped work on `main`, unmerged work, and planned work. Resu
 - **Selection is not completion.** Checkmarks/circles are reserved for genuine completion semantics, not generic selected state.
 - On iPad, task sheets such as Add Sections should use compact centered form/page-style presentation where practical; narrow iPhone layouts may remain bottom-oriented.
 - Physical iPhone review after the foundation consolidation established two phone-specific rules: short routes that fit the visual viewport must not create root scroll/bounce, and dense routes should compact redundant secondary information before shrinking touch targets.
+- **Adaptive composition is now a shared rule:** current/incomplete work stays expanded and visually dominant; completed work compresses into an editable summary that remains one tap away; future work stays quiet. The Map collapses completed Song Setup, Project makes the current-phase surface the action, and Roadmap reserves full detail for the current phase.
+- Root scrolling must be **content-driven rather than route-driven**. Measure rendered in-flow content against the real visual viewport; lock root scroll only when the page genuinely fits, and automatically restore it whenever content becomes taller.
 - On narrow phones, Roadmap should prioritize full detail for the current phase and compact non-current phases; The Map may collapse redundant checkpoint descriptions while preserving titles, state, and progression.
 - Huge light full-width CTA slabs are not the default FIRE action pattern. Action prominence should come from hierarchy/style, not simply width.
 - Passive center pills are being retired. Leading toolbar = navigation; trailing toolbar = contextual action; page title = current location.

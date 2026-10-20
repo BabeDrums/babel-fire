@@ -212,8 +212,44 @@
     sectionIndex: 0,
     newType: "original",
     expandedTrackId: null,
+    setupExpanded: false,
     animating: false,
   };
+
+  // Root scrolling follows rendered content, not a route allowlist. Measuring the
+  // in-flow children avoids Safari dynamic-toolbar/dvh reserve creating fake scroll.
+  let viewportFitFrame = 0;
+  function applyViewportFit() {
+    viewportFitFrame = 0;
+    if (document.body.classList.contains("sheet-open")) return;
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    if (!viewportHeight) return;
+    const shellRect = app.getBoundingClientRect(),
+      style = getComputedStyle(app),
+      bottomPadding = Number.parseFloat(style.paddingBottom) || 0,
+      flowBottom = [...app.children]
+        .filter((el) => getComputedStyle(el).position !== "fixed")
+        .reduce(
+          (bottom, el) => Math.max(bottom, el.getBoundingClientRect().bottom),
+          shellRect.top,
+        ),
+      contentHeight = flowBottom - shellRect.top + bottomPadding,
+      fits = contentHeight <= viewportHeight + 2;
+    app.dataset.viewportFit = fits ? "true" : "false";
+    document.documentElement.style.overflowY = fits ? "hidden" : "";
+    document.body.style.overflowY = fits ? "hidden" : "";
+    if (fits && window.scrollY) window.scrollTo(0, 0);
+  }
+  function queueViewportFit() {
+    cancelAnimationFrame(viewportFitFrame);
+    viewportFitFrame = requestAnimationFrame(() =>
+      requestAnimationFrame(applyViewportFit),
+    );
+  }
+  if (typeof ResizeObserver === "function")
+    new ResizeObserver(queueViewportFit).observe(app);
+  window.visualViewport?.addEventListener("resize", queueViewportFit);
+  window.addEventListener("resize", queueViewportFit);
 
   function makeSectionData() {
     return {
@@ -684,15 +720,15 @@
     const p = project(), state = canonicalState(p), done = mapCheckpointCount(p);
     const destinations = ["structure", "tracks", sectionStudyCoreDone(p) ? "map-summary" : "section-study"];
     const completed = [state.structure, state.palette, state.study];
-    app.querySelectorAll(".checkpoint-head + .progress + .list > .list-row").forEach((row, i) => {
+    app.querySelectorAll(".phase-checkpoints .group-card.list > .list-row").forEach((row, i) => {
       const html = checkpointRow(["Structure", "Tracks", "Section Study"][i],
         ["Map the form.", "Identify what plays.", "Map each section in time."][i],
         destinations[i], completed[i], !!state.eligible[destinations[i]]);
       row.outerHTML = html;
     });
-    const count = app.querySelector(".checkpoint-count"), bar = app.querySelector(".checkpoint-progress span");
+    const count = app.querySelector(".checkpoint-count");
     if (count) count.textContent = `${done} of 3`;
-    if (bar) bar.style.width = `${done / 3 * 100}%`;
+    queueViewportFit();
   }
   let cancelGesture = null;
   function go(route, extra = {}, push = true) {
@@ -704,6 +740,8 @@
     ui.selectedPresenceId = null;
     const fromRoute = ui.route,
       fromLabel = routeLabel(fromRoute);
+    if (route !== fromRoute && (route === "map" || fromRoute === "map"))
+      ui.setupExpanded = false;
     routeMotion =
       fromRoute === "projects" && route === "new-project"
         ? "route-forward"
@@ -797,7 +835,10 @@
   function workflowPhaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
     const p = project(),
       pct = total ? Math.round((done / total) * 100) : 0,
-      body = `<div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div></section></div>`;
+      progress = index === 0
+        ? ""
+        : `<div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div>`,
+      body = `<div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div>${progress}<div class="group-card list">${checkpointsHtml}</div></section></div>`;
     return (
       topbar(
         backButton("project", p?.title || "Project"),
@@ -1446,8 +1487,13 @@
     const phaseIndex = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[phaseIndex],
       next = STUDY_PHASES[phaseIndex + 1],
-      context = [p.artist, "Recreation"].filter(Boolean).join(" · ");
-    const body = `<div class="project-overview"><section class="project-current"><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p>${progressBar(phaseIndex, 7).replace(/<div class="progress-meta">.*?<\/div>/, "")}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="${phase.route}">${phaseIndex === 0 ? (mapCheckpointCount(p) ? "Continue The Map" : "Start The Map") : phaseIndex === 1 ? (skeletonCheckpointCount(p) ? "Continue The Skeleton" : "Start The Skeleton") : "View Roadmap"}</button></div></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
+      context = [p.artist, "Recreation"].filter(Boolean).join(" · "),
+      phaseProgress = phaseIndex === 0
+        ? `${mapCheckpointCount(p)} of 3 checkpoints`
+        : phaseIndex === 1
+          ? `${skeletonCheckpointCount(p)} of 3 checkpoints`
+          : "Open roadmap";
+    const body = `<div class="project-overview"><section class="project-current"><button class="hero-card project-open" style="border-radius:var(--radius-card);height:auto" data-action="go" data-route="${phase.route}" aria-label="Open ${esc(phase.title)}"><div class="phase-line"><div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p><div class="foot"><span>${esc(phaseProgress)}</span><span aria-hidden="true">›</span></div></button></section><section class="project-support">${next ? `<div class="section-kicker">Next</div><div class="group-card list"><div class="list-row static no-status"><div><div class="title">${esc(next.title)}</div><div class="desc">${esc(next.desc)}</div></div></div></div>` : ""}<div class="section-kicker">Project</div><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
     app.innerHTML =
       topbar(
         backButton("projects", "Projects"),
@@ -1500,7 +1546,10 @@
       tracksUnlocked = structureDone(p),
       studyUnlocked = tracksDone(p),
       studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
-    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`;
+    const setupExpanded = !setupDone || ui.setupExpanded;
+    const setup = setupExpanded
+      ? `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`
+      : `<div class="group-card list"><button class="list-row" data-action="toggle-setup-disclosure" aria-expanded="false"><span class="round-check on"></span><div><div class="title">Song Setup</div><div class="desc">Ready · ${esc(m.setup.tempo)} BPM · ${esc(m.setup.meter)}</div></div><span class="chev">›</span></button></div>`;
     const checkpoints =
       checkpointRow(
         "Structure",
@@ -1997,8 +2046,23 @@
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
             unlocked = studyPhaseUnlocked(p, i),
-            tag = unlocked ? "button" : "div";
-          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3><p>${esc(ph.desc)}</p><span class="micro">${st === "unimplemented" ? "Coming later · Not implemented" : st === "done" ? "Completed" : st === "current" ? "Current" : st === "available" ? "Available" : "Locked"}</span></div>${unlocked ? `<span class="chev">›</span>` : ""}</div><div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div></${tag}>`;
+            tag = unlocked ? "button" : "div",
+            status = st === "done"
+              ? "Completed"
+              : st === "available"
+                ? "Available"
+                : st === "locked"
+                  ? "Locked"
+                  : "",
+            detail = st === "current"
+              ? `<p>${esc(ph.desc)}</p>`
+              : status
+                ? `<span class="micro">${status}</span>`
+                : "",
+            checks = st === "current"
+              ? `<div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div>`
+              : "";
+          return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3>${detail}</div>${unlocked ? `<span class="chev">›</span>` : ""}</div>${checks}</${tag}>`;
         },
       ).join("")}</div>`;
   }
@@ -2192,6 +2256,7 @@
     const opener = sheetOpener?.isConnected ? sheetOpener : ui.route === "structure" ? app.querySelector('[data-action="open-add-section"]') : null;
     opener?.focus({ preventScroll: true });
     sheetRoot.setAttribute("aria-hidden", "true");
+    queueViewportFit();
     clearTimeout(sheetClearTimer);
     sheetClearTimer = setTimeout(() => {
       if (!sheetRoot.classList.contains("open")) sheetRoot.innerHTML = "";
@@ -2683,9 +2748,14 @@
     }
     if (action === "project-menu") return openProjectMenu(b.dataset.id);
     if (action === "settings") return openSettings();
-        if (action === "toggle-setup") {
+    if (action === "toggle-setup-disclosure") {
+      ui.setupExpanded = true;
+      return renderMapHome();
+    }
+    if (action === "toggle-setup") {
       p.map.setup[b.dataset.field] = !p.map.setup[b.dataset.field];
       invalidateMapVerification(p);
+      ui.setupExpanded = !mapSetupComplete(p);
       save();
       return renderMapHome();
     }
@@ -2892,11 +2962,20 @@
     }
   });
   app.addEventListener("change", (e) => {
+    if (e.target.id === "tempoInput") {
+      // When setup is open because it is incomplete, completing the last field
+      // can collapse it. When the musician explicitly reopened a completed
+      // summary to edit, keep that edit session open so blur cannot swallow the
+      // next navigation tap by replacing the DOM underneath it.
+      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
+      return;
+    }
     if (e.target.id === "meterInput") {
       project().map.setup.meter = e.target.value;
       invalidateMapVerification(project());
       save();
-      refreshMapProgress();
+      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
+      else refreshMapProgress();
     }
   });
   app.addEventListener("keydown", (e) => {
@@ -3116,6 +3195,7 @@
           sectionIndex: 0,
           newType: "original",
           expandedTrackId: null,
+          setupExpanded: false,
           animating: false,
         };
         history.replaceState(
@@ -3398,4 +3478,5 @@
   });
   initHistory();
   render();
+  queueViewportFit();
 })();
