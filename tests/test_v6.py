@@ -1036,7 +1036,7 @@ class V6Browser(unittest.TestCase):
                     self.assertEqual(node.evaluate('el=>getComputedStyle(el).borderRadius'),radius)
                     self.assertGreaterEqual(float(node.evaluate('el=>getComputedStyle(el).opacity')),.5)
         self.canvas_route('structure');self.click('edit-section','[data-section-id="s0"]');self.settled_sheet()
-        expect(self.page.locator('.sheet')).to_have_css('border-radius','18px')
+        expect(self.page.locator('.sheet')).to_have_css('border-radius','20px')
         self.assertNotEqual(self.page.evaluate('document.activeElement.tagName'),'INPUT')
 
     def test_fire_design_system_foundation_across_representative_routes(self):
@@ -1060,7 +1060,7 @@ class V6Browser(unittest.TestCase):
         self.canvas_route('tracks')
         selected = self.page.locator('.choice[aria-pressed="true"]').first
         self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"), 'none')
-        self.assertLessEqual(self.page.locator('.primary.full').bounding_box()['width'], 320.5)
+        self.assertLessEqual(self.page.locator('[data-action="start-section-study"]').bounding_box()['width'], 320.5)
 
         self.canvas_route('skeleton-session')
         self.assertLessEqual(self.page.locator('.primary.full').bounding_box()['width'], 320.5)
@@ -1120,7 +1120,7 @@ class V6Browser(unittest.TestCase):
         for width in [390,820]:
             with self.subTest(width=width):
                 self.open('structure',width=width,pointer=width>=820)
-                expect(self.page.locator('.structure-ready-label')).to_have_text('Ready?')
+                expect(self.page.locator('.structure-ready-label')).to_have_text('Finish structure')
                 self.assertEqual(self.page.locator('[data-action="open-add-section"]').evaluate('el=>getComputedStyle(el).borderStyle'),'solid')
                 row=self.page.locator('.structure-row').first
                 self.assertGreaterEqual(row.bounding_box()['height'],68)
