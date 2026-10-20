@@ -1142,3 +1142,43 @@ That is the intended long-term handoff method.
 # 35. Regression workflow
 
 `tests/test_v6.py` is a browser regression suite using Python Playwright and a local Chromium installation. Serve the repository with `python3 scripts/serve.py`, then run `python3 -B -m unittest discover -s tests -v`. `CHROMIUM_PATH`, `FIRE_URL`, and `FIRE_TEST_WIDTH` can override the browser, server, and viewport. Test dependencies are development tools only; the shipped app remains dependency-free. Tests use disposable browser contexts, representative V4/legacy saved data, actual Chromium touch input, and imported backups. Physical iOS Safari verification remains a separate device check.
+
+
+---
+
+# Current FIRE Design System direction — October 2026
+
+This section records the durable visual/interaction direction established through physical iPad review. It is a product rule, not a temporary screenshot critique.
+
+## North star
+Projects and New Project are the current visual reference implementation. They feel cleaner because they use stable page geometry, restrained controls, deliberate whitespace, calmer typography, and fewer decorative containers. Future work should extract those principles into shared components rather than redesigning each route independently.
+
+The goal is not to make every page identical. The goal is for Roadmap, Notes, The Map, Structure, Tracks, Section Study, Review Map, Skeleton Session/Draft/Bounce, Arrangement, Original flows, and future screens to feel like one product designed by one system.
+
+## Global design language
+- Stable page anatomy: toolbar → page title → subtitle/status → primary content.
+- Leading toolbar area is navigation; trailing toolbar area is contextual action. Passive center pills are not part of the final language.
+- One type hierarchy: page title, page subtitle, section title, row title, supporting text, metadata/status.
+- Tracked uppercase is not the default section treatment. Use it only when it genuinely improves orientation.
+- One spacing/radius/control rhythm across the app. State changes must not alter geometry.
+- One action hierarchy: primary, secondary, quiet, destructive. Full-width light slabs are not the universal primary-action pattern.
+- One grouped-surface/row language. Prefer structured rows/lists for text-heavy editable information; keep cards only for meaningful conceptual groups.
+- One form language for fields and segmented controls.
+- One state model: normal, hover for fine pointers, pressed, selected, focus-visible, disabled, destructive, completed.
+- Selection and completion are semantically different. Selected tracks/feel choices/etc. should not borrow completion checkmarks by default.
+- Completion circles/checkmarks are reserved for actual workflow completion.
+- iPad task sheets should use compact centered form/page-style presentation when practical; phone layouts may use bottom-oriented presentation.
+- Avoid fake Liquid Glass, decorative gradients, excessive glow, and blur. FIRE remains a near-black creative tool; borrow hierarchy, geometry, restraint, adaptive behavior, and interaction clarity rather than visual imitation.
+
+## Route implications
+- Roadmap should read as structured progression, not seven unrelated large cards packed with chips and status decorations.
+- Notes should use intentional empty states/layout rather than arbitrary columns of sparse text.
+- The Map should reduce competing pill/control treatments and use one coherent grouped-row language.
+- Structure should become one coherent editable structure list with integrated add/edit/reorder/delete behavior and downstream verification, not a stack of unrelated bordered widgets.
+- Tracks remains multi-select but should become denser/calmer and use the shared selected-state language rather than completion-style checkmarks.
+- Review Map should reduce redundant cards and make Structure/Track summaries navigational and coherent.
+- Section Study/Arrangement may keep specialized timeline geometry, but its controls, typography, selection, sheets, and spacing must inherit the shared FIRE system.
+- Skeleton Session/Draft/Bounce should inherit the same shell and component language; Draft parent rows are derived progress/disclosure, while child parts are the actual completion controls.
+
+## Implementation rule
+Build the system globally, validate it locally, then roll it out. Change core shared components and styles, not overlay polish files or MutationObserver rewrites. Automated green tests are necessary but not sufficient; physical iPhone/iPad Safari review determines whether a visual chunk is actually locked.

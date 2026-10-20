@@ -4,6 +4,11 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- Projects + New Project now establish the visual north star: stable shared page shell, aligned toolbar/title/subtitle/content guides, persistent Song title + Artist fields, restrained navigation, and geometry-stable transitions.
+- Workflow shell continuity was extended through Project → The Map → Structure → Tracks; passive center pills were removed from those routes and page hierarchy was normalized.
+- Structure received an interim hierarchy/interaction cleanup while preserving rapid repeated section entry, bar persistence, row editing, delete + Undo, reorder, verification, and downstream gating.
+- A global FIRE Design System foundation is now the approved next refinement: shared typography, surfaces, rows, actions, selection/completion semantics, adaptive iPad sheets, and app-wide component consistency.
+
 - Coherent shared shapes and states, rapid repeated section entry, separate row delete/Undo, and direct musical blocks with drag, tap-boundary/tap-destination and keyboard edits. Aligned changes and horizontal dense-section navigation replace separate timing editors.
 
 - Shared stable controls and sheets, intentional text focus, tonal selection, and reduced-motion support.
