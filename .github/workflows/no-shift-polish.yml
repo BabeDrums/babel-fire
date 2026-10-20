@@ -20,50 +20,30 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-
           styles = Path('styles.css')
           text = styles.read_text()
           text = text.replace('animation: routeForwardIn var(--motion-standard) var(--ease);', 'animation: routeForwardIn var(--motion-fast) var(--ease);')
           text = text.replace('animation: routeBackIn var(--motion-standard) var(--ease);', 'animation: routeBackIn var(--motion-fast) var(--ease);')
-          old = '''@keyframes routeForwardIn {
-  from {
-    opacity: 0.82;
-    transform: translateX(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes routeBackIn {
-  from {
-    opacity: 0.82;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}'''
-          new = '''@keyframes routeForwardIn {
-  from { opacity: 0.92; }
-  to { opacity: 1; }
-}
-@keyframes routeBackIn {
-  from { opacity: 0.92; }
-  to { opacity: 1; }
-}'''
-          if text.count(old) != 1:
-              raise SystemExit('route keyframes not found exactly once')
-          styles.write_text(text.replace(old, new, 1))
-
+          if text.count('    opacity: 0.82;') != 2:
+              raise SystemExit('expected two route opacity starts')
+          text = text.replace('    opacity: 0.82;', '    opacity: 0.92;')
+          if text.count('    transform: translateX(8px);\n') != 1:
+              raise SystemExit('forward transform not found')
+          if text.count('    transform: translateX(-8px);\n') != 1:
+              raise SystemExit('back transform not found')
+          if text.count('    transform: translateX(0);\n') != 2:
+              raise SystemExit('route destination transforms not found')
+          text = text.replace('    transform: translateX(8px);\n', '', 1)
+          text = text.replace('    transform: translateX(-8px);\n', '', 1)
+          text = text.replace('    transform: translateX(0);\n', '')
+          styles.write_text(text)
           tests = Path('tests/test_v6.py')
           text = tests.read_text()
           needle = "                self.assertEqual(self.page.locator('.project-page.route-forward').count(), 1)\n"
-          replacement = needle + "                self.assertTrue(self.page.locator('.project-page.route-forward').evaluate('el=>el.getAnimations().every(a=>a.effect.getKeyframes().every(k=>!k.transform || k.transform===\"none\"))'))\n"
+          addition = "                self.assertTrue(self.page.locator('.project-page.route-forward').evaluate('el=>el.getAnimations().every(a=>a.effect.getKeyframes().every(k=>!k.transform || k.transform===\"none\"))'))\n"
           if text.count(needle) != 1:
               raise SystemExit('forward route assertion not found exactly once')
-          tests.write_text(text.replace(needle, replacement, 1))
+          tests.write_text(text.replace(needle, needle + addition, 1))
           PY
       - name: Verify
         run: |
