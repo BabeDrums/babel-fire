@@ -212,7 +212,6 @@
     sectionIndex: 0,
     newType: "original",
     expandedTrackId: null,
-    setupExpanded: false,
     animating: false,
   };
 
@@ -316,6 +315,66 @@
       notes: [],
     };
   }
+  function projectNoteEntries(p) {
+    return (Array.isArray(p.notes) ? p.notes : [])
+      .map((note, index) => {
+        if (typeof note === "string")
+          return {
+            id: `legacy-note-${index}`,
+            type: "General",
+            context: "Project",
+            text: clean(note),
+            createdAt: Number(p.createdAt) || 0,
+          };
+        return {
+          id: note?.id || `note-${index}`,
+          type: clean(note?.type) || "General",
+          context: clean(note?.context) || "Project",
+          text: clean(note?.text),
+          createdAt: Number(note?.createdAt) || Number(p.createdAt) || 0,
+        };
+      })
+      .filter((note) => note.text);
+  }
+  function pushProjectNote(p, type, context, text) {
+    text = clean(text);
+    if (!text) return;
+    p.notes = Array.isArray(p.notes) ? p.notes : [];
+    const key = [type, context, text].join("|").toLowerCase();
+    if (
+      projectNoteEntries(p).some(
+        (note) =>
+          [note.type, note.context, note.text].join("|").toLowerCase() === key,
+      )
+    )
+      return;
+    p.notes.push({ id: uid(), type, context, text, createdAt: Date.now() });
+  }
+  function archiveWorkflowNotes(p) {
+    if (p.type !== "study") return;
+    pushProjectNote(p, "Parking Lot", "The Map", p.map.phaseParking);
+    pushProjectNote(p, "Takeaway", "The Map", p.map.phaseTakeaway);
+    const labels = sectionLabels(p);
+    sections(p).forEach((section, index) => {
+      const data = sectionData(p, section.id),
+        context = `The Map · ${labels[index]}`;
+      pushProjectNote(p, "Parking Lot", context, data.parking);
+      pushProjectNote(p, "Takeaway", context, data.takeaway);
+    });
+  }
+  function resetProjectProgress(p) {
+    archiveWorkflowNotes(p);
+    const notes = JSON.parse(JSON.stringify(p.notes || [])),
+      fresh =
+        p.type === "study"
+          ? makeStudyProject(p.title, p.artist)
+          : makeOriginalProject(p.title, p.artist);
+    fresh.id = p.id;
+    fresh.createdAt = p.createdAt;
+    fresh.notes = notes;
+    return fresh;
+  }
+
   function seedDB() {
     const p = makeStudyProject();
     p.id = "smithereens";
@@ -716,31 +775,22 @@
   }
   // Live Setup updates replace only derived controls, preserving text/caret/IME.
   function refreshMapProgress() {
-    if (ui.route !== "map") return;
-    const p = project(), state = canonicalState(p), done = mapCheckpointCount(p),
-      list = app.querySelector(".phase-checkpoints .group-card.list");
-    if (!list) return;
-    const destinations = ["structure", "tracks", sectionStudyCoreDone(p) ? "map-summary" : "section-study"],
-      completed = [state.structure, state.palette, state.study],
-      rows = () => ["Structure", "Tracks", "Section Study"].map((title, i) =>
-        checkpointRow(title,
-          ["Map the form.", "Identify what plays.", "Map each section in time."][i],
-          destinations[i], completed[i], !!state.eligible[destinations[i]]),
-      ).join("");
-    if (!state.setup) {
-      if (!list.querySelector(".checkpoint-locked-message"))
-        list.innerHTML = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
-    } else if (list.querySelector(".checkpoint-locked-message") || list.children.length !== 3) {
-      list.innerHTML = rows();
-    } else {
-      [...list.children].forEach((row, i) => {
-        row.outerHTML = checkpointRow(["Structure", "Tracks", "Section Study"][i],
-          ["Map the form.", "Identify what plays.", "Map each section in time."][i],
-          destinations[i], completed[i], !!state.eligible[destinations[i]]);
-      });
-    }
-    const count = app.querySelector(".checkpoint-count");
+    const p = project(),
+      holder = app.querySelector(".phase-checkpoints .group-card"),
+      count = app.querySelector(".checkpoint-count"),
+      setupDone = mapSetupComplete(p),
+      done = mapCheckpointCount(p);
     if (count) count.textContent = `${done} of 3`;
+    if (!holder) return queueViewportFit();
+    if (!setupDone) {
+      holder.innerHTML = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
+    } else {
+      const studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
+      holder.innerHTML =
+        checkpointRow("Structure", "Map the form.", "structure", structureDone(p), true) +
+        checkpointRow("Tracks", "Identify what plays.", "tracks", tracksDone(p), structureDone(p)) +
+        checkpointRow("Section Study", "Map each section in time.", studyRoute, sectionStudyDone(p), tracksDone(p));
+    }
     queueViewportFit();
   }
   let cancelGesture = null;
@@ -1469,6 +1519,22 @@
       if (stamp) stamp.textContent = `FIRE V6 DEV · ${commit}`;
     });
   }
+  function projectListStatus(p) {
+    if (p.type !== "study")
+      return originalSparkDone(p) ? "The Direction" : "The Spark";
+    const index = currentStudyPhaseIndex(p),
+      phase = STUDY_PHASES[index].title,
+      progress =
+        index === 0
+          ? `${mapCheckpointCount(p)} of 3`
+          : index === 1
+            ? `${skeletonCheckpointCount(p)} of 3`
+            : "";
+    return [phase, progress].filter(Boolean).join(" · ");
+  }
+  function projectOverviewBody(phaseTitle, progress, route, roadmapCopy) {
+    return `<div class="project-overview"><section class="project-current"><button class="project-current-card" data-action="go" data-route="${route}" aria-label="Open ${esc(phaseTitle)}"><div><h3>${esc(phaseTitle)}</h3>${progress ? `<div class="project-phase-meta">${esc(progress)}</div>` : ""}</div><span class="chev" aria-hidden="true">›</span></button></section><section class="project-support"><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>${esc(roadmapCopy)}</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
+  }
   function renderProjects() {
     app.innerHTML =
       topbar(
@@ -1480,13 +1546,10 @@
         db.projects.length
           ? db.projects
               .map((p) => {
-                const phase =
-                  p.type === "study"
-                    ? STUDY_PHASES[currentStudyPhaseIndex(p)].title
-                    : originalSparkDone(p)
-                      ? "The Direction"
-                      : "The Spark";
-                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><div class="type">${p.type === "study" ? "Recreation" : "Original Song"}</div><strong>${esc(p.title)}</strong>${p.artist ? `<div class="artist">${esc(p.artist)}</div>` : ""}<div class="foot"><span>${esc(phase)}</span><span aria-hidden="true">›</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">…</button></div>`;
+                const kind = p.type === "study" ? "Recreation" : "Original Song",
+                  meta = [p.artist, kind].filter(Boolean).join(" · "),
+                  status = projectListStatus(p);
+                return `<div class="project-card"><button class="project-open" data-action="open-project" data-id="${p.id}"><strong>${esc(p.title)}</strong>${meta ? `<div class="artist">${esc(meta)}</div>` : ""}<div class="foot"><span>${esc(status)}</span></div></button><button class="project-menu" data-action="project-menu" data-id="${p.id}" aria-label="Project options">…</button></div>`;
               })
               .join("")
           : ""
@@ -1499,14 +1562,19 @@
     if (p.type === "original") return renderOriginalOverview();
     const phaseIndex = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[phaseIndex],
-      next = STUDY_PHASES[phaseIndex + 1],
       context = [p.artist, "Recreation"].filter(Boolean).join(" · "),
-      phaseProgress = phaseIndex === 0
-        ? `${mapCheckpointCount(p)} of 3 checkpoints`
-        : phaseIndex === 1
-          ? `${skeletonCheckpointCount(p)} of 3 checkpoints`
-          : "Open roadmap";
-    const body = `<div class="project-overview"><section class="project-current"><button class="hero-card project-open" style="border-radius:var(--radius-card);height:auto" data-action="go" data-route="${phase.route}" aria-label="Open ${esc(phase.title)}"><div class="phase-line"><div><h3>${esc(phase.title)}</h3></div><div class="phase-num">Phase ${phaseIndex + 1} of 7</div></div><p class="sub">${esc(phase.desc)}</p><div class="foot"><span>${esc(phaseProgress)}</span><span aria-hidden="true">›</span></div></button></section><section class="project-support"><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>Seven phases to a finished rebuild.</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
+      phaseProgress =
+        phaseIndex === 0
+          ? `${mapCheckpointCount(p)} of 3 checkpoints`
+          : phaseIndex === 1
+            ? `${skeletonCheckpointCount(p)} of 3 checkpoints`
+            : "Open roadmap";
+    const body = projectOverviewBody(
+      phase.title,
+      phaseProgress,
+      phase.route,
+      "Seven phases to a finished rebuild.",
+    );
     app.innerHTML =
       topbar(
         backButton("projects", "Projects"),
@@ -1517,8 +1585,13 @@
   function renderOriginalOverview() {
     const p = project(),
       done = originalSparkDone(p),
-      context = [p.artist, "Original"].filter(Boolean).join(" · ");
-    const body = `<div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>The Spark</h3></div><div class="phase-num">Phase 1 of 7</div></div><p class="sub">Capture the thing worth making before you overthink it.</p>${progressBar(done ? 1 : 0, 1)}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="original-spark">${done ? "Open The Spark" : "Start The Spark"}</button></div>`;
+      context = [p.artist, "Original"].filter(Boolean).join(" · "),
+      body = projectOverviewBody(
+        "The Spark",
+        done ? "Complete" : "Start here",
+        "original-spark",
+        "Seven phases to a finished record.",
+      );
     app.innerHTML =
       topbar(
         backButton("projects", "Projects"),
@@ -1559,32 +1632,11 @@
       tracksUnlocked = structureDone(p),
       studyUnlocked = tracksDone(p),
       studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
-    const setupExpanded = !setupDone || ui.setupExpanded;
-    const setup = setupExpanded
-      ? `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div></div><div class="spacer-18"></div>${actionCard("First Listen", "Play the full song once without stopping.", m.setup.firstListen, "toggle-setup", false, 'data-field="firstListen"')}`
-      : `<div class="group-card list"><button class="list-row" data-action="toggle-setup-disclosure" aria-expanded="false"><span class="round-check on"></span><div><div class="title">Song Setup</div><div class="desc">Ready · ${esc(m.setup.tempo)} BPM · ${esc(m.setup.meter)}</div></div><span class="chev">›</span></button></div>`;
+    const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div><button class="setup-listen-row ${m.setup.firstListen ? "on" : ""}" data-action="toggle-setup" data-field="firstListen" aria-pressed="${!!m.setup.firstListen}"><div><strong>First Listen</strong><span>Play the full song once without stopping.</span></div><span class="round-check ${m.setup.firstListen ? "on" : ""}"></span></button></div>`;
     let checkpoints =
-      checkpointRow(
-        "Structure",
-        "Map the form.",
-        "structure",
-        structureDone(p),
-        structureUnlocked,
-      ) +
-      checkpointRow(
-        "Tracks",
-        "Identify what plays.",
-        "tracks",
-        tracksDone(p),
-        tracksUnlocked,
-      ) +
-      checkpointRow(
-        "Section Study",
-        "Map each section in time.",
-        studyRoute,
-        sectionStudyDone(p),
-        studyUnlocked,
-      );
+      checkpointRow("Structure", "Map the form.", "structure", structureDone(p), structureUnlocked) +
+      checkpointRow("Tracks", "Identify what plays.", "tracks", tracksDone(p), tracksUnlocked) +
+      checkpointRow("Section Study", "Map each section in time.", studyRoute, sectionStudyDone(p), studyUnlocked);
     if (!setupDone)
       checkpoints = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
     app.innerHTML = workflowPhaseHome(0, done, 3, checkpoints, setup);
@@ -1603,7 +1655,7 @@
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
-      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div>${done ? `<div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks">Next</button></div>` : ""}`;
+      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div>${done ? `<div class="structure-next-wrap"><button class="primary" data-action="go" data-route="tracks">Next</button></div>` : ""}`;
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), "", savedMark()) +
       workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
@@ -2082,26 +2134,31 @@
       ).join("")}</div>`;
   }
   function renderNotes() {
-    const p = project();
-    if (p.type === "original") {
-      app.innerHTML =
-        topbar(backButton("project", "Original Song"), "", "") +
-        `<h2>Notes</h2><p class="sub">Keep project notes in one place.</p>`;
-      return;
-    }
-    const labels = sectionLabels(p),
+    const p = project(),
+      canonical = projectNoteEntries(p),
       parking = [],
-      takeaways = [];
-    if (p.map.phaseParking) parking.push(["The Map", p.map.phaseParking]);
-    if (p.map.phaseTakeaway) takeaways.push(["The Map", p.map.phaseTakeaway]);
-    sections(p).forEach((s, i) => {
-      const d = sectionData(p, s.id);
-      if (d.parking) parking.push([`The Map · ${labels[i]}`, d.parking]);
-      if (d.takeaway) takeaways.push([`The Map · ${labels[i]}`, d.takeaway]);
+      takeaways = [],
+      saved = [];
+    canonical.forEach((note) => {
+      const row = [note.context, note.text];
+      if (note.type === "Parking Lot") parking.push(row);
+      else if (note.type === "Takeaway") takeaways.push(row);
+      else saved.push([`${note.type} · ${note.context}`, note.text]);
     });
+    if (p.type === "study") {
+      if (p.map.phaseParking) parking.push(["The Map", p.map.phaseParking]);
+      if (p.map.phaseTakeaway) takeaways.push(["The Map", p.map.phaseTakeaway]);
+      const labels = sectionLabels(p);
+      sections(p).forEach((s, i) => {
+        const d = sectionData(p, s.id);
+        if (d.parking) parking.push([`The Map · ${labels[i]}`, d.parking]);
+        if (d.takeaway) takeaways.push([`The Map · ${labels[i]}`, d.takeaway]);
+      });
+    }
+    const sectionsHtml = `<div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>${saved.length ? `<section class="saved-notes"><div class="section-kicker">Saved Notes</div>${saved.map(([ctx, text]) => noteCard(ctx, text)).join("")}</section>` : ""}`;
     app.innerHTML =
-      topbar(backButton("project", "Recreation"), "", "") +
-      `<h2>Notes</h2><p class="sub">Keep questions and lessons in one place.</p><div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>`;
+      topbar(backButton("project", p.type === "study" ? "Recreation" : "Original Song"), "", "") +
+      `<h2>Notes</h2><p class="sub">Review project notes and takeaways.</p>${sectionsHtml}`;
   }
   function noteCard(ctx, text) {
     return `<div class="card card-pad" style="margin-bottom:9px"><div class="micro" style="margin-bottom:6px">${esc(ctx)}</div><div style="font-size:14px;line-height:1.5">${esc(text)}</div></div>`;
@@ -2234,13 +2291,18 @@
   }
   function openSettings() {
     const p = project();
-    sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>Project Settings</h3><div class="sheet-actions"><button class="secondary full" data-action="export-backup">Export Backup</button><button class="secondary full" data-action="import-backup">Import Backup</button><button class="destructive full" data-action="reset-project">Reset This Project</button><button class="sheet-close" data-action="close-sheet">Done</button></div></div>`;
-    openSheet();
+    if (p) openProjectMenu(p.id);
   }
   function openProjectMenu(id) {
     const p = db.projects.find((x) => x.id === id);
     if (!p) return;
-    sheetRoot.innerHTML = `<div class="sheet"><div class="grabber"></div><h3>${esc(p.title)}</h3><div class="sheet-actions"><button class="destructive full" data-action="delete-project" data-id="${p.id}">Delete Project</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
+    sheetRoot.innerHTML = `<div class="sheet project-menu-sheet"><div class="grabber"></div><h3>${esc(p.title)}</h3><div class="group-card list project-action-list"><button class="list-row no-status" data-action="edit-project" data-id="${p.id}"><div><div class="title">Edit Project</div><div class="desc">Change title or artist.</div></div></button><button class="list-row no-status" data-action="reset-project" data-id="${p.id}"><div><div class="title">Reset Progress</div><div class="desc">Keep project details and notes.</div></div></button><button class="list-row no-status project-danger" data-action="delete-project" data-id="${p.id}"><div><div class="title">Delete Project</div><div class="desc">Delete this project and its notes.</div></div></button></div><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`;
+    openSheet();
+  }
+  function openEditProjectSheet(id) {
+    const p = db.projects.find((x) => x.id === id);
+    if (!p) return;
+    sheetRoot.innerHTML = `<div class="sheet edit-project-sheet"><div class="grabber"></div><h3>Edit project</h3><div class="project-edit-fields"><input class="field" id="editProjectTitle" aria-label="Song title" autocomplete="off" autocapitalize="words" value="${esc(p.title)}" placeholder="Song title"><input class="field" id="editProjectArtist" aria-label="Artist" autocomplete="off" autocapitalize="words" value="${esc(p.artist || "")}" placeholder="Artist"></div><div class="sheet-error" id="sheetError"></div><div class="sheet-actions"><button class="primary" data-action="save-project-details" data-id="${p.id}">Save</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div></div>`;
     openSheet();
   }
   let sheetOpener = null;
@@ -2762,15 +2824,10 @@
       return go("project");
     }
     if (action === "project-menu") return openProjectMenu(b.dataset.id);
-    if (action === "settings") return openSettings();
-    if (action === "toggle-setup-disclosure") {
-      ui.setupExpanded = true;
-      return renderMapHome();
-    }
+    if (action === "settings") return openProjectMenu(p?.id);
     if (action === "toggle-setup") {
       p.map.setup[b.dataset.field] = !p.map.setup[b.dataset.field];
       invalidateMapVerification(p);
-      ui.setupExpanded = !mapSetupComplete(p);
       save();
       return renderMapHome();
     }
@@ -2985,20 +3042,12 @@
     }
   });
   app.addEventListener("change", (e) => {
-    if (e.target.id === "tempoInput") {
-      // When setup is open because it is incomplete, completing the last field
-      // can collapse it. When the musician explicitly reopened a completed
-      // summary to edit, keep that edit session open so blur cannot swallow the
-      // next navigation tap by replacing the DOM underneath it.
-      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
-      return;
-    }
+    if (e.target.id === "tempoInput") return refreshMapProgress();
     if (e.target.id === "meterInput") {
       project().map.setup.meter = e.target.value;
       invalidateMapVerification(project());
       save();
-      if (mapSetupComplete(project()) && !ui.setupExpanded) renderMapHome();
-      else refreshMapProgress();
+      refreshMapProgress();
     }
   });
   app.addEventListener("keydown", (e) => {
@@ -3040,6 +3089,22 @@
     const action = b.dataset.action,
       p = project();
     if (action === "close-sheet") return closeSheet();
+    if (action === "edit-project") return openEditProjectSheet(b.dataset.id);
+    if (action === "save-project-details") {
+      const target = db.projects.find((x) => x.id === b.dataset.id),
+        title = clean(document.getElementById("editProjectTitle")?.value),
+        artist = clean(document.getElementById("editProjectArtist")?.value);
+      if (!target || !title) {
+        sheetError("Add a song title.");
+        document.getElementById("editProjectTitle")?.focus({ preventScroll: true });
+        return;
+      }
+      target.title = title;
+      target.artist = artist;
+      save();
+      closeSheet();
+      return render();
+    }
     if (action === "choose-section-type") {
       const d = sectionDraft;
       d.name = b.dataset.name;
@@ -3158,27 +3223,28 @@
       return;
     }
     if (action === "reset-project") {
-      if (confirm(`Reset ${p.title}? This clears its saved progress.`)) {
-        const fresh =
-          p.type === "study"
-            ? makeStudyProject(p.title, p.artist)
-            : makeOriginalProject(p.title);
-        fresh.id = p.id;
-        db.projects[db.projects.findIndex((x) => x.id === p.id)] = fresh;
+      const target = db.projects.find((x) => x.id === b.dataset.id) || p;
+      if (target && confirm(`Reset ${target.title}? Progress will be cleared, but project details and notes will stay.`)) {
+        const before = JSON.parse(JSON.stringify(target)),
+          index = db.projects.findIndex((x) => x.id === target.id);
+        db.projects[index] = resetProjectProgress(target);
         save();
         closeSheet();
-        go("project");
+        render();
+        offerUndo(before, "Progress reset");
       }
       return;
     }
     if (action === "delete-project") {
-      if (confirm("Delete this project?")) {
-        db.projects = db.projects.filter((x) => x.id !== b.dataset.id);
-        if (db.currentProjectId === b.dataset.id)
+      const target = db.projects.find((x) => x.id === b.dataset.id);
+      if (target && confirm(`Delete ${target.title}? This also deletes its notes.`)) {
+        db.projects = db.projects.filter((x) => x.id !== target.id);
+        if (db.currentProjectId === target.id)
           db.currentProjectId = db.projects[0]?.id || null;
         save();
         closeSheet();
-        go("projects");
+        if (ui.route === "projects") renderProjects();
+        else go("projects");
       }
       return;
     }
@@ -3218,8 +3284,7 @@
           sectionIndex: 0,
           newType: "original",
           expandedTrackId: null,
-          setupExpanded: false,
-          animating: false,
+                animating: false,
         };
         history.replaceState(
           {
