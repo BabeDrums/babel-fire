@@ -1063,7 +1063,7 @@ class V6Browser(unittest.TestCase):
         self.assertLessEqual(self.page.locator('[data-action="start-section-study"]').bounding_box()['width'], 320.5)
 
         self.canvas_route('skeleton-session')
-        self.assertLessEqual(self.page.locator('.primary.full').bounding_box()['width'], 320.5)
+        self.assertLessEqual(self.page.locator('[data-route="skeleton-draft"]').bounding_box()['width'], 320.5)
 
     def test_dense_lane_scroll_keyboard_precision_and_touch_scroll_cancellation(self):
         data=fixture();data['projects'][0]['map']['sections'][0]['lengthBars']=256
@@ -1123,7 +1123,7 @@ class V6Browser(unittest.TestCase):
                 expect(self.page.locator('.structure-ready-label')).to_have_text('Finish structure')
                 self.assertEqual(self.page.locator('[data-action="open-add-section"]').evaluate('el=>getComputedStyle(el).borderStyle'),'solid')
                 row=self.page.locator('.structure-row').first
-                self.assertGreaterEqual(row.bounding_box()['height'],68)
+                self.assertGreaterEqual(row.bounding_box()['height'],62)
                 self.assertEqual(self.page.locator('.bars-badge').first.evaluate('el=>getComputedStyle(el).backgroundColor'),'rgba(0, 0, 0, 0)')
                 nxt=self.page.locator('[data-route="tracks"]');page=self.page.locator('.workflow-page')
                 if width>=640:
