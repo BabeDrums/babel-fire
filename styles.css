@@ -1055,7 +1055,9 @@ details.note-disclosure summary::-webkit-details-marker {
   height: 44px;
   display: grid;
   place-items: center;
-  color: var(--muted);
+  color: var(--quiet);
+  font-size: 20px;
+  line-height: 1;
   cursor: pointer;
   border-radius: var(--radius-control);
 }
