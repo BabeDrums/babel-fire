@@ -631,9 +631,10 @@ class V6Browser(unittest.TestCase):
         self.assertEqual(segments.count(), 2)
         for i in range(segments.count()):
             self.assertGreaterEqual(segments.nth(i).bounding_box()['height'], 44)
-        expect(self.page.locator('#newTypeDescription')).to_have_text('Start with anything worth keeping.')
+        self.assertEqual(self.page.locator('#newTypeDescription').count(), 0)
+        self.assertEqual(self.page.get_by_text('Start with anything worth keeping.').count(), 0)
         self.click('set-new-type', '[data-type="study"]')
-        expect(self.page.locator('#newTypeDescription')).to_have_text('Rebuild an existing song to learn how it works.')
+        self.assertEqual(self.page.get_by_text('Rebuild an existing song to learn how it works.').count(), 0)
         title = self.page.locator('#newTitle')
         artist = self.page.locator('#newArtist')
         self.assertEqual(title.get_attribute('enterkeyhint'), 'next')

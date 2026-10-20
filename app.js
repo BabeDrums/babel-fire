@@ -1426,13 +1426,9 @@
       `<h1>${esc(p.title)}</h1><p class="sub">Take anything worth keeping and turn it into a finished record.</p><div class="spacer-24"></div><div class="hero-card"><div class="phase-line"><div><div class="eyebrow" style="margin:0 0 6px">Current Phase</div><h3>The Spark</h3></div><div class="phase-num">Phase 1 of 7</div></div><p class="sub">Capture the thing worth making before you overthink it.</p>${progressBar(done ? 1 : 0, 1)}<div class="spacer-18"></div><button class="primary full" data-action="go" data-route="original-spark">${done ? "Open The Spark" : "Start The Spark"}</button></div>`;
   }
   function renderNewProject() {
-    const typeCopy =
-      ui.newType === "study"
-        ? "Rebuild an existing song to learn how it works."
-        : "Start with anything worth keeping.";
     app.innerHTML =
       topbar(backButton("projects", "Projects"), "", "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><p class="project-type-copy" id="newTypeDescription">${typeCopy}</p><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Project title" enterkeyhint="${ui.newType === "study" ? "next" : "done"}" autocomplete="off" autocapitalize="words" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Project title" enterkeyhint="${ui.newType === "study" ? "next" : "done"}" autocomplete="off" autocapitalize="words" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
   }
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
@@ -2617,15 +2613,9 @@
       ui.newType = b.dataset.type;
       app.querySelectorAll('[data-action="set-new-type"]').forEach((el) => setSelected(el, el.dataset.type === ui.newType));
       document.getElementById("newArtist").hidden = ui.newType !== "study";
-      const titleInput = document.getElementById("newTitle"),
-        typeDescription = document.getElementById("newTypeDescription");
+      const titleInput = document.getElementById("newTitle");
       titleInput.placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
       titleInput.setAttribute("enterkeyhint", ui.newType === "study" ? "next" : "done");
-      if (typeDescription)
-        typeDescription.textContent =
-          ui.newType === "study"
-            ? "Rebuild an existing song to learn how it works."
-            : "Start with anything worth keeping.";
       return;
     }
     if (action === "create-project") {
@@ -2885,8 +2875,12 @@
     if (e.target.id === "newTitle") {
       e.preventDefault();
       const artist = document.getElementById("newArtist");
-      if (ui.newType === "study" && artist && !artist.hidden) artist.focus();
-      else app.querySelector('[data-action="create-project"]')?.click();
+      if (ui.newType === "study" && artist && !artist.hidden) {
+        // Give iOS a fresh text-input handoff so the Artist field can reapply
+        // its own keyboard traits (including autocapitalize="words").
+        e.target.blur();
+        artist.focus({ preventScroll: true });
+      } else app.querySelector('[data-action="create-project"]')?.click();
       return;
     }
     if (e.target.id === "newArtist") {
