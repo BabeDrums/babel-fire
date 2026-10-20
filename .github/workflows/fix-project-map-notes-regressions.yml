@@ -26,7 +26,7 @@ jobs:
           fi
       - name: Apply regression fixes
         if: steps.guard.outputs.skip != 'true'
-        run: python3 scripts/fix_project_map_notes_regressions.py
+        run: python3 scripts/fix_project_map_notes_regressions_v2.py
       - name: Validate source
         if: steps.guard.outputs.skip != 'true'
         shell: bash
