@@ -359,8 +359,8 @@ class V6Browser(unittest.TestCase):
         self.click('go','[data-route="tracks"]')
         self.click('start-section-study')
         self.click('next-section');expect(self.page.locator('.section-tab.current')).to_have_text('Verse')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Tracks')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Structure')
+        self.click('history-back');expect(self.page.locator('h1')).to_have_text('Tracks')
+        self.click('history-back');expect(self.page.locator('h1')).to_have_text('Structure')
         self.page.go_back();expect(self.page.locator('[data-route="structure"]')).to_be_visible()
 
     def test_finite_cross_section_reorder_remove_preserves_unaffected_coverage_and_ids(self):
@@ -456,11 +456,11 @@ class V6Browser(unittest.TestCase):
         # Guard history restoration even if stored completion records are true.
         inp.fill('')
         self.page.evaluate("history.pushState({route:'skeleton-bounce',projectId:'p1'},'');dispatchEvent(new PopStateEvent('popstate',{state:history.state}))")
-        expect(self.page.locator('h2')).to_have_text('The Map')
+        expect(self.page.locator('h1')).to_have_text('The Map')
         self.assertEqual(self.page.evaluate('history.state.route'),'map')
         self.assertEqual(self.project()['skeleton'],original)
         inp.fill('128.25');self.click('go','[data-route="structure"]')
-        expect(self.page.locator('h2')).to_have_text('Structure')
+        expect(self.page.locator('h1')).to_have_text('Structure')
 
     def test_each_setup_prerequisite_locks_and_restores_without_losing_work(self):
         self.open('map', data=self.complete_fixture()); original=self.project()['skeleton']
@@ -547,10 +547,11 @@ class V6Browser(unittest.TestCase):
 
     def test_parent_pills_and_back_follow_distinct_destinations(self):
         self.open('map');self.click('go','[data-route="tracks"]');self.click('start-section-study')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('Tracks')
+        self.click('history-back');expect(self.page.locator('h1')).to_have_text('Tracks')
         self.page.go_forward();expect(self.page.locator('.study-pane')).to_be_visible()
-        self.page.locator('.phase-pill').click();expect(self.page.locator('h2')).to_have_text('The Map')
-        self.page.locator('.phase-pill').click();expect(self.page.locator('h1')).to_have_text('Migration song')
+        self.page.locator('.phase-pill').click();expect(self.page.locator('h1')).to_have_text('The Map')
+        self.assertEqual(self.page.locator('.phase-pill').count(),0)
+        self.canvas_route('project');expect(self.page.locator('h1')).to_have_text('Migration song')
         self.click('go','[data-route="roadmap"]');expect(self.page.locator('h2')).to_have_text('Roadmap')
         self.context.close()
         self.open('skeleton',data=self.complete_fixture());self.click('go','[data-route="skeleton-session"]')
@@ -1010,7 +1011,7 @@ class V6Browser(unittest.TestCase):
     def test_component_shapes_stay_fixed_across_hover_focus_selected_and_disabled(self):
         self.open('projects',width=1440,data=self.complete_fixture(),pointer=True)
         samples=[('projects','.project-open'),('projects','.project-menu'),('project','.quick-card'),
-                 ('map','.phase-pill'),('map','.state-control'),('map','.action-card'),('map','.list-row'),
+                 ('map','.nav-btn'),('map','.state-control'),('map','.action-card'),('map','.list-row'),
                  ('structure','.structure-row'),('tracks','.choice'),('section-study','.segment'),
                  ('skeleton-draft','.workflow-disclosure summary'),('skeleton-bounce','.primary')]
         for route,selector in samples:
@@ -1248,6 +1249,39 @@ class V6Browser(unittest.TestCase):
         data=fixture();data['projects'][0]['map']['timeline']['presence'][0]['end']={'sectionId':'s1','bar':4}
         self.open(width=820,data=data);self.select();self.click('select-event','[data-event-id="e1"]')
         self.assertEqual(self.page.locator('[data-event-handle][data-edge="end"]').count(),0)
+
+
+    def test_workflow_shell_continuity_project_map_structure_tracks(self):
+        self.open('project',width=820)
+        cases=[
+            ('project','Migration song','Test artist · Recreation','projects',''),
+            ('map','The Map','Understand the song before rebuilding it.','project',''),
+            ('structure','Structure','Build the song one section at a time.','map','1 of 3'),
+            ('tracks','Tracks','Select everything that appears somewhere in the song.','structure','2 of 3'),
+        ]
+        anchor=None
+        for route,title,subtitle,back,status in cases:
+            with self.subTest(route=route):
+                self.canvas_route(route)
+                self.assertEqual(self.page.locator('.workflow-page').count(),1)
+                self.assertEqual(self.page.locator('.topbar .center').inner_text(),'')
+                self.assertEqual(self.page.locator('.phase-pill').count(),0)
+                expect(self.page.locator('.workflow-page .page-heading h1')).to_have_text(title)
+                expect(self.page.locator('.workflow-page .page-heading .sub')).to_have_text(subtitle)
+                back_button=self.page.locator('.topbar > .left > .nav-btn')
+                self.assertEqual(back_button.count(),1)
+                self.assertEqual(back_button.get_attribute('data-fallback-route'),back)
+                if status:
+                    expect(self.page.locator('.workflow-position')).to_have_text(status)
+                else:
+                    self.assertEqual(self.page.locator('.workflow-position').count(),0)
+                box=self.page.locator('.workflow-page .page-heading h1').bounding_box()
+                if anchor is None:
+                    anchor=(box['x'],box['y'])
+                else:
+                    self.assertLessEqual(abs(box['x']-anchor[0]),1)
+                    self.assertLessEqual(abs(box['y']-anchor[1]),1)
+
 
 
 if __name__ == '__main__':

@@ -1728,14 +1728,32 @@ body.sheet-open .undo-notice {
   width: 100%;
   max-width: 760px;
 }
-.project-page {
+.project-page,
+.workflow-page {
   min-width: 0;
 }
-.project-page .page-heading {
+.workflow-page {
+  width: 100%;
+}
+.project-page .page-heading,
+.workflow-page .page-heading {
   margin: 0 0 var(--space-5);
 }
-.project-page .page-heading h1 {
+.project-page .page-heading h1,
+.workflow-page .page-heading h1 {
   margin: 0 0 7px;
+}
+.workflow-position {
+  margin-top: 9px;
+  color: var(--quiet);
+  font-size: 12px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.workflow-page > .page-heading + .section-kicker,
+.workflow-page .phase-setup > .section-kicker:first-child,
+.workflow-page .phase-checkpoints > .checkpoint-head:first-child {
+  margin-top: 0;
 }
 .projects-grid {
   display: grid;
@@ -1848,10 +1866,12 @@ from {
 }
 /* Adaptive composition and input capabilities. */
 @media (max-width: 430px) {
-  .project-page .page-heading {
+  .project-page .page-heading,
+  .workflow-page .page-heading {
     margin-bottom: 20px;
   }
-  .project-page .page-heading h1 {
+  .project-page .page-heading h1,
+  .workflow-page .page-heading h1 {
     font-size: 34px;
     line-height: 1.04;
   }
