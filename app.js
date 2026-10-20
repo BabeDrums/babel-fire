@@ -2777,7 +2777,15 @@
       else addTrack(name);
       const names = new Set(tracks(p).map((t) => t.name));
       app.querySelectorAll('[data-action="toggle-track-choice"]').forEach((el) => setSelected(el, names.has(el.dataset.name)));
-      app.querySelector('[data-action="start-section-study"]').disabled = !tracksDone(p);
+      const next = app.querySelector('[data-action="start-section-study"]');
+      if (tracksDone(p)) {
+        if (!next)
+          app.querySelector('.inline-add')?.insertAdjacentHTML(
+            'afterend',
+            '<div class="tracks-next-wrap"><button class="primary" data-action="start-section-study">Next</button></div>',
+          );
+      } else next?.closest('.tracks-next-wrap')?.remove();
+      queueViewportFit();
       return;
     }
     if (action === "add-custom-track") {
