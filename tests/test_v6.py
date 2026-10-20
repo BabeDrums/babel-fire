@@ -88,6 +88,12 @@ class V6Browser(unittest.TestCase):
         button=self.page.locator(f'[data-action="{action}"]{extra}')
         button.click()
 
+    def expand_map_setup(self):
+        disclosure=self.page.locator('[data-action="toggle-setup-disclosure"]')
+        if disclosure.count():
+            disclosure.click()
+            expect(self.page.locator('#tempoInput')).to_be_visible()
+
     def db(self):
         return self.page.evaluate('(key)=>JSON.parse(localStorage.getItem(key))', KEY)
 
@@ -443,7 +449,7 @@ class V6Browser(unittest.TestCase):
         return data
 
     def test_live_bpm_validation_progress_caret_and_route_guards(self):
-        self.open('map', data=self.complete_fixture())
+        self.open('map', data=self.complete_fixture());self.expand_map_setup()
         inp=self.page.locator('#tempoInput'); inp.focus()
         original=self.project()['skeleton']
         for value,valid in [('',False),(' ',False),('abc',False),('Infinity',False),('0',False),('-2',False),('120.5',True),('1.',True),('1..2',False),('120',True)]:
@@ -465,6 +471,7 @@ class V6Browser(unittest.TestCase):
     def test_each_setup_prerequisite_locks_and_restores_without_losing_work(self):
         self.open('map', data=self.complete_fixture()); original=self.project()['skeleton']
         for field in ['reference','grid','firstListen']:
+            self.expand_map_setup()
             self.click('toggle-setup',f'[data-field="{field}"]')
             expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
             expect(self.page.locator('.checkpoint-count')).to_have_text('0 of 3')
@@ -472,6 +479,7 @@ class V6Browser(unittest.TestCase):
             expect(self.page.locator('[data-route="structure"]')).to_be_enabled()
             expect(self.page.locator('.checkpoint-count')).to_have_text('3 of 3')
             self.assertEqual(self.project()['skeleton'],original)
+        self.expand_map_setup()
         self.page.locator('#meterInput').evaluate("el=>{el.add(new Option('Choose',''));el.value='';el.dispatchEvent(new Event('change',{bubbles:true}))}")
         expect(self.page.locator('[data-route="structure"]')).to_be_disabled()
         self.page.locator('#meterInput').select_option('3/4')
@@ -840,7 +848,7 @@ class V6Browser(unittest.TestCase):
                 self.page.keyboard.press('Tab');expect(self.page.locator('[data-action="delete-project"]')).to_be_focused()
                 self.page.keyboard.press('Shift+Tab');expect(self.page.locator('[data-action="close-sheet"]')).to_be_focused()
                 self.page.keyboard.press('Escape');expect(self.page.locator('.project-menu').first).to_be_focused()
-                self.click('open-project','[data-id="p1"]');self.page.locator('.quick-card[data-route="roadmap"]').click();self.click('go','[data-route="map"]')
+                self.click('open-project','[data-id="p1"]');self.page.locator('.quick-card[data-route="roadmap"]').click();self.click('go','[data-route="map"]');self.expand_map_setup()
                 self.page.locator('#tempoInput').fill('128.5');expect(self.page.locator('#tempoInput')).to_be_focused()
                 self.click('go','[data-route="structure"]');self.click('open-add-section');self.settled_sheet()
                 self.assert_hover_stable(self.page.locator('[data-name="Verse"]'))
@@ -1016,7 +1024,10 @@ class V6Browser(unittest.TestCase):
                  ('skeleton-draft','.workflow-disclosure summary'),('skeleton-bounce','.primary')]
         for route,selector in samples:
             with self.subTest(route=route,selector=selector):
-                self.canvas_route(route);node=self.page.locator(selector).first
+                self.canvas_route(route)
+                if route == 'map' and selector in ('.state-control','.action-card'):
+                    self.expand_map_setup()
+                node=self.page.locator(selector).first
                 node.scroll_into_view_if_needed();before=node.bounding_box()
                 radius=node.evaluate('el=>getComputedStyle(el).borderRadius')
                 self.assertEqual(float(node.evaluate('el=>getComputedStyle(el).opacity')),1)
