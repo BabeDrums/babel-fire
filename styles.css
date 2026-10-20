@@ -134,7 +134,17 @@ button:disabled {
 .topbar .right {
   justify-self: end;
 }
-.topbar .center .phase-pill,
+.topbar .center .phase-pill {
+  display: inline-flex;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 620;
+}
 .topbar .center .pill-tag {
   display: none;
 }
@@ -825,14 +835,14 @@ p {
   white-space: nowrap;
 }
 .add-section-row {
-  width: auto;
-  min-height: 44px;
+  width: 100%;
+  min-height: 48px;
   margin-top: 8px;
-  padding: 0 10px;
-  border: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line);
   border-radius: var(--radius-control);
-  color: var(--accent-text);
-  font-weight: 650;
+  color: var(--muted);
+  font-weight: 640;
   cursor: pointer;
   background: transparent;
 }
@@ -1733,10 +1743,16 @@ body.sheet-open .undo-notice {
   margin-top: 24px;
 }
 .structure-next {
-  width: auto;
+  width: 100%;
   min-width: 132px;
-  max-width: var(--action-max);
+  max-width: none;
   min-height: 48px;
+}
+@media (min-width: 640px) {
+  .structure-next {
+    width: var(--action-max);
+    max-width: var(--action-max);
+  }
 }
 .action-row button {
   min-height: 48px;
