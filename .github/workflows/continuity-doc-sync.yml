@@ -1,0 +1,24 @@
+name: Sync FIRE continuity docs
+on:
+  push:
+    branches: [sol/continuity-design-system-handoff]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/continuity-design-system-handoff
+      - name: Update continuity docs
+        run: python scripts/sync_continuity_docs.py
+      - name: Commit continuity docs
+        run: |
+          rm scripts/sync_continuity_docs.py
+          rm .github/workflows/continuity-doc-sync.yml
+          git config user.name "Babel"
+          git config user.email "110964546+BabeDrums@users.noreply.github.com"
+          git add START_HERE.md AGENTS.md CONTEXT.md V5.md V6.md CHANGELOG.md scripts/sync_continuity_docs.py .github/workflows/continuity-doc-sync.yml
+          git commit -m "Refresh FIRE continuity documentation"
+          git push origin HEAD:sol/continuity-design-system-handoff
