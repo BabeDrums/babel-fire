@@ -3284,7 +3284,7 @@
           sectionIndex: 0,
           newType: "original",
           expandedTrackId: null,
-                animating: false,
+          animating: false,
         };
         history.replaceState(
           {
