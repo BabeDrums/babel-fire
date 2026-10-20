@@ -2413,3 +2413,13 @@ from {
     width: 100%;
   }
 }
+
+/* Preserve the approved Projects/New Project north-star geometry. */
+#app[data-route="new-project"] .project-field-label {
+  margin: 18px 2px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
