@@ -267,11 +267,12 @@
       notes: [],
     };
   }
-  function makeOriginalProject(title = "Untitled") {
+  function makeOriginalProject(title = "", artist = "") {
     return {
       id: uid(),
       type: "original",
-      title: title || "Untitled",
+      title,
+      artist,
       createdAt: Date.now(),
       schemaVersion: SCHEMA_VERSION,
       spark: { starts: [], idea: "", reasons: [], anchor: "" },
@@ -339,6 +340,7 @@
     out.projects.forEach((p) => {
       p.schemaVersion = SCHEMA_VERSION;
       if (p.type === "original") {
+        p.artist = p.artist || "";
         p.spark = p.spark || { starts: [], idea: "", reasons: [], anchor: "" };
         p.spark.starts = p.spark.starts || [];
         p.spark.reasons = p.spark.reasons || [];
@@ -1428,7 +1430,7 @@
   function renderNewProject() {
     app.innerHTML =
       topbar(backButton("projects", "Projects"), "", "") +
-      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Project title" enterkeyhint="${ui.newType === "study" ? "next" : "done"}" autocomplete="off" autocapitalize="words" placeholder="${ui.newType === "study" ? "Song title" : "Song title or Untitled"}"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist" ${ui.newType === "study" ? "" : "hidden"}><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
+      `<h2>New project</h2><p class="sub">Start original or rebuild a reference.</p><div class="spacer-24"></div><div class="project-type-control" role="group" aria-label="Project type"><button class="segment-choice ${ui.newType === "original" ? "selected" : ""}" data-action="set-new-type" data-type="original" aria-pressed="${ui.newType === "original"}">Original</button><button class="segment-choice ${ui.newType === "study" ? "selected" : ""}" data-action="set-new-type" data-type="study" aria-pressed="${ui.newType === "study"}">Recreation</button></div><div class="section-kicker project-field-label">Project</div><input class="field" id="newTitle" aria-label="Song title" enterkeyhint="next" autocomplete="off" autocapitalize="words" placeholder="Song title"><input class="field custom-length" id="newArtist" aria-label="Artist" enterkeyhint="done" autocomplete="off" autocapitalize="words" placeholder="Artist"><div class="spacer-24"></div><button class="primary full" data-action="create-project">Create Project</button>`;
   }
 
   function checkpointRow(title, desc, route, done, unlocked = true) {
@@ -2612,22 +2614,20 @@
     if (action === "set-new-type") {
       ui.newType = b.dataset.type;
       app.querySelectorAll('[data-action="set-new-type"]').forEach((el) => setSelected(el, el.dataset.type === ui.newType));
-      document.getElementById("newArtist").hidden = ui.newType !== "study";
-      const titleInput = document.getElementById("newTitle");
-      titleInput.placeholder = ui.newType === "study" ? "Song title" : "Song title or Untitled";
-      titleInput.setAttribute("enterkeyhint", ui.newType === "study" ? "next" : "done");
       return;
     }
     if (action === "create-project") {
-      const title =
-          clean(document.getElementById("newTitle")?.value) || "Untitled",
-        np =
-          ui.newType === "study"
-            ? makeStudyProject(
-                title,
-                clean(document.getElementById("newArtist")?.value),
-              )
-            : makeOriginalProject(title);
+      const titleInput = document.getElementById("newTitle"),
+        title = clean(titleInput?.value),
+        artist = clean(document.getElementById("newArtist")?.value);
+      if (!title) {
+        titleInput?.focus({ preventScroll: true });
+        return;
+      }
+      const np =
+        ui.newType === "study"
+          ? makeStudyProject(title, artist)
+          : makeOriginalProject(title, artist);
       db.projects.push(np);
       db.currentProjectId = np.id;
       save();
@@ -2874,19 +2874,7 @@
     if (e.key !== "Enter" || e.shiftKey || e.isComposing) return;
     if (e.target.id === "newTitle") {
       e.preventDefault();
-      const artist = document.getElementById("newArtist");
-      if (ui.newType === "study" && artist && !artist.hidden) {
-        // Treat Artist as a genuinely fresh editing host. iOS/WebKit can carry
-        // the prior field's keyboard state across a scripted focus handoff;
-        // replacing the input gives the new field its own editor session while
-        // preserving the user's text exactly as entered.
-        const freshArtist = artist.cloneNode(true);
-        freshArtist.value = artist.value;
-        artist.replaceWith(freshArtist);
-        freshArtist.focus({ preventScroll: true });
-        const end = freshArtist.value.length;
-        freshArtist.setSelectionRange(end, end);
-      } else app.querySelector('[data-action="create-project"]')?.click();
+      document.getElementById("newArtist")?.focus({ preventScroll: true });
       return;
     }
     if (e.target.id === "newArtist") {

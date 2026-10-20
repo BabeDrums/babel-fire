@@ -707,21 +707,38 @@ class V6Browser(unittest.TestCase):
     def settled_sheet(self):
         self.page.locator('.sheet').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
 
-    def test_new_project_next_handoff_uses_fresh_artist_input_without_rewriting_text(self):
+    def test_new_project_fields_persist_and_original_stores_artist(self):
         self.open('new-project', width=390,
                   data={'version': 5, 'currentProjectId': None, 'projects': []})
-        self.click('set-new-type', '[data-type="study"]')
         title = self.page.locator('#newTitle')
-        self.page.evaluate('window.previousArtist=document.getElementById("newArtist")')
-        title.fill('Creep')
-        title.press('Enter')
         artist = self.page.locator('#newArtist')
-        expect(artist).to_be_focused()
-        self.assertFalse(self.page.evaluate('window.previousArtist.isConnected'))
-        self.page.keyboard.type('r')
-        self.assertEqual(artist.input_value(), 'r')
-        self.assertEqual(artist.get_attribute('autocapitalize'), 'words')
+        expect(artist).to_be_visible()
+        self.assertEqual(title.get_attribute('placeholder'), 'Song title')
         self.assertEqual(title.get_attribute('enterkeyhint'), 'next')
+        self.page.evaluate('window.originalArtist=document.getElementById("newArtist")')
+        title.fill('My Song')
+        title.press('Enter')
+        expect(artist).to_be_focused()
+        self.assertTrue(self.page.evaluate('window.originalArtist===document.getElementById("newArtist")'))
+        artist.fill('Babel')
+        self.click('set-new-type', '[data-type="study"]')
+        expect(artist).to_be_visible()
+        self.assertEqual(title.input_value(), 'My Song')
+        self.assertEqual(artist.input_value(), 'Babel')
+        self.click('set-new-type', '[data-type="original"]')
+        self.click('create-project')
+        saved = self.db()['projects'][0]
+        self.assertEqual(saved['type'], 'original')
+        self.assertEqual(saved['title'], 'My Song')
+        self.assertEqual(saved['artist'], 'Babel')
+
+    def test_new_project_requires_song_title_instead_of_creating_untitled(self):
+        self.open('new-project', width=390,
+                  data={'version': 5, 'currentProjectId': None, 'projects': []})
+        self.page.locator('#newArtist').fill('Babel')
+        self.click('create-project')
+        self.assertEqual(len(self.db()['projects']), 0)
+        expect(self.page.locator('#newTitle')).to_be_focused()
 
     def test_cross_platform_screen_canvases_and_fluid_widths(self):
         routes=['projects','new-project','project','roadmap','map','structure','tracks','section-study',
