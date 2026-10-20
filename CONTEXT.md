@@ -819,6 +819,8 @@ Same FIRE, different canvas: phone, tablet, laptop, and desktop share one workfl
 
 Mouse, touch, and normal keyboard accessibility are first-class. Keep important controls visible without hover, provide stable non-geometric hover/press feedback and visible focus, and preserve native scrolling, Tab/Shift+Tab, Enter/Space activation, and safe Escape dismissal. Custom productivity shortcuts remain outside the current scope.
 
+On narrow iPhone layouts, a route that already fits the visual viewport should not gain fake root scroll or rubber-band drift; keeping the page shell stationary preserves alignment when moving between screens. When a phone route is genuinely dense, first remove redundant supporting copy or compact non-current states before shrinking touch targets. Roadmap should emphasize the current phase and compress future/completed phase detail; Map checkpoint descriptions may collapse when the titles and state already communicate the task.
+
 ## Apple-like rules that have emerged
 - avoid unnecessary hairlines
 - use spacing/grouping before separators

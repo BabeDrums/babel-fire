@@ -27,6 +27,8 @@ Always distinguish shipped work on `main`, unmerged work, and planned work. Resu
 - The design-system pass should standardize typography, spacing, radii, grouped surfaces, rows, inputs, segmented controls, selections, completion states, primary/secondary/quiet/destructive actions, navigation placement, hover/pressed/focus/disabled states, and adaptive sheets.
 - **Selection is not completion.** Checkmarks/circles are reserved for genuine completion semantics, not generic selected state.
 - On iPad, task sheets such as Add Sections should use compact centered form/page-style presentation where practical; narrow iPhone layouts may remain bottom-oriented.
+- Physical iPhone review after the foundation consolidation established two phone-specific rules: short routes that fit the visual viewport must not create root scroll/bounce, and dense routes should compact redundant secondary information before shrinking touch targets.
+- On narrow phones, Roadmap should prioritize full detail for the current phase and compact non-current phases; The Map may collapse redundant checkpoint descriptions while preserving titles, state, and progression.
 - Huge light full-width CTA slabs are not the default FIRE action pattern. Action prominence should come from hierarchy/style, not simply width.
 - Passive center pills are being retired. Leading toolbar = navigation; trailing toolbar = contextual action; page title = current location.
 - Typography should use a consistent hierarchy and reduce unnecessary tracked-uppercase labels or redundant copy.
