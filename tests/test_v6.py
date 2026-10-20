@@ -707,19 +707,21 @@ class V6Browser(unittest.TestCase):
     def settled_sheet(self):
         self.page.locator('.sheet').evaluate('async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))}')
 
-    def test_new_project_next_handoff_capitalizes_first_artist_keystroke(self):
+    def test_new_project_next_handoff_uses_fresh_artist_input_without_rewriting_text(self):
         self.open('new-project', width=390,
                   data={'version': 5, 'currentProjectId': None, 'projects': []})
         self.click('set-new-type', '[data-type="study"]')
         title = self.page.locator('#newTitle')
-        artist = self.page.locator('#newArtist')
+        self.page.evaluate('window.previousArtist=document.getElementById("newArtist")')
         title.fill('Creep')
         title.press('Enter')
+        artist = self.page.locator('#newArtist')
         expect(artist).to_be_focused()
+        self.assertFalse(self.page.evaluate('window.previousArtist.isConnected'))
         self.page.keyboard.type('r')
-        self.assertEqual(artist.input_value(), 'R')
-        self.page.keyboard.type('adio head')
-        self.assertEqual(artist.input_value(), 'Radio head')
+        self.assertEqual(artist.input_value(), 'r')
+        self.assertEqual(artist.get_attribute('autocapitalize'), 'words')
+        self.assertEqual(title.get_attribute('enterkeyhint'), 'next')
 
     def test_cross_platform_screen_canvases_and_fluid_widths(self):
         routes=['projects','new-project','project','roadmap','map','structure','tracks','section-study',
