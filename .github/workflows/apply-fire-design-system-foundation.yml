@@ -19,7 +19,9 @@ jobs:
         with:
           ref: sol/fire-design-system-foundation
       - name: Apply foundation patch
-        run: python3 scripts/apply_fire_design_system_foundation.py
+        run: |
+          python3 scripts/apply_fire_design_system_foundation.py
+          python3 -c "from pathlib import Path; p=Path('styles.css'); p.write_text(p.read_text().rstrip() + '\\n')"
       - name: Commit foundation
         run: |
           git config user.name "Babel"
