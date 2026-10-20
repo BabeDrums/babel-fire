@@ -551,7 +551,7 @@ class V6Browser(unittest.TestCase):
         self.page.go_forward();expect(self.page.locator('.study-pane')).to_be_visible()
         self.page.locator('.phase-pill').click();expect(self.page.locator('h1')).to_have_text('The Map')
         self.assertEqual(self.page.locator('.phase-pill').count(),0)
-        self.click('go','[data-route="project"]');expect(self.page.locator('h1')).to_have_text('Migration song')
+        self.canvas_route('project');expect(self.page.locator('h1')).to_have_text('Migration song')
         self.click('go','[data-route="roadmap"]');expect(self.page.locator('h2')).to_have_text('Roadmap')
         self.context.close()
         self.open('skeleton',data=self.complete_fixture());self.click('go','[data-route="skeleton-session"]')
@@ -1254,10 +1254,10 @@ class V6Browser(unittest.TestCase):
     def test_workflow_shell_continuity_project_map_structure_tracks(self):
         self.open('project',width=820)
         cases=[
-            ('project','Migration song','Test artist · Recreation','Projects',''),
-            ('map','The Map','Understand the song before rebuilding it.','Migration song',''),
-            ('structure','Structure','Build the song one section at a time.','The Map','1 of 3'),
-            ('tracks','Tracks','Select everything that appears somewhere in the song.','Structure','2 of 3'),
+            ('project','Migration song','Test artist · Recreation','projects',''),
+            ('map','The Map','Understand the song before rebuilding it.','project',''),
+            ('structure','Structure','Build the song one section at a time.','map','1 of 3'),
+            ('tracks','Tracks','Select everything that appears somewhere in the song.','structure','2 of 3'),
         ]
         anchor=None
         for route,title,subtitle,back,status in cases:
@@ -1268,7 +1268,9 @@ class V6Browser(unittest.TestCase):
                 self.assertEqual(self.page.locator('.phase-pill').count(),0)
                 expect(self.page.locator('.workflow-page .page-heading h1')).to_have_text(title)
                 expect(self.page.locator('.workflow-page .page-heading .sub')).to_have_text(subtitle)
-                expect(self.page.locator('.topbar .left')).to_contain_text(back)
+                back_button=self.page.locator('.topbar > .left > .nav-btn')
+                self.assertEqual(back_button.count(),1)
+                self.assertEqual(back_button.get_attribute('data-fallback-route'),back)
                 if status:
                     expect(self.page.locator('.workflow-position')).to_have_text(status)
                 else:
