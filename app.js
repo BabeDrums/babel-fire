@@ -1535,11 +1535,11 @@
           ? sections(p)
               .map(
                 (s, i) =>
-                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><button class="delete-section" data-action="delete-section" data-id="${s.id}" aria-label="Delete ${esc(labels[i])}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v7M14 10v7"/></svg></button><div class="drag-handle" data-drag-handle role="button" tabindex="0" aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
+                  `<div class="structure-row sort-row" role="button" tabindex="0" data-action="edit-section" data-section-id="${s.id}" aria-label="Edit ${esc(labels[i])}, ${s.lengthBars} bars"><div class="index">${i + 1}</div><div class="name">${esc(labels[i])}</div><span class="bars-badge">${s.lengthBars} bars</span><button class="delete-section" data-action="delete-section" data-id="${s.id}" aria-label="Delete ${esc(labels[i])}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v7M14 10v7"/></svg></button><div class="drag-handle" data-drag-handle role="button" tabindex="0" aria-label="Reorder ${esc(labels[i])}">≡</div></div>`,
               )
               .join("")
           : `<div class="empty">No sections yet.</div>`
-      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="section-kicker">Verify</div>${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button>`;
+      }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="section-kicker structure-ready-label">Ready?</div><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div><div class="structure-next-wrap"><button class="primary structure-next" data-action="go" data-route="tracks" ${done ? "" : "disabled"}>Next</button></div>`;
     app.innerHTML =
       topbar(historyBackButton("map", "The Map"), "", savedMark()) +
       workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
