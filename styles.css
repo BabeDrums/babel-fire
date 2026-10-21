@@ -99,7 +99,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 button:not(:disabled):active {
   filter: none;
 }
-:is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):active {
+:is(.list-row, .step-row, .project-open, .quick-card, .nav-btn, .context-nav-button, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):active {
   background-color: var(--state-pressed);
 }
 .primary:not(:disabled):active {
@@ -136,16 +136,30 @@ button:disabled {
 .topbar .right {
   justify-self: end;
 }
-.topbar .center .phase-pill {
+.context-nav-button {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 44px;
   min-height: 44px;
+  max-width: min(44vw, 250px);
   padding: 0 8px;
-  border: 0;
   border-radius: 9px;
-  background: transparent;
   color: var(--muted);
   font-size: 14px;
   font-weight: 620;
+}
+.context-nav-button > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.context-caret {
+  flex: 0 0 auto;
+  color: var(--quiet);
+  font-size: 13px;
+  transform: translateY(-1px);
 }
 .topbar .center .pill-tag {
   display: none;
@@ -279,22 +293,59 @@ p {
   font-size: 12px;
   color: var(--meta-text);
 }
-.checkpoint-head {
+.step-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin: 30px 2px 9px;
 }
-.checkpoint-head .section-kicker {
+.step-head .section-kicker {
   margin: 0;
 }
-.checkpoint-count {
+.step-count {
   font-size: 12px;
   color: var(--meta-text);
+  font-variant-numeric: tabular-nums;
 }
-.checkpoint-progress {
-  margin: 0 0 12px;
+.step-row {
+  width: 100%;
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px var(--space-4);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  text-align: left;
+}
+.step-row:last-child {
+  border-bottom: 0;
+}
+.step-row .title {
+  font-size: 16px;
+  font-weight: 670;
+}
+.step-trailing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+.step-state {
+  color: var(--meta-text);
+  font-size: 12px;
+  font-weight: 560;
+}
+.step-row.current .step-state {
+  color: var(--accent-text);
+}
+.step-row.done .step-state {
+  color: var(--muted);
+}
+.step-row.locked {
+  opacity: 0.5;
 }
 .card {
   background: #111318;
@@ -1224,14 +1275,6 @@ details.note-disclosure summary::-webkit-details-marker {
   min-width: 170px;
   margin-top: 18px;
 }
-.checkpoint-locked-message {
-  min-height: 52px;
-  color: var(--muted);
-}
-.checkpoint-locked-message .title {
-  color: var(--muted);
-  font-weight: 560;
-}
 .empty {
   color: var(--muted);
   font-size: 13px;
@@ -1252,6 +1295,79 @@ details.note-disclosure summary::-webkit-details-marker {
   color: var(--muted);
   margin-top: 4px;
   line-height: 1.4;
+}
+
+.context-nav-sheet {
+  width: min(360px, calc(100vw - 28px));
+  max-width: 360px;
+  max-height: calc(100dvh - env(safe-area-inset-top) - 84px);
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 58px);
+  left: 50%;
+  bottom: auto;
+  transform: translateX(-50%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  animation: none;
+}
+.context-nav-head {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 4px 10px;
+}
+.context-nav-head strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
+}
+.context-nav-close {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 24px;
+}
+.context-nav-group {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+.context-nav-row {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 13px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  text-align: left;
+  font-size: 14px;
+}
+.context-nav-row:last-child {
+  border-bottom: 0;
+}
+.context-nav-status {
+  color: var(--meta-text);
+  font-size: 11px;
+}
+.context-nav-phase {
+  margin: 14px 4px 7px;
+  color: var(--meta-text);
+  font-size: 11px;
+  font-weight: 650;
+}
+.presence-handle,
+.event-handle,
+.change-marker {
+  z-index: 7;
 }
 .sheet-backdrop {
   position: fixed;
@@ -1495,6 +1611,7 @@ details.note-disclosure summary::-webkit-details-marker {
 }
 .presence-handle, .event-handle {
   position: absolute;
+  z-index: 7;
   top: 4px;
   width: 44px;
   height: 44px;
@@ -1543,7 +1660,7 @@ details.note-disclosure summary::-webkit-details-marker {
   min-width: 2px;
 }
 .change-marker {
-  z-index: 3;
+  z-index: 7;
   position: absolute;
   top: 0;
   width: 44px;
@@ -1822,7 +1939,7 @@ body.sheet-open .undo-notice {
 .tracks-next-wrap {
   display: flex;
   justify-content: flex-end;
-  margin-top: 18px;
+  margin-top: 26px;
 }
 .structure-next-wrap {
   display: flex;
@@ -1943,7 +2060,7 @@ body.sheet-open .undo-notice {
 }
 .workflow-page > .page-heading + .section-kicker,
 .workflow-page .phase-setup > .section-kicker:first-child,
-.workflow-page .phase-checkpoints > .checkpoint-head:first-child {
+.workflow-page .phase-steps > .step-head:first-child {
   margin-top: 0;
 }
 .projects-grid {
@@ -1961,7 +2078,7 @@ body.sheet-open .undo-notice {
 .project-page.route-back {
   animation: routeBackIn var(--motion-fast) var(--ease);
 }
-.phase-setup, .phase-checkpoints, .arrangement-region, .study-observations {
+.phase-setup, .phase-steps, .arrangement-region, .study-observations {
   min-width: 0;
 }
 .study-actions {
@@ -2059,8 +2176,12 @@ from {
 /* Same FIRE, different canvas. Adapt only when the task needs it. */
 @media (max-width: 430px) {
   .app-shell {
-    /* Let intrinsic content decide whether the page scrolls; do not reserve a fake toolbar-height tail. */
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    /* Short pages stay planted; true scroll pages get clearance above Safari chrome. */
+    --scroll-end-clearance: 0px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom) + var(--scroll-end-clearance));
+  }
+  .app-shell[data-viewport-fit="false"] {
+    --scroll-end-clearance: 72px;
   }
   .project-page .page-heading,
   .workflow-page .page-heading {
@@ -2103,19 +2224,16 @@ from {
     min-height: 56px;
     padding: 9px 14px;
   }
-  #app[data-route="map"] .phase-checkpoints {
+  #app[data-route="map"] .phase-steps {
     margin-top: 18px;
   }
-  #app[data-route="map"] .phase-checkpoints .list-row {
+  #app[data-route="map"] .phase-steps .list-row {
     min-height: 54px;
     padding-top: 8px;
     padding-bottom: 8px;
   }
-  #app[data-route="map"] .phase-checkpoints .list-row .desc {
+  #app[data-route="map"] .phase-steps .list-row .desc {
     display: none;
-  }
-  #app[data-route="map"] .checkpoint-progress {
-    margin-bottom: 8px;
   }
 
   #app[data-route="roadmap"] > .spacer-18 {
@@ -2207,6 +2325,17 @@ from {
   .grabber {
     display: none;
   }
+  .context-nav-sheet {
+    width: min(380px, calc(100vw - 64px));
+    max-width: 380px;
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 58px);
+    left: 50%;
+    bottom: auto;
+    padding: var(--space-3);
+    border-radius: var(--radius-card);
+    transform: translateX(-50%);
+  }
 }
 
 @media (min-width: 760px) {
@@ -2230,7 +2359,7 @@ from {
   button:not(:disabled):hover {
     filter: none;
   }
-  :is(.list-row, .project-open, .quick-card, .nav-btn, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):hover, summary:hover, .structure-row:hover {
+  :is(.list-row, .step-row, .project-open, .quick-card, .nav-btn, .context-nav-button, .context-nav-row, .text-btn, .mini-btn, .sheet-close, .mix-toggle, .top-icon-btn, .project-menu, .segment-choice):not(:disabled):hover, summary:hover, .structure-row:hover {
     background-color: var(--state-hover);
   }
   .primary:not(:disabled):hover {
