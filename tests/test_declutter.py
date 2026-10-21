@@ -1,4 +1,4 @@
-"""Focused regressions for FIRE's current-task declutter rules."""
+"""Focused regressions for FIRE's current-task declutter and Step rules."""
 import json
 import os
 import unittest
@@ -104,28 +104,31 @@ class CurrentTaskDeclutter(unittest.TestCase):
         self.assertEqual(page.locator(".project-field-label").count(), 0)
         expect(page.locator(".create-project-action")).to_be_visible()
 
-    def test_incomplete_map_setup_shows_one_quiet_checkpoint_prerequisite(self):
+    def test_incomplete_map_setup_keeps_all_steps_visible_and_locked(self):
         page = self.open("map")
-        rows = page.locator(".phase-checkpoints .list-row")
-        self.assertEqual(rows.count(), 1)
-        expect(rows.first).to_have_text("Available after Song Setup")
-        self.assertEqual(page.locator('.phase-checkpoints [data-route="structure"]').count(), 0)
-        self.assertEqual(page.locator('.phase-checkpoints [data-route="tracks"]').count(), 0)
+        rows = page.locator(".phase-steps .step-row")
+        self.assertEqual(rows.count(), 3)
+        expect(page.locator('.step-row[data-route="structure"]')).to_be_disabled()
+        expect(page.locator('.step-row[data-route="tracks"]')).to_be_disabled()
+        expect(page.locator('.step-row[data-route="section-study"]')).to_be_disabled()
+        self.assertEqual(page.locator(".checkpoint-locked-message").count(), 0)
+        expect(page.locator(".step-count")).to_have_text("0 of 3 complete")
 
-    def test_map_prerequisite_summary_stays_live_while_editing_setup(self):
+    def test_map_step_states_stay_live_while_editing_setup(self):
         page = self.open("map", project_data(setup_complete=True))
         meter = page.locator("#meterInput")
         expect(meter).to_be_visible()
+        expect(page.locator('.step-row[data-route="structure"]')).to_be_enabled()
+        expect(page.locator('.step-row[data-route="structure"] .step-state')).to_have_text("Current")
         meter.evaluate(
             "el=>{el.add(new Option('Choose',''));el.value='';"
             "el.dispatchEvent(new Event('change',{bubbles:true}))}"
         )
-        expect(page.locator(".checkpoint-locked-message")).to_have_text(
-            "Available after Song Setup"
-        )
-        self.assertEqual(page.locator('.phase-checkpoints [data-route="structure"]').count(), 0)
+        expect(page.locator('.step-row[data-route="structure"]')).to_be_disabled()
+        expect(page.locator('.step-row[data-route="structure"] .step-state')).to_have_text("Locked")
         meter.select_option("3/4")
-        expect(page.locator('.phase-checkpoints [data-route="structure"]')).to_be_visible()
+        expect(page.locator('.step-row[data-route="structure"]')).to_be_enabled()
+        expect(page.locator('.step-row[data-route="structure"] .step-state')).to_have_text("Current")
 
     def test_structure_hides_repeated_labels_and_unavailable_next(self):
         page = self.open("structure", project_data(setup_complete=True))
