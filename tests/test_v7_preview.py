@@ -1,4 +1,4 @@
-"""Physical-review prototype regressions for the isolated FIRE V7 preview shell."""
+"""Physical-review regressions for the isolated FIRE V7 preview shell."""
 import json
 import os
 import unittest
@@ -85,60 +85,80 @@ class V7Preview(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
-    def test_project_home_is_continue_plus_journey_without_custom_navigator(self):
+    def test_projects_root_has_no_empty_toolbar_and_uses_grouped_list(self):
+        page = self.open("projects")
+        expect(page.locator("h1")).to_have_text("Projects")
+        self.assertEqual(page.locator(".root-screen .topbar").count(), 0)
+        expect(page.locator(".project-list.group")).to_be_visible()
+        expect(page.locator(".project-row")).to_contain_text("Creep")
+        expect(page.locator(".preview-note")).to_contain_text("Sandbox preview")
+
+    def test_project_home_is_continue_plus_journey_without_dashboard_status_chrome(self):
         page = self.open("project")
         expect(page.locator("h1")).to_have_text("Creep")
-        expect(page.locator(".section-title").nth(0)).to_contain_text("Continue")
-        expect(page.locator(".section-title").nth(1)).to_contain_text("Journey")
+        expect(page.locator(".section-title").nth(0)).to_have_text("Continue")
+        expect(page.locator(".section-title").nth(1)).to_have_text("Journey")
         expect(page.locator(".continue-title")).to_have_text("Song Setup")
-        self.assertEqual(page.locator(".context-nav-button,.context-nav-sheet").count(), 0)
+        self.assertEqual(page.locator(".continue-card,.context-nav-button,.context-nav-sheet").count(), 0)
+        self.assertEqual(page.get_by_text("Recommended", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("In progress", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("Later", exact=True).count(), 0)
         self.assertEqual(page.get_by_text("Checkpoint", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("Step ", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("Roadmap", exact=True).count(), 0)
 
     def test_song_setup_is_a_dedicated_work_page(self):
         page = self.open("project")
-        page.locator(".continue-card").click()
+        page.locator(".continue-row").click()
         expect(page.locator("h1")).to_have_text("Song Setup")
-        self.assertEqual(page.locator(".journey,.phase-block").count(), 0)
+        self.assertEqual(page.locator(".journey,.journey-group").count(), 0)
         self.assertEqual(page.locator(".form-row").count(), 5)
         expect(page.locator(".back")).to_contain_text("Creep")
 
     def test_guidance_does_not_hard_lock_structure_or_tracks(self):
         page = self.open("structure")
         expect(page.locator("h1")).to_have_text("Structure")
-        expect(page.locator(".add-row")).to_be_enabled()
+        expect(page.get_by_role("button", name="Add Section")).to_be_enabled()
         page = self.open("tracks")
         expect(page.locator("h1")).to_have_text("Tracks")
         expect(page.locator('.track-tile[data-name="Vocal"]')).to_be_enabled()
 
-    def test_section_study_explains_missing_context_instead_of_dead_lock(self):
-        page = self.open("section-study")
-        expect(page.locator("h1")).to_have_text("Section Study")
-        expect(page.locator(".prereq-card")).to_contain_text("Nothing is locked")
-        expect(page.locator('.prereq-actions [data-route="structure"]')).to_be_visible()
-        expect(page.locator('.prereq-actions [data-route="tracks"]')).to_be_visible()
-
-    def test_add_section_is_compact_and_immediate(self):
+    def test_structure_is_direct_arrangement_editing_and_quick_add(self):
         page = self.open("structure")
-        page.locator(".add-row").click()
+        page.get_by_role("button", name="Add Section").click()
         expect(page.locator(".sheet")).to_be_visible()
         box = page.locator(".sheet").bounding_box()
-        self.assertLess(box["height"], 600)
+        self.assertLess(box["height"], 560)
         page.locator('[data-action="quick-add-section"][data-name="Intro"]').click()
         expect(page.locator(".sheet-backdrop")).to_be_hidden()
         expect(page.locator(".arrangement-row")).to_have_count(1)
         expect(page.locator(".arrangement-row")).to_contain_text("Intro")
         expect(page.locator(".arrangement-row")).to_contain_text("8 bars")
+        expect(page.locator(".group.arrangement .add-section-row")).to_be_visible()
 
-    def test_tracks_is_focused_and_continuation_is_direct(self):
+    def test_tracks_is_focused_and_continuation_is_separated(self):
         page = self.open("tracks", study_db(setup=True, structure=True))
         expect(page.locator("h1")).to_have_text("Tracks")
+        expect(page.locator(".sub")).to_have_text("Choose everything you hear in the song.")
         self.assertEqual(page.get_by_text("Step ", exact=False).count(), 0)
         tile = page.locator('.track-tile[data-name="Drums"]')
         tile.click()
         expect(tile).to_have_attribute("aria-pressed", "true")
         expect(page.locator('[data-action="continue-section-study"]')).to_be_enabled()
+        expect(page.locator(".action-row.action-separated")).to_be_visible()
+
+    def test_section_study_explains_missing_context_instead_of_dead_lock(self):
+        page = self.open("section-study")
+        expect(page.locator("h1")).to_have_text("Section Study")
+        expect(page.locator(".prereq-card")).to_contain_text("what’s missing")
+        expect(page.locator('.prereq-actions [data-route="structure"]')).to_be_visible()
+        expect(page.locator('.prereq-actions [data-route="tracks"]')).to_be_visible()
+
+    def test_review_map_stays_visible_in_journey_without_migrating_editor(self):
+        page = self.open("project", study_db(setup=True, structure=True, tracks=True))
+        page.get_by_role("button", name="Review Map").click()
+        expect(page.locator("h1")).to_have_text("Review Map")
+        expect(page.locator(".prereq-card")).to_contain_text("Not migrated yet")
 
 
 if __name__ == "__main__":
