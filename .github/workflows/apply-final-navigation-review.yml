@@ -1,0 +1,36 @@
+name: Apply final navigation review fixes
+
+on:
+  push:
+    branches: [sol/steps-navigation-handoff]
+    paths:
+      - scripts/final_navigation_review_fix.py
+      - .github/workflows/apply-final-navigation-review.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/steps-navigation-handoff
+          fetch-depth: 0
+      - name: Apply review fixes
+        run: python3 scripts/final_navigation_review_fix.py
+      - name: Remove one-shot helpers
+        run: rm scripts/final_navigation_review_fix.py .github/workflows/apply-final-navigation-review.yml
+      - name: Validate patched files
+        run: |
+          node --check app.js
+          git diff --check
+      - name: Commit review fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Tighten FIRE Step navigation review flow"
+          git push origin HEAD:sol/steps-navigation-handoff
