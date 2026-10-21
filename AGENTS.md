@@ -25,6 +25,37 @@ If a genuine conflict remains after applying this hierarchy, ask rather than gue
 
 Normal sequence: task branch → implementation → tests → commit → push → PR → review/checks → merge under standing permission → Pages deploy → physical-device approval when visual/interaction work is involved.
 
+## Default product/design iteration protocol
+
+The user should not need to repeatedly request research, project review, file cleanup, or handoff maintenance. For every nontrivial FIRE product/design pass, treat those activities as implied when they materially improve the work.
+
+User ideas and examples are **inputs and hypotheses, not locked requirements**, unless the user explicitly says to lock, approve, or require them. Evaluate suggestions against the product goal, platform guidance, current evidence, and project architecture. Improve, reinterpret, defer, or reject an idea when that produces a better FIRE.
+
+Use a lightweight FIRE adaptation of established divergent/convergent and iterative design practice:
+
+1. **Discover** — review physical-device feedback, current app behavior, relevant repo state, and current external/platform references when useful.
+2. **Define** — state the actual problem and success condition before changing UI. Distinguish architecture, usability, correctness, polish, and delight problems so a visual symptom is not mistaken for the root cause.
+3. **Develop** — consider more than one plausible solution when the problem is open-ended. Prefer the smallest coherent approach that removes complexity rather than adding compensating UI.
+4. **Deliver** — prototype or implement the chosen approach in the safest appropriate surface (currently the isolated V7 preview for experimental shell work), then run relevant static/browser tests.
+5. **Verify + consolidate** — use physical-device evidence for visual work, remove superseded UI/code, reconcile documentation, and refresh the zero-context handoff before treating a pass as complete.
+
+Do not make the process bureaucratic. The framework exists to make iteration faster and prevent solving the wrong problem; it does not replace creative exploration or judgment.
+
+### Page necessity audit
+
+Before adding or polishing a screen, explicitly ask what job the page performs. For each visible element, classify it as one of:
+
+- essential to the page’s primary task,
+- necessary context or navigation,
+- conditional/advanced information that can be progressively disclosed,
+- duplicated/system-explanation content that should be removed or moved elsewhere.
+
+Every focused work page should have a clear primary task, the minimum information needed to perform it, an obvious continuation or exit when appropriate, and no redundant workflow explanation. Also ask whether the page needs to exist at all or can be merged into a more natural surface.
+
+### Fundamentals before signature polish
+
+Stabilize information architecture, navigation, page purpose, scrolling/viewport behavior, spacing, interaction states, and consistency before adding decorative or brand-signature behavior. Distinctive Babel/FIRE touches are welcome after the fundamentals work, but prototype them as optional product evidence rather than letting personality compensate for structural problems.
+
 ## Engineering and product rules
 
 - Read `CONTEXT.md`, the active specification, and relevant code/tests before product work. The active approved implementation scope is **V6**.

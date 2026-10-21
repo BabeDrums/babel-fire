@@ -34,7 +34,7 @@ Always distinguish shipped production work from experimental V7 preview work.
 
 The V7 preview is intentionally isolated at `/v7-preview/` and uses `production-projects-v1-v7-preview`.
 
-Latest physical iPhone review said the V7 direction is **definitely getting better**. The architecture is approved enough to keep iterating in the preview, but **not yet approved to replace production**.
+Latest physical iPhone review says the V7 direction is **approved enough to move from architecture work into decluttering/polish**, but **not yet approved to replace production**.
 
 The redesign question remains:
 
@@ -54,16 +54,33 @@ Current V7 direction:
 
 ## Latest physical-review feedback to carry forward
 
-The comparison screenshots confirmed:
+The current shell is meaningfully better and Project Home is starting to feel like a real home page.
 
-- The V7 hierarchy is easier than V6.
-- Projects still had too much empty space at the top and should feel more like a grouped list than a large card layout.
-- Project Home should become even less dashboard-like: one quiet Continue destination, then Journey.
-- Avoid extra status words such as Recommended / In progress / Later when hierarchy already communicates the state.
-- Dedicated Song Setup is the right direction.
-- Structure should make the arrangement itself the main interface; adding a common section should be immediate and editing happens afterward.
-- Tracks is one of the strongest existing interactions; preserve the grid while simplifying its surrounding chrome and copy.
-- Do not add app-level tabs yet.
+Next concerns:
+
+- Short pages are still scrollable when they should fit and feel locked. The V7 preview currently uses blanket bottom scroll clearance; replace it with content-aware visual-viewport behavior so only genuinely tall pages scroll and receive Safari end clearance.
+- Enter a **declutter/polish phase** before migrating more complex editors. Ask what each page is actually for and remove duplicated navigation, status, explanatory, or continuation UI that does not earn its place.
+- Normalize spacing, heading offsets, row heights, action placement, and visual density across the preview.
+- Fundamentals come before personality. Do not add decorative brand behavior until page purpose, navigation, scrolling, spacing, and consistency are stable.
+- A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
+
+## Default FIRE iteration behavior
+
+The user does **not** want to repeatedly request research, project review, cleanup, or handoff maintenance.
+
+For nontrivial FIRE design/product passes, automatically:
+
+- review the latest physical feedback and current repo state,
+- research relevant current platform/product references when they can improve the decision,
+- define the root problem before changing UI,
+- treat user suggestions as hypotheses unless explicitly locked,
+- perform the Page Necessity Audit from `AGENTS.md`,
+- prototype the smallest coherent solution,
+- run relevant tests,
+- remove superseded UI/code,
+- update project documentation and this handoff when durable/current direction changes.
+
+The lightweight FIRE loop is **Discover → Define → Develop → Deliver → Verify + consolidate**. It is a guardrail against solving the wrong problem, not a rigid bureaucracy.
 
 ## Current preview scope
 
@@ -78,7 +95,7 @@ The preview currently covers:
 - Review Map placeholder
 - project Notes view
 
-Full Section Study timeline, full Review Map, Skeleton interiors, and production-shell replacement stay deferred until the shell passes another physical iPhone review.
+Full Section Study timeline, full Review Map, Skeleton interiors, and production-shell replacement stay deferred until the shell passes the declutter/polish physical gate.
 
 ## Automatic handoff rule
 
@@ -98,7 +115,13 @@ The user should **never need to ask for a handoff update again**.
 
 ## Next action
 
-Continue tightening the isolated V7 preview on iPhone Safari. Judge whether Projects, Project Home, Song Setup, Structure, and Tracks feel calm and obvious. Do **not** migrate the specialized editors or replace V6 until that shell passes the physical gate.
+Run the V7 fundamentals polish pass before migrating more editors:
+
+1. fix fake scrolling with content-aware iPhone Safari visual-viewport handling and more realistic short-height regression coverage,
+2. apply the Page Necessity Audit route by route and remove redundant UI,
+3. normalize shared spacing/density/action placement,
+4. physically review the calmer shell,
+5. only after the fundamentals pass, prototype any optional Babel signature/progress-path treatment separately.
 
 Fallback continuation phrase:
 
