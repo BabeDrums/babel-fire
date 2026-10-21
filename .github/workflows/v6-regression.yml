@@ -18,7 +18,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Check JavaScript syntax
-        run: node --check app.js
+        run: |
+          node --check app.js
+          if [ -f v7-preview/preview.js ]; then
+            node --check v7-preview/preview.js
+          fi
       - name: Check whitespace
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
