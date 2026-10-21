@@ -1329,10 +1329,18 @@
     return sessionDone(p) && draftDone(p) && bounceDone(p);
   }
   function mapStepCount(p) {
-    return [structureDone(p), tracksDone(p), sectionStudyDone(p)].filter(Boolean).length;
+    if (!mapSetupComplete(p)) return 0;
+    if (!structureDone(p)) return 0;
+    if (!tracksDone(p)) return 1;
+    if (!sectionStudyDone(p)) return 2;
+    return 3;
   }
   function skeletonStepCount(p) {
-    return [sessionDone(p), draftDone(p), bounceDone(p)].filter(Boolean).length;
+    if (!mapDone(p)) return 0;
+    if (!sessionDone(p)) return 0;
+    if (!draftDone(p)) return 1;
+    if (!bounceDone(p)) return 2;
+    return 3;
   }
   function mapNextStepLabel(p) {
     if (!mapSetupComplete(p)) return "Song Setup";
@@ -1618,7 +1626,8 @@
     return STUDY_PHASES[index].steps.map((title) => ({ title, route: "roadmap", done: false, unlocked: false }));
   }
   function stepState(step) {
-    return step.done ? "done" : step.unlocked ? "current" : "locked";
+    if (!step.unlocked) return "locked";
+    return step.done ? "done" : "current";
   }
   function stepRow(step) {
     const state = stepState(step),
