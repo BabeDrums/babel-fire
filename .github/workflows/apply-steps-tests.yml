@@ -1,0 +1,36 @@
+name: Apply Steps test migration
+
+on:
+  push:
+    branches: [sol/steps-navigation-handoff]
+    paths:
+      - scripts/patch_steps_tests.py
+      - .github/workflows/apply-steps-tests.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/steps-navigation-handoff
+          fetch-depth: 0
+      - name: Patch retained V6 regressions
+        run: python3 scripts/patch_steps_tests.py
+      - name: Remove one-shot helpers
+        run: rm scripts/patch_steps_tests.py .github/workflows/apply-steps-tests.yml
+      - name: Validate Python and whitespace
+        run: |
+          python3 -m py_compile tests/test_v6.py
+          git diff --check
+      - name: Commit test migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Migrate retained regressions to FIRE Steps"
+          git push origin HEAD:sol/steps-navigation-handoff
