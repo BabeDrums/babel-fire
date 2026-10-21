@@ -777,17 +777,42 @@
       history.replaceState({ ...history.state, route }, "", location.pathname + location.search);
     }
   }
-  // Live Setup updates replace only derived Step navigation, preserving text/caret/IME.
-  function refreshMapProgress() {
-    const p = project(),
-      holder = app.querySelector(".phase-steps .group-card"),
-      count = app.querySelector(".step-count"),
-      done = mapStepCount(p);
-    if (count) count.textContent = `${done} of 3 complete`;
-    if (holder) holder.innerHTML = phaseStepsHtml(p, 0);
-    queueViewportFit();
+  // Live Setup updates patch existing Step rows in place so text/caret/IME
+// and a pointer gesture already aimed at a row remain stable.
+function refreshMapProgress() {
+  const p = project(),
+    holder = app.querySelector(".phase-steps .group-card"),
+    count = app.querySelector(".step-count"),
+    done = mapStepCount(p);
+  if (count) count.textContent = `${done} of 3 complete`;
+  if (holder) {
+    phaseStepDefinitions(p, 0).forEach((step) => {
+      const row = holder.querySelector(`.step-row[data-route="${step.route}"]`);
+      if (!row) return;
+      const state = stepState(step),
+        stateLabel =
+          state === "done" ? "Done" : state === "current" ? "Current" : "Locked",
+        trailing = row.querySelector(".step-trailing"),
+        label = row.querySelector(".step-state");
+      row.classList.remove("done", "current", "locked");
+      row.classList.add(state);
+      row.disabled = state === "locked";
+      row.setAttribute("aria-label", `${step.title}, ${stateLabel}`);
+      if (label) label.textContent = stateLabel;
+      const chev = trailing?.querySelector(".chev");
+      if (state === "locked") {
+        chev?.remove();
+      } else if (trailing && !chev) {
+        trailing.insertAdjacentHTML(
+          "beforeend",
+          '<span class="chev" aria-hidden="true">›</span>',
+        );
+      }
+    });
   }
-  let cancelGesture = null;
+  queueViewportFit();
+}
+let cancelGesture = null;
   function go(route, extra = {}, push = true) {
     cancelGesture?.();
     clearBoundarySelection();
