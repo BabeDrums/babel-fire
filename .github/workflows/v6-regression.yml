@@ -24,6 +24,9 @@ jobs:
             node --check v7-preview/app.js
             node --check v7-preview/model.js
           fi
+          if [ -f v7-preview/new-project.js ]; then
+            node --check v7-preview/new-project.js
+          fi
       - name: Check whitespace
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
