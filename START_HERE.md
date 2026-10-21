@@ -34,7 +34,7 @@ Always distinguish shipped production work from experimental V7 preview work.
 
 The V7 preview is intentionally isolated at `/v7-preview/` and uses `production-projects-v1-v7-preview`.
 
-Latest physical iPhone review says the V7 direction is **approved enough to move from architecture work into decluttering/polish**, but **not yet approved to replace production**.
+Latest physical iPhone review moved V7 into a **fundamentals polish gate**. The shell direction is promising, but **not yet approved to replace production**.
 
 The redesign question remains:
 
@@ -58,9 +58,9 @@ The current shell is meaningfully better and Project Home is starting to feel li
 
 Next concerns:
 
-- Short pages are still scrollable when they should fit and feel locked. The V7 preview currently uses blanket bottom scroll clearance; replace it with content-aware visual-viewport behavior so only genuinely tall pages scroll and receive Safari end clearance.
-- Enter a **declutter/polish phase** before migrating more complex editors. Ask what each page is actually for and remove duplicated navigation, status, explanatory, or continuation UI that does not earn its place.
-- Normalize spacing, heading offsets, row heights, action placement, and visual density across the preview.
+- The current fundamentals pass replaces blanket preview scroll padding with **content-aware visual-viewport fitting**: short phone pages should lock naturally while genuinely tall pages receive Safari end clearance.
+- The Page Necessity Audit is being applied route by route: redundant bottom “Back to Project” controls and duplicated completion wording are removed instead of restyled.
+- Shared spacing, heading offsets, row density, action placement, and placeholder presentation are being normalized before more editors migrate.
 - Fundamentals come before personality. Do not add decorative brand behavior until page purpose, navigation, scrolling, spacing, and consistency are stable.
 - A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
 
@@ -115,13 +115,12 @@ The user should **never need to ask for a handoff update again**.
 
 ## Next action
 
-Run the V7 fundamentals polish pass before migrating more editors:
+Complete and physically review the V7 fundamentals polish pass before migrating more editors:
 
-1. fix fake scrolling with content-aware iPhone Safari visual-viewport handling and more realistic short-height regression coverage,
-2. apply the Page Necessity Audit route by route and remove redundant UI,
-3. normalize shared spacing/density/action placement,
-4. physically review the calmer shell,
-5. only after the fundamentals pass, prototype any optional Babel signature/progress-path treatment separately.
+1. verify short pages no longer fake-scroll on physical iPhone Safari and genuinely tall pages still clear browser chrome,
+2. review the route-by-route subtraction and shared spacing/density polish,
+3. fix any physical-only issues without expanding scope,
+4. only after the fundamentals gate passes, consider a separate Babel signature/progress-path experiment.
 
 Fallback continuation phrase:
 
