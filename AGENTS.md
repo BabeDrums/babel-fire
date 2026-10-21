@@ -38,6 +38,16 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Do not introduce features outside the active approved scope unless required for correctness.
 - Remove replaced/dead interactions. Do not commit screenshots, temporary/debug fixtures, browser artifacts, caches, or environment-only files. Permanent regression tests and their representative test data belong in `tests/`.
 
+## Progression and navigation model — October 2026
+
+- User-facing workflow hierarchy is **Project → Phase → Step → Musical content**.
+- **Checkpoint** is historical/internal terminology only. Do not present phase navigation as manual checklist controls; completion is automatically derived from canonical project state.
+- Phase homes show ordered **Steps** with clear done/current/locked state. Completed Steps remain navigable for editing; locked Steps remain visible when they help orientation.
+- **Back = browser/history navigation.** It should truthfully reflect where the user came from rather than pretending to be a hierarchy jump.
+- **Center context title = fast in-project navigation.** A quiet interactive context title may occupy the center toolbar when it opens real navigation to useful destinations such as Project Overview, Roadmap, Notes, the current Phase, and available Steps.
+- **Roadmap = whole journey.** Do not turn the context navigator into a duplicate seven-phase Roadmap.
+- Passive center labels/pills are prohibited. If a center element looks interactive, it must perform navigation.
+- A future Projects/Notes tab bar or iPad sidebar is allowed only when Notes becomes a genuine app-level destination; do not add persistent app-level chrome before the product earns it.
 
 ## FIRE design-system operating rules — October 2026
 
@@ -49,9 +59,10 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Selection and completion are distinct semantics. Do not use completion checkmarks as generic selection decoration.
 - Prefer grouped rows/lists for structured text-heavy workflows; reserve cards for meaningful conceptual groups.
 - Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
-- Passive center pills are prohibited. Leading toolbar = navigation; trailing toolbar = contextual action; page title = current location.
+- Leading toolbar = navigation; trailing toolbar = contextual action. The center toolbar is normally quiet but may host the approved interactive context navigator described above.
 - iPad task sheets should prefer compact centered form/page-style presentation when appropriate; narrow phone layouts may use bottom-oriented sheets.
 - Short phone pages that fit within the visual viewport must not create unnecessary root scrolling or rubber-band drift. Use dynamic viewport sizing/overscroll containment while preserving natural scrolling when content genuinely exceeds the viewport.
+- Pages that genuinely scroll on iOS Safari must provide enough scroll-end clearance for the final interactive row to rise fully above dynamic browser chrome; short pages must not reserve that clearance and become fake-scroll pages.
 - Dense narrow-phone layouts should reduce redundant secondary copy and compact non-current states before shrinking controls. Preserve ~44px touch targets and progression/state clarity.
 - Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
 - Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
@@ -66,11 +77,14 @@ Normal sequence: task branch → implementation → tests → commit → push �
 - Git commit history is independent of FIRE product-version numbers. Never silently invent or increment a product version; a new version must represent an actual approved product milestone.
 - When the active generation changes, update its specification, `START_HERE.md`, and `CHANGELOG.md` together. Committing the current work does not create V5.1 or V6.
 
-## Documentation hygiene
+## Documentation hygiene and automatic handoff
 
 - `CONTEXT.md` is not a changelog. It stores durable product decisions, architecture principles, and reusable interaction rules. Preserve valid durable V5 additions; change it only when those rules change.
 - Task-specific implementation details, validation results, and review findings belong in the PR/completion report.
-- `START_HERE.md` is a short entry point, not a second context document. Keep its active-specification reference current.
+- `START_HERE.md` is the canonical zero-context handoff entry point, not a second context document. Keep its active-specification reference, current shipped/approved direction, physical-device review state, and next approved chunk current.
+- Every product/runtime or durable-rule PR that changes `app.js`, `styles.css`, `index.html`, `V6.md`, `CONTEXT.md`, or `AGENTS.md` must also refresh `START_HERE.md`. `scripts/check_handoff.py` and the CI **Handoff freshness** job enforce this automatically.
+- The user should never need to remember to request a handoff update. Handoff maintenance is part of FIRE's definition of done.
+- A brand-new chat should be able to continue after being pointed at `BabeDrums/babel-fire` by reading `README.md` → `START_HERE.md` and following this file's source-of-truth order.
 - `CHANGELOG.md` records meaningful product milestones, not every technical commit. Do not fabricate unverifiable history; Git contains detailed technical history.
 - Changelog milestone text describes the product milestone itself; avoid temporary PR-state wording that automatically becomes false on merge. Determine shipped/unmerged state from `main` and open PRs.
 - Avoid duplicating large bodies of information across files. Remove obsolete filenames and contradictory guidance rather than retaining duplicate context/specification files.
@@ -80,11 +94,12 @@ Normal sequence: task branch → implementation → tests → commit → push �
 An implementation task is not complete until:
 
 - Requested behavior is implemented and reviewed against the active specification.
-- Existing user data is preserved or has a tested forward migration, including imported backups.
+- Existing user data is preserved or has a tested forward migration, including imported legacy data.
 - Relevant regression tests pass; startup/JavaScript is clean with no known application console errors.
 - Touch interaction is checked at representative iPhone and iPad viewport widths.
 - Replaced/dead interaction code and temporary/debug artifacts are removed.
 - Documentation is updated only when durable rules changed, with milestones recorded in the changelog when appropriate.
+- `START_HERE.md` passes the handoff freshness check whenever the product/runtime or durable rules changed.
 - Remaining risks are explicitly stated, and completed work is committed, pushed, and opened as a PR for review.
 
 For V6, verify section add/edit/reorder/remove; open presence through existing and newly added sections; boundary/internal trimming; change creation/selection/trimming/removal/supersession; section slides; collapsed/expanded track states; forgiving hit targets; migration/data safety; history; and downstream invalidation.
