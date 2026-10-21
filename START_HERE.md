@@ -39,6 +39,7 @@ Always distinguish shipped work on `main`, unmerged work, and planned work. `REA
 
 - The design-system foundation lives in core `app.js` and `styles.css`; do not recreate `polish.css`, `polish.js`, MutationObserver visual rewrites, or a second override layer.
 - Map and Skeleton should share the same Phase Home / Step-list primitives rather than drifting into separate generations.
+- Live Song Setup validation must update existing Step rows **in place**. Do not replace the Step-list DOM on every keystroke; replacing a just-enabled row can swallow the user's immediate tap and break route progression.
 - Dormant Backup/Restore UI and implementation are not part of the current product. Keep the app focused on active workflow needs.
 - Preserve `production-projects-v1`, schema 5, stable section/track/range/event IDs, migrations, browser history, timeline semantics, durable notes, and downstream Skeleton behavior.
 - `app.js` remains a large static file by design for now. Prefer targeted consolidation/removal of dead or duplicate code; do **not** broad-module-refactor the stable timeline engine without a clear approved need.
