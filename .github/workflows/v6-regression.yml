@@ -27,6 +27,20 @@ jobs:
             git diff --check HEAD^
           fi
 
+  handoff:
+    name: Handoff freshness
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a current START_HERE handoff
+        run: >-
+          python3 scripts/check_handoff.py
+          "${{ github.event.pull_request.base.sha }}"
+          "${{ github.sha }}"
+
   browser:
     name: Chromium regression (${{ matrix.width }}px)
     runs-on: ubuntu-latest

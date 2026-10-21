@@ -152,7 +152,18 @@ These phase names are currently the core Recreation framework:
 6. **The World** — depth, width, reverb, delay, automation, movement
 7. **The Finish** — compare, revise, polish, complete
 
-Historically this was designed as 3 checkpoints per phase / 21 checkpoints total.
+Earlier versions described three checkpoints per phase / 21 checkpoints total. The current user-facing progression model calls ordered work inside a Phase **Steps**; completion is derived automatically and Phase homes must not look like manual checklists.
+
+
+### Current progression and navigation vocabulary — LOCKED
+
+FIRE's user-facing hierarchy is **Project → Phase → Step → Musical content**. `Checkpoint` is historical/internal wording only and must not return as the phase-home checklist metaphor.
+
+- **Back** follows actual browser/history navigation.
+- A quiet **interactive center context title** provides fast in-project navigation without becoming another passive pill. Phase homes use the project context; Step/review screens use their parent Phase context.
+- The context navigator may expose Project Overview, Roadmap, Notes, the current Phase, and relevant Steps. It does not duplicate the full seven-phase Roadmap.
+- **Roadmap** remains the whole-journey view.
+- Persistent app-level Projects/Notes navigation is deferred until the global Notes hub is a real top-level destination.
 
 ### Goal of a Recreation
 The target is a **complete finished reconstruction** taken as far as the user’s current ability allows.
@@ -188,7 +199,7 @@ Current conceptual workflow:
 5. **The Recording**
    - replace placeholders with intentional performances
 6. **The Mix**
-   - Balance → Shape → World as mix sub-checkpoints
+   - Balance → Shape → World as mix sub-steps
 7. **The Finish**
    - reference, revise, final mix/master/commit
 
@@ -261,7 +272,7 @@ Song Setup includes:
 - Grid
 - First Listen action state
 
-**LOCKED home-screen behavior:** The Map is an intentional exception to the otherwise minimal phase-home template because it has genuine setup work that must happen before analysis. Keep the full **Song Setup** controls directly on The Map home: Reference, Tempo, Meter, Grid, followed by the First Listen action card. Then show Checkpoints below. Do not hide setup behind a separate page, disclosure, compact row, or pill strip.
+**LOCKED home-screen behavior:** The Map is an intentional exception to the otherwise minimal phase-home template because it has genuine setup work that must happen before analysis. Keep the full **Song Setup** controls directly on The Map home: Reference, Tempo, Meter, Grid, followed by the First Listen action card. Then show the three ordered Steps below. Structure / Tracks / Section Study remain visible for orientation even when locked; do not replace them with one generic prerequisite card. Do not hide setup behind a separate page, disclosure, compact row, or pill strip.
 
 ### Structure
 Instruction style:
@@ -346,7 +357,7 @@ Creating DAW placeholder tracks belongs in **The Skeleton**.
 
 # 8. Section Study — LOCKED name
 
-Checkpoint 3 of The Map is:
+Step 3 of The Map is:
 ## **Section Study**
 
 Do not rename it back to “Production.”

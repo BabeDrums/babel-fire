@@ -4,6 +4,7 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## V6
 
+- Phase progression/navigation consolidation: user-facing Checkpoints become ordered Steps with derived done/current/locked state; Map and Skeleton share one Phase Home system; a real center context navigator provides fast project-local jumps while Back remains truthful history; true scrolling pages gain Safari end clearance; dormant Backup/Restore code is removed; and zero-context handoff freshness is CI-enforced.
 - Project/Map calmness foundation: unified Edit/Reset/Delete project actions, reset now preserves identity/details and archives workflow notes, Projects/Project overview carry less repeated phase chrome, Song Setup stays permanently editable with First Listen integrated into the same group, and Structure uses the compact continuation action pattern.
 - iPhone composition refinement: narrow-phone pages now let intrinsic content decide whether scrolling is needed instead of reserving a fake toolbar-height tail; The Map also uses a quieter grouped setup surface with less nested control chrome and a visually integrated First Listen row.
 - iPhone scroll/density refinement: short routes now use the dynamic visual viewport without unnecessary root bounce, while dense phone screens compact secondary detail instead of shrinking controls; Map checkpoints and Roadmap progression receive phone-specific density treatment and the Add Sections sheet wastes less vertical space.

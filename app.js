@@ -113,49 +113,49 @@
       title: "The Map",
       desc: "Understand the song before rebuilding it.",
       route: "map",
-      checkpoints: ["Structure", "Tracks", "Section Study"],
+      steps: ["Structure", "Tracks", "Section Study"],
     },
     {
       key: "skeleton",
       title: "The Skeleton",
       desc: "Build the complete draft.",
       route: "skeleton",
-      checkpoints: ["Session", "Draft", "Bounce"],
+      steps: ["Session", "Draft", "Bounce"],
     },
     {
       key: "sounds",
       title: "The Sounds",
       desc: "Match sounds and performances.",
       route: "roadmap",
-      checkpoints: ["Sources", "Performance", "Character"],
+      steps: ["Sources", "Performance", "Character"],
     },
     {
       key: "balance",
       title: "The Balance",
       desc: "Set levels, pan, and hierarchy.",
       route: "roadmap",
-      checkpoints: ["Levels", "Pan", "Hierarchy"],
+      steps: ["Levels", "Pan", "Hierarchy"],
     },
     {
       key: "shape",
       title: "The Shape",
       desc: "Shape tone and dynamics.",
       route: "roadmap",
-      checkpoints: ["Frequency", "Dynamics", "Character"],
+      steps: ["Frequency", "Dynamics", "Character"],
     },
     {
       key: "world",
       title: "The World",
       desc: "Create depth, width, and movement.",
       route: "roadmap",
-      checkpoints: ["Depth", "Width", "Movement"],
+      steps: ["Depth", "Width", "Movement"],
     },
     {
       key: "finish",
       title: "The Finish",
       desc: "Compare, revise, finish.",
       route: "roadmap",
-      checkpoints: ["A/B", "Revise", "Deliver"],
+      steps: ["A/B", "Revise", "Deliver"],
     },
   ];
   const ORIGINAL_PHASES = [
@@ -226,13 +226,16 @@
     const shellRect = app.getBoundingClientRect(),
       style = getComputedStyle(app),
       bottomPadding = Number.parseFloat(style.paddingBottom) || 0,
+      scrollClearance =
+        Number.parseFloat(style.getPropertyValue("--scroll-end-clearance")) || 0,
       flowBottom = [...app.children]
         .filter((el) => getComputedStyle(el).position !== "fixed")
         .reduce(
           (bottom, el) => Math.max(bottom, el.getBoundingClientRect().bottom),
           shellRect.top,
         ),
-      contentHeight = flowBottom - shellRect.top + bottomPadding,
+      contentHeight =
+        flowBottom - shellRect.top + Math.max(0, bottomPadding - scrollClearance),
       fits = contentHeight <= viewportHeight + 2;
     app.dataset.viewportFit = fits ? "true" : "false";
     document.documentElement.style.overflowY = fits ? "hidden" : "";
@@ -722,6 +725,7 @@
   function routeLabel(route) {
     const labels = {
       projects: "Projects",
+      "new-project": "Projects",
       project: project()?.type === "study" ? "Recreation" : "Original Song",
       map: "The Map",
       structure: "Structure",
@@ -773,28 +777,42 @@
       history.replaceState({ ...history.state, route }, "", location.pathname + location.search);
     }
   }
-  // Live Setup updates replace only derived controls, preserving text/caret/IME.
-  function refreshMapProgress() {
-    const p = project(),
-      holder = app.querySelector(".phase-checkpoints .group-card"),
-      count = app.querySelector(".checkpoint-count"),
-      setupDone = mapSetupComplete(p),
-      done = mapCheckpointCount(p);
-    if (count) count.textContent = `${done} of 3`;
-    if (!holder) return queueViewportFit();
-    const currentlyLocked = !!holder.querySelector(".checkpoint-locked-message");
-    if (!setupDone && !currentlyLocked) {
-      holder.innerHTML = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
-    } else if (setupDone && currentlyLocked) {
-      const studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
-      holder.innerHTML =
-        checkpointRow("Structure", "Map the form.", "structure", structureDone(p), true) +
-        checkpointRow("Tracks", "Identify what plays.", "tracks", tracksDone(p), structureDone(p)) +
-        checkpointRow("Section Study", "Map each section in time.", studyRoute, sectionStudyDone(p), tracksDone(p));
-    }
-    queueViewportFit();
+  // Live Setup updates patch existing Step rows in place so text/caret/IME
+// and a pointer gesture already aimed at a row remain stable.
+function refreshMapProgress() {
+  const p = project(),
+    holder = app.querySelector(".phase-steps .group-card"),
+    count = app.querySelector(".step-count"),
+    done = mapStepCount(p);
+  if (count) count.textContent = `${done} of 3 complete`;
+  if (holder) {
+    phaseStepDefinitions(p, 0).forEach((step) => {
+      const row = holder.querySelector(`.step-row[data-route="${step.route}"]`);
+      if (!row) return;
+      const state = stepState(step),
+        stateLabel =
+          state === "done" ? "Done" : state === "current" ? "Current" : "Locked",
+        trailing = row.querySelector(".step-trailing"),
+        label = row.querySelector(".step-state");
+      row.classList.remove("done", "current", "locked");
+      row.classList.add(state);
+      row.disabled = state === "locked";
+      row.setAttribute("aria-label", `${step.title}, ${stateLabel}`);
+      if (label) label.textContent = stateLabel;
+      const chev = trailing?.querySelector(".chev");
+      if (state === "locked") {
+        chev?.remove();
+      } else if (trailing && !chev) {
+        trailing.insertAdjacentHTML(
+          "beforeend",
+          '<span class="chev" aria-hidden="true">›</span>',
+        );
+      }
+    });
   }
-  let cancelGesture = null;
+  queueViewportFit();
+}
+let cancelGesture = null;
   function go(route, extra = {}, push = true) {
     cancelGesture?.();
     clearBoundarySelection();
@@ -804,8 +822,6 @@
     ui.selectedPresenceId = null;
     const fromRoute = ui.route,
       fromLabel = routeLabel(fromRoute);
-    if (route !== fromRoute && (route === "map" || fromRoute === "map"))
-      ui.setupExpanded = false;
     routeMotion =
       fromRoute === "projects" && route === "new-project"
         ? "route-forward"
@@ -881,6 +897,14 @@
       label = state.fromRoute ? routeLabel(resolveRoute(state.fromRoute)) : fallbackLabel;
     return `<button class="nav-btn left" data-action="history-back" data-fallback-route="${fallbackRoute}"><span class="arrow">‹</span>${esc(label)}</button>`;
   }
+  function contextButton(label) {
+    return `<button class="context-nav-button" data-action="open-context-nav" aria-haspopup="dialog" aria-label="Navigate ${esc(label)}"><span>${esc(label)}</span><span class="context-caret" aria-hidden="true">⌄</span></button>`;
+  }
+  function phaseIndexForRoute(route) {
+    if (["skeleton", "skeleton-session", "skeleton-draft", "skeleton-bounce"].includes(route)) return 1;
+    if (["map", "structure", "tracks", "section-study", "map-summary"].includes(route)) return 0;
+    return Math.min(currentStudyPhaseIndex(project()), 1);
+  }
   function topbar(left = "", center = "", right = "") {
     // Canvas size follows content, not the user's device or input method.
     app.dataset.route = ui.route;
@@ -896,17 +920,13 @@
   function workflowPage(title, subtitle, body, status = "") {
     return `<main class="workflow-page">${workflowHeading(title, subtitle, status)}${body}</main>`;
   }
-  function workflowPhaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
+  function workflowPhaseHome(index, done, total, stepsHtml, beforeHtml = "") {
     const p = project(),
-      pct = total ? Math.round((done / total) * 100) : 0,
-      progress = index === 0
-        ? ""
-        : `<div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div>`,
-      body = `<div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div>${progress}<div class="group-card list">${checkpointsHtml}</div></section></div>`;
+      body = `<div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-steps"><div class="step-head"><div class="section-kicker">Steps</div><span class="step-count">${done} of ${total} complete</span></div><div class="group-card list">${stepsHtml}</div></section></div>`;
     return (
       topbar(
         backButton("project", p?.title || "Project"),
-        "",
+        contextButton(p?.title || "Project"),
         savedMark(),
       ) + workflowPage(STUDY_PHASES[index].title, STUDY_PHASES[index].desc, body)
     );
@@ -918,17 +938,6 @@
   }
   function savedMark() {
     return `<span class="saved">Saved</span>`;
-  }
-  function phaseTag(text) {
-    return `<span class="pill-tag">${esc(text)}</span>`;
-  }
-  function phasePill(index) {
-    const ph = STUDY_PHASES[index];
-    return `<button class="phase-pill" data-action="go" data-route="${ph.route}" aria-label="Open ${esc(ph.title)}">${esc(ph.title)}</button>`;
-  }
-  function progressBar(done, total) {
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return `<div class="progress"><span style="width:${pct}%"></span></div><div class="progress-meta"><span>${done} of ${total}</span></div>`;
   }
 
   function sections(p = project()) {
@@ -1344,13 +1353,33 @@
   function skeletonDone(p) {
     return sessionDone(p) && draftDone(p) && bounceDone(p);
   }
-  function mapCheckpointCount(p) {
-    return [structureDone(p), tracksDone(p), sectionStudyDone(p)].filter(
-      Boolean,
-    ).length;
+  function mapStepCount(p) {
+    if (!mapSetupComplete(p)) return 0;
+    if (!structureDone(p)) return 0;
+    if (!tracksDone(p)) return 1;
+    if (!sectionStudyDone(p)) return 2;
+    return 3;
   }
-  function skeletonCheckpointCount(p) {
-    return [sessionDone(p), draftDone(p), bounceDone(p)].filter(Boolean).length;
+  function skeletonStepCount(p) {
+    if (!mapDone(p)) return 0;
+    if (!sessionDone(p)) return 0;
+    if (!draftDone(p)) return 1;
+    if (!bounceDone(p)) return 2;
+    return 3;
+  }
+  function mapNextStepLabel(p) {
+    if (!mapSetupComplete(p)) return "Song Setup";
+    if (!structureDone(p)) return "Structure";
+    if (!tracksDone(p)) return "Tracks";
+    if (!sectionStudyDone(p)) return "Section Study";
+    if (!mapDone(p)) return "Review Map";
+    return "Complete";
+  }
+  function skeletonNextStepLabel(p) {
+    if (!sessionDone(p)) return "Session";
+    if (!draftDone(p)) return "Draft";
+    if (!bounceDone(p)) return "Bounce";
+    return "Complete";
   }
   function currentStudyPhaseIndex(p) {
     if (!mapDone(p)) return 0;
@@ -1525,13 +1554,12 @@
       return originalSparkDone(p) ? "The Direction" : "The Spark";
     const index = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[index].title,
-      progress =
-        index === 0
-          ? `${mapCheckpointCount(p)} of 3`
-          : index === 1
-            ? `${skeletonCheckpointCount(p)} of 3`
-            : "";
-    return [phase, progress].filter(Boolean).join(" · ");
+      next = index === 0
+        ? mapNextStepLabel(p)
+        : index === 1
+          ? skeletonNextStepLabel(p)
+          : "";
+    return [phase, next].filter(Boolean).join(" · ");
   }
   function projectOverviewBody(phaseTitle, progress, route, roadmapCopy) {
     return `<div class="project-overview"><section class="project-current"><button class="project-current-card" data-action="go" data-route="${route}" aria-label="Open ${esc(phaseTitle)}"><div><h3>${esc(phaseTitle)}</h3>${progress ? `<div class="project-phase-meta">${esc(progress)}</div>` : ""}</div><span class="chev" aria-hidden="true">›</span></button></section><section class="project-support"><div class="quick-grid"><button class="quick-card" data-action="go" data-route="roadmap"><strong>Roadmap</strong><span>${esc(roadmapCopy)}</span></button><button class="quick-card" data-action="go" data-route="notes"><strong>Notes</strong><span>Questions and takeaways.</span></button></div></section></div>`;
@@ -1563,17 +1591,21 @@
     if (p.type === "original") return renderOriginalOverview();
     const phaseIndex = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[phaseIndex],
+      phaseRoute =
+        phaseIndex === 0 && sectionStudyDone(p) && !mapDone(p)
+          ? "map-summary"
+          : phase.route,
       context = [p.artist, "Recreation"].filter(Boolean).join(" · "),
       phaseProgress =
         phaseIndex === 0
-          ? `${mapCheckpointCount(p)} of 3 checkpoints`
+          ? `Next: ${mapNextStepLabel(p)}`
           : phaseIndex === 1
-            ? `${skeletonCheckpointCount(p)} of 3 checkpoints`
+            ? `Next: ${skeletonNextStepLabel(p)}`
             : "Open roadmap";
     const body = projectOverviewBody(
       phase.title,
       phaseProgress,
-      phase.route,
+      phaseRoute,
       "Seven phases to a finished rebuild.",
     );
     app.innerHTML =
@@ -1607,40 +1639,42 @@
   }
 
 
-  function checkpointRow(title, desc, route, done, unlocked = true) {
-    return `<button class="list-row" data-action="go" data-route="${route}" ${unlocked ? "" : "disabled"}>${done ? `<span class="round-check on"></span>` : unlocked ? `<span class="status-dot"></span>` : `<span class="lock-dot">•</span>`}<div><div class="title">${esc(title)}</div><div class="desc">${esc(desc)}</div></div><span class="chev">${unlocked ? "›" : ""}</span></button>`;
+  function phaseStepDefinitions(p, index) {
+    if (index === 0)
+      return [
+        { title: "Structure", route: "structure", done: structureDone(p), unlocked: mapSetupComplete(p) },
+        { title: "Tracks", route: "tracks", done: tracksDone(p), unlocked: structureDone(p) },
+        { title: "Section Study", route: "section-study", done: sectionStudyDone(p), unlocked: tracksDone(p) },
+      ];
+    if (index === 1)
+      return [
+        { title: "Session", route: "skeleton-session", done: sessionDone(p), unlocked: mapDone(p) },
+        { title: "Draft", route: "skeleton-draft", done: draftDone(p), unlocked: sessionDone(p) },
+        { title: "Bounce", route: "skeleton-bounce", done: bounceDone(p), unlocked: draftDone(p) },
+      ];
+    return STUDY_PHASES[index].steps.map((title) => ({ title, route: "roadmap", done: false, unlocked: false }));
+  }
+  function stepState(step) {
+    if (!step.unlocked) return "locked";
+    return step.done ? "done" : "current";
+  }
+  function stepRow(step) {
+    const state = stepState(step),
+      stateLabel = state === "done" ? "Done" : state === "current" ? "Current" : "Locked";
+    return `<button class="step-row ${state}" data-action="go" data-route="${step.route}" aria-label="${esc(step.title)}, ${stateLabel}" ${state === "locked" ? "disabled" : ""}><span class="title">${esc(step.title)}</span><span class="step-trailing"><span class="step-state">${stateLabel}</span>${state === "locked" ? "" : '<span class="chev" aria-hidden="true">›</span>'}</span></button>`;
+  }
+  function phaseStepsHtml(p, index) {
+    return phaseStepDefinitions(p, index).map(stepRow).join("");
   }
   function actionCard(title, copy, on, action, disabled = false, attrs = "") {
     return `<button class="action-card ${on ? "on" : ""}" data-action="${action}" aria-pressed="${!!on}" ${attrs} ${disabled ? "disabled" : ""}><div><strong>${esc(title)}</strong>${copy ? `<span class="copy">${esc(copy)}</span>` : ""}</div><span class="round-check ${on ? "on" : ""}"></span></button>`;
   }
-  function phaseHome(index, done, total, checkpointsHtml, beforeHtml = "") {
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return (
-      topbar(
-        backButton("project", "Recreation"),
-        `<button class="phase-pill" data-action="go" data-route="project">Recreation</button>`,
-        savedMark(),
-      ) +
-      `<h2>${STUDY_PHASES[index].title}</h2><div class="phase-layout ${beforeHtml ? "with-setup" : ""}">${beforeHtml ? `<section class="phase-setup">${beforeHtml}</section>` : ""}<section class="phase-checkpoints"><div class="checkpoint-head"><div class="section-kicker">Checkpoints</div><span class="checkpoint-count">${done} of ${total}</span></div><div class="progress checkpoint-progress"><span style="width:${pct}%"></span></div><div class="group-card list">${checkpointsHtml}</div></section></div>`
-    );
-  }
   function renderMapHome() {
     const p = project(),
       m = p.map,
-      done = mapCheckpointCount(p),
-      setupDone = mapSetupComplete(p),
-      structureUnlocked = setupDone,
-      tracksUnlocked = structureDone(p),
-      studyUnlocked = tracksDone(p),
-      studyRoute = sectionStudyCoreDone(p) ? "map-summary" : "section-study";
+      done = mapStepCount(p);
     const setup = `<div class="section-kicker">Song Setup</div><div class="group-card setup-panel"><div class="setup-row"><div class="setup-label">Reference</div><button class="state-control ${m.setup.reference ? "on" : ""}" data-action="toggle-setup" data-field="reference"><span>${m.setup.reference ? "Imported" : "Import"}</span><span class="check-circle"></span></button></div><div class="setup-row"><div class="setup-label">Tempo</div><div class="setup-value"><input id="tempoInput" aria-label="Tempo in BPM" inputmode="decimal" value="${esc(m.setup.tempo)}" placeholder="—"><span class="suffix">BPM</span></div></div><div class="setup-row"><div class="setup-label">Meter</div><div class="setup-value"><select id="meterInput" aria-label="Meter">${["4/4", "3/4", "6/8", "5/4", "7/8"].map((x) => `<option ${m.setup.meter === x ? "selected" : ""}>${x}</option>`).join("")}</select></div></div><div class="setup-row"><div class="setup-label">Grid</div><button class="state-control ${m.setup.grid ? "on" : ""}" data-action="toggle-setup" data-field="grid"><span>${m.setup.grid ? "Aligned" : "Align"}</span><span class="check-circle"></span></button></div><button class="setup-listen-row ${m.setup.firstListen ? "on" : ""}" data-action="toggle-setup" data-field="firstListen" aria-pressed="${!!m.setup.firstListen}"><div><strong>First Listen</strong><span>Play the full song once without stopping.</span></div><span class="round-check ${m.setup.firstListen ? "on" : ""}"></span></button></div>`;
-    let checkpoints =
-      checkpointRow("Structure", "Map the form.", "structure", structureDone(p), structureUnlocked) +
-      checkpointRow("Tracks", "Identify what plays.", "tracks", tracksDone(p), tracksUnlocked) +
-      checkpointRow("Section Study", "Map each section in time.", studyRoute, sectionStudyDone(p), studyUnlocked);
-    if (!setupDone)
-      checkpoints = `<div class="list-row static no-status checkpoint-locked-message"><div><div class="title">Available after Song Setup</div></div></div>`;
-    app.innerHTML = workflowPhaseHome(0, done, 3, checkpoints, setup);
+    app.innerHTML = workflowPhaseHome(0, done, 3, phaseStepsHtml(p, 0), setup);
   }
 
   function renderStructure() {
@@ -1658,8 +1692,8 @@
           : `<div class="empty">No sections yet.</div>`
       }</div><button class="add-section-row" data-action="open-add-section">+ Add section</button><div class="structure-verify">${actionCard("Verify structure", "Confirm the order, lengths, and boundaries.", p.map.structureVerified, "toggle-structure-verified", !lengthsComplete(p))}</div>${done ? `<div class="structure-next-wrap"><button class="primary" data-action="go" data-route="tracks">Next</button></div>` : ""}`;
     app.innerHTML =
-      topbar(historyBackButton("map", "The Map"), "", savedMark()) +
-      workflowPage("Structure", "Build the song one section at a time.", body, "1 of 3");
+      topbar(historyBackButton("map", "The Map"), contextButton("The Map"), savedMark()) +
+      workflowPage("Structure", "Build the song one section at a time.", body, "Step 1 of 3");
     installSorting();
   }
   function renderTracks() {
@@ -1669,8 +1703,8 @@
       choices = [...COMMON_TRACKS, ...custom.map((t) => t.name)];
     const body = `<div class="choice-wrap">${choices.map((name) => `<button class="choice ${selectedNames.has(name) ? "selected" : ""}" data-action="toggle-track-choice" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("")}</div><div class="inline-add"><input aria-label="Custom track name" class="field" id="customTrack" placeholder="Other..."><button class="secondary" data-action="add-custom-track">Add</button></div>${tracksDone(p) ? `<div class="tracks-next-wrap"><button class="primary" data-action="start-section-study">Next</button></div>` : ""}`;
     app.innerHTML =
-      topbar(historyBackButton("structure", "Structure"), "", savedMark()) +
-      workflowPage("Tracks", "Select everything that appears somewhere in the song.", body, "2 of 3");
+      topbar(historyBackButton("structure", "Structure"), contextButton("The Map"), savedMark()) +
+      workflowPage("Tracks", "Select everything that appears somewhere in the song.", body, "Step 2 of 3");
   }
 
   function rulerHtml(bars) {
@@ -1840,7 +1874,7 @@
     const p = project();
     if (!structureDone(p) || !tracksDone(p)) {
       app.innerHTML =
-        topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
+        topbar(historyBackButton("map", "The Map"), contextButton("The Map"), savedMark()) +
         `<h2>Section Study</h2><p class="sub">Finish Structure and Tracks first.</p>`;
       return;
     }
@@ -1851,7 +1885,7 @@
     app.innerHTML =
       topbar(
         historyBackButton("map", "The Map"),
-        phasePill(0),
+        contextButton("The Map"),
         savedMark(),
       ) +
       `<div class="horizontal-nav">${sections(p)
@@ -1930,7 +1964,7 @@
       labels = sectionLabels(p),
       unused = tracks(p).filter((t) => !trackUsedAnywhere(p, t.id));
     app.innerHTML =
-      topbar(historyBackButton("map", "The Map"), phasePill(0), savedMark()) +
+      topbar(historyBackButton("map", "The Map"), contextButton("The Map"), savedMark()) +
       `<h2>Review Map</h2><p class="sub">Listen once more and fix anything that doesn’t match.</p><div class="section-kicker">Structure</div><div class="chip-list">${sections(
         p,
       )
@@ -1982,30 +2016,8 @@
 
   function renderSkeletonHome() {
     const p = project(),
-      done = skeletonCheckpointCount(p),
-      checkpoints =
-        checkpointRow(
-          "Session",
-          "Create tracks and section markers.",
-          "skeleton-session",
-          sessionDone(p),
-          mapDone(p),
-        ) +
-        checkpointRow(
-          "Draft",
-          "Build every mapped part end to end.",
-          "skeleton-draft",
-          draftDone(p),
-          sessionDone(p),
-        ) +
-        checkpointRow(
-          "Bounce",
-          "Export and hear the complete draft.",
-          "skeleton-bounce",
-          bounceDone(p),
-          draftDone(p),
-        );
-    app.innerHTML = phaseHome(1, done, 3, checkpoints);
+      done = skeletonStepCount(p);
+    app.innerHTML = workflowPhaseHome(1, done, 3, phaseStepsHtml(p, 1));
   }
   function refreshSkeletonChecks() {
     const p = project();
@@ -2030,10 +2042,10 @@
     app.innerHTML =
       topbar(
         historyBackButton("skeleton", "The Skeleton"),
-        phasePill(1),
+        contextButton("The Skeleton"),
         savedMark(),
       ) +
-      `<div class="work-position">1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="session-groups"><section><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
+      `<div class="work-position">Step 1 of 3</div><h2>Session</h2><p class="sub">Create the tracks and markers from The Map.</p><div class="session-groups"><section><div class="section-kicker">Tracks</div><div class="group-card list">${tracks(
         p,
       )
         .map(
@@ -2065,8 +2077,8 @@
   }
   function renderSkeletonDraft() {
     const p = project();
-    app.innerHTML = topbar(historyBackButton("skeleton", "The Skeleton"), phasePill(1), savedMark()) +
-      `<div class="work-position">2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div><div class="draft-sections">${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
+    app.innerHTML = topbar(historyBackButton("skeleton", "The Skeleton"), contextButton("The Skeleton"), savedMark()) +
+      `<div class="work-position">Step 2 of 3</div><h2>Draft</h2><p class="sub">Build each mapped part.</p><p id="draftCoverage" class="coverage" aria-live="polite">${draftCoverage(p)}</p><div class="section-kicker">Sections</div><div class="draft-sections">${sections(p).map((sec, i) => draftSectionHtml(p, sec, i)).join("")}</div><div class="spacer-24"></div><button class="primary full" data-action="go" data-route="skeleton-bounce" ${draftDone(p) ? "" : "disabled"}>Next</button>`;
   }
   function refreshDraftChecks() {
     const p = project();
@@ -2090,10 +2102,10 @@
     app.innerHTML =
       topbar(
         historyBackButton("skeleton", "The Skeleton"),
-        phasePill(1),
+        contextButton("The Skeleton"),
         savedMark(),
       ) +
-      `<div class="work-position">3 of 3</div><h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
+      `<div class="work-position">Step 3 of 3</div><h2>Bounce</h2><p class="sub">Hear the complete arrangement as one song.</p><div class="section-kicker">Bounce</div>${actionCard("Export draft bounce", "One beginning-to-end bounce.", p.skeleton.bounce.exported, "toggle-bounce-export")}${actionCard("Listen start to finish", "Play the bounce once without stopping.", p.skeleton.bounce.listened, "toggle-bounce-listen", !p.skeleton.bounce.exported)}<div class="spacer-24"></div><button class="primary full" data-action="go" data-route="roadmap" ${skeletonDone(p) ? "" : "disabled"}>View Roadmap</button>`;
   }
 
   function renderRoadmap() {
@@ -2109,7 +2121,7 @@
       return;
     }
     app.innerHTML =
-      topbar(backButton("project", "Recreation"), "", "") +
+      topbar(backButton("project", "Recreation"), contextButton(p.title), "") +
       `<h2>Roadmap</h2><p class="sub">Seven phases from analysis to finished rebuild.</p><div class="spacer-18"></div><div class="roadmap-grid">${STUDY_PHASES.map(
         (ph, i) => {
           const st = studyPhaseStatus(p, i),
@@ -2128,7 +2140,7 @@
                 ? `<span class="micro">${status}</span>`
                 : "",
             checks = st === "current"
-              ? `<div class="road-checks">${ph.checkpoints.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div>`
+              ? `<div class="road-checks">${ph.steps.map((x) => `<span class="road-check">${esc(x)}</span>`).join("")}</div>`
               : "";
           return `<${tag} class="road-phase ${st} ${unlocked ? "clickable" : ""}" ${unlocked ? `data-action="go" data-route="${ph.route}"` : ""}><div class="road-top">${st === "done" ? `<span class="round-check on"></span>` : st === "current" ? `<span class="current-ring"></span>` : `<div class="road-num">${i + 1}</div>`}<div><h3>${esc(ph.title)}</h3>${detail}</div>${unlocked ? `<span class="chev">›</span>` : ""}</div>${checks}</${tag}>`;
         },
@@ -2158,7 +2170,7 @@
     }
     const sectionsHtml = `<div class="notes-columns"><section><div class="section-kicker">Parking Lot</div>${parking.length ? parking.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">Nothing parked yet.</div>'}</section><section><div class="section-kicker">Takeaways</div>${takeaways.length ? takeaways.map(([ctx, text]) => noteCard(ctx, text)).join("") : '<div class="empty">No takeaways yet.</div>'}</section></div>${saved.length ? `<section class="saved-notes"><div class="section-kicker">Saved Notes</div>${saved.map(([ctx, text]) => noteCard(ctx, text)).join("")}</section>` : ""}`;
     app.innerHTML =
-      topbar(backButton("project", p.type === "study" ? "Recreation" : "Original Song"), "", "") +
+      topbar(backButton("project", p.type === "study" ? "Recreation" : "Original Song"), contextButton(p.title), "") +
       `<h2>Notes</h2><p class="sub">Review project notes and takeaways.</p>${sectionsHtml}`;
   }
   function noteCard(ctx, text) {
@@ -2181,7 +2193,7 @@
     app.innerHTML =
       topbar(
         backButton("project", "Original Song"),
-        phaseTag("The Spark"),
+        contextButton(p.title),
         savedMark(),
       ) +
       `<h1>Start with what you have</h1><p class="sub">Capture the thing that made you want to make something.</p><div class="section-kicker">Starting With</div><div class="choice-wrap">${starts.map((x) => `<button class="choice ${p.spark.starts.includes(x) ? "selected" : ""}" data-action="toggle-spark-start" data-name="${x}">${x}</button>`).join("")}</div><div class="section-kicker">The Idea</div><textarea class="textarea" data-input="spark-idea" placeholder="What do you have right now?">${esc(p.spark.idea)}</textarea><div class="section-kicker">What Makes It Worth Keeping?</div><div class="choice-wrap">${reasons.map((x) => `<button class="choice ${p.spark.reasons.includes(x) ? "selected" : ""}" data-action="toggle-spark-reason" data-name="${x}">${x}</button>`).join("")}</div><div class="section-kicker">Anchor</div><textarea class="textarea" data-input="spark-anchor" placeholder="What absolutely should survive as this song grows?">${esc(p.spark.anchor)}</textarea>`;
@@ -2290,6 +2302,28 @@
           end: chosen?.range.end ? { ...chosen.range.end } : null,
         };
   }
+
+  function contextNavRow(title, route, status = "", disabled = false) {
+    return `<button class="context-nav-row" data-action="context-go" data-route="${route}" ${disabled ? "disabled" : ""}><span>${esc(title)}</span>${status ? `<span class="context-nav-status">${esc(status)}</span>` : ""}</button>`;
+  }
+  function openContextNavigator() {
+    const p = project();
+    if (!p) return;
+    if (p.type === "original") {
+      sheetRoot.innerHTML = `<div class="sheet context-nav-sheet"><div class="context-nav-head"><div><span class="micro">Navigate</span><strong>${esc(p.title)}</strong></div><button class="context-nav-close" data-action="close-sheet" aria-label="Close navigation">×</button></div><div class="context-nav-group">${contextNavRow("Project Overview", "project")}${contextNavRow("Roadmap", "roadmap")}${contextNavRow("Notes", "notes")}</div><div class="context-nav-phase">The Spark</div><div class="context-nav-group">${contextNavRow("The Spark", "original-spark", "Phase")}</div></div>`;
+      openSheet();
+      return;
+    }
+    const phaseIndex = phaseIndexForRoute(ui.route),
+      phase = STUDY_PHASES[phaseIndex],
+      steps = phaseStepDefinitions(p, phaseIndex),
+      review =
+        phaseIndex === 0 && sectionStudyCoreDone(p)
+          ? contextNavRow("Review Map", "map-summary", mapDone(p) ? "Complete" : "Review")
+          : "";
+    sheetRoot.innerHTML = `<div class="sheet context-nav-sheet"><div class="context-nav-head"><div><span class="micro">Navigate</span><strong>${esc(p.title)}</strong></div><button class="context-nav-close" data-action="close-sheet" aria-label="Close navigation">×</button></div><div class="context-nav-group">${contextNavRow("Project Overview", "project")}${contextNavRow("Roadmap", "roadmap")}${contextNavRow("Notes", "notes")}</div><div class="context-nav-phase">${esc(phase.title)}</div><div class="context-nav-group">${contextNavRow(phase.title, phase.route, "Phase")}${steps.map((step) => { const state = stepState(step); return contextNavRow(step.title, step.route, state === "done" ? "Done" : state === "current" ? "Current" : "Locked", state === "locked"); }).join("")}${review}</div></div>`;
+    openSheet();
+  }
   function openSettings() {
     const p = project();
     if (p) openProjectMenu(p.id);
@@ -2314,6 +2348,10 @@
     if (heading) {
       heading.id = "sheetTitle";
       sheetRoot.setAttribute("aria-labelledby", "sheetTitle");
+      sheetRoot.removeAttribute("aria-label");
+    } else {
+      sheetRoot.removeAttribute("aria-labelledby");
+      sheetRoot.setAttribute("aria-label", "Project navigation");
     }
     sheetRoot.setAttribute("role", "dialog");
     sheetRoot.setAttribute("aria-modal", "true");
@@ -2324,7 +2362,9 @@
     sheetRoot.setAttribute("aria-hidden", "false");
     app.inert = true;
     document.getElementById("undoNotice").inert = true;
-    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+    const focusTarget = heading || sheetRoot.querySelector("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled)");
+    if (heading) heading.tabIndex = -1;
+    focusTarget?.focus({ preventScroll: true });
   }
   function closeSheet() {
     app.inert = false;
@@ -2795,6 +2835,7 @@
       }
       return go(b.dataset.fallbackRoute || "project");
     }
+    if (action === "open-context-nav") return openContextNavigator();
     if (action === "go") return go(b.dataset.route);
     if (action === "new-project") return go("new-project");
     if (action === "set-new-type") {
@@ -3090,6 +3131,11 @@
     const action = b.dataset.action,
       p = project();
     if (action === "close-sheet") return closeSheet();
+    if (action === "context-go") {
+      const route = b.dataset.route;
+      closeSheet();
+      return go(route);
+    }
     if (action === "edit-project") return openEditProjectSheet(b.dataset.id);
     if (action === "save-project-details") {
       const target = db.projects.find((x) => x.id === b.dataset.id),
@@ -3218,11 +3264,6 @@
       offerUndo(before, "Change added");
       return renderSectionStudy();
     }
-    if (action === "export-backup") return exportBackup();
-    if (action === "import-backup") {
-      document.getElementById("importFile").click();
-      return;
-    }
     if (action === "reset-project") {
       const target = db.projects.find((x) => x.id === b.dataset.id) || p;
       if (target && confirm(`Reset ${target.title}? Progress will be cleared, but project details and notes will stay.`)) {
@@ -3256,54 +3297,6 @@
     if (i >= 0) arr.splice(i, 1);
     else arr.push(val);
   }
-  function exportBackup() {
-    const blob = new Blob([JSON.stringify(db, null, 2)], {
-        type: "application/json",
-      }),
-      url = URL.createObjectURL(blob),
-      a = document.createElement("a");
-    a.href = url;
-    a.download = "babel-fire-backup.json";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  document
-    .getElementById("importFile")
-    .addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const parsed = JSON.parse(await file.text());
-        if (!parsed || !Array.isArray(parsed.projects)) throw new Error();
-        const normalized = normalizeDatabase(parsed);
-        db = normalized;
-        clearUndo();
-        persist();
-        closeSheet();
-        ui = {
-          route: "projects",
-          sectionIndex: 0,
-          newType: "original",
-          expandedTrackId: null,
-          animating: false,
-        };
-        history.replaceState(
-          {
-            route: "projects",
-            projectId: db.currentProjectId,
-            fromRoute: null,
-            fromLabel: null,
-          },
-          "",
-          location.pathname + location.search,
-        );
-        render();
-      } catch (err) {
-        alert("That backup could not be imported.");
-      } finally {
-        e.target.value = "";
-      }
-    });
 
   // Editor state is transient. Only musical anchors and project progress are persisted.
   let undoState = null;

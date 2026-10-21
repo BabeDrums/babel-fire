@@ -10,6 +10,8 @@ class FireDesignSystemSource(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.css = (ROOT / "styles.css").read_text(encoding="utf-8")
+        cls.app = (ROOT / "app.js").read_text(encoding="utf-8")
+        cls.index = (ROOT / "index.html").read_text(encoding="utf-8")
 
     def test_no_second_polish_or_fire_override_layer(self):
         self.assertNotIn("FIRE DESIGN SYSTEM FOUNDATION — OCTOBER 2026", self.css)
@@ -27,11 +29,12 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('display: none;', self.css)
         self.assertIn('.round-check.on:after', self.css)
 
-    def test_parent_navigation_keeps_function_but_loses_pill_chrome(self):
-        self.assertIn('.topbar .center .phase-pill {', self.css)
-        self.assertIn('background: transparent;', self.css)
-        self.assertIn('border: 0;', self.css)
-        self.assertIn('.topbar .center .pill-tag {\n  display: none;', self.css)
+    def test_center_navigation_is_functional_not_a_passive_pill(self):
+        self.assertIn('.context-nav-button {', self.css)
+        self.assertIn('data-action="open-context-nav"', self.app)
+        self.assertNotIn('class="phase-pill"', self.app)
+        self.assertNotIn('.topbar .center .phase-pill {', self.css)
+        self.assertNotIn('pill-tag', self.app)
 
     def test_structure_and_roadmap_share_grouped_list_language(self):
         self.assertIn('.structure-list {\n  display: block;', self.css)
@@ -41,11 +44,12 @@ class FireDesignSystemSource(unittest.TestCase):
     def test_short_pages_use_dynamic_viewport_without_root_bounce(self):
         self.assertGreaterEqual(self.css.count('min-height: 100dvh;'), 2)
         self.assertIn('overscroll-behavior-y: none;', self.css)
-        self.assertIn('padding-bottom: calc(24px + env(safe-area-inset-bottom));', self.css)
+        self.assertIn('--scroll-end-clearance: 0px;', self.css)
+        self.assertIn('.app-shell[data-viewport-fit="false"]', self.css)
 
     def test_phone_map_and_roadmap_have_compact_density_rules(self):
         self.assertIn('#app[data-route="map"] .setup-row', self.css)
-        self.assertIn('#app[data-route="map"] .phase-checkpoints .list-row .desc', self.css)
+        self.assertIn('#app[data-route="map"] .phase-steps', self.css)
         self.assertIn('#app[data-route="roadmap"] .road-phase:not(.current) .road-top p', self.css)
         self.assertIn('.section-builder .builder-status:empty', self.css)
         self.assertIn('.section-builder .sheet-error:empty', self.css)
@@ -57,6 +61,12 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('border-radius: var(--radius-card);', self.css)
         self.assertIn('border-bottom: 1px solid var(--line);', self.css)
         self.assertIn('#app[data-route="map"] .phase-setup .setup-listen-row {', self.css)
+
+    def test_dead_backup_and_inline_polish_are_removed(self):
+        self.assertNotIn('data-action="export-backup"', self.app)
+        self.assertNotIn('data-action="import-backup"', self.app)
+        self.assertNotIn('id="importFile"', self.index)
+        self.assertNotIn('<style>', self.index)
 
 
 if __name__ == "__main__":
