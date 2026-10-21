@@ -1,0 +1,37 @@
+name: Apply Steps CI fixes
+
+on:
+  push:
+    branches: [sol/steps-navigation-handoff]
+    paths:
+      - scripts/fix_steps_ci.py
+      - .github/workflows/apply-steps-ci-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/steps-navigation-handoff
+          fetch-depth: 0
+      - name: Apply focused fixes
+        run: python3 scripts/fix_steps_ci.py
+      - name: Remove one-shot helpers
+        run: rm scripts/fix_steps_ci.py .github/workflows/apply-steps-ci-fix.yml
+      - name: Validate patched files
+        run: |
+          node --check app.js
+          python3 -m py_compile tests/test_v6.py tests/test_navigation_progression.py
+          git diff --check
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Fix FIRE Steps regression expectations"
+          git push origin HEAD:sol/steps-navigation-handoff
