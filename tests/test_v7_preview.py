@@ -59,10 +59,10 @@ class V7Preview(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def open(self, route="project", data=None):
+    def open(self, route="project", data=None, height=844):
         width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
         context = self.browser.new_context(
-            viewport={"width": width, "height": 1000}, has_touch=True
+            viewport={"width": width, "height": height}, has_touch=True
         )
         self.addCleanup(context.close)
         state = data or study_db()
@@ -85,6 +85,14 @@ class V7Preview(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
+    def assert_short_page_locked(self, page):
+        expect(page.locator("#app")).to_have_attribute("data-scrollable", "false")
+        expect(page.locator("html")).to_have_attribute("data-v7-fit", "true")
+
+    def assert_tall_page_scrolls(self, page):
+        expect(page.locator("#app")).to_have_attribute("data-scrollable", "true")
+        expect(page.locator("html")).to_have_attribute("data-v7-fit", "false")
+
     def test_projects_root_has_no_empty_toolbar_and_uses_grouped_list(self):
         page = self.open("projects")
         expect(page.locator("h1")).to_have_text("Projects")
@@ -92,6 +100,20 @@ class V7Preview(unittest.TestCase):
         expect(page.locator(".project-list.group")).to_be_visible()
         expect(page.locator(".project-row")).to_contain_text("Creep")
         expect(page.locator(".preview-note")).to_contain_text("Sandbox preview")
+        self.assert_short_page_locked(page)
+
+    def test_short_work_pages_do_not_fake_scroll(self):
+        page = self.open("structure", height=780)
+        self.assert_short_page_locked(page)
+        page = self.open("review-map", height=780)
+        self.assert_short_page_locked(page)
+        self.assertEqual(page.get_by_role("button", name="Back to Project").count(), 0)
+
+    def test_genuinely_tall_project_home_gets_scroll_end_clearance(self):
+        page = self.open("project", study_db(setup=True, structure=True, tracks=True), height=720)
+        self.assert_tall_page_scrolls(page)
+        padding = page.locator("#app").evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)")
+        self.assertGreater(padding, 60)
 
     def test_project_home_is_continue_plus_journey_without_dashboard_status_chrome(self):
         page = self.open("project")
@@ -114,6 +136,8 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(page.locator(".journey,.journey-group").count(), 0)
         self.assertEqual(page.locator(".form-row").count(), 5)
         expect(page.locator(".back")).to_contain_text("Creep")
+        page = self.open("setup", study_db(setup=True))
+        self.assertEqual(page.get_by_text("Done", exact=True).count(), 0)
 
     def test_guidance_does_not_hard_lock_structure_or_tracks(self):
         page = self.open("structure")
@@ -151,6 +175,7 @@ class V7Preview(unittest.TestCase):
         page = self.open("section-study")
         expect(page.locator("h1")).to_have_text("Section Study")
         expect(page.locator(".prereq-card")).to_contain_text("what’s missing")
+        self.assertEqual(page.get_by_role("button", name="Back to Project").count(), 0)
         expect(page.locator('.prereq-actions [data-route="structure"]')).to_be_visible()
         expect(page.locator('.prereq-actions [data-route="tracks"]')).to_be_visible()
 
