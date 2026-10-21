@@ -161,9 +161,6 @@ button:disabled {
   font-size: 13px;
   transform: translateY(-1px);
 }
-.topbar .center .pill-tag {
-  display: none;
-}
 .nav-btn, .text-btn {
   min-height: 44px;
   padding: 0 2px;
@@ -200,19 +197,6 @@ button:disabled {
 }
 .hero-card .eyebrow {
   display: none;
-}
-.pill-tag, .phase-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-pill);
-  background: #171a20;
-  border: 1px solid var(--line);
-  font-size: 12px;
-  font-weight: 680;
-  color: #e6e6e9;
-  cursor: pointer;
 }
 .pill-tag:not(button) {
   cursor: default;
@@ -270,28 +254,6 @@ p {
   letter-spacing: 0;
   line-height: 1.25;
   text-transform: none;
-}
-.progress {
-  height: 3px;
-  background: #242832;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 20px 0 5px;
-}
-.progress > span {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: var(--accent);
-  border-radius: inherit;
-  transition: width var(--motion-standard) var(--ease);
-}
-.progress-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--meta-text);
 }
 .step-head {
   display: flex;
@@ -1364,11 +1326,6 @@ details.note-disclosure summary::-webkit-details-marker {
   font-size: 11px;
   font-weight: 650;
 }
-.presence-handle,
-.event-handle,
-.change-marker {
-  z-index: 7;
-}
 .sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -1811,7 +1768,7 @@ details.note-disclosure summary::-webkit-details-marker {
   outline: 2px solid var(--accent);
   outline-offset: -3px;
 }
-.section-tab, .pill-tag, .phase-pill {
+.section-tab {
   min-height: 44px;
 }
 body.sheet-open {

@@ -34,7 +34,7 @@ class FireDesignSystemSource(unittest.TestCase):
         self.assertIn('data-action="open-context-nav"', self.app)
         self.assertNotIn('class="phase-pill"', self.app)
         self.assertNotIn('.topbar .center .phase-pill {', self.css)
-        self.assertIn('.topbar .center .pill-tag {\n  display: none;', self.css)
+        self.assertNotIn('pill-tag', self.app)
 
     def test_structure_and_roadmap_share_grouped_list_language(self):
         self.assertIn('.structure-list {\n  display: block;', self.css)

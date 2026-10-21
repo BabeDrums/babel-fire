@@ -914,13 +914,6 @@
   function savedMark() {
     return `<span class="saved">Saved</span>`;
   }
-  function phaseTag(text) {
-    return `<span class="pill-tag">${esc(text)}</span>`;
-  }
-  function progressBar(done, total) {
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return `<div class="progress"><span style="width:${pct}%"></span></div><div class="progress-meta"><span>${done} of ${total}</span></div>`;
-  }
 
   function sections(p = project()) {
     return p?.map?.sections || [];
@@ -2162,7 +2155,7 @@
     app.innerHTML =
       topbar(
         backButton("project", "Original Song"),
-        phaseTag("The Spark"),
+        contextButton(p.title),
         savedMark(),
       ) +
       `<h1>Start with what you have</h1><p class="sub">Capture the thing that made you want to make something.</p><div class="section-kicker">Starting With</div><div class="choice-wrap">${starts.map((x) => `<button class="choice ${p.spark.starts.includes(x) ? "selected" : ""}" data-action="toggle-spark-start" data-name="${x}">${x}</button>`).join("")}</div><div class="section-kicker">The Idea</div><textarea class="textarea" data-input="spark-idea" placeholder="What do you have right now?">${esc(p.spark.idea)}</textarea><div class="section-kicker">What Makes It Worth Keeping?</div><div class="choice-wrap">${reasons.map((x) => `<button class="choice ${p.spark.reasons.includes(x) ? "selected" : ""}" data-action="toggle-spark-reason" data-name="${x}">${x}</button>`).join("")}</div><div class="section-kicker">Anchor</div><textarea class="textarea" data-input="spark-anchor" placeholder="What absolutely should survive as this song grows?">${esc(p.spark.anchor)}</textarea>`;
@@ -2278,6 +2271,11 @@
   function openContextNavigator() {
     const p = project();
     if (!p) return;
+    if (p.type === "original") {
+      sheetRoot.innerHTML = `<div class="sheet context-nav-sheet"><div class="context-nav-head"><div><span class="micro">Navigate</span><strong>${esc(p.title)}</strong></div><button class="context-nav-close" data-action="close-sheet" aria-label="Close navigation">×</button></div><div class="context-nav-group">${contextNavRow("Project Overview", "project")}${contextNavRow("Roadmap", "roadmap")}${contextNavRow("Notes", "notes")}</div><div class="context-nav-phase">The Spark</div><div class="context-nav-group">${contextNavRow("The Spark", "original-spark", "Phase")}</div></div>`;
+      openSheet();
+      return;
+    }
     const phaseIndex = phaseIndexForRoute(ui.route),
       phase = STUDY_PHASES[phaseIndex],
       steps = phaseStepDefinitions(p, phaseIndex);
@@ -2308,6 +2306,10 @@
     if (heading) {
       heading.id = "sheetTitle";
       sheetRoot.setAttribute("aria-labelledby", "sheetTitle");
+      sheetRoot.removeAttribute("aria-label");
+    } else {
+      sheetRoot.removeAttribute("aria-labelledby");
+      sheetRoot.setAttribute("aria-label", "Project navigation");
     }
     sheetRoot.setAttribute("role", "dialog");
     sheetRoot.setAttribute("aria-modal", "true");
@@ -2318,7 +2320,9 @@
     sheetRoot.setAttribute("aria-hidden", "false");
     app.inert = true;
     document.getElementById("undoNotice").inert = true;
-    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+    const focusTarget = heading || sheetRoot.querySelector("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled)");
+    if (heading) heading.tabIndex = -1;
+    focusTarget?.focus({ preventScroll: true });
   }
   function closeSheet() {
     app.inert = false;
