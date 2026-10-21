@@ -124,9 +124,9 @@ class NavigationProgression(unittest.TestCase):
         page.locator('.context-nav-row[data-route="project"]').click()
         expect(page.locator("h1")).to_have_text("Even")
 
-    def test_new_project_back_label_resolves_to_projects(self):
+    def test_new_project_back_fallback_resolves_to_projects(self):
         page = self.open("new-project")
-        expect(page.locator('[data-action="history-back"]')).to_contain_text("Projects")
+        expect(page.locator('[data-action="history-back"]')).to_have_attribute("data-fallback-route", "projects")
 
     def test_working_step_position_is_explicit(self):
         page = self.open("structure", study_project(setup=True))

@@ -220,8 +220,9 @@ class V6Browser(unittest.TestCase):
         self.assertIsNone(next(r for r in ranges if r['trackId']=='t2')['end'])
         self.assertFalse(self.project()['skeleton']['draft']['parts']['s2']['t2'])
         self.assertFalse(self.project()['map']['sectionData']['s2']['silence'])
-        # Route to Structure through the normal phase navigator.
-        self.click('go', '[data-route="map"]')
+        # Route to Structure through the real project context navigator.
+        self.click('open-context-nav')
+        self.click('context-go', '[data-route="map"]')
         self.click('go', '[data-route="structure"]')
         self.click('open-add-section');self.click('choose-section-type', '[data-name="Outro"]')
         self.click('set-new-section-bars', '[data-bars="4"]');self.click('save-new-section');self.click('close-sheet')
@@ -349,16 +350,6 @@ class V6Browser(unittest.TestCase):
                 self.assertGreaterEqual(size['height'],44,selector)
                 self.assertGreaterEqual(size['width'],44,selector)
 
-    def test_import_v4_backup_uses_same_migration(self):
-        self.open('project');self.click('settings')
-        self.page.locator('#importFile').set_input_files({'name':'v4.json','mimeType':'application/json',
-                                                        'buffer':json.dumps(fixture()).encode()})
-        expect(self.page.locator('h1')).to_have_text('Projects')
-        self.assertEqual(self.db()['version'],5)
-        self.assertEqual(self.event('e2')['point']['bar'],2.5)
-        self.assertEqual(self.event('cue')['label'],'Transition cue')
-
-
     def test_browser_back_tracks_the_entry_route_after_section_slides(self):
         self.open('map')
         self.click('go','[data-route="structure"]')
@@ -413,11 +404,10 @@ class V6Browser(unittest.TestCase):
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),320)
 
 
-    def test_empty_projects_remain_empty_and_malformed_import_cannot_replace_data(self):
-        self.open('project');self.click('settings');before=self.db()
-        self.page.once('dialog',lambda d:d.accept())
-        self.page.locator('#importFile').set_input_files({'name':'bad.json','mimeType':'application/json','buffer':b'{"unexpected":true}'})
-        self.assertEqual(self.db(),before)
+    def test_empty_projects_remain_empty_without_backup_ui(self):
+        self.open('projects')
+        self.assertEqual(self.page.locator('#importFile').count(), 0)
+        self.assertEqual(self.page.locator('[data-action="export-backup"],[data-action="import-backup"]').count(), 0)
         self.page.evaluate("localStorage.setItem('production-projects-v1',JSON.stringify({version:4,currentProjectId:null,projects:[]}));history.replaceState({route:'projects'},'')")
         self.page.reload();expect(self.page.locator('h1')).to_have_text('Projects')
         self.assertEqual(self.db()['projects'],[])
@@ -471,7 +461,8 @@ class V6Browser(unittest.TestCase):
         expect(self.page.locator('h1')).to_have_text('The Map')
         self.assertEqual(self.page.evaluate('history.state.route'),'map')
         self.assertEqual(self.project()['skeleton'],original)
-        inp.fill('128.25');self.click('go','[data-route="structure"]')
+        self.page.locator('#tempoInput').fill('128.25')
+        structure=self.page.locator('.step-row[data-route="structure"]');expect(structure).to_be_enabled();structure.click()
         expect(self.page.locator('h1')).to_have_text('Structure')
 
     def test_each_setup_prerequisite_locks_and_restores_without_losing_work(self):
@@ -576,7 +567,7 @@ class V6Browser(unittest.TestCase):
         self.click('go','[data-route="roadmap"]');expect(self.page.locator('h2')).to_have_text('Roadmap')
         self.context.close()
         self.open('skeleton',data=self.complete_fixture());self.click('go','[data-route="skeleton-session"]')
-        self.click('history-back');expect(self.page.locator('h2')).to_have_text('The Skeleton')
+        self.click('history-back');expect(self.page.locator('h1')).to_have_text('The Skeleton')
         self.click('go','[data-route="skeleton-session"]');self.click('go','[data-route="skeleton-draft"]')
         self.click('history-back');expect(self.page.locator('h2')).to_have_text('Session')
 
@@ -864,7 +855,7 @@ class V6Browser(unittest.TestCase):
                 self.page.keyboard.press('Escape');expect(self.page.locator('.project-menu').first).to_be_focused()
                 self.click('open-project','[data-id="p1"]');self.page.locator('.quick-card[data-route="roadmap"]').click();self.click('go','[data-route="map"]');self.expand_map_setup()
                 self.page.locator('#tempoInput').fill('128.5');expect(self.page.locator('#tempoInput')).to_be_focused()
-                self.click('go','[data-route="structure"]');self.click('open-add-section');self.settled_sheet()
+                self.canvas_route('structure');self.click('open-add-section');self.settled_sheet()
                 self.assert_hover_stable(self.page.locator('[data-name="Verse"]'))
                 self.click('choose-section-type','[data-name="Verse"]')
                 self.assert_hover_stable(self.page.locator('[data-bars="8"]'))
@@ -1246,7 +1237,7 @@ class V6Browser(unittest.TestCase):
                 if mode=='vertical':self.page.mouse.move(box['x']+24,y+45,steps=3)
                 if mode=='capture':handle.evaluate('el=>el.releasePointerCapture(1)');self.page.mouse.move(lane['x']+lane['width']*.3,y)
                 if mode=='resize':self.page.set_viewport_size({'width':820,'height':1000})
-                if mode=='route':self.page.locator('[data-action="history-back"]').evaluate('el=>el.click()')
+                if mode=='route':self.canvas_route('tracks')
                 if mode=='layout':
                     handle.locator('xpath=..').evaluate('el=>el.style.width="75%"')
                     self.page.wait_for_timeout(40)

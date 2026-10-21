@@ -1571,7 +1571,7 @@ details.note-disclosure summary::-webkit-details-marker {
   height: 44px;
   transform: translateX(-50%);
   touch-action: pan-y;
-  z-index: 4;
+  z-index: 7;
   cursor: ew-resize;
   border-radius: var(--radius-control);
 }
