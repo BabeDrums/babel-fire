@@ -20,8 +20,9 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check app.js
-          if [ -f v7-preview/preview.js ]; then
-            node --check v7-preview/preview.js
+          if [ -f v7-preview/app.js ]; then
+            node --check v7-preview/app.js
+            node --check v7-preview/model.js
           fi
       - name: Check whitespace
         run: |
