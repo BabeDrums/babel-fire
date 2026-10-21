@@ -146,6 +146,16 @@ Notes become a canonical cross-project library. Each note can know project, type
 
 Do not require manual tagging for context FIRE already knows.
 
+## Fundamentals polish gate
+
+Before migrating specialized editors or adding a Babel/FIRE signature treatment, the shell must pass a physical fundamentals gate:
+
+- **Content-aware scrolling:** short phone pages that fit the real visual viewport do not create root scrolling or rubber-band drift. Only genuinely tall pages receive Safari scroll-end clearance.
+- **Page necessity:** every visible element must support the page’s primary musical task, necessary context/navigation, or progressive disclosure. Duplicated workflow explanation and redundant escape/continuation controls are removed.
+- **Shared rhythm:** title offsets, subtitle spacing, grouped-row density, action placement, control states, and bottom breathing room should feel like one system across Projects, Project Home, Song Setup, Structure, Tracks, and preview placeholders.
+- **Real-state testing:** review short, partial, completed, and genuinely tall states at realistic phone heights rather than judging only a generous desktop-like viewport.
+- **No signature compensation:** progress-path, animation, or other Babel-specific delight remains deferred until the plain shell is calm and useful on its own.
+
 ## iPhone / iPad adaptation
 
 ### iPhone

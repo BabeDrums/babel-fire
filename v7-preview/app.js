@@ -30,6 +30,30 @@ const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
 let db = loadDb();
 let currentRoute = "projects";
 let sheetState = null;
+let viewportFitFrame = 0;
+
+function applyViewportFit() {
+  const screen = app.querySelector(".screen");
+  const phone = window.matchMedia("(max-width: 699px)").matches;
+  app.dataset.scrollable = "false";
+  document.documentElement.dataset.v7Fit = "false";
+  if (!screen || !phone) return;
+
+  const viewport = window.visualViewport;
+  const viewportTop = viewport?.offsetTop || 0;
+  const viewportHeight = viewport?.height || window.innerHeight;
+  const viewportBottom = viewportTop + viewportHeight;
+  const contentBottom = screen.getBoundingClientRect().bottom;
+  const needsScroll = contentBottom > viewportBottom - 12;
+
+  app.dataset.scrollable = needsScroll ? "true" : "false";
+  document.documentElement.dataset.v7Fit = needsScroll ? "false" : "true";
+}
+
+function queueViewportFit() {
+  cancelAnimationFrame(viewportFitFrame);
+  viewportFitFrame = requestAnimationFrame(applyViewportFit);
+}
 
 function save() {
   saveDb(db);
@@ -64,6 +88,7 @@ function navigate(route, mode = "push") {
   setHistory(route, mode);
   render();
   window.scrollTo(0, 0);
+  queueViewportFit();
 }
 
 function continueTo(route) {
@@ -148,7 +173,7 @@ function setupRow(label, field, value, help = "") {
   return `
     <button class="form-row" data-action="toggle-setup" data-field="${field}">
       <span><span class="form-label">${esc(label)}</span>${help ? `<span class="form-help">${esc(help)}</span>` : ""}</span>
-      <span class="form-value">${checked ? `<span>${field === "reference" ? "Imported" : "Done"}</span><span class="checkmark" aria-hidden="true">✓</span>` : `<span>${field === "reference" ? "Import" : "Mark done"}</span>`}</span>
+      <span class="form-value">${checked ? `${field === "reference" ? `<span>Imported</span>` : ""}<span class="checkmark" aria-label="Done">✓</span>` : `<span>${field === "reference" ? "Import" : "Mark done"}</span>`}</span>
     </button>`;
 }
 
@@ -227,13 +252,13 @@ function renderSectionStudy() {
   } else {
     body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">The full timeline editor stays in V6 until this lighter shell is approved.</p></div>`;
   }
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}<div class="action-row"><button class="primary-action" data-route="project" data-nav="replace">Back to Project</button></div></main>`;
+  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}</main>`;
 }
 
 function renderReviewMap() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><h3>Not migrated yet.</h3><p class="prototype-end">This preview keeps Review Map in the Journey so the project shape is visible, but the full review workspace remains in V6 until this shell passes physical review.</p></div><div class="action-row"><button class="primary-action" data-route="project" data-nav="replace">Back to Project</button></div></main>`;
+  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><h3>Not migrated yet.</h3><p class="prototype-end">The full Review Map workspace stays in V6 while this lighter shell is being evaluated.</p></div></main>`;
 }
 
 function renderNotes() {
@@ -244,7 +269,7 @@ function renderNotes() {
     if (!clean(entry?.text)) return "";
     return `<article class="note-card"><div class="meta">${esc(entry.type || "General")} · ${esc(entry.context || "Project")}</div><p>${esc(entry.text)}</p></article>`;
   }).join("");
-  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Notes", "Your project notes, in one place.")}<div class="notes-list">${notes || `<div class="empty-state">No saved notes yet.</div>`}</div><p class="preview-note"><span>The cross-project Notes hub comes after the shell is approved.</span></p></main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Notes", "Your project notes, in one place.")}<div class="notes-list">${notes || `<div class="empty-state">No saved notes yet.</div>`}</div></main>`;
 }
 
 function render() {
@@ -473,12 +498,19 @@ sheetRoot.addEventListener("click", (event) => {
   }
 });
 
+app.addEventListener("click", () => requestAnimationFrame(queueViewportFit));
+app.addEventListener("input", queueViewportFit);
+app.addEventListener("change", queueViewportFit);
+window.addEventListener("resize", queueViewportFit);
+window.visualViewport?.addEventListener("resize", queueViewportFit);
+
 window.addEventListener("popstate", (event) => {
   const route = event.state?.v7Preview ? event.state.route : (location.hash || "#projects").slice(1);
   currentRoute = route || "projects";
   closeSheet(false);
   render();
   window.scrollTo(0, 0);
+  queueViewportFit();
 });
 
 const hashRoute = (location.hash || "").slice(1);
@@ -486,3 +518,4 @@ const validRoutes = new Set(["projects", "project", "setup", "structure", "track
 currentRoute = validRoutes.has(hashRoute) ? hashRoute : "projects";
 history.replaceState({ v7Preview: true, route: currentRoute }, "", `#${currentRoute}`);
 render();
+queueViewportFit();
