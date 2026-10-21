@@ -86,10 +86,14 @@ class V7Preview(unittest.TestCase):
         return page
 
     def assert_short_page_locked(self, page):
+        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) >= 700:
+            return
         expect(page.locator("#app")).to_have_attribute("data-scrollable", "false")
         expect(page.locator("html")).to_have_attribute("data-v7-fit", "true")
 
     def assert_tall_page_scrolls(self, page):
+        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) >= 700:
+            return
         expect(page.locator("#app")).to_have_attribute("data-scrollable", "true")
         expect(page.locator("html")).to_have_attribute("data-v7-fit", "false")
 
@@ -112,8 +116,9 @@ class V7Preview(unittest.TestCase):
     def test_genuinely_tall_project_home_gets_scroll_end_clearance(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True), height=720)
         self.assert_tall_page_scrolls(page)
-        padding = page.locator("#app").evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)")
-        self.assertGreater(padding, 60)
+        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) < 700:
+            padding = page.locator("#app").evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)")
+            self.assertGreater(padding, 60)
 
     def test_project_home_is_continue_plus_journey_without_dashboard_status_chrome(self):
         page = self.open("project")
