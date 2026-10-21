@@ -5,6 +5,7 @@ on:
     branches: [sol/steps-navigation-handoff]
     paths:
       - scripts/apply_steps_navigation.py
+      - scripts/fix_steps_patcher.py
       - .github/workflows/apply-steps-navigation.yml
 
 permissions:
@@ -20,9 +21,11 @@ jobs:
           ref: sol/steps-navigation-handoff
           fetch-depth: 0
       - name: Apply approved repository patch
-        run: python3 scripts/apply_steps_navigation.py
+        run: |
+          python3 scripts/fix_steps_patcher.py
+          python3 scripts/apply_steps_navigation.py
       - name: Remove one-shot implementation helpers
-        run: rm scripts/apply_steps_navigation.py .github/workflows/apply-steps-navigation.yml
+        run: rm scripts/apply_steps_navigation.py scripts/fix_steps_patcher.py .github/workflows/apply-steps-navigation.yml
       - name: Validate patched JavaScript and whitespace
         run: |
           node --check app.js
