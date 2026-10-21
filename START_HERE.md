@@ -51,6 +51,7 @@ Current V7 direction:
 - Strong guidance, minimal gating.
 - Work screens return directly to Project Home.
 - Notes will become a true cross-project destination before Projects/Notes top-level navigation is introduced.
+- **Core actions must survive subtraction.** Physical review caught that Projects had lost its only New Project path. V7 now requires a persistent Projects `+` action plus an explicit New Project CTA in the empty state; project creation remains sandbox-only and must never mutate V6 production data.
 
 ## Latest physical-review feedback to carry forward
 
@@ -61,6 +62,7 @@ Next concerns:
 - The current fundamentals pass replaces blanket preview scroll padding with **content-aware visual-viewport fitting**: short phone pages should lock naturally while genuinely tall pages receive Safari end clearance.
 - The Page Necessity Audit is being applied route by route: redundant bottom “Back to Project” controls and duplicated completion wording are removed instead of restyled.
 - Shared spacing, heading offsets, row density, action placement, and placeholder presentation are being normalized before more editors migrate.
+- Subtraction is not allowed to remove a core route or primary task. Verify create/open/edit/reset/delete/navigation affordances after every declutter pass.
 - Fundamentals come before personality. Do not add decorative brand behavior until page purpose, navigation, scrolling, spacing, and consistency are stable.
 - A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
 
@@ -86,7 +88,7 @@ The lightweight FIRE loop is **Discover → Define → Develop → Deliver → V
 
 The preview currently covers:
 
-- Projects
+- Projects, including sandbox New Project creation
 - Project Home
 - Song Setup
 - simplified Structure
@@ -117,10 +119,11 @@ The user should **never need to ask for a handoff update again**.
 
 Complete and physically review the V7 fundamentals polish pass before migrating more editors:
 
-1. verify short pages no longer fake-scroll on physical iPhone Safari and genuinely tall pages still clear browser chrome,
-2. review the route-by-route subtraction and shared spacing/density polish,
-3. fix any physical-only issues without expanding scope,
-4. only after the fundamentals gate passes, consider a separate Babel signature/progress-path experiment.
+1. verify New Project is always discoverable on Projects, including the zero-project state, and creation stays isolated to the V7 sandbox,
+2. verify short pages no longer fake-scroll on physical iPhone Safari and genuinely tall pages still clear browser chrome,
+3. review the route-by-route subtraction and shared spacing/density polish,
+4. fix any physical-only issues without expanding scope,
+5. only after the fundamentals gate passes, consider a separate Babel signature/progress-path experiment.
 
 Fallback continuation phrase:
 
