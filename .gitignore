@@ -1,0 +1,12 @@
+# Local development artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.playwright/
+node_modules/
+.DS_Store
+
+# Local browser/test output
+playwright-report/
+test-results/
+*.log
