@@ -2181,13 +2181,10 @@ from {
   #app[data-route="map"] .phase-steps {
     margin-top: 18px;
   }
-  #app[data-route="map"] .phase-steps .list-row {
+  #app[data-route="map"] .phase-steps .step-row {
     min-height: 54px;
     padding-top: 8px;
     padding-bottom: 8px;
-  }
-  #app[data-route="map"] .phase-steps .list-row .desc {
-    display: none;
   }
 
   #app[data-route="roadmap"] > .spacer-18 {

@@ -1566,6 +1566,10 @@
     if (p.type === "original") return renderOriginalOverview();
     const phaseIndex = currentStudyPhaseIndex(p),
       phase = STUDY_PHASES[phaseIndex],
+      phaseRoute =
+        phaseIndex === 0 && sectionStudyDone(p) && !mapDone(p)
+          ? "map-summary"
+          : phase.route,
       context = [p.artist, "Recreation"].filter(Boolean).join(" · "),
       phaseProgress =
         phaseIndex === 0
@@ -1576,7 +1580,7 @@
     const body = projectOverviewBody(
       phase.title,
       phaseProgress,
-      phase.route,
+      phaseRoute,
       "Seven phases to a finished rebuild.",
     );
     app.innerHTML =
@@ -2287,8 +2291,12 @@
     }
     const phaseIndex = phaseIndexForRoute(ui.route),
       phase = STUDY_PHASES[phaseIndex],
-      steps = phaseStepDefinitions(p, phaseIndex);
-    sheetRoot.innerHTML = `<div class="sheet context-nav-sheet"><div class="context-nav-head"><div><span class="micro">Navigate</span><strong>${esc(p.title)}</strong></div><button class="context-nav-close" data-action="close-sheet" aria-label="Close navigation">×</button></div><div class="context-nav-group">${contextNavRow("Project Overview", "project")}${contextNavRow("Roadmap", "roadmap")}${contextNavRow("Notes", "notes")}</div><div class="context-nav-phase">${esc(phase.title)}</div><div class="context-nav-group">${contextNavRow(phase.title, phase.route, "Phase")}${steps.map((step) => { const state = stepState(step); return contextNavRow(step.title, step.route, state === "done" ? "Done" : state === "current" ? "Current" : "Locked", state === "locked"); }).join("")}</div></div>`;
+      steps = phaseStepDefinitions(p, phaseIndex),
+      review =
+        phaseIndex === 0 && sectionStudyCoreDone(p)
+          ? contextNavRow("Review Map", "map-summary", mapDone(p) ? "Complete" : "Review")
+          : "";
+    sheetRoot.innerHTML = `<div class="sheet context-nav-sheet"><div class="context-nav-head"><div><span class="micro">Navigate</span><strong>${esc(p.title)}</strong></div><button class="context-nav-close" data-action="close-sheet" aria-label="Close navigation">×</button></div><div class="context-nav-group">${contextNavRow("Project Overview", "project")}${contextNavRow("Roadmap", "roadmap")}${contextNavRow("Notes", "notes")}</div><div class="context-nav-phase">${esc(phase.title)}</div><div class="context-nav-group">${contextNavRow(phase.title, phase.route, "Phase")}${steps.map((step) => { const state = stepState(step); return contextNavRow(step.title, step.route, state === "done" ? "Done" : state === "current" ? "Current" : "Locked", state === "locked"); }).join("")}${review}</div></div>`;
     openSheet();
   }
   function openSettings() {
