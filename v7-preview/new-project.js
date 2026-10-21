@@ -4,9 +4,8 @@ const app = document.getElementById("app");
 const style = document.createElement("style");
 style.textContent = `
   .v7-new-project-button{position:absolute;top:calc(18px + env(safe-area-inset-top));right:0;width:44px;height:44px;border:0;background:transparent;color:var(--text,#f5f5f7);font:300 34px/44px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;cursor:pointer}
-  .v7-empty-projects{display:grid;gap:18px;justify-items:center;padding:30px 24px;text-align:center}
-  .v7-empty-projects span{color:var(--muted,#9b9ba3);font-size:18px}
-  .v7-empty-projects button{min-height:46px;padding:0 22px;border:1px solid #4a4a50;border-radius:14px;background:#2d2d34;color:#fff;font:600 17px -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}
+  .v7-empty-projects{padding:30px 24px;text-align:center;color:var(--muted,#9b9ba3);font-size:18px}
+  .v7-build-stamp{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:10px;line-height:14px;font-weight:400;letter-spacing:.03em;white-space:nowrap;opacity:.35;pointer-events:none}
   .v7-create-backdrop{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:12px;background:rgba(0,0,0,.5)}
   .v7-create-sheet{width:min(100%,520px);margin-bottom:max(8px,env(safe-area-inset-bottom));padding:24px;border:1px solid #34343a;border-radius:24px;background:#171719;box-shadow:0 20px 70px rgba(0,0,0,.45)}
   .v7-create-sheet h2{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
@@ -21,6 +20,27 @@ style.textContent = `
   @media(min-width:700px){.v7-create-backdrop{align-items:center}.v7-create-sheet{margin-bottom:0}}
 `;
 document.head.appendChild(style);
+
+let buildCommitRequest;
+function showBuildStamp(screen) {
+  let stamp = screen.querySelector(".v7-build-stamp");
+  if (!stamp) {
+    stamp = document.createElement("footer");
+    stamp.className = "v7-build-stamp";
+    stamp.textContent = "FIRE V7 PREVIEW · …";
+    screen.appendChild(stamp);
+  }
+  buildCommitRequest ||= fetch("../build-info.json", { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) throw new Error("Build metadata unavailable");
+      return response.json();
+    })
+    .then((info) => /^[0-9a-f]{40}$/i.test(info.commit) ? info.commit.slice(0, 7) : "unavailable")
+    .catch(() => "unavailable");
+  buildCommitRequest.then((commit) => {
+    if (stamp.isConnected) stamp.textContent = `FIRE V7 PREVIEW · ${commit}`;
+  });
+}
 
 function isProjectsScreen() {
   return location.hash === "" || location.hash === "#projects";
@@ -46,9 +66,9 @@ function enhanceProjects() {
   const empty = screen.querySelector(".project-list .empty-state");
   if (empty && !empty.classList.contains("v7-empty-projects")) {
     empty.classList.add("v7-empty-projects");
-    empty.innerHTML = `<span>No preview projects.</span><button type="button">New Project</button>`;
-    empty.querySelector("button").addEventListener("click", openCreateSheet);
+    empty.textContent = "No projects yet.";
   }
+  showBuildStamp(screen);
 }
 
 function openCreateSheet() {
