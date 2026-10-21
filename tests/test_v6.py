@@ -635,7 +635,8 @@ class V6Browser(unittest.TestCase):
                 self.assertLess(abs(toolbar['x'] - shell['x']), 1.1)
                 self.assertLess(abs(toolbar['width'] - shell['width']), 1.1)
                 self.assertEqual(self.page.locator('.project-menu').first.text_content().strip(), '…')
-                self.assertEqual(self.page.locator('.project-open .foot > span:last-child').first.text_content().strip(), '›')
+                self.assertEqual(self.page.locator('.project-open .foot > span').first.count(), 1)
+                self.assertEqual(self.page.locator('.project-open .foot').first.locator('text=›').count(), 0)
 
                 self.click('new-project')
                 expect(self.page.locator('.page-heading h1')).to_have_text('New project')
@@ -852,7 +853,7 @@ class V6Browser(unittest.TestCase):
                 self.assert_hover_stable(self.page.locator('.project-open').first)
                 self.assert_hover_stable(self.page.locator('.project-menu').first)
                 self.click('project-menu','[data-id="p1"]');self.settled_sheet()
-                self.page.keyboard.press('Tab');expect(self.page.locator('[data-action="delete-project"]')).to_be_focused()
+                self.page.keyboard.press('Tab');expect(self.page.locator('[data-action="edit-project"]')).to_be_focused()
                 self.page.keyboard.press('Shift+Tab');expect(self.page.locator('[data-action="close-sheet"]')).to_be_focused()
                 self.page.keyboard.press('Escape');expect(self.page.locator('.project-menu').first).to_be_focused()
                 self.click('open-project','[data-id="p1"]');self.page.locator('.quick-card[data-route="roadmap"]').click();self.click('go','[data-route="map"]');self.expand_map_setup()
@@ -1026,13 +1027,13 @@ class V6Browser(unittest.TestCase):
     def test_component_shapes_stay_fixed_across_hover_focus_selected_and_disabled(self):
         self.open('projects',width=1440,data=self.complete_fixture(),pointer=True)
         samples=[('projects','.project-open'),('projects','.project-menu'),('project','.quick-card'),
-                 ('map','.nav-btn'),('map','.state-control'),('map','.action-card'),('map','.list-row'),
+                 ('map','.nav-btn'),('map','.state-control'),('map','.setup-listen-row'),('map','.list-row'),
                  ('structure','.structure-row'),('tracks','.choice'),('section-study','.segment'),
                  ('skeleton-draft','.workflow-disclosure summary'),('skeleton-bounce','.primary')]
         for route,selector in samples:
             with self.subTest(route=route,selector=selector):
                 self.canvas_route(route)
-                if route == 'map' and selector in ('.state-control','.action-card'):
+                if route == 'map' and selector in ('.state-control','.setup-listen-row'):
                     self.expand_map_setup()
                 node=self.page.locator(selector).first
                 node.scroll_into_view_if_needed();before=node.bounding_box()
@@ -1145,11 +1146,9 @@ class V6Browser(unittest.TestCase):
                 self.assertGreaterEqual(row.bounding_box()['height'],62)
                 self.assertEqual(self.page.locator('.bars-badge').first.evaluate('el=>getComputedStyle(el).backgroundColor'),'rgba(0, 0, 0, 0)')
                 nxt=self.page.locator('[data-route="tracks"]');page=self.page.locator('.workflow-page')
-                if width>=640:
-                    self.assertLessEqual(nxt.bounding_box()['width'],280.5)
-                    self.assertAlmostEqual(nxt.bounding_box()['x']+nxt.bounding_box()['width'],page.bounding_box()['x']+page.bounding_box()['width'],delta=1)
-                else:
-                    self.assertAlmostEqual(nxt.bounding_box()['width'],page.bounding_box()['width'],delta=1)
+                self.assertLessEqual(nxt.bounding_box()['width'],220.5)
+                self.assertLess(nxt.bounding_box()['width'],page.bounding_box()['width'])
+                self.assertAlmostEqual(nxt.bounding_box()['x']+nxt.bounding_box()['width'],page.bounding_box()['x']+page.bounding_box()['width'],delta=1)
                 self.click('open-add-section');self.click('choose-section-type','[data-name="Intro"]')
                 selected=self.page.locator('[data-action="choose-section-type"][data-name="Intro"]')
                 self.assertEqual(selected.evaluate("el=>getComputedStyle(el,'::before').display"),'none')
@@ -1351,6 +1350,65 @@ class V6Browser(unittest.TestCase):
                     self.assertLessEqual(abs(box['x']-anchor[0]),1)
                     self.assertLessEqual(abs(box['y']-anchor[1]),1)
 
+
+
+    def test_project_actions_edit_reset_preserve_metadata_and_notes(self):
+        self.open('projects', width=390)
+        original = json.loads(json.dumps(self.project()))
+        self.click('project-menu', '[data-id="p1"]')
+        expect(self.page.locator('[data-action="edit-project"]')).to_be_visible()
+        expect(self.page.locator('[data-action="reset-project"]')).to_be_visible()
+        expect(self.page.locator('[data-action="delete-project"]')).to_be_visible()
+        self.click('edit-project')
+        self.page.locator('#editProjectTitle').fill('Edited Song')
+        self.page.locator('#editProjectArtist').fill('Edited Artist')
+        self.click('save-project-details')
+        self.assertEqual(self.project()['title'], 'Edited Song')
+        self.assertEqual(self.project()['artist'], 'Edited Artist')
+        before_reset = json.loads(json.dumps(self.project()))
+        self.click('project-menu', '[data-id="p1"]')
+        self.page.once('dialog', lambda d: d.accept())
+        self.click('reset-project')
+        p = self.project()
+        self.assertEqual(p['id'], original['id'])
+        self.assertEqual(p['createdAt'], original['createdAt'])
+        self.assertEqual(p['title'], 'Edited Song')
+        self.assertEqual(p['artist'], 'Edited Artist')
+        self.assertEqual(p['map']['sections'], [])
+        self.assertFalse(p['map']['setup']['reference'])
+        self.assertIn('Retain me', p['notes'])
+        archived = [n for n in p['notes'] if isinstance(n, dict)]
+        texts = {n['text'] for n in archived}
+        self.assertTrue({'Unresolved', 'Listen', 'Note s0', 'Keep this'}.issubset(texts))
+        self.assertTrue(all(n.get('context') for n in archived))
+        self.page.locator('#undoEdit').click()
+        self.assertEqual(self.project(), before_reset)
+
+    def test_song_setup_is_stable_and_first_listen_is_one_grouped_row(self):
+        self.open('map', width=390)
+        expect(self.page.locator('.phase-setup .section-kicker')).to_have_text('Song Setup')
+        expect(self.page.locator('#tempoInput')).to_be_visible()
+        self.assertEqual(self.page.locator('[data-action="toggle-setup-disclosure"]').count(), 0)
+        self.assertEqual(self.page.locator('.phase-setup .action-card').count(), 0)
+        self.assertEqual(self.page.locator('.setup-panel .setup-listen-row').count(), 1)
+        self.page.locator('#tempoInput').fill('128.5')
+        self.page.locator('#meterInput').select_option('3/4')
+        expect(self.page.locator('#tempoInput')).to_be_visible()
+        expect(self.page.locator('.phase-setup .section-kicker')).to_have_text('Song Setup')
+        self.assertEqual(self.page.locator('.setup-panel .setup-listen-row').count(), 1)
+
+    def test_project_card_and_overview_keep_only_current_context(self):
+        self.open('projects', width=390)
+        card = self.page.locator('.project-open').first
+        self.assertEqual(card.locator('.type').count(), 0)
+        expect(card.locator('.artist')).to_contain_text('Test artist · Recreation')
+        expect(card.locator('.foot')).to_contain_text('The Map · 2 of 3')
+        self.click('open-project', '[data-id="p1"]')
+        self.assertEqual(self.page.locator('.project-current-card').count(), 1)
+        self.assertEqual(self.page.locator('.project-current-card .phase-num').count(), 0)
+        self.assertEqual(self.page.locator('.project-current-card > .sub').count(), 0)
+        gap = self.page.evaluate("""()=>{const a=document.querySelector('.project-current').getBoundingClientRect(),b=document.querySelector('.project-support').getBoundingClientRect();return b.top-a.bottom}""")
+        self.assertGreaterEqual(gap, 15)
 
 
 if __name__ == '__main__':
