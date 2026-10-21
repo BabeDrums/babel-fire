@@ -21,6 +21,7 @@ The redesign goal is not to make that hierarchy prettier. It is to make FIRE use
 7. **Notes are a real app-level destination.** Project notes are one view into a cross-project Notes system, not a separate notes implementation.
 8. **Use familiar platform patterns.** Prefer standard navigation bars, grouped lists, forms, sheets, and top-level tabs/sidebar over custom context menus or clever navigation widgets.
 9. **Keep the musical engines.** Timeline semantics, IDs, migration, invalidation, Skeleton dependencies, and durable notes are valuable. Rebuild the shell around them rather than rewriting proven musical logic.
+10. **Strong guidance, minimal gating.** `Continue` recommends the intended sequence, but the musician may open useful work directly. Only block an action when it literally cannot function without missing information; when that happens, explain what is missing and provide direct routes to fix it instead of showing a dead locked row.
 
 ## New information architecture
 
@@ -71,6 +72,8 @@ The Skeleton follows the same model:
 
 A phase is a grouping in the Journey, not necessarily another screen the user must enter.
 
+Structure and Tracks are useful on their own and should remain directly accessible even if Song Setup is incomplete. Section Study genuinely needs a structure and at least one track; if either is missing, open a helpful prerequisite screen with direct actions rather than a disabled destination.
+
 ## Navigation model
 
 The current center context navigator is removed.
@@ -97,7 +100,19 @@ It should use one stable grouped form containing:
 - Grid alignment
 - First Listen
 
-No collapse state. No Step list beneath it. No competing phase navigation. Completion unlocks Structure automatically. The primary continuation is `Continue to Structure` only when valid.
+No collapse state. No Step list beneath it. No competing phase navigation. Completion makes Structure the recommended continuation; Structure itself does not need to be hard-locked behind Setup.
+
+## Structure
+
+Structure should make the arrangement itself the interface.
+
+- The main screen shows the ordered section list directly.
+- **Add Section** opens a small, short task surface rather than a near-full-screen workflow.
+- Choosing a common section type adds it immediately at a sensible default length (8 bars in the prototype).
+- Tap an existing section to rename it, change bars, reorder, duplicate, or remove it.
+- A simple confirmation such as **Structure matches the song** remains an explicit user attestation before `Continue` recommends Tracks.
+
+The user should not have to choose a type, choose a length, press Add, and then separately dismiss a large sheet for every section.
 
 ## Project Home / Journey behavior
 
@@ -110,6 +125,7 @@ The Project Home should feel closer to Apple Music / Reminders / Settings hierar
 - The current work item gets the strongest row emphasis and disclosure.
 - Future work stays visible but quiet.
 - Do not show redundant `Phase 1 of 7`, `2 of 3 complete`, `Current`, `Next`, and a progress bar simultaneously.
+- Do not label revisitable work as `Locked` merely because it is not the recommended next task.
 
 ## Notes hub
 
@@ -169,13 +185,23 @@ Unless a later requirement proves otherwise, preserve:
 
 This is an information-architecture and presentation reset, not permission to delete musical capability.
 
+## Isolated preview contract
+
+The first V7 shell is implemented as an isolated static preview under `/v7-preview/` before replacing the production root app.
+
+- The production root remains V6 during physical review.
+- The preview reads the current FIRE database only to create an initial **sandbox copy** under `production-projects-v1-v7-preview`.
+- Preview edits never write to `production-projects-v1`.
+- The preview intentionally covers Project Home, Song Setup, Structure, Tracks, and a Section Study handoff/prerequisite state only.
+- This preview is disposable evidence for the shell direction, not a second permanent application architecture.
+
 ## Implementation order
 
-1. Remove the center context navigator from the redesign branch.
+1. Remove the center context navigator from the redesign direction.
 2. Build the new Project Home as hub + Continue + Journey, folding Roadmap into it.
 3. Make Song Setup its own work route/page.
 4. Flatten Map navigation so work screens return to Project Home and `Continue` moves through work without accumulating needless depth.
-5. Bring Structure and Tracks into the new work-page shell without changing their musical behavior.
+5. Simplify Structure around direct arrangement editing and bring Tracks into the same focused work-page shell without changing its musical meaning.
 6. Build the global Notes hub and only then introduce Projects / Notes top-level navigation.
 7. Adapt Project Home/Work shell to iPad split/sidebar behavior.
 8. Only after the shell is physically approved, migrate Section Study, Review Map, and Skeleton interiors.
