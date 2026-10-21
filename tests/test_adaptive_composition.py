@@ -111,7 +111,7 @@ class AdaptiveComposition(unittest.TestCase):
         expect(current).to_be_visible()
         expect(current).to_have_attribute("data-route", "map")
         expect(current).to_contain_text("The Map")
-        expect(current).to_contain_text("0 of 3 checkpoints")
+        expect(current).to_contain_text("Next: Structure")
         self.assertEqual(page.locator(".project-current .progress").count(), 0)
         self.assertNotIn("Continue The Map", page.locator(".project-current").inner_text())
 
@@ -137,6 +137,13 @@ class AdaptiveComposition(unittest.TestCase):
             "document.querySelector('#app').dataset.viewportFit === 'false'"
         )
         self.assertEqual(page.evaluate("document.documentElement.style.overflowY"), "")
+        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) <= 430:
+            self.assertGreater(
+                page.evaluate(
+                    "parseFloat(getComputedStyle(document.querySelector('#app')).getPropertyValue('--scroll-end-clearance'))"
+                ),
+                0,
+            )
 
         page.evaluate("document.querySelector('#fitProbe').remove()")
         page.wait_for_function(
