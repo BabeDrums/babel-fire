@@ -95,9 +95,9 @@ function continueTo(route) {
   navigate(route, "replace");
 }
 
-function showBuildStamp() {
-  const stamp = app.querySelector(".build-stamp");
-  if (!stamp) return;
+function showBuildInfo() {
+  const targets = document.querySelectorAll(".build-info");
+  if (!targets.length) return;
   buildCommitPromise ||= fetch("../build-info.json", { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error("Build metadata unavailable");
@@ -106,7 +106,9 @@ function showBuildStamp() {
     .then((info) => /^[0-9a-f]{40}$/i.test(info.commit) ? info.commit.slice(0, 7) : "unavailable")
     .catch(() => "unavailable");
   buildCommitPromise.then((commit) => {
-    if (stamp.isConnected) stamp.textContent = `FIRE V7 PREVIEW · ${commit}`;
+    targets.forEach((target) => {
+      if (target.isConnected) target.textContent = `V7 Preview · ${commit}`;
+    });
   });
 }
 
@@ -124,9 +126,7 @@ function renderProjects() {
         <button class="new-project-button" data-action="new-project" aria-label="New Project">+</button>
       </div>
       <div class="project-list group">${rows || `<div class="empty-state projects-empty">No projects yet.</div>`}</div>
-      <footer class="build-stamp">FIRE V7 PREVIEW · …</footer>
     </main>`;
-  showBuildStamp();
 }
 
 function journeyRow(item, route) {
@@ -156,7 +156,7 @@ function renderProjectHome() {
     .map((route) => journeyRow(item, route)).join("");
   const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
   const future = ["The Skeleton", "The Sounds", "The Balance", "The Shape", "The World", "The Finish"]
-    .map((name) => `<span>${esc(name)}</span>`).join("");
+    .map((name) => esc(name)).join(" · ");
 
   app.innerHTML = `
     <main class="screen scroll-safe">
@@ -195,15 +195,23 @@ function completionAccessory(checked) {
     : `<span class="completion-ring" aria-hidden="true"></span>`;
 }
 
+function referenceRow(setup) {
+  const imported = !!setup.reference;
+  const detail = clean(setup.referenceName) || (imported ? "Imported reference" : "Choose audio from Files");
+  return `
+    <button class="form-row reference-row" data-action="${imported ? "reference-actions" : "import-reference"}">
+      <span><span class="form-label">Reference</span><span class="form-help reference-detail">${esc(detail)}</span></span>
+      ${imported ? completionAccessory(true) : `<span class="form-action">Import…</span>`}
+    </button>
+    <input id="referenceFileInput" class="visually-hidden" type="file" accept="audio/*" aria-label="Reference audio file">`;
+}
+
 function setupRow(label, field, value, help = "") {
   const checked = !!value;
-  const accessory = field === "reference"
-    ? `<span class="form-value status-value">${checked ? "Imported" : "Import"}</span>`
-    : completionAccessory(checked);
   return `
     <button class="form-row" data-action="toggle-setup" data-field="${field}">
       <span><span class="form-label">${esc(label)}</span>${help ? `<span class="form-help">${esc(help)}</span>` : ""}</span>
-      ${accessory}
+      ${completionAccessory(checked)}
     </button>`;
 }
 
@@ -228,7 +236,7 @@ function renderSetup() {
       ${topbar(backButton(item.title, "project"), "")}
       ${pageHeader("Song Setup", "Prepare the reference before studying it.")}
       <div class="form-group">
-        ${setupRow("Reference", "reference", setup.reference)}
+        ${referenceRow(setup)}
         <div class="form-row"><span class="form-label">Tempo</span><span class="form-value"><input id="tempoInput" class="inline-input" inputmode="decimal" aria-label="Tempo" value="${esc(setup.tempo)}" placeholder="—"><span>BPM</span></span></div>
         <div class="form-row"><span class="form-label">Meter</span><select id="meterInput" class="inline-select" aria-label="Meter"><option ${setup.meter === "4/4" ? "selected" : ""}>4/4</option><option ${setup.meter === "3/4" ? "selected" : ""}>3/4</option><option ${setup.meter === "6/8" ? "selected" : ""}>6/8</option></select></div>
         ${setupRow("Grid", "grid", setup.grid, "Align the reference to the bar grid.")}
@@ -362,9 +370,32 @@ function openNewProjectSheet() {
     </div>
     <div class="sheet-actions">
       <button class="sheet-close" data-action="close-sheet">Cancel</button>
-      <button class="compact-button" data-action="create-project">Create Project</button>
+      <button class="sheet-primary" data-action="create-project" disabled>Create Project</button>
     </div>`, { type: "new-project" });
   requestAnimationFrame(() => document.getElementById("newProjectTitle")?.focus());
+}
+
+function syncNewProjectAction() {
+  const button = sheetRoot.querySelector('[data-action="create-project"]');
+  if (!button) return;
+  const title = clean(document.getElementById("newProjectTitle")?.value);
+  const artist = clean(document.getElementById("newProjectArtist")?.value);
+  button.disabled = !(title && artist);
+}
+
+function openReferenceSheet() {
+  const setup = project()?.map?.setup;
+  if (!setup?.reference) return;
+  const detail = clean(setup.referenceName) || "Imported reference";
+  openSheet(`
+    <div class="grabber"></div>
+    <h2>Reference</h2>
+    <p class="sheet-kicker reference-sheet-name">${esc(detail)}</p>
+    <div class="group">
+      <button class="row" data-action="replace-reference"><span class="row-title">Replace Reference</span><span></span></button>
+      <button class="row sheet-danger" data-action="remove-reference"><span class="row-title">Remove Reference</span><span></span></button>
+    </div>
+    <div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "reference" });
 }
 
 function createProject() {
@@ -381,7 +412,7 @@ function createProject() {
     createdAt: Date.now(),
     notes: [],
     map: {
-      setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
+      setup: { reference: false, referenceName: "", tempo: "", meter: "4/4", grid: false, firstListen: false },
       sections: [],
       structureVerified: false,
       tracks: [],
@@ -423,7 +454,8 @@ function openEditSectionSheet(sectionId) {
 function openProjectActions() {
   const item = project();
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions" });
+  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div><div class="sheet-meta build-info">V7 Preview · …</div>`, { type: "project-actions" });
+  showBuildInfo();
 }
 
 function openEditProjectSheet() {
@@ -448,6 +480,11 @@ app.addEventListener("click", (event) => {
 
   if (action === "new-project") return openNewProjectSheet();
   if (action === "project-actions") return openProjectActions();
+  if (action === "import-reference") {
+    document.getElementById("referenceFileInput")?.click();
+    return;
+  }
+  if (action === "reference-actions") return openReferenceSheet();
   if (action === "toggle-setup") {
     item.map.setup[button.dataset.field] = !item.map.setup[button.dataset.field];
     save();
@@ -491,9 +528,22 @@ app.addEventListener("input", (event) => {
   }
 });
 
+sheetRoot.addEventListener("input", () => {
+  if (sheetState?.type === "new-project") syncNewProjectAction();
+});
+
 app.addEventListener("change", (event) => {
   const item = project();
   if (!item || currentRoute !== "setup") return;
+  if (event.target.id === "referenceFileInput") {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    item.map.setup.reference = true;
+    item.map.setup.referenceName = file.name;
+    save();
+    renderSetup();
+    return;
+  }
   if (event.target.id === "meterInput") {
     item.map.setup.meter = event.target.value;
     save();
@@ -509,6 +559,18 @@ sheetRoot.addEventListener("click", (event) => {
 
   if (action === "close-sheet") return closeSheet();
   if (action === "create-project") return createProject();
+  if (action === "replace-reference") {
+    closeSheet();
+    requestAnimationFrame(() => document.getElementById("referenceFileInput")?.click());
+    return;
+  }
+  if (action === "remove-reference") {
+    item.map.setup.reference = false;
+    item.map.setup.referenceName = "";
+    save();
+    closeSheet();
+    return renderSetup();
+  }
   if (action === "quick-add-section") {
     item.map.sections.push({ id: uid(), name: button.dataset.name, lengthBars: 8 });
     item.map.structureVerified = false;

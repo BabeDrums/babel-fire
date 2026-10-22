@@ -86,7 +86,7 @@ Projects should read like a calm grouped list rather than a grid of large cards.
 - No empty toolbar on the root screen.
 - Project title is primary; artist + type are secondary.
 - Keep project rows concise; detailed progress belongs inside Project Home.
-- Preview-only sandbox information stays visually subordinate.
+- Preview-only sandbox information stays out of the main Projects canvas; build/version traceability belongs in a subordinate project-actions/debug location during review.
 
 ## Project Home
 
@@ -106,11 +106,13 @@ Use one meaning per visual state:
 
 - **Selection** — restrained selected surface/border; no completion checkmark.
 - **Completion** — ring/check language.
-- **Status/value** — concise text when a word communicates the state better than an icon.
+- **Status/value** — concise text when text is the information itself; do not use a bare word as the only feedback for an action that needs stronger confirmation.
 - **Navigation** — list row + chevron where the row opens another destination.
 - **Primary progression** — the strongest compact button treatment on the work page.
 
-Do not show two indicators for the same state. A primary action must read differently from a selected option.
+Do not show two indicators for the same state. A primary action must read differently from a selected option. During the fundamentals gate, prove hierarchy in grayscale through luminance, material, border, typography, spacing, and state before introducing a functional accent color.
+
+Reference is a special case: the filename/identity answers **what** is loaded, while a completion mark answers whether the setup requirement is satisfied. The preview should use a real file picker, persist the selected filename as metadata, and offer Replace / Remove rather than treating Reference like a silent boolean toggle.
 
 Inactive future phases should orient without masquerading as disabled controls. Keep them visible in a compact quiet summary; expand the active phase’s work in Journey.
 
@@ -169,6 +171,17 @@ Before migrating specialized editors or adding a Babel/FIRE signature treatment,
 - **Shared rhythm:** title offsets, subtitle spacing, grouped-row density, action placement, control states, and bottom breathing room should feel like one system across Projects, Project Home, Song Setup, Structure, Tracks, and preview placeholders.
 - **Real-state testing:** review short, partial, completed, and genuinely tall states at realistic phone heights rather than judging only a generous desktop-like viewport.
 - **No signature compensation:** progress-path, animation, or other Babel-specific delight remains deferred until the plain shell is calm and useful on its own.
+
+## Interaction fidelity + grayscale foundation
+
+Before signature personality arrives, ordinary controls should feel finished without relying on color:
+
+- selected options must be obvious through grayscale surface/border contrast
+- primary continuation must be distinct from selection without becoming a stark white web-style button
+- required sheet actions should be visibly disabled until valid
+- fields should use restrained focus treatment instead of oversized browser-like rings
+- compact widths may use full-width primary actions while regular widths can use trailing compact actions; product logic stays identical
+- future customizable atmosphere, animation, and expressive modes are intentionally deferred until the neutral control system is trustworthy
 
 ## iPhone / iPad adaptation
 

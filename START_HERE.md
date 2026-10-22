@@ -23,13 +23,13 @@ Always distinguish shipped production work from experimental V7 preview work.
 
 ## Current verified continuity — October 21, 2026
 
-PR #36, **Consolidate V7 shell and Journey**, is merged and deployed at `a151376…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #61 succeeded. PRs #34–#35 remain the preceding Projects/continuity milestones.
+PR #37, **Refine V7 visual semantics and composition**, is merged and deployed at `ae00659…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #62 succeeded. PR #36 is the preceding shell-consolidation milestone; PRs #34–#35 remain the preceding Projects/continuity milestones.
 
 The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
 The V7 shell is now consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
-The current refinement direction is **visual semantics + composition**: selection, completion, status, navigation, and primary progression must use distinct visual languages; future phases should orient without looking like dead controls; and the same adaptive FIRE interface must preserve identical product logic across phone/tablet sizes.
+The current refinement direction is **grayscale interaction fidelity**: make controls feel finished without relying on accent color, replace prototype boolean-style interactions with truthful state behavior, preserve distinct selection/completion/navigation/progression semantics, and let compact/regular layouts adapt presentation without changing product logic.
 
 ## Production state — V6
 
@@ -77,7 +77,7 @@ Projects:
 - persistent `+` is the single create affordance
 - zero state is only `No projects yet.`
 - no duplicate giant New Project CTA
-- temporary subtle `FIRE V7 PREVIEW · <commit>` stamp remains for physical-review traceability
+- preview build/commit traceability stays available in subordinate project actions/debug UI rather than occupying the main Projects canvas
 - the Projects subtitle is intentionally removed in the consolidation pass because it did not add useful context
 
 Project Home:
@@ -102,7 +102,7 @@ Visual semantics:
 
 - **selection** uses restrained selected surfaces, not completion marks
 - **completion** uses ring/check language
-- **status/value** uses text where text is clearer (for example, `Imported`)
+- **status/value** uses text when text is the information itself; Reference uses filename/identity plus completion feedback rather than a bare `Import` / `Imported` toggle
 - **navigation** uses rows/chevrons
 - **primary progression** gets the strongest compact button treatment
 - do not stack two indicators for one state
@@ -131,6 +131,7 @@ Viewport:
 
 ### Testing
 
+- grayscale interaction-fidelity refinements: material contrast, primary-action weight, field focus, Reference import/replace/remove, and compact-vs-regular composition
 - exact Journey signature treatment beyond the restrained semantic hierarchy
 - exact future FIRE/signal-path personality treatment
 - shell spacing/density refinements after physical review
@@ -213,9 +214,9 @@ https://babedrums.github.io/babel-fire/v7-preview/
 
 Review in this order:
 
-1. Projects — `+`, one create path, quiet empty state, build stamp, no needless subtitle
+1. Projects — `+`, one create path, quiet empty state, no visible prototype stamp, no needless subtitle
 2. Project Home — Continue hierarchy, restrained Journey, completed/current/upcoming clarity, future-phase density, Notes
-3. Song Setup — focused task, no duplicated status copy
+3. Song Setup — real Reference file-selection feedback with filename + completion, Replace/Remove behavior, and no fake boolean toggle semantics
 4. Structure — arrangement first, verification quieter than musical content, continuation only when useful
 5. Tracks — direct selection and clear separation of custom entry vs continuation
 6. Section Study / Review Map placeholders — truthful, concise, no fake completion
