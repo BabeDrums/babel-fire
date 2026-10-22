@@ -7,7 +7,7 @@
 - **Active production specification:** [V6.md](V6.md)
 - **Experimental next-shell direction:** [V7_DRAFT.md](V7_DRAFT.md)
 
-When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**, resume this project immediately. Do not ask the user to reconstruct documented FIRE decisions.
+When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**, resume this project immediately. Do not ask Gabriel to reconstruct documented FIRE decisions.
 
 ## Read in this order
 
@@ -20,6 +20,14 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 7. `CHANGELOG.md` for shipped milestones
 
 Always distinguish shipped production work from experimental V7 preview work.
+
+## Current verified state — October 21, 2026
+
+PR #34, **Simplify V7 Projects empty state**, is merged to `main` at merge commit `dc93b591dbc15772678f34ec48d22aca8bdd6448`.
+
+The post-merge `main` FIRE regression run #160 completed successfully, and Pages deployment run #59 completed successfully. The deployed V7 preview therefore includes the latest Projects micro-polish.
+
+The PR-triggered regression run #158 became abnormally stuck in all three browser jobs even though static checks and handoff freshness had passed. The same merged code then passed the complete regression suite on `main`, confirming this was a CI-run hang rather than a product failure. The follow-up continuity pass adds a 15-minute browser-job timeout so a future stuck runner cannot wait indefinitely.
 
 ## Current production state — V6
 
@@ -51,26 +59,35 @@ Current V7 direction:
 - Strong guidance, minimal gating.
 - Work screens return directly to Project Home.
 - Notes will become a true cross-project destination before Projects/Notes top-level navigation is introduced.
-- **Core actions must survive subtraction.** Physical review caught that Projects had lost its only New Project path. V7 keeps a persistent Projects `+` as the single creation affordance; the empty state stays quiet instead of duplicating that action. Project creation remains sandbox-only and must never mutate V6 production data.
-- During preview review, Projects shows a subtle automatic `FIRE V7 PREVIEW · <commit>` build stamp so physical screenshots can be tied to the deployed revision.
+- **Core actions must survive subtraction.** Projects keeps a persistent `+` as the single New Project affordance. The zero-project state is intentionally quiet (`No projects yet.`) and must not duplicate the create action with another large CTA.
+- Project creation remains sandbox-only and must never mutate V6 production data.
+- Projects shows a subtle automatic `FIRE V7 PREVIEW · <commit>` build stamp so physical screenshots can be tied to the deployed revision.
 
 ## Latest physical-review feedback to carry forward
 
 The current shell is meaningfully better and Project Home is starting to feel like a real home page.
 
-Next concerns:
-
-- The current fundamentals pass replaces blanket preview scroll padding with **content-aware visual-viewport fitting**: short phone pages should lock naturally while genuinely tall pages receive Safari end clearance.
+- The fundamentals pass replaced blanket preview scroll padding with **content-aware visual-viewport fitting**: short phone pages should lock naturally while genuinely tall pages receive Safari end clearance.
 - The Page Necessity Audit is being applied route by route: redundant bottom “Back to Project” controls and duplicated completion wording are removed instead of restyled.
 - Shared spacing, heading offsets, row density, action placement, and placeholder presentation are being normalized before more editors migrate.
 - Subtraction is not allowed to remove a core route or primary task. Verify create/open/edit/reset/delete/navigation affordances after every declutter pass.
 - Do not duplicate a core action merely to make it more obvious when one clear, persistent affordance is sufficient.
 - Fundamentals come before personality. Do not add decorative brand behavior until page purpose, navigation, scrolling, spacing, and consistency are stable.
-- A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
+- A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired only by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
+
+## Gabriel's approval / execution contract
+
+This is important for continuity across chats:
+
+- Gabriel uses **“bet”** to mean **approved — go execute it now**, not merely acknowledge the idea.
+- Once Gabriel approves a FIRE implementation, do not stop after editing code or opening a PR. The expected unit of work is **implement → test → fix failures → merge → deploy → verify → provide the live V7 link**.
+- Do not make Gabriel repeatedly say “continue,” “merge it,” or “give me the link.” Continue through the safe workflow automatically under the standing merge permission.
+- If CI is genuinely stuck, failed, unsafe, or requires Gabriel's intervention, diagnose it and take the safest available corrective action. Do not repeatedly return status-only messages while an actionable next step remains.
+- Never claim a change is live until merge and Pages deployment are actually verified.
 
 ## Default FIRE iteration behavior
 
-The user does **not** want to repeatedly request research, project review, cleanup, or handoff maintenance.
+Gabriel does **not** want to repeatedly request research, project review, cleanup, or handoff maintenance.
 
 For nontrivial FIRE design/product passes, automatically:
 
@@ -103,7 +120,7 @@ Full Section Study timeline, full Review Map, Skeleton interiors, and production
 
 ## Automatic handoff rule
 
-The user should **never need to ask for a handoff update again**.
+Gabriel should **never need to ask for a handoff update again**.
 
 - `START_HERE.md` is the canonical zero-context continuation file.
 - Product/runtime or durable-rule PRs that change `app.js`, `styles.css`, `index.html`, `V6.md`, `V7_DRAFT.md`, `CONTEXT.md`, `AGENTS.md`, or `v7-preview/` must refresh this file when the current handoff materially changes.
@@ -113,20 +130,21 @@ The user should **never need to ask for a handoff update again**.
 ## Operating workflow
 
 - **No Codex for FIRE.** Use normal GitHub connector/direct repository tools.
-- Work on a task branch → review diff → run static/browser regressions → PR → merge only when checks are green and data safety is clear → verify Pages → physical-device review.
+- Work on a task branch → review diff → run static/browser regressions → PR → merge when safe/verified under standing permission → Pages deploy → verify live URL → physical-device review for visual work.
 - It is acceptable to ship isolated `/v7-preview/` iterations while leaving the root V6 app unchanged.
 - Stop instead of merging when tests fail, production data safety is uncertain, destructive behavior is unresolved, or a genuine product decision remains open.
+- Browser CI jobs have a 15-minute timeout so infrastructure hangs become explicit failures instead of indefinite blockers.
 
-## Next action
+## Next action in the new chat
 
-Complete and physically review the V7 fundamentals polish pass before migrating more editors:
+Start from the **deployed V7 preview**, not from PR #34 or the old stuck run.
 
-1. verify the persistent Projects `+` is sufficient and the quiet zero-project state no longer competes with it,
-2. verify the V7 build stamp correctly identifies the deployed commit during physical review,
-3. verify short pages no longer fake-scroll on physical iPhone Safari and genuinely tall pages still clear browser chrome,
-4. review the route-by-route subtraction and shared spacing/density polish,
-5. fix any physical-only issues without expanding scope,
-6. only after the fundamentals gate passes, consider a separate Babel signature/progress-path experiment.
+1. Have Gabriel physically review the current Projects screen: persistent `+`, quiet `No projects yet.` state, subtle build SHA, and no duplicate New Project CTA.
+2. Continue physical review of the fundamentals pass: short-page scrolling, tall-page Safari clearance, spacing/density, and route-by-route subtraction.
+3. Fix physical-only issues without expanding scope.
+4. Once the fundamentals gate passes, decide whether to migrate more editors or run a separate Babel signature/progress-path experiment.
+
+Do **not** reopen already-settled architecture or re-research from zero unless new evidence requires it.
 
 Fallback continuation phrase:
 
