@@ -52,6 +52,7 @@ jobs:
   browser:
     name: Chromium regression (${{ matrix.width }}px)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
