@@ -2,7 +2,6 @@ import {
   COMMON_TRACKS,
   SECTION_TYPES,
   WORK,
-  cloneProductionDb,
   currentProject,
   helpers,
   loadDb,
@@ -31,6 +30,7 @@ let db = loadDb();
 let currentRoute = "projects";
 let sheetState = null;
 let viewportFitFrame = 0;
+let buildCommitPromise = null;
 
 function applyViewportFit() {
   const screen = app.querySelector(".screen");
@@ -71,7 +71,7 @@ function backButton(label, route) {
   return `<button class="back" data-route="${route}" data-nav="replace"><span class="arrow" aria-hidden="true">‹</span><span>${esc(label)}</span></button>`;
 }
 
-function pageHeader(title, copy) {
+function pageHeader(title, copy = "") {
   return `<div class="page-header"><h1>${esc(title)}</h1>${copy ? `<p class="sub">${esc(copy)}</p>` : ""}</div>`;
 }
 
@@ -95,6 +95,21 @@ function continueTo(route) {
   navigate(route, "replace");
 }
 
+function showBuildStamp() {
+  const stamp = app.querySelector(".build-stamp");
+  if (!stamp) return;
+  buildCommitPromise ||= fetch("../build-info.json", { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) throw new Error("Build metadata unavailable");
+      return response.json();
+    })
+    .then((info) => /^[0-9a-f]{40}$/i.test(info.commit) ? info.commit.slice(0, 7) : "unavailable")
+    .catch(() => "unavailable");
+  buildCommitPromise.then((commit) => {
+    if (stamp.isConnected) stamp.textContent = `FIRE V7 PREVIEW · ${commit}`;
+  });
+}
+
 function renderProjects() {
   const rows = db.projects.map((item) => `
     <button class="project-row" data-project="${esc(item.id)}">
@@ -104,21 +119,26 @@ function renderProjects() {
 
   app.innerHTML = `
     <main class="screen root-screen scroll-safe">
-      <div class="projects-header">${pageHeader("Projects", "Your songs.")}</div>
-      <div class="project-list group">${rows || `<div class="empty-state">No preview projects.</div>`}</div>
-      <p class="preview-note"><span>Sandbox preview</span><button data-action="refresh-preview">Refresh copy</button></p>
+      <div class="projects-heading">
+        <h1>Projects</h1>
+        <button class="new-project-button" data-action="new-project" aria-label="New Project">+</button>
+      </div>
+      <div class="project-list group">${rows || `<div class="empty-state projects-empty">No projects yet.</div>`}</div>
+      <footer class="build-stamp">FIRE V7 PREVIEW · …</footer>
     </main>`;
+  showBuildStamp();
 }
 
 function journeyRow(item, route) {
   const done = workDone(item, route);
-  const recommended = route === recommendedWork(item);
-  const trailing = done
-    ? `<span class="journey-check" aria-label="Done">✓</span>`
-    : `<span class="chevron" aria-hidden="true">›</span>`;
+  const current = route === recommendedWork(item);
+  const stateClass = done ? "done" : current ? "current" : "upcoming";
+  const mark = done ? "✓" : current ? "●" : "○";
   return `
-    <button class="row journey-row${done ? " done" : ""}${recommended ? " recommended" : ""}" data-route="${route}">
-      <span class="row-title">${esc(WORK[route].title)}</span>${trailing}
+    <button class="row journey-row ${stateClass}" data-route="${route}" ${current ? `aria-current="step"` : ""}>
+      <span class="journey-mark ${stateClass}" aria-hidden="true">${mark}</span>
+      <span class="row-title">${esc(WORK[route].title)}</span>
+      <span class="chevron" aria-hidden="true">›</span>
     </button>`;
 }
 
@@ -132,10 +152,11 @@ function renderProjectHome() {
 
   const recommended = recommendedWork(item);
   const rec = WORK[recommended];
-  const workRows = ["setup", "structure", "tracks", "section-study"].map((route) => journeyRow(item, route)).join("");
+  const workRows = ["setup", "structure", "tracks", "section-study", "review-map"]
+    .map((route) => journeyRow(item, route)).join("");
   const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
   const future = ["The Skeleton", "The Sounds", "The Balance", "The Shape", "The World", "The Finish"]
-    .map((name) => `<div class="future-row"><strong>${esc(name)}</strong></div>`).join("");
+    .map((name) => `<div class="future-row"><span>${esc(name)}</span></div>`).join("");
 
   app.innerHTML = `
     <main class="screen scroll-safe">
@@ -151,11 +172,8 @@ function renderProjectHome() {
       <div class="section-title"><span>Journey</span></div>
       <section class="journey">
         <div class="phase-label">The Map</div>
-        <div class="group journey-group">
-          ${workRows}
-          <button class="row journey-row" data-route="review-map"><span class="row-title">Review Map</span><span class="chevron" aria-hidden="true">›</span></button>
-        </div>
-        <div class="future-phases">${future}</div>
+        <div class="group journey-group">${workRows}</div>
+        <div class="future-phases" aria-label="Future phases">${future}</div>
       </section>
 
       <div class="section-title"><span>Notes</span></div>
@@ -168,13 +186,36 @@ function renderProjectHome() {
     </main>`;
 }
 
+function completionAccessory(checked) {
+  return checked
+    ? `<span class="checkmark" aria-label="Done">✓</span>`
+    : `<span class="completion-ring" aria-hidden="true"></span>`;
+}
+
 function setupRow(label, field, value, help = "") {
   const checked = !!value;
+  const accessory = field === "reference"
+    ? (checked
+      ? `<span class="form-value"><span>Imported</span><span class="checkmark" aria-label="Done">✓</span></span>`
+      : `<span class="form-value">Import</span>`)
+    : completionAccessory(checked);
   return `
     <button class="form-row" data-action="toggle-setup" data-field="${field}">
       <span><span class="form-label">${esc(label)}</span>${help ? `<span class="form-help">${esc(help)}</span>` : ""}</span>
-      <span class="form-value">${checked ? `${field === "reference" ? `<span>Imported</span>` : ""}<span class="checkmark" aria-label="Done">✓</span>` : `<span>${field === "reference" ? "Import" : "Mark done"}</span>`}</span>
+      ${accessory}
     </button>`;
+}
+
+function setupContinuationMarkup(item) {
+  return setupComplete(item)
+    ? `<div class="action-row"><button id="setupContinue" class="primary-action" data-action="continue-structure">Continue to Structure</button></div>`
+    : "";
+}
+
+function syncSetupContinuation(item) {
+  const host = document.getElementById("setupContinuation");
+  if (host) host.innerHTML = setupContinuationMarkup(item);
+  queueViewportFit();
 }
 
 function renderSetup() {
@@ -182,7 +223,7 @@ function renderSetup() {
   if (!item || item.type !== "study") return navigate("project", "replace");
   const setup = item.map.setup;
   app.innerHTML = `
-    <main class="screen">
+    <main class="screen scroll-safe">
       ${topbar(backButton(item.title, "project"), "")}
       ${pageHeader("Song Setup", "Prepare the reference before studying it.")}
       <div class="form-group">
@@ -192,7 +233,7 @@ function renderSetup() {
         ${setupRow("Grid", "grid", setup.grid, "Align the reference to the bar grid.")}
         ${setupRow("First Listen", "firstListen", setup.firstListen, "Play the full song once without stopping.")}
       </div>
-      <div class="action-row"><button id="setupContinue" class="primary-action" data-action="continue-structure" ${setupComplete(item) ? "" : "disabled"}>Continue to Structure</button></div>
+      <div id="setupContinuation">${setupContinuationMarkup(item)}</div>
     </main>`;
 }
 
@@ -208,6 +249,10 @@ function renderStructure() {
       <span class="chevron" aria-hidden="true">›</span>
     </button>`).join("");
 
+  const continuation = structureComplete(item)
+    ? `<div class="action-row"><button class="primary-action" data-action="continue-tracks">Continue to Tracks</button></div>`
+    : "";
+
   app.innerHTML = `
     <main class="screen scroll-safe">
       ${topbar(backButton(item.title, "project"), "")}
@@ -215,8 +260,8 @@ function renderStructure() {
       ${sections.length
         ? `<div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button></div>`
         : `<div class="structure-empty"><p>Add the first section you hear.</p><button class="primary-action compact-primary" data-action="open-add-section">Add Section</button></div>`}
-      ${sections.length ? `<button class="confirm-row" data-action="toggle-structure-verified"><span><span class="row-title">Structure matches the song</span><span class="row-sub">Confirm when the order and lengths feel right.</span></span>${item.map.structureVerified ? `<span class="checkmark" aria-hidden="true">✓</span>` : `<span class="trailing">Confirm</span>`}</button>` : ""}
-      <div class="action-row"><button class="primary-action" data-action="continue-tracks" ${structureComplete(item) ? "" : "disabled"}>Continue to Tracks</button></div>
+      ${sections.length ? `<button class="confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${item.map.structureVerified ? `<span class="checkmark" aria-label="Done">✓</span>` : `<span class="trailing">Confirm</span>`}</button>` : ""}
+      ${continuation}
     </main>`;
 }
 
@@ -227,13 +272,17 @@ function renderTracks() {
   const extra = item.map.tracks.map((track) => track.name).filter((name) => !COMMON_TRACKS.includes(name));
   const names = [...COMMON_TRACKS, ...extra];
   const tiles = names.map((name) => `<button class="track-tile${selectedNames.has(name) ? " selected" : ""}" data-action="toggle-track" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("");
+  const continuation = tracksComplete(item)
+    ? `<div class="action-row action-separated"><button class="primary-action" data-action="continue-section-study">Continue to Section Study</button></div>`
+    : "";
+
   app.innerHTML = `
     <main class="screen scroll-safe">
       ${topbar(backButton(item.title, "project"), "")}
       ${pageHeader("Tracks", "Choose everything you hear in the song.")}
       <div class="track-grid">${tiles}</div>
       <div class="custom-track"><input id="customTrackInput" class="field" placeholder="Other…" aria-label="Other track"><button class="compact-button" data-action="add-custom-track">Add</button></div>
-      <div class="action-row action-separated"><button class="primary-action" data-action="continue-section-study" ${tracksComplete(item) ? "" : "disabled"}>Continue to Section Study</button></div>
+      ${continuation}
     </main>`;
 }
 
@@ -248,7 +297,7 @@ function renderSectionStudy() {
       missingStructure ? `<button data-route="structure">Add the song structure <span class="chevron">›</span></button>` : "",
       missingTracks ? `<button data-route="tracks">Choose the tracks <span class="chevron">›</span></button>` : "",
     ].join("");
-    body = `<div class="prereq-card"><h3>A little more context will make this useful.</h3><p>Section Study needs a song structure and at least one track. FIRE is pointing you straight to what’s missing.</p><div class="prereq-actions">${actions}</div></div>`;
+    body = `<div class="prereq-card"><h3>Finish the missing context first.</h3><p>Section Study needs a structure and at least one track.</p><div class="prereq-actions">${actions}</div></div>`;
   } else {
     body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">The full timeline editor stays in V6 until this lighter shell is approved.</p></div>`;
   }
@@ -258,7 +307,7 @@ function renderSectionStudy() {
 function renderReviewMap() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><h3>Not migrated yet.</h3><p class="prototype-end">The full Review Map workspace stays in V6 while this lighter shell is being evaluated.</p></div></main>`;
+  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">The full Review Map workspace still uses V6 while this lighter shell is being evaluated.</p></div></main>`;
 }
 
 function renderNotes() {
@@ -299,6 +348,62 @@ function closeSheet(clear = true) {
   if (clear) sheetState = null;
 }
 
+function openNewProjectSheet() {
+  openSheet(`
+    <div class="grabber"></div>
+    <h2>New Project</h2>
+    <p class="sheet-kicker">Recreation</p>
+    <div class="stack-fields">
+      <label class="field-label" for="newProjectTitle">Song</label>
+      <input id="newProjectTitle" class="field" autocomplete="off" placeholder="Song title" aria-label="Song title">
+      <label class="field-label" for="newProjectArtist">Artist</label>
+      <input id="newProjectArtist" class="field" autocomplete="off" placeholder="Artist" aria-label="Artist">
+    </div>
+    <div class="sheet-actions">
+      <button class="sheet-close" data-action="close-sheet">Cancel</button>
+      <button class="compact-button" data-action="create-project">Create Project</button>
+    </div>`, { type: "new-project" });
+  requestAnimationFrame(() => document.getElementById("newProjectTitle")?.focus());
+}
+
+function createProject() {
+  const title = clean(document.getElementById("newProjectTitle")?.value);
+  const artist = clean(document.getElementById("newProjectArtist")?.value);
+  if (!title || !artist) return;
+
+  const item = {
+    id: uid(),
+    type: "study",
+    schemaVersion: 5,
+    title,
+    artist,
+    createdAt: Date.now(),
+    notes: [],
+    map: {
+      setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
+      sections: [],
+      structureVerified: false,
+      tracks: [],
+      timeline: { presence: [], events: [] },
+      sectionData: {},
+      mapVerified: false,
+      teachBack: false,
+      phaseParking: "",
+      phaseTakeaway: "",
+    },
+    skeleton: {
+      session: { tracks: {}, markers: {} },
+      draft: { parts: {} },
+      bounce: { exported: false, listened: false },
+    },
+  };
+  db.projects.push(item);
+  db.currentProjectId = item.id;
+  save();
+  closeSheet();
+  navigate("project");
+}
+
 function openAddSectionSheet() {
   const choices = SECTION_TYPES.map((name) => `<button class="sheet-choice" data-action="quick-add-section" data-name="${esc(name)}">${esc(name)}</button>`).join("");
   openSheet(`<div class="grabber"></div><h2>Add Section</h2><div class="sheet-grid">${choices}<button class="sheet-choice" data-action="show-custom-section">Custom</button></div><div id="customSectionArea"></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "add-section" });
@@ -317,7 +422,7 @@ function openEditSectionSheet(sectionId) {
 function openProjectActions() {
   const item = project();
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Preview Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Remove from Preview</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions" });
+  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions" });
 }
 
 function openEditProjectSheet() {
@@ -340,11 +445,7 @@ app.addEventListener("click", (event) => {
   if (!action) return;
   const item = project();
 
-  if (action === "refresh-preview") {
-    db = cloneProductionDb();
-    save();
-    return render();
-  }
+  if (action === "new-project") return openNewProjectSheet();
   if (action === "project-actions") return openProjectActions();
   if (action === "toggle-setup") {
     item.map.setup[button.dataset.field] = !item.map.setup[button.dataset.field];
@@ -385,8 +486,7 @@ app.addEventListener("input", (event) => {
   if (event.target.id === "tempoInput") {
     item.map.setup.tempo = event.target.value;
     save();
-    const continueButton = document.getElementById("setupContinue");
-    if (continueButton) continueButton.disabled = !setupComplete(item);
+    syncSetupContinuation(item);
   }
 });
 
@@ -407,6 +507,7 @@ sheetRoot.addEventListener("click", (event) => {
   const item = project();
 
   if (action === "close-sheet") return closeSheet();
+  if (action === "create-project") return createProject();
   if (action === "quick-add-section") {
     item.map.sections.push({ id: uid(), name: button.dataset.name, lengthBars: 8 });
     item.map.structureVerified = false;
@@ -496,6 +597,10 @@ sheetRoot.addEventListener("click", (event) => {
     closeSheet();
     return navigate("projects", "replace");
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !sheetRoot.hidden) closeSheet();
 });
 
 app.addEventListener("click", () => requestAnimationFrame(queueViewportFit));
