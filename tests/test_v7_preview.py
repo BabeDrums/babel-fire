@@ -2,6 +2,7 @@
 import json
 import os
 import unittest
+from pathlib import Path
 
 from playwright.sync_api import sync_playwright, expect
 
@@ -96,18 +97,6 @@ class V7Preview(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
-    def assert_short_page_locked(self, page):
-        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) >= 700:
-            return
-        expect(page.locator("#app")).to_have_attribute("data-scrollable", "false")
-        expect(page.locator("html")).to_have_attribute("data-v7-fit", "true")
-
-    def assert_tall_page_scrolls(self, page):
-        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) >= 700:
-            return
-        expect(page.locator("#app")).to_have_attribute("data-scrollable", "true")
-        expect(page.locator("html")).to_have_attribute("data-v7-fit", "false")
-
     def test_projects_is_one_job_open_or_create(self):
         page = self.open("projects")
         expect(page.locator("h1")).to_have_text("Projects")
@@ -119,7 +108,6 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(page.locator(".preview-note").count(), 0)
         self.assertEqual(page.locator(".build-stamp").count(), 0)
         self.assertEqual(page.locator('script[src*="new-project.js"]').count(), 0)
-        self.assert_short_page_locked(page)
 
     def test_empty_projects_has_one_create_path_and_creation_stays_sandboxed(self):
         source = study_db(setup=True, structure=True, tracks=True)
@@ -144,19 +132,17 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(preview["projects"][0]["title"], "Still")
         self.assertEqual(production, source)
 
-    def test_short_work_pages_do_not_fake_scroll(self):
-        page = self.open("structure", height=780)
-        self.assert_short_page_locked(page)
-        page = self.open("review-map", height=780)
-        self.assert_short_page_locked(page)
-        self.assertEqual(page.get_by_role("button", name="Back to Project").count(), 0)
-
-    def test_genuinely_tall_project_home_gets_scroll_end_clearance(self):
+    def test_phone_pages_use_natural_document_scrolling(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True), height=720)
-        self.assert_tall_page_scrolls(page)
-        if int(os.environ.get("FIRE_TEST_WIDTH", "390")) < 700:
-            padding = page.locator("#app").evaluate("el => parseFloat(getComputedStyle(el).paddingBottom)")
-            self.assertGreater(padding, 60)
+        self.assertNotEqual(page.evaluate("getComputedStyle(document.documentElement).overflowY"), "hidden")
+        self.assertNotEqual(page.evaluate("getComputedStyle(document.body).overflowY"), "hidden")
+        self.assertFalse(page.evaluate("'v7Fit' in document.documentElement.dataset"))
+        self.assertFalse(page.evaluate("'scrollable' in document.querySelector('#app').dataset"))
+        source = Path("v7-preview/app.js").read_text()
+        styles = Path("v7-preview/styles.css").read_text()
+        self.assertNotIn("visualViewport", source)
+        self.assertNotIn("dataset.scrollable", source)
+        self.assertNotIn("data-v7-fit", styles)
 
     def test_project_home_is_continue_journey_notes_without_v6_chrome(self):
         page = self.open("project")
@@ -198,40 +184,38 @@ class V7Preview(unittest.TestCase):
         page = self.open("setup", study_db(setup=True))
         self.assertEqual(page.get_by_text("Done", exact=True).count(), 0)
         reference = page.locator(".reference-row")
-        expect(reference.locator(".reference-detail")).to_have_text("Imported reference")
+        expect(reference.locator(".form-help")).to_have_text("Import the reference into your session.")
         expect(reference.locator(".checkmark")).to_be_visible()
         expect(page.get_by_role("button", name="Continue to Structure")).to_be_visible()
 
-    def test_reference_import_has_identity_feedback_and_replace_remove_actions(self):
+    def test_reference_is_a_setup_requirement_not_a_file_picker(self):
         page = self.open("setup")
         reference = page.locator(".reference-row")
-        expect(reference).to_contain_text("Import…")
-        expect(reference.locator(".reference-detail")).to_have_text("Choose audio from Files")
-        self.assertEqual(reference.locator(".checkmark").count(), 0)
-
-        page.locator("#referenceFileInput").set_input_files({
-            "name": "still-reference.wav",
-            "mimeType": "audio/wav",
-            "buffer": b"RIFFfake",
-        })
-        reference = page.locator(".reference-row")
-        expect(reference.locator(".reference-detail")).to_have_text("still-reference.wav")
-        expect(reference.locator(".checkmark")).to_be_visible()
-        self.assertEqual(reference.get_by_text("Import…", exact=True).count(), 0)
-
+        expect(reference.locator(".form-help")).to_have_text("Import the reference into your session.")
+        expect(reference.locator(".completion-ring")).to_be_visible()
+        self.assertEqual(page.locator('input[type="file"]').count(), 0)
         reference.click()
-        expect(page.get_by_role("button", name="Replace Reference")).to_be_visible()
-        expect(page.get_by_role("button", name="Remove Reference")).to_be_visible()
-        page.get_by_role("button", name="Remove Reference").click()
         reference = page.locator(".reference-row")
-        expect(reference.locator(".reference-detail")).to_have_text("Choose audio from Files")
-        expect(reference).to_contain_text("Import…")
-        self.assertEqual(reference.locator(".checkmark").count(), 0)
-
+        expect(reference.locator(".checkmark")).to_be_visible()
+        self.assertEqual(page.locator(".sheet").count(), 0)
         preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
         setup = preview["projects"][0]["map"]["setup"]
-        self.assertFalse(setup["reference"])
-        self.assertEqual(setup.get("referenceName", ""), "")
+        self.assertTrue(setup["reference"])
+        self.assertNotIn("referenceName", setup)
+        reference.click()
+        expect(page.locator(".reference-row .completion-ring")).to_be_visible()
+        preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
+        self.assertFalse(preview["projects"][0]["map"]["setup"]["reference"])
+
+    def test_preview_placeholders_do_not_leak_internal_v6_language(self):
+        complete = study_db(setup=True, structure=True, tracks=True)
+        page = self.open("section-study", complete)
+        expect(page.get_by_text("Section Study isn't available in this preview yet.")).to_be_visible()
+        self.assertEqual(page.get_by_text("V6", exact=False).count(), 0)
+        self.assertEqual(page.get_by_text("approved", exact=False).count(), 0)
+        page = self.open("review-map", complete)
+        expect(page.get_by_text("Review Map isn't available in this preview yet.")).to_be_visible()
+        self.assertEqual(page.get_by_text("V6", exact=False).count(), 0)
 
     def test_song_setup_continuation_reacts_to_tempo_without_rerendering_input(self):
         data = study_db()

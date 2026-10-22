@@ -28,17 +28,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
   padding: calc(10px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
 }
 .root-screen { padding-top: 18px; }
-
-@media (max-width: 699px) {
-  html[data-v7-fit="true"],
-  html[data-v7-fit="true"] body {
-    height: 100%;
-    overflow-y: hidden;
-  }
-  .app-shell[data-scrollable="true"] {
-    padding-bottom: calc(92px + env(safe-area-inset-bottom));
-  }
-}
+.scroll-safe { padding-bottom: 64px; }
 
 .topbar {
   min-height: 48px;
@@ -208,9 +198,9 @@ h3 { margin: 0; font-size: 17px; line-height: 1.25; }
 }
 .journey-row.current .row-title { font-weight: 735; color: var(--text); }
 .journey-row.done .row-title { color: #b8b8c0; }
-.journey-row.upcoming .row-title { color: #8d8e96; }
-.journey-row.done .chevron,
-.journey-row.upcoming .chevron { opacity: .72; }
+.journey-row.upcoming .row-title { color: #a1a2aa; }
+.journey-row.done .chevron { opacity: .72; }
+.journey-row.upcoming .chevron { opacity: .9; }
 .journey-mark {
   width: 20px;
   text-align: center;
@@ -260,8 +250,6 @@ h3 { margin: 0; font-size: 17px; line-height: 1.25; }
 .form-help { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.35; }
 .form-value { color: #dddde2; display: inline-flex; gap: 8px; align-items: center; }
 .form-action { color: #d1d1d7; font-size: 14px; font-weight: 620; }
-.reference-detail { max-width: 430px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; }
 .inline-input {
   width: 88px;
   border: 0;
