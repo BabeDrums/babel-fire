@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
           ref: sol/fire-core-doctrine
       - name: Apply doctrine reconciliation
-        run: python3 scripts/apply_fire_core_doctrine.py
+        run: python3 scripts/apply_fire_core_doctrine_v2.py
       - name: Validate doctrine guard
         run: python3 scripts/check_product_doctrine.py
       - name: Commit reconciled doctrine
@@ -24,5 +24,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Define FIRE Core doctrine and reconcile product guidance"
+          git commit -m "Reconcile FIRE Core doctrine across project docs"
           git push origin HEAD:sol/fire-core-doctrine
