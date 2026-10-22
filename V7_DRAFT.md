@@ -97,7 +97,7 @@ Project Home should feel like a document home, not a dashboard.
 - The active phase may expose its named work inline.
 - Completed work gets a quiet completion accessory.
 - Future phases remain visible but quiet.
-- Avoid redundant labels such as Recommended, In progress, Current, Later, Phase 1 of 7, 2 of 3 complete, or progress bars when the hierarchy is already obvious.
+- Avoid redundant status labels such as Recommended, In progress, Current, Phase 1 of 7, 2 of 3 complete, or progress bars when the hierarchy is already obvious.
 - Roadmap does not exist as a separate destination.
 
 ## Visual semantics
