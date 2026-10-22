@@ -117,7 +117,7 @@ class V7Preview(unittest.TestCase):
         expect(page.locator(".project-list.group")).to_be_visible()
         expect(page.locator(".project-row")).to_contain_text("Creep")
         self.assertEqual(page.locator(".preview-note").count(), 0)
-        expect(page.locator(".build-stamp")).to_contain_text("FIRE V7 PREVIEW")
+        self.assertEqual(page.locator(".build-stamp").count(), 0)
         self.assertEqual(page.locator('script[src*="new-project.js"]').count(), 0)
         self.assert_short_page_locked(page)
 
@@ -129,9 +129,13 @@ class V7Preview(unittest.TestCase):
 
         page.get_by_role("button", name="New Project").click()
         expect(page.locator(".sheet")).to_be_visible()
+        create = page.get_by_role("button", name="Create Project")
+        expect(create).to_be_disabled()
         page.get_by_role("textbox", name="Song title").fill("Still")
+        expect(create).to_be_disabled()
         page.get_by_role("textbox", name="Artist").fill("Babel")
-        page.get_by_role("button", name="Create Project").click()
+        expect(create).to_be_enabled()
+        create.click()
 
         expect(page.locator("h1")).to_have_text("Still")
         preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
@@ -166,7 +170,7 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(page.get_by_text("Recommended", exact=True).count(), 0)
         self.assertEqual(page.get_by_text("In progress", exact=True).count(), 0)
         expect(page.locator(".future-label")).to_have_text("Later")
-        expect(page.locator(".future-phase-list span")).to_have_count(6)
+        expect(page.locator(".future-phase-list")).to_contain_text("The Skeleton · The Sounds · The Balance")
         self.assertEqual(page.locator(".future-row").count(), 0)
         self.assertEqual(page.get_by_text("Checkpoint", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("Step ", exact=False).count(), 0)
@@ -193,10 +197,41 @@ class V7Preview(unittest.TestCase):
 
         page = self.open("setup", study_db(setup=True))
         self.assertEqual(page.get_by_text("Done", exact=True).count(), 0)
-        reference = page.locator('.form-row[data-field="reference"]')
-        expect(reference).to_contain_text("Imported")
-        self.assertEqual(reference.locator(".checkmark").count(), 0)
+        reference = page.locator(".reference-row")
+        expect(reference.locator(".reference-detail")).to_have_text("Imported reference")
+        expect(reference.locator(".checkmark")).to_be_visible()
         expect(page.get_by_role("button", name="Continue to Structure")).to_be_visible()
+
+    def test_reference_import_has_identity_feedback_and_replace_remove_actions(self):
+        page = self.open("setup")
+        reference = page.locator(".reference-row")
+        expect(reference).to_contain_text("Import…")
+        expect(reference.locator(".reference-detail")).to_have_text("Choose audio from Files")
+        self.assertEqual(reference.locator(".checkmark").count(), 0)
+
+        page.locator("#referenceFileInput").set_input_files({
+            "name": "still-reference.wav",
+            "mimeType": "audio/wav",
+            "buffer": b"RIFFfake",
+        })
+        reference = page.locator(".reference-row")
+        expect(reference.locator(".reference-detail")).to_have_text("still-reference.wav")
+        expect(reference.locator(".checkmark")).to_be_visible()
+        self.assertEqual(reference.get_by_text("Import…", exact=True).count(), 0)
+
+        reference.click()
+        expect(page.get_by_role("button", name="Replace Reference")).to_be_visible()
+        expect(page.get_by_role("button", name="Remove Reference")).to_be_visible()
+        page.get_by_role("button", name="Remove Reference").click()
+        reference = page.locator(".reference-row")
+        expect(reference.locator(".reference-detail")).to_have_text("Choose audio from Files")
+        expect(reference).to_contain_text("Import…")
+        self.assertEqual(reference.locator(".checkmark").count(), 0)
+
+        preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
+        setup = preview["projects"][0]["map"]["setup"]
+        self.assertFalse(setup["reference"])
+        self.assertEqual(setup.get("referenceName", ""), "")
 
     def test_song_setup_continuation_reacts_to_tempo_without_rerendering_input(self):
         data = study_db()
@@ -246,8 +281,12 @@ class V7Preview(unittest.TestCase):
         expect(page.get_by_role("button", name="Add custom track")).to_be_visible()
         self.assertEqual(page.get_by_role("button", name="Add", exact=True).count(), 0)
         tile = page.locator('.track-tile[data-name="Drums"]')
+        unselected = page.locator('.track-tile[data-name="Bass"]')
+        unselected_color = unselected.evaluate("el => getComputedStyle(el).backgroundColor")
         tile.click()
         expect(tile).to_have_attribute("aria-pressed", "true")
+        selected_color = tile.evaluate("el => getComputedStyle(el).backgroundColor")
+        self.assertNotEqual(selected_color, unselected_color)
         expect(page.get_by_role("button", name="Continue to Section Study")).to_be_visible()
         expect(page.locator(".action-row.action-separated")).to_be_visible()
 
@@ -279,6 +318,7 @@ class V7Preview(unittest.TestCase):
         expect(page.get_by_role("button", name="Edit Project")).to_be_visible()
         expect(page.get_by_role("button", name="Reset Progress")).to_be_visible()
         expect(page.get_by_role("button", name="Delete Project")).to_be_visible()
+        expect(page.locator(".build-info")).to_contain_text("V7 Preview")
 
 
 if __name__ == "__main__":
