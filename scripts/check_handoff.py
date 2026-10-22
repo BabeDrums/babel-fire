@@ -20,6 +20,7 @@ WATCHED_PATHS = {
     "V6.md",
     "V7_DRAFT.md",
     "FIRE_CORE.md",
+    "BABEL_PLATFORM.md",
     "CONTEXT.md",
     "AGENTS.md",
 }

@@ -70,7 +70,7 @@ Making the record is always the primary task.
 - Do not treat page completion as mastery.
 - Duolingo is inspiration for adaptive learning and learn-by-doing, not a requirement to add XP, streaks, cartoon paths, or forced lessons.
 
-A future optional Skills/Growth/Insights surface may summarize development without being required to finish music.
+A future optional Skills/Growth/Insights or Practice surface may summarize development and offer targeted category practice without being required to finish music. A living, shareable visualization of growth (working concept: the user’s **Fire**) is also worth prototyping, but it must represent credible learning evidence rather than raw usage, page completion, or a punitive daily streak. These remain future hypotheses; see `BABEL_PLATFORM.md`.
 
 ## Recreation creative intent
 
@@ -201,6 +201,8 @@ Do not prematurely lock:
 - exact Track → Element → Role data/UI
 - whether coaching depth needs an explicit control or remains contextual
 - how skill confidence is represented without fake mastery
+- exact optional Practice/Skills/Growth surface and how project lessons feed targeted practice
+- whether/how the user’s Fire visualizes growth without becoming a fake global producer score
 - exact Recreation intent copy and whether it is chosen, inferred, or edited later
 - which later phases truly need which earlier information
 - future audio-aware analysis; FIRE Core does not require it today
