@@ -19,6 +19,7 @@ WATCHED_PATHS = {
     "index.html",
     "V6.md",
     "V7_DRAFT.md",
+    "FIRE_CORE.md",
     "CONTEXT.md",
     "AGENTS.md",
 }
@@ -59,6 +60,9 @@ def main() -> int:
         return 1
 
     print("FIRE handoff freshness check passed.")
+    doctrine = subprocess.run([sys.executable, "scripts/check_product_doctrine.py"], check=False)
+    if doctrine.returncode:
+        return doctrine.returncode
     return 0
 
 

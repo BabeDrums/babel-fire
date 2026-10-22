@@ -7,11 +7,13 @@ Babel FIRE is an iPhone/iPad-first music-production workflow app. Production run
 Apply this hierarchy when sources conflict:
 
 1. **AGENTS.md** — repository workflow, engineering, maintenance, review, and documentation rules.
-2. **Active version specification, currently V6.md** — approved requirements for the active product generation; supersedes older UI/product descriptions where they conflict.
-3. **CONTEXT.md** — durable product philosophy, architecture, learning/workflow context, and decisions intended to survive across versions.
-4. **Current code and tests** — implementation evidence; they do not override explicit approved product requirements.
+2. **FIRE_CORE.md** — current cross-generation product doctrine: purpose, shared reasoning/learning model, project-type semantics, and product boundaries.
+3. **Active production specification, currently V6.md** — approved requirements for behavior that ships in the active production generation. Generation-specific rules do not override FIRE Core doctrine unless the doctrine is deliberately changed in the same work.
+4. **V7_DRAFT.md** — experimental V7 shell behavior and interaction direction, scoped to that generation.
+5. **CONTEXT.md** — durable supporting history, detailed learning/workflow context, and decisions not superseded above.
+6. **Current code and tests** — implementation evidence; they do not override explicit approved product requirements.
 
-If a genuine conflict remains after applying this hierarchy, ask rather than guessing. Inspect `main`, open PRs, relevant branches, and the working tree to distinguish shipped, unmerged, and planned work. Never mistake a local implementation or a passing test for a production release.
+Historical/versioned specifications are a library of generation-specific truth, not current universal doctrine. If a genuine conflict remains after applying this hierarchy, reconcile the durable product documents rather than silently choosing one. Inspect `main`, open PRs, relevant branches, and the working tree to distinguish shipped, unmerged, and planned work. Never mistake a local implementation or a passing test for a production release.
 
 ## Git and review workflow
 
@@ -58,7 +60,7 @@ Stabilize information architecture, navigation, page purpose, scrolling/viewport
 
 ## Engineering and product rules
 
-- Read `CONTEXT.md`, the active specification, and relevant code/tests before product work. The active approved implementation scope is **V6**.
+- Read `FIRE_CORE.md`, `CONTEXT.md`, the relevant generation specification, and relevant code/tests before product work. The active shipped implementation scope is **V6**; V7 remains an isolated preview until deliberately promoted.
 - Preserve existing user data and the localStorage key `production-projects-v1`. Schema changes require a tested forward migration; never wipe projects.
 - Preserve stable section, track, presence-range, and change IDs. When a genuine split/merge needs new identities, retain surviving identities wherever possible.
 - The continuous timeline is the source of truth. Do not recreate duplicate Parts / Enters / Leaves state. Preserve downstream Skeleton Session → Draft → Bounce dependencies and browser-history behavior.
@@ -90,7 +92,7 @@ Keep the production and redesign models distinct.
 
 - **No Codex for FIRE.** Use the normal ChatGPT GitHub connector/direct repository tools for implementation and repository maintenance.
 - Projects + New Project are the current visual reference implementation. Extract their rules; do not copy one layout blindly onto every screen.
-- The current approved next step is a global FIRE Design System foundation pass. Do not continue route-by-route cosmetic micro-polish without first fixing shared typography, spacing, surfaces, controls, states, and adaptive presentation.
+- The current design objective is **V7 Shell Freeze**: one deliberate declutter/system pass should lock reusable header archetypes, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, and adaptive presentation. After that, stop broad shell churn and breadboard FIRE Core end-to-end before deeply designing later phases.
 - Use one coherent hierarchy for page title, subtitle, section title, row title, supporting text, and metadata/status. Remove redundant labels and excessive tracked uppercase when layout already communicates hierarchy.
 - Use one coherent interaction-state system: normal, hover (fine pointer only), pressed, selected, focus-visible, disabled, destructive, and completed. Geometry must not change between states.
 - Selection and completion are distinct semantics. Do not use completion checkmarks as generic selection decoration.
@@ -98,8 +100,8 @@ Keep the production and redesign models distinct.
 - Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
 - Leading toolbar = navigation; trailing toolbar = contextual action. Keep the V7 center toolbar quiet; the V6 center context navigator is production-generation behavior and does not carry into V7.
 - The same task sheet behavior applies across device classes; presentation may adapt to available space (for example, centered on wider canvases and bottom-oriented on compact canvases) without changing product logic.
-- Short phone pages that fit within the visual viewport must not create unnecessary root scrolling or rubber-band drift. Use dynamic viewport sizing/overscroll containment while preserving natural scrolling when content genuinely exceeds the viewport.
-- Pages that genuinely scroll on iOS Safari must provide enough scroll-end clearance for the final interactive row to rise fully above dynamic browser chrome; short pages must not reserve that clearance and become fake-scroll pages.
+- Document height determines page scrolling. Never switch root overflow based on live `VisualViewport` measurements while Safari chrome moves; short pages remain naturally short and genuinely tall pages scroll normally.
+- Tall iOS Safari pages may use modest CSS-only end clearance so final controls can rise above browser chrome. Short pages must not reserve a fake-scroll tail. Modal sheets may temporarily lock background scrolling while open.
 - Dense narrow-phone layouts should reduce redundant secondary copy and compact non-current states before shrinking controls. Preserve ~44px touch targets and progression/state clarity.
 - Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
 - Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
@@ -108,6 +110,7 @@ Keep the production and redesign models distinct.
 
 ## Product versioning
 
+- **V6 / V7 / future Vx** are implementation/product-interaction generations. **FIRE Core** is the first complete functional product definition, not `V1`. **FIRE 1.0** is reserved for a future validated release milestone.
 - Major approved product/interaction generations increment the whole version: V5 → V6.
 - Meaningful approved refinements within the same generation may use a minor version: V6 → V6.1.
 - Tiny bug fixes normally do not require a FIRE product-version bump.
@@ -116,7 +119,8 @@ Keep the production and redesign models distinct.
 
 ## Documentation hygiene and automatic handoff
 
-- `CONTEXT.md` is not a changelog. It stores durable product decisions, architecture principles, and reusable interaction rules. Preserve valid durable V5 additions; change it only when those rules change.
+- `FIRE_CORE.md` is the canonical current cross-generation product doctrine. A durable doctrine change must update it and reconcile affected guidance in `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, and relevant generation specs in the same PR.
+- `CONTEXT.md` is not a changelog. It stores durable supporting history, detailed workflow knowledge, and decisions that remain valid under FIRE Core. Preserve useful historical evidence, but scope it clearly when superseded so it cannot compete with current doctrine.
 - Task-specific implementation details, validation results, and review findings belong in the PR/completion report.
 - `START_HERE.md` is the canonical zero-context handoff entry point, not a second context document. Keep its active-specification reference, current shipped/approved direction, physical-device review state, and next approved chunk current.
 - Every product/runtime or durable-rule PR that changes `app.js`, `styles.css`, `index.html`, `V6.md`, `CONTEXT.md`, or `AGENTS.md` must also refresh `START_HERE.md`. `scripts/check_handoff.py` and the CI **Handoff freshness** job enforce this automatically.
