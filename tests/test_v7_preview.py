@@ -294,7 +294,7 @@ class V7Preview(unittest.TestCase):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True))
         page.get_by_role("button", name="Review Map").click()
         expect(page.locator("h1")).to_have_text("Review Map")
-        expect(page.locator(".prereq-card")).to_contain_text("still uses V6")
+        expect(page.locator(".prereq-card")).to_contain_text("Review Map isn't available in this preview yet.")
 
     def test_project_actions_keep_core_edit_reset_delete_paths(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True))
