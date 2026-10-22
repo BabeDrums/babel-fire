@@ -20,7 +20,8 @@ REQUIRED = {
         "Documentation authority and conflict policy",
     ],
     "AGENTS.md": ["FIRE_CORE.md", "Historical/versioned specifications are a library"],
-    "START_HERE.md": ["FIRE_CORE.md", "FIRE Core product doctrine"],
+    "START_HERE.md": ["FIRE_CORE.md", "FIRE Core product doctrine", "BABEL_PLATFORM.md"],
+    "BABEL_PLATFORM.md": ["# Babel Platform — Future Hypotheses", "The user’s Fire", "entitlements", "Future/platform exploration only"],
     "CONTEXT.md": ["FIRE_CORE.md", "standalone cover/reconstruction workflow"],
     "V7_DRAFT.md": ["`FIRE_CORE.md` governs cross-generation product doctrine"],
 }
