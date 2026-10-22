@@ -165,7 +165,9 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(page.get_by_text("Locked", exact=True).count(), 0)
         self.assertEqual(page.get_by_text("Recommended", exact=True).count(), 0)
         self.assertEqual(page.get_by_text("In progress", exact=True).count(), 0)
-        self.assertEqual(page.get_by_text("Later", exact=True).count(), 0)
+        expect(page.locator(".future-label")).to_have_text("Later")
+        expect(page.locator(".future-phase-list span")).to_have_count(6)
+        self.assertEqual(page.locator(".future-row").count(), 0)
         self.assertEqual(page.get_by_text("Checkpoint", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("Step ", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("Roadmap", exact=True).count(), 0)
@@ -191,6 +193,9 @@ class V7Preview(unittest.TestCase):
 
         page = self.open("setup", study_db(setup=True))
         self.assertEqual(page.get_by_text("Done", exact=True).count(), 0)
+        reference = page.locator('.form-row[data-field="reference"]')
+        expect(reference).to_contain_text("Imported")
+        self.assertEqual(reference.locator(".checkmark").count(), 0)
         expect(page.get_by_role("button", name="Continue to Structure")).to_be_visible()
 
     def test_song_setup_continuation_reacts_to_tempo_without_rerendering_input(self):
@@ -226,8 +231,11 @@ class V7Preview(unittest.TestCase):
         expect(page.locator(".arrangement-row")).to_contain_text("8 bars")
         expect(page.locator(".group.arrangement .add-section-row")).to_be_visible()
         self.assertEqual(page.get_by_role("button", name="Continue to Tracks").count(), 0)
-        page.get_by_role("button", name="Structure matches the song").click()
+        confirm = page.get_by_role("button", name="Structure matches the song")
+        expect(confirm.locator(".completion-ring")).to_be_visible()
+        confirm.click()
         expect(page.get_by_role("button", name="Continue to Tracks")).to_be_visible()
+        expect(page.get_by_role("button", name="Structure matches the song").locator(".checkmark")).to_be_visible()
 
     def test_tracks_shows_continuation_only_after_the_task_has_started(self):
         page = self.open("tracks", study_db(setup=True, structure=True))
@@ -235,11 +243,21 @@ class V7Preview(unittest.TestCase):
         expect(page.locator(".sub")).to_have_text("Choose everything you hear in the song.")
         self.assertEqual(page.get_by_text("Step ", exact=False).count(), 0)
         self.assertEqual(page.get_by_role("button", name="Continue to Section Study").count(), 0)
+        expect(page.get_by_role("button", name="Add custom track")).to_be_visible()
+        self.assertEqual(page.get_by_role("button", name="Add", exact=True).count(), 0)
         tile = page.locator('.track-tile[data-name="Drums"]')
         tile.click()
         expect(tile).to_have_attribute("aria-pressed", "true")
         expect(page.get_by_role("button", name="Continue to Section Study")).to_be_visible()
         expect(page.locator(".action-row.action-separated")).to_be_visible()
+
+    def test_custom_track_is_one_control_and_enter_adds_it(self):
+        page = self.open("tracks", study_db(setup=True, structure=True))
+        field = page.get_by_role("textbox", name="Other track")
+        field.fill("Strings")
+        field.press("Enter")
+        expect(page.locator('.track-tile[data-name="Strings"]')).to_be_visible()
+        expect(page.get_by_role("button", name="Continue to Section Study")).to_be_visible()
 
     def test_section_study_explains_only_real_missing_context(self):
         page = self.open("section-study")
