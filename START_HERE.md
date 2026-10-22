@@ -21,15 +21,15 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 
 Always distinguish shipped production work from experimental V7 preview work.
 
-## Current verified continuity — October 21, 2026
+## Current verified continuity — October 22, 2026
 
-PR #37, **Refine V7 visual semantics and composition**, is merged and deployed at `ae00659…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #62 succeeded. PR #36 is the preceding shell-consolidation milestone; PRs #34–#35 remain the preceding Projects/continuity milestones.
+PR #38, **Refine V7 grayscale interaction fidelity**, is merged and deployed at `c7aa0c4…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #63 succeeded. Physical iPhone Safari review then exposed two conceptual/runtime defects that the current corrective pass addresses: Reference should be a setup attestation rather than a file picker, and VisualViewport-driven root scroll locking can glitch as Safari browser chrome changes height. PR #37 remains the preceding visual-semantics milestone.
 
 The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
 The V7 shell is now consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
-The current refinement direction is **grayscale interaction fidelity**: make controls feel finished without relying on accent color, replace prototype boolean-style interactions with truthful state behavior, preserve distinct selection/completion/navigation/progression semantics, and let compact/regular layouts adapt presentation without changing product logic.
+The current corrective direction is **Safari stability + setup semantics**: preserve the grayscale interaction foundation, treat Reference as a setup completion requirement rather than file ownership, use natural document scrolling instead of runtime root-scroll locking, keep upcoming Journey destinations visibly tappable, and remove internal V6/approval language from preview placeholders.
 
 ## Production state — V6
 
@@ -102,16 +102,17 @@ Visual semantics:
 
 - **selection** uses restrained selected surfaces, not completion marks
 - **completion** uses ring/check language
-- **status/value** uses text when text is the information itself; Reference uses filename/identity plus completion feedback rather than a bare `Import` / `Imported` toggle
+- **status/value** uses text when text is the information itself; Reference is a completion requirement (“Import the reference into your session”) and uses ring/check feedback without asking FIRE to own the media
 - **navigation** uses rows/chevrons
 - **primary progression** gets the strongest compact button treatment
 - do not stack two indicators for one state
 
 Viewport:
 
-- short phone pages that fit the actual visual viewport should not create fake root scrolling
-- genuinely tall pages scroll naturally and receive enough Safari end clearance
-- do not globally disable scrolling or globally reserve a giant bottom tail
+- document height determines whether a page scrolls naturally
+- never toggle root `overflow` from `VisualViewport` measurements while Safari chrome is moving
+- short pages remain naturally short; tall pages receive modest CSS-only Safari end clearance
+- modal sheets may temporarily lock body scrolling while open, but page scrollability itself is never runtime-switched
 
 ## What is locked vs still experimental
 
@@ -125,13 +126,13 @@ Viewport:
 - Structure and Tracks are directly revisitable
 - persistent `+` is the Projects create affordance
 - quiet Projects empty state
-- content-aware viewport behavior
+- natural CSS document scrolling with no VisualViewport-driven root lock
 - V7 sandbox isolation
 - core preview UI should render directly from `app.js` / `styles.css`, not through visual MutationObserver overlays
 
 ### Testing
 
-- grayscale interaction-fidelity refinements: material contrast, primary-action weight, field focus, Reference import/replace/remove, and compact-vs-regular composition
+- grayscale interaction-fidelity refinements: material contrast, primary-action weight, field focus, Reference completion semantics, and compact-vs-regular composition
 - exact Journey signature treatment beyond the restrained semantic hierarchy
 - exact future FIRE/signal-path personality treatment
 - shell spacing/density refinements after physical review
@@ -216,7 +217,7 @@ Review in this order:
 
 1. Projects — `+`, one create path, quiet empty state, no visible prototype stamp, no needless subtitle
 2. Project Home — Continue hierarchy, restrained Journey, completed/current/upcoming clarity, future-phase density, Notes
-3. Song Setup — real Reference file-selection feedback with filename + completion, Replace/Remove behavior, and no fake boolean toggle semantics
+3. Song Setup — Reference as a clear ring/check setup requirement with no file picker, filename, Replace/Remove sheet, or media ownership implication
 4. Structure — arrangement first, verification quieter than musical content, continuation only when useful
 5. Tracks — direct selection and clear separation of custom entry vs continuation
 6. Section Study / Review Map placeholders — truthful, concise, no fake completion

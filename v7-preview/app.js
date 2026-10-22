@@ -29,31 +29,7 @@ const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
 let db = loadDb();
 let currentRoute = "projects";
 let sheetState = null;
-let viewportFitFrame = 0;
 let buildCommitPromise = null;
-
-function applyViewportFit() {
-  const screen = app.querySelector(".screen");
-  const phone = window.matchMedia("(max-width: 699px)").matches;
-  app.dataset.scrollable = "false";
-  document.documentElement.dataset.v7Fit = "false";
-  if (!screen || !phone) return;
-
-  const viewport = window.visualViewport;
-  const viewportTop = viewport?.offsetTop || 0;
-  const viewportHeight = viewport?.height || window.innerHeight;
-  const viewportBottom = viewportTop + viewportHeight;
-  const contentBottom = screen.getBoundingClientRect().bottom;
-  const needsScroll = contentBottom > viewportBottom - 12;
-
-  app.dataset.scrollable = needsScroll ? "true" : "false";
-  document.documentElement.dataset.v7Fit = needsScroll ? "false" : "true";
-}
-
-function queueViewportFit() {
-  cancelAnimationFrame(viewportFitFrame);
-  viewportFitFrame = requestAnimationFrame(applyViewportFit);
-}
 
 function save() {
   saveDb(db);
@@ -88,7 +64,6 @@ function navigate(route, mode = "push") {
   setHistory(route, mode);
   render();
   window.scrollTo(0, 0);
-  queueViewportFit();
 }
 
 function continueTo(route) {
@@ -196,14 +171,11 @@ function completionAccessory(checked) {
 }
 
 function referenceRow(setup) {
-  const imported = !!setup.reference;
-  const detail = clean(setup.referenceName) || (imported ? "Imported reference" : "Choose audio from Files");
   return `
-    <button class="form-row reference-row" data-action="${imported ? "reference-actions" : "import-reference"}">
-      <span><span class="form-label">Reference</span><span class="form-help reference-detail">${esc(detail)}</span></span>
-      ${imported ? completionAccessory(true) : `<span class="form-action">Import…</span>`}
-    </button>
-    <input id="referenceFileInput" class="visually-hidden" type="file" accept="audio/*" aria-label="Reference audio file">`;
+    <button class="form-row reference-row" data-action="toggle-setup" data-field="reference">
+      <span><span class="form-label">Reference</span><span class="form-help">Import the reference into your session.</span></span>
+      ${completionAccessory(!!setup.reference)}
+    </button>`;
 }
 
 function setupRow(label, field, value, help = "") {
@@ -224,7 +196,6 @@ function setupContinuationMarkup(item) {
 function syncSetupContinuation(item) {
   const host = document.getElementById("setupContinuation");
   if (host) host.innerHTML = setupContinuationMarkup(item);
-  queueViewportFit();
 }
 
 function renderSetup() {
@@ -308,7 +279,7 @@ function renderSectionStudy() {
     ].join("");
     body = `<div class="prereq-card"><h3>Finish the missing context first.</h3><p>Section Study needs a structure and at least one track.</p><div class="prereq-actions">${actions}</div></div>`;
   } else {
-    body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">The full timeline editor stays in V6 until this lighter shell is approved.</p></div>`;
+    body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">Section Study isn\'t available in this preview yet.</p></div>`;
   }
   app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}</main>`;
 }
@@ -316,7 +287,7 @@ function renderSectionStudy() {
 function renderReviewMap() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">The full Review Map workspace still uses V6 while this lighter shell is being evaluated.</p></div></main>`;
+  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">Review Map isn\'t available in this preview yet.</p></div></main>`;
 }
 
 function renderNotes() {
@@ -383,21 +354,6 @@ function syncNewProjectAction() {
   button.disabled = !(title && artist);
 }
 
-function openReferenceSheet() {
-  const setup = project()?.map?.setup;
-  if (!setup?.reference) return;
-  const detail = clean(setup.referenceName) || "Imported reference";
-  openSheet(`
-    <div class="grabber"></div>
-    <h2>Reference</h2>
-    <p class="sheet-kicker reference-sheet-name">${esc(detail)}</p>
-    <div class="group">
-      <button class="row" data-action="replace-reference"><span class="row-title">Replace Reference</span><span></span></button>
-      <button class="row sheet-danger" data-action="remove-reference"><span class="row-title">Remove Reference</span><span></span></button>
-    </div>
-    <div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "reference" });
-}
-
 function createProject() {
   const title = clean(document.getElementById("newProjectTitle")?.value);
   const artist = clean(document.getElementById("newProjectArtist")?.value);
@@ -412,7 +368,7 @@ function createProject() {
     createdAt: Date.now(),
     notes: [],
     map: {
-      setup: { reference: false, referenceName: "", tempo: "", meter: "4/4", grid: false, firstListen: false },
+      setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
       sections: [],
       structureVerified: false,
       tracks: [],
@@ -480,11 +436,6 @@ app.addEventListener("click", (event) => {
 
   if (action === "new-project") return openNewProjectSheet();
   if (action === "project-actions") return openProjectActions();
-  if (action === "import-reference") {
-    document.getElementById("referenceFileInput")?.click();
-    return;
-  }
-  if (action === "reference-actions") return openReferenceSheet();
   if (action === "toggle-setup") {
     item.map.setup[button.dataset.field] = !item.map.setup[button.dataset.field];
     save();
@@ -535,15 +486,6 @@ sheetRoot.addEventListener("input", () => {
 app.addEventListener("change", (event) => {
   const item = project();
   if (!item || currentRoute !== "setup") return;
-  if (event.target.id === "referenceFileInput") {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    item.map.setup.reference = true;
-    item.map.setup.referenceName = file.name;
-    save();
-    renderSetup();
-    return;
-  }
   if (event.target.id === "meterInput") {
     item.map.setup.meter = event.target.value;
     save();
@@ -559,18 +501,6 @@ sheetRoot.addEventListener("click", (event) => {
 
   if (action === "close-sheet") return closeSheet();
   if (action === "create-project") return createProject();
-  if (action === "replace-reference") {
-    closeSheet();
-    requestAnimationFrame(() => document.getElementById("referenceFileInput")?.click());
-    return;
-  }
-  if (action === "remove-reference") {
-    item.map.setup.reference = false;
-    item.map.setup.referenceName = "";
-    save();
-    closeSheet();
-    return renderSetup();
-  }
   if (action === "quick-add-section") {
     item.map.sections.push({ id: uid(), name: button.dataset.name, lengthBars: 8 });
     item.map.structureVerified = false;
@@ -672,19 +602,12 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !sheetRoot.hidden) closeSheet();
 });
 
-app.addEventListener("click", () => requestAnimationFrame(queueViewportFit));
-app.addEventListener("input", queueViewportFit);
-app.addEventListener("change", queueViewportFit);
-window.addEventListener("resize", queueViewportFit);
-window.visualViewport?.addEventListener("resize", queueViewportFit);
-
 window.addEventListener("popstate", (event) => {
   const route = event.state?.v7Preview ? event.state.route : (location.hash || "#projects").slice(1);
   currentRoute = route || "projects";
   closeSheet(false);
   render();
   window.scrollTo(0, 0);
-  queueViewportFit();
 });
 
 const hashRoute = (location.hash || "").slice(1);
@@ -692,4 +615,3 @@ const validRoutes = new Set(["projects", "project", "setup", "structure", "track
 currentRoute = validRoutes.has(hashRoute) ? hashRoute : "projects";
 history.replaceState({ v7Preview: true, route: currentRoute }, "", `#${currentRoute}`);
 render();
-queueViewportFit();

@@ -112,7 +112,7 @@ Use one meaning per visual state:
 
 Do not show two indicators for the same state. A primary action must read differently from a selected option. During the fundamentals gate, prove hierarchy in grayscale through luminance, material, border, typography, spacing, and state before introducing a functional accent color.
 
-Reference is a special case: the filename/identity answers **what** is loaded, while a completion mark answers whether the setup requirement is satisfied. The preview should use a real file picker, persist the selected filename as metadata, and offer Replace / Remove rather than treating Reference like a silent boolean toggle.
+Reference is a setup requirement, not media FIRE needs to own. The user confirms that the reference has been imported into their production/session environment; FIRE stores only the completion state. Use the same ring/check completion language as other setup requirements. Do not request, upload, retain, or identify the reference file unless a future musical feature genuinely needs the media itself.
 
 Inactive future phases should orient without masquerading as disabled controls. Keep them visible in a compact quiet summary; expand the active phase’s work in Journey.
 
@@ -150,7 +150,7 @@ Tracks keeps the successful direct multi-select interaction.
 
 ## Section Study and Review Map
 
-The isolated preview may show prerequisite/placeholder states, but the full specialized editors remain V6 until the shell is approved physically.
+The isolated preview may show prerequisite/placeholder states, but preview-facing copy should describe availability plainly rather than expose internal V6 migration or approval language.
 
 Section Study genuinely needs a structure and at least one track. If context is missing, explain what is missing and provide direct routes to fix it instead of showing dead locked rows.
 
@@ -166,7 +166,7 @@ Do not require manual tagging for context FIRE already knows.
 
 Before migrating specialized editors or adding a Babel/FIRE signature treatment, the shell must pass a physical fundamentals gate:
 
-- **Content-aware scrolling:** short phone pages that fit the real visual viewport do not create root scrolling or rubber-band drift. Only genuinely tall pages receive Safari scroll-end clearance.
+- **Natural scrolling:** document height determines whether a page scrolls. Never switch root overflow in response to `VisualViewport` changes while the user is scrolling; mobile browser chrome must not cause content to lock, jump, disappear, or reappear. Short pages simply remain shorter than the viewport, while tall pages get modest CSS-only end clearance.
 - **Page necessity:** every visible element must support the page’s primary musical task, necessary context/navigation, or progressive disclosure. Duplicated workflow explanation and redundant escape/continuation controls are removed.
 - **Shared rhythm:** title offsets, subtitle spacing, grouped-row density, action placement, control states, and bottom breathing room should feel like one system across Projects, Project Home, Song Setup, Structure, Tracks, and preview placeholders.
 - **Real-state testing:** review short, partial, completed, and genuinely tall states at realistic phone heights rather than judging only a generous desktop-like viewport.
@@ -194,7 +194,7 @@ FIRE has one product logic, hierarchy, and interaction model across device class
 - Back/navigation semantics do not change by device.
 - Completion, selection, Journey, and Continue behavior do not change by device.
 - Presentation may adapt to available space: column count, content width, spacing, and sheet placement can change when useful.
-- Respect the real visual viewport for scrolling/end clearance.
+- Use stable CSS viewport sizing and natural document overflow; do not make product scrollability depend on live visual-viewport measurements.
 - Do not create “iPhone FIRE” and “iPad FIRE” as separate product experiences.
 
 ## Technical stability
