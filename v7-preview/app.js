@@ -156,7 +156,7 @@ function renderProjectHome() {
     .map((route) => journeyRow(item, route)).join("");
   const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
   const future = ["The Skeleton", "The Sounds", "The Balance", "The Shape", "The World", "The Finish"]
-    .map((name) => `<div class="future-row"><span>${esc(name)}</span></div>`).join("");
+    .map((name) => `<span>${esc(name)}</span>`).join("");
 
   app.innerHTML = `
     <main class="screen scroll-safe">
@@ -173,7 +173,10 @@ function renderProjectHome() {
       <section class="journey">
         <div class="phase-label">The Map</div>
         <div class="group journey-group">${workRows}</div>
-        <div class="future-phases" aria-label="Future phases">${future}</div>
+        <div class="future-phases" aria-label="Later phases">
+          <span class="future-label">Later</span>
+          <div class="future-phase-list">${future}</div>
+        </div>
       </section>
 
       <div class="section-title"><span>Notes</span></div>
@@ -195,9 +198,7 @@ function completionAccessory(checked) {
 function setupRow(label, field, value, help = "") {
   const checked = !!value;
   const accessory = field === "reference"
-    ? (checked
-      ? `<span class="form-value"><span>Imported</span><span class="checkmark" aria-label="Done">✓</span></span>`
-      : `<span class="form-value">Import</span>`)
+    ? `<span class="form-value status-value">${checked ? "Imported" : "Import"}</span>`
     : completionAccessory(checked);
   return `
     <button class="form-row" data-action="toggle-setup" data-field="${field}">
@@ -260,7 +261,7 @@ function renderStructure() {
       ${sections.length
         ? `<div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button></div>`
         : `<div class="structure-empty"><p>Add the first section you hear.</p><button class="primary-action compact-primary" data-action="open-add-section">Add Section</button></div>`}
-      ${sections.length ? `<button class="confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${item.map.structureVerified ? `<span class="checkmark" aria-label="Done">✓</span>` : `<span class="trailing">Confirm</span>`}</button>` : ""}
+      ${sections.length ? `<button class="confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${completionAccessory(item.map.structureVerified)}</button>` : ""}
       ${continuation}
     </main>`;
 }
@@ -281,7 +282,7 @@ function renderTracks() {
       ${topbar(backButton(item.title, "project"), "")}
       ${pageHeader("Tracks", "Choose everything you hear in the song.")}
       <div class="track-grid">${tiles}</div>
-      <div class="custom-track"><input id="customTrackInput" class="field" placeholder="Other…" aria-label="Other track"><button class="compact-button" data-action="add-custom-track">Add</button></div>
+      <div class="custom-track-control"><input id="customTrackInput" class="field" placeholder="Other…" aria-label="Other track"><button class="inline-add-button" data-action="add-custom-track" aria-label="Add custom track">＋</button></div>
       ${continuation}
     </main>`;
 }
@@ -597,6 +598,12 @@ sheetRoot.addEventListener("click", (event) => {
     closeSheet();
     return navigate("projects", "replace");
   }
+});
+
+app.addEventListener("keydown", (event) => {
+  if (currentRoute !== "tracks" || event.target.id !== "customTrackInput" || event.key !== "Enter") return;
+  event.preventDefault();
+  app.querySelector('[data-action="add-custom-track"]')?.click();
 });
 
 document.addEventListener("keydown", (event) => {

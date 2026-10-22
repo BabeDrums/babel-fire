@@ -23,11 +23,13 @@ Always distinguish shipped production work from experimental V7 preview work.
 
 ## Current verified continuity — October 21, 2026
 
-PR #34, **Simplify V7 Projects empty state**, is merged and deployed. PR #35, **Finalize FIRE handoff continuity**, is also merged. The post-merge `main` regression and Pages deployment completed successfully.
+PR #36, **Consolidate V7 shell and Journey**, is merged and deployed at `a151376…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #61 succeeded. PRs #34–#35 remain the preceding Projects/continuity milestones.
 
 The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
-The current V7 shell-consolidation direction removes the temporary Projects enhancer architecture: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet belong directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are superseded.
+The V7 shell is now consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
+
+The current refinement direction is **visual semantics + composition**: selection, completion, status, navigation, and primary progression must use distinct visual languages; future phases should orient without looking like dead controls; and the same adaptive FIRE interface must preserve identical product logic across phone/tablet sizes.
 
 ## Production state — V6
 
@@ -96,6 +98,15 @@ Work pages:
 - Tracks keeps direct multi-select
 - Section Study and Review Map specialized editors remain deferred
 
+Visual semantics:
+
+- **selection** uses restrained selected surfaces, not completion marks
+- **completion** uses ring/check language
+- **status/value** uses text where text is clearer (for example, `Imported`)
+- **navigation** uses rows/chevrons
+- **primary progression** gets the strongest compact button treatment
+- do not stack two indicators for one state
+
 Viewport:
 
 - short phone pages that fit the actual visual viewport should not create fake root scrolling
@@ -120,11 +131,10 @@ Viewport:
 
 ### Testing
 
-- exact Journey visual treatment
-- exact Continue emphasis
-- exact future-phase weight/placement
-- shell spacing/density refinements
-- how much explanatory copy individual work pages need
+- exact Journey signature treatment beyond the restrained semantic hierarchy
+- exact future FIRE/signal-path personality treatment
+- shell spacing/density refinements after physical review
+- how much explanatory copy dense migrated editors will need
 
 ### Parking lot / later experiment
 
@@ -210,7 +220,7 @@ Review in this order:
 5. Tracks — direct selection and clear separation of custom entry vs continuation
 6. Section Study / Review Map placeholders — truthful, concise, no fake completion
 
-Specifically test short-page scrolling, tall-page Safari clearance, spacing/density, direct revisiting, Back behavior, and core action discoverability.
+Specifically test short-page scrolling, tall-page Safari clearance, spacing/density, direct revisiting, Back behavior, core action discoverability, and that one adaptive interface preserves identical product logic across compact and wide layouts.
 
 Do not promote the stylized signal-path concept until this restrained shell passes physical review.
 

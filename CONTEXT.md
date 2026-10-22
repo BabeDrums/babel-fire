@@ -152,18 +152,21 @@ These phase names are currently the core Recreation framework:
 6. **The World** — depth, width, reverb, delay, automation, movement
 7. **The Finish** — compare, revise, polish, complete
 
-Earlier versions described three checkpoints per phase / 21 checkpoints total. The current user-facing progression model calls ordered work inside a Phase **Steps**; completion is derived automatically and Phase homes must not look like manual checklists.
+Earlier versions described three checkpoints per phase / 21 checkpoints total. V6 later exposed ordered work as Steps. That vocabulary and its Phase-home shell are **production-generation behavior, not universal FIRE architecture**.
 
+### Current redesign progression and navigation direction — LOCKED FOR V7 SHELL
 
-### Current progression and navigation vocabulary — LOCKED
+The V7 shell uses **Projects → Project Home → direct musical work**.
 
-FIRE's user-facing hierarchy is **Project → Phase → Step → Musical content**. `Checkpoint` is historical/internal wording only and must not return as the phase-home checklist metaphor.
+- Project Home owns **Continue + Journey + Notes**.
+- Continue recommends one next destination.
+- Journey shows the project path, supports direct revisiting, and groups work by Phase without requiring a Phase intermediary screen.
+- The Map remains the first Recreation phase, but its work (Song Setup, Structure, Tracks, Section Study, Review Map) is directly reachable from Journey.
+- Completed work remains revisitable. Upcoming work remains visible when useful for orientation. Hard gates exist only when a destination cannot function without required context.
+- V7 has no center context navigator and no separate Roadmap destination.
+- The future Projects/Notes top-level navigation surface remains deferred until Notes is a genuine app-level destination.
 
-- **Back** follows actual browser/history navigation.
-- A quiet **interactive center context title** provides fast in-project navigation without becoming another passive pill. Phase homes use the project context; Step/review screens use their parent Phase context.
-- The context navigator may expose Project Overview, Roadmap, Notes, the current Phase, and relevant Steps. It does not duplicate the full seven-phase Roadmap.
-- **Roadmap** remains the whole-journey view.
-- Persistent app-level Projects/Notes navigation is deferred until the global Notes hub is a real top-level destination.
+The shipped V6 Phase/Step/Roadmap/center-navigator model remains documented in `V6.md` and later V6-specific sections of this file for production maintenance only.
 
 ### Goal of a Recreation
 The target is a **complete finished reconstruction** taken as far as the user’s current ability allows.
@@ -272,7 +275,7 @@ Song Setup includes:
 - Grid
 - First Listen action state
 
-**LOCKED home-screen behavior:** The Map is an intentional exception to the otherwise minimal phase-home template because it has genuine setup work that must happen before analysis. Keep the full **Song Setup** controls directly on The Map home: Reference, Tempo, Meter, Grid, followed by the First Listen action card. Then show the three ordered Steps below. Structure / Tracks / Section Study remain visible for orientation even when locked; do not replace them with one generic prerequisite card. Do not hide setup behind a separate page, disclosure, compact row, or pill strip.
+**V6 production behavior (superseded by V7 shell direction):** V6 keeps Song Setup controls on The Map phase home. In V7, **Song Setup is a dedicated focused work page** reached directly from Project Home/Journey; do not recreate the V6 Map-home shell in the redesign.
 
 ### Structure
 Instruction style:
@@ -631,12 +634,12 @@ Progress is contextual: seven-phase journey on Recreation home, valid checkpoint
 
 ---
 
-# 17. Phase homes — universal template
+# 17. Phase homes — V6 production pattern (not V7 architecture)
 
 The Map and Skeleton previously looked too different.
 
-## LOCKED phase-home rule
-A phase home is an **overview**, not a workspace.
+## V6-only phase-home rule
+A V6 phase home is an **overview**, not a workspace. This section exists to maintain production V6 and must not override the V7 Project Home + Journey architecture.
 
 Default structure:
 - parent phase/project pill
@@ -830,7 +833,7 @@ Same FIRE, different canvas: phone, tablet, laptop, and desktop share one workfl
 
 Mouse, touch, and normal keyboard accessibility are first-class. Keep important controls visible without hover, provide stable non-geometric hover/press feedback and visible focus, and preserve native scrolling, Tab/Shift+Tab, Enter/Space activation, and safe Escape dismissal. Custom productivity shortcuts remain outside the current scope.
 
-On narrow iPhone layouts, a route that already fits the visual viewport should not gain fake root scroll or rubber-band drift; keeping the page shell stationary preserves alignment when moving between screens. When a phone route is genuinely dense, first remove redundant supporting copy or compact non-current states before shrinking touch targets. Roadmap should emphasize the current phase and compress future/completed phase detail; Map checkpoint descriptions may collapse when the titles and state already communicate the task.
+On compact layouts, a route that already fits the visual viewport should not gain fake root scroll or rubber-band drift; keeping the page shell stationary preserves alignment when moving between screens. When a route is genuinely dense, first remove redundant supporting copy or compact non-current states before shrinking touch targets. The same FIRE product logic, hierarchy, and interaction model must survive across phone and tablet; only presentation may adapt to available space. In production V6, Roadmap may compress future/completed phase detail.
 
 ## Apple-like rules that have emerged
 - avoid unnecessary hairlines

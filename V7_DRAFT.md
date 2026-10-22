@@ -97,8 +97,22 @@ Project Home should feel like a document home, not a dashboard.
 - The active phase may expose its named work inline.
 - Completed work gets a quiet completion accessory.
 - Future phases remain visible but quiet.
-- Avoid redundant labels such as Recommended, In progress, Current, Later, Phase 1 of 7, 2 of 3 complete, or progress bars when the hierarchy is already obvious.
+- Avoid redundant status labels such as Recommended, In progress, Current, Phase 1 of 7, 2 of 3 complete, or progress bars when the hierarchy is already obvious.
 - Roadmap does not exist as a separate destination.
+
+## Visual semantics
+
+Use one meaning per visual state:
+
+- **Selection** — restrained selected surface/border; no completion checkmark.
+- **Completion** — ring/check language.
+- **Status/value** — concise text when a word communicates the state better than an icon.
+- **Navigation** — list row + chevron where the row opens another destination.
+- **Primary progression** — the strongest compact button treatment on the work page.
+
+Do not show two indicators for the same state. A primary action must read differently from a selected option.
+
+Inactive future phases should orient without masquerading as disabled controls. Keep them visible in a compact quiet summary; expand the active phase’s work in Journey.
 
 ## Song Setup
 
@@ -158,18 +172,17 @@ Before migrating specialized editors or adding a Babel/FIRE signature treatment,
 
 ## iPhone / iPad adaptation
 
-### iPhone
+### Universal adaptive interface
 
-- Project Home is a vertically scrolling hub.
-- Work screens are focused single-column pages.
-- Native-feeling Back + contextual trailing action only.
-- Avoid custom center navigation controls.
-- Respect Safari's real visual viewport for scrolling/end clearance.
+FIRE has one product logic, hierarchy, and interaction model across device classes.
 
-### iPad
-
-- Prefer sidebar/split composition when it materially reduces navigation.
-- Do not simply enlarge the phone layout.
+- Project Home remains the hub.
+- Work screens remain focused.
+- Back/navigation semantics do not change by device.
+- Completion, selection, Journey, and Continue behavior do not change by device.
+- Presentation may adapt to available space: column count, content width, spacing, and sheet placement can change when useful.
+- Respect the real visual viewport for scrolling/end clearance.
+- Do not create “iPhone FIRE” and “iPad FIRE” as separate product experiences.
 
 ## Technical stability
 

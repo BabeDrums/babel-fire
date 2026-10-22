@@ -69,16 +69,22 @@ Stabilize information architecture, navigation, page purpose, scrolling/viewport
 - Do not introduce features outside the active approved scope unless required for correctness.
 - Remove replaced/dead interactions. Do not commit screenshots, temporary/debug fixtures, browser artifacts, caches, or environment-only files. Permanent regression tests and their representative test data belong in `tests/`.
 
-## Progression and navigation model — October 2026
+## Progression and navigation model — production V6 vs experimental V7
 
-- User-facing workflow hierarchy is **Project → Phase → Step → Musical content**.
-- **Checkpoint** is historical/internal terminology only. Do not present phase navigation as manual checklist controls; completion is automatically derived from canonical project state.
-- Phase homes show ordered **Steps** with clear done/current/locked state. Completed Steps remain navigable for editing; locked Steps remain visible when they help orientation.
-- **Back = browser/history navigation.** It should truthfully reflect where the user came from rather than pretending to be a hierarchy jump.
-- **Center context title = fast in-project navigation.** A quiet interactive context title may occupy the center toolbar when it opens real navigation to useful destinations such as Project Overview, Roadmap, Notes, the current Phase, and available Steps.
-- **Roadmap = whole journey.** Do not turn the context navigator into a duplicate seven-phase Roadmap.
-- Passive center labels/pills are prohibited. If a center element looks interactive, it must perform navigation.
-- A future Projects/Notes tab bar or iPad sidebar is allowed only when Notes becomes a genuine app-level destination; do not add persistent app-level chrome before the product earns it.
+Keep the production and redesign models distinct.
+
+**V6 production behavior** remains governed by `V6.md`. Its Phase/Step homes, center context navigator, and Roadmap are production-generation behavior only; do not treat them as universal FIRE rules or reintroduce them into V7 merely because V6 still ships at `/`.
+
+**V7 redesign direction** is governed by `V7_DRAFT.md` and the latest verified `START_HERE.md`:
+
+- **Projects → Project Home → direct musical work.**
+- Project Home owns **Continue + Journey + Notes**.
+- A Phase such as The Map is a grouping in Journey, not necessarily another intermediary screen.
+- Continue recommends one useful next action; Journey provides orientation and direct revisiting.
+- Completed work stays navigable. Upcoming work stays visible when it improves orientation. Hard-block only when a task literally cannot function without missing data.
+- No center context navigator and no separate Roadmap destination in V7.
+- Back/navigation should remain shallow and truthful to the current V7 route model.
+- A future Projects/Notes top-level navigation surface is allowed only when Notes becomes a genuine app-level destination.
 
 ## FIRE design-system operating rules — October 2026
 
@@ -90,14 +96,14 @@ Stabilize information architecture, navigation, page purpose, scrolling/viewport
 - Selection and completion are distinct semantics. Do not use completion checkmarks as generic selection decoration.
 - Prefer grouped rows/lists for structured text-heavy workflows; reserve cards for meaningful conceptual groups.
 - Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
-- Leading toolbar = navigation; trailing toolbar = contextual action. The center toolbar is normally quiet but may host the approved interactive context navigator described above.
-- iPad task sheets should prefer compact centered form/page-style presentation when appropriate; narrow phone layouts may use bottom-oriented sheets.
+- Leading toolbar = navigation; trailing toolbar = contextual action. Keep the V7 center toolbar quiet; the V6 center context navigator is production-generation behavior and does not carry into V7.
+- The same task sheet behavior applies across device classes; presentation may adapt to available space (for example, centered on wider canvases and bottom-oriented on compact canvases) without changing product logic.
 - Short phone pages that fit within the visual viewport must not create unnecessary root scrolling or rubber-band drift. Use dynamic viewport sizing/overscroll containment while preserving natural scrolling when content genuinely exceeds the viewport.
 - Pages that genuinely scroll on iOS Safari must provide enough scroll-end clearance for the final interactive row to rise fully above dynamic browser chrome; short pages must not reserve that clearance and become fake-scroll pages.
 - Dense narrow-phone layouts should reduce redundant secondary copy and compact non-current states before shrinking controls. Preserve ~44px touch targets and progression/state clarity.
 - Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
 - Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
-- Visual work is not complete merely because CI is green. Physical iPhone/iPad Safari approval is required before locking a visual chunk.
+- Visual work is not complete merely because CI is green. Verify the same adaptive interface in physical iOS/iPadOS Safari at representative compact and wide sizes; device class must not change FIRE’s product logic, hierarchy, or interaction model.
 - Update `START_HERE.md`, `AGENTS.md`, `CONTEXT.md`, `V6.md`, and `CHANGELOG.md` whenever a durable design-system rule or major shipped milestone changes, so a new chat can resume without reconstructing decisions.
 
 ## Product versioning
