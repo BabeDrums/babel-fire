@@ -4,6 +4,7 @@
 - **Production branch:** `main`
 - **Live production app:** https://babedrums.github.io/babel-fire/
 - **Live V7 preview:** https://babedrums.github.io/babel-fire/v7-preview/
+- **Cross-generation product doctrine:** [FIRE_CORE.md](FIRE_CORE.md)
 - **Active production specification:** [V6.md](V6.md)
 - **Experimental next-shell direction:** [V7_DRAFT.md](V7_DRAFT.md)
 
@@ -13,23 +14,36 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 
 1. `START_HERE.md`
 2. `AGENTS.md`
-3. `V6.md` for current production requirements
-4. `V7_DRAFT.md` for the redesign preview
-5. `CONTEXT.md`
-6. Current `main`, open PRs, relevant branches, and tests
-7. `CHANGELOG.md` for shipped milestones
+3. `FIRE_CORE.md` for current cross-generation product doctrine
+4. `V6.md` for shipped production-generation requirements
+5. `V7_DRAFT.md` for the redesign shell
+6. `CONTEXT.md` for supporting history/detail not superseded above
+7. Current `main`, open PRs, relevant branches, and tests
+8. `CHANGELOG.md` for shipped milestones
 
 Always distinguish shipped production work from experimental V7 preview work.
 
+## FIRE Core product doctrine
+
+`FIRE_CORE.md` is the canonical current product doctrine. Key direction:
+
+- FIRE is a **production companion that teaches through use**, not a mandatory learning course.
+- Original and Recreation are both first-class project types. Recreation must work standalone for someone who only wants to make a cover quickly.
+- Learning is ambient and adaptive: concise action by default, optional `Why?` / deeper help, domain-specific growth, and `I don't know` as a valid path.
+- Recreation can **Match, Interpret, or Reimagine** a reference; individual differences can be matched, intentional, or explored.
+- One shared FIRE reasoning engine serves both modes: **Feel → Identify → Reason → Experiment → Evaluate**.
+- Historical V6/V7 rules remain useful generation-specific evidence but cannot override current FIRE Core doctrine.
+
+
 ## Current verified continuity — October 22, 2026
 
-PR #38, **Refine V7 grayscale interaction fidelity**, is merged and deployed at `c7aa0c4…`; its PR and post-merge regression matrices passed at 390px, 440px, and 820px, and Pages deployment #63 succeeded. Physical iPhone Safari review then exposed two conceptual/runtime defects that the current corrective pass addresses: Reference should be a setup attestation rather than a file picker, and VisualViewport-driven root scroll locking can glitch as Safari browser chrome changes height. PR #37 remains the preceding visual-semantics milestone.
+PR #39, **Stabilize V7 Safari scrolling and setup semantics**, is merged and deployed at `d459a4f…`; its exact post-merge regression matrix passed at 390px, 440px, and 820px, Pages deployment #64 succeeded on the same SHA, and physical iPhone Safari review confirmed the scrolling behavior is improved. PR #38 remains the preceding grayscale interaction-fidelity milestone.
 
 The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
 The V7 shell is now consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
-The current corrective direction is **Safari stability + setup semantics**: preserve the grayscale interaction foundation, treat Reference as a setup completion requirement rather than file ownership, use natural document scrolling instead of runtime root-scroll locking, keep upcoming Journey destinations visibly tappable, and remove internal V6/approval language from preview placeholders.
+The current direction is **V7 Shell Freeze + FIRE Core shaping**: perform one deliberate declutter/system pass so headers, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, and adaptive presentation stop being re-litigated route by route; then breadboard the complete FIRE Core Original + Recreation journeys before deeply designing later phases.
 
 ## Production state — V6
 

@@ -1,7 +1,7 @@
 # Babel FIRE — Project Continuity / Handoff Context
 
 ## Purpose of this file
-This is the durable product/design context for Babel FIRE, not a changelog or a report of what has shipped. Begin continuations with `START_HERE.md` and follow the source-of-truth order in `AGENTS.md`: repository rules, active version specification (currently `V6.md`), this context, then current code/tests. The active specification supersedes older product/UI descriptions here where they conflict.
+This is durable supporting product/design context for Babel FIRE, not a changelog or a report of what has shipped. Begin continuations with `START_HERE.md` and follow the source-of-truth order in `AGENTS.md`. `FIRE_CORE.md` is the canonical current cross-generation product doctrine; version specs describe generation-specific behavior, and this file preserves deeper workflow/history that remains valid under that doctrine.
 
 Inspect current `main`, open PRs, relevant branches, and local changes without overwriting unfinished work. Distinguish shipped, unmerged, and planned work; continue from the latest verified state rather than asking the user to repeat documented decisions.
 
@@ -12,7 +12,7 @@ Inspect current `main`, open PRs, relevant branches, and local changes without o
 - Update it whenever a **locked product decision, learning-framework decision, architecture rule, or important user preference changes**.
 - Pure visual tweaks and bug fixes do not need a context rewrite unless they establish a new reusable rule.
 - The production branch records shipped implementation; task branches and PRs may contain newer, unmerged work. Code/tests describe implementation state without overriding approved requirements.
-- This file is the source of truth for **why FIRE works the way it does**, the user's production-learning profile, and decisions that must survive future chats.
+- `FIRE_CORE.md` is the source of truth for current cross-generation product doctrine. This file preserves supporting workflow/history, the reference user's design-relevant production profile, and detailed decisions that remain compatible with FIRE Core.
 - A new chat should inspect both the current repo and this file before proposing changes.
 - Do not make the user repeat the original production assessment or previously settled FIRE decisions.
 
@@ -64,12 +64,12 @@ The product should help expand that spark into a complete, intentional song.
 ## Two project types
 FIRE is one app with two project modes:
 
-### Original Song — PRIMARY
-The main long-term product.
+### Original Song
+The main long-term creative workflow.
 Goal: start with anything → finish a record.
 
-### Recreation — SECONDARY / LEARNING MODE
-Take an existing record apart, reconstruct it, and learn production decisions by doing.
+### Recreation
+A first-class standalone cover/reconstruction workflow that can range from faithful Match to Interpretation or full Reimagination. Recreation can develop production judgment through use, but learning is optional and must never be a prerequisite for someone who simply wants to complete a cover efficiently.
 
 **Smithereens by Twenty One Pilots is the first preloaded Recreation.**
 
@@ -124,7 +124,7 @@ The user also wants to make music **now**, so app development should remain effi
 Keep this section limited to information that directly affects FIRE's product design. Do not include private biography, embarrassing skill gaps, health/relationship/financial details, or anything a collaborator/developer would not need to know.
 
 ### Learning / interaction preferences
-- Assume the user is an experienced musician/creator with working familiarity with common production concepts; do not teach from absolute zero unless asked.
+- The reference user has strong musical experience but uneven production confidence by domain. FIRE itself must not require prior production knowledge: adapt guidance by domain, let `I don't know` be a valid answer, and avoid one global Beginner/Intermediate/Advanced assumption.
 - Prefer concise, manager-like direction with one clear next action at a time.
 - Keep the interface simple, but make the underlying logic rigorous.
 - Favor applied learning on real songs over detached theory.
@@ -134,7 +134,7 @@ Keep this section limited to information that directly affects FIRE's product de
 - Preserve the user's creative authorship: FIRE should guide decisions and learning, not make the artistic decisions for them.
 
 ### Product implication
-FIRE should emphasize structured listening, diagnosis, intentional experimentation, and finishing. It should not behave like a beginner course, a plugin encyclopedia, or an automatic song generator.
+FIRE should emphasize structured listening, diagnosis, intentional experimentation, and finishing. It should behave as a production companion that can teach through real work, not a mandatory beginner course, plugin encyclopedia, or automatic song generator. Concise production flow remains available even when the musician does not want educational depth.
 
 
 ---
@@ -169,9 +169,9 @@ The V7 shell uses **Projects → Project Home → direct musical work**.
 The shipped V6 Phase/Step/Roadmap/center-navigator model remains documented in `V6.md` and later V6-specific sections of this file for production maintenance only.
 
 ### Goal of a Recreation
-The target is a **complete finished reconstruction** taken as far as the user’s current ability allows.
+The target is a **complete finished cover/recreation** whose relationship to the reference is intentionally chosen rather than assumed. A project may begin as **Match**, **Interpret**, or **Reimagine**, and that bias may change during the work. Individual differences may be matched, intentionally kept, or explored.
 
-Success does **not** require being indistinguishable from the commercial master.
+A musician can use Recreation purely to make a cover quickly; learning/progress tracking must remain optional and ambient. Success does **not** require being indistinguishable from the commercial master unless faithful matching is the musician's actual goal.
 
 A strong outcome is:
 > Every meaningful remaining difference is either understood or consciously accepted.
@@ -206,13 +206,13 @@ Current conceptual workflow:
 7. **The Finish**
    - reference, revise, final mix/master/commit
 
-Original projects should be **more flexible** than Recreation.
+Original projects should remain creatively flexible, but Recreation is no longer defined as a rigid learning sequence either. Both project types use strong default guidance with minimal hard gating.
 
 Important distinction:
-- **Recreation:** sequential forward, flexible backward
-- **Original Song:** progress should guide, not police creativity
+- **Recreation:** the reference helps define the target, while Match / Interpret / Reimagine and intentional differences control how closely it is followed.
+- **Original Song:** the musician's own intention defines the target.
 
-Do not impose strict gating on Original mode just because Study mode uses it.
+Both modes share the FIRE reasoning engine. Guidance may recommend an order of operations, but creative exploration stays reversible and hard gates exist only when a task literally cannot function without required context.
 
 ---
 

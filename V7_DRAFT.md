@@ -1,6 +1,6 @@
 # Babel FIRE — Guided Workspace Redesign (Draft)
 
-**Status:** Isolated V7 shell preview is live from `main` under `/v7-preview/`. V6 remains the production app and active production specification until the V7 shell passes physical iPhone review and is deliberately promoted.
+**Status:** Isolated V7 shell preview is live from `main` under `/v7-preview/`. V6 remains the production app and active production specification until the V7 shell passes physical review and is deliberately promoted. `FIRE_CORE.md` governs cross-generation product doctrine; this file governs the V7 shell and must not redefine Recreation, learning, or Original semantics in conflict with FIRE Core.
 
 ## Why this reset exists
 
