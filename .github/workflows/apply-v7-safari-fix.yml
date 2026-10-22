@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - sol/v7-safari-stability-setup-semantics
+  pull_request:
+    branches:
+      - main
 permissions:
   contents: write
 jobs:
