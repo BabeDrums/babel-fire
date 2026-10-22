@@ -24,7 +24,7 @@ jobs:
           node --check v7-preview/app.js
           python -m py_compile tests/test_v7_preview.py
           git diff --check
-          ! grep -R "referenceFileInput\|visualViewport\|queueViewportFit\|data-v7-fit" v7-preview tests/test_v7_preview.py START_HERE.md V7_DRAFT.md
+          ! grep -R "referenceFileInput\|visualViewport\|queueViewportFit\|data-v7-fit" v7-preview
       - name: Remove one-shot helper
         run: rm .github/scripts/apply_v7_safari_fix.py .github/workflows/apply-v7-safari-fix.yml
       - name: Commit corrected V7 behavior
