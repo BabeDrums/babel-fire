@@ -17,17 +17,20 @@ jobs:
           ref: sol/babel-platform-learning-fire
       - name: Reconcile future-platform docs
         run: python3 scripts/apply_babel_platform_hypotheses.py
-      - name: Validate doctrine and handoff
-        run: |
-          python3 scripts/check_product_doctrine.py
-          python3 scripts/check_handoff.py "$(git merge-base HEAD origin/main)" HEAD
-      - name: Commit reconciled docs
+      - name: Commit reconciled docs locally
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add FIRE_CORE.md START_HERE.md scripts/check_handoff.py scripts/check_product_doctrine.py
-          if git diff --cached --quiet; then
-            exit 0
+          if ! git diff --cached --quiet; then
+            git commit -m "Reconcile Babel platform hypotheses with FIRE doctrine"
           fi
-          git commit -m "Reconcile Babel platform hypotheses with FIRE doctrine"
-          git push origin HEAD:sol/babel-platform-learning-fire
+      - name: Validate doctrine and handoff
+        run: |
+          python3 scripts/check_product_doctrine.py
+          python3 scripts/check_handoff.py "$(git merge-base HEAD origin/main)" HEAD
+      - name: Push reconciled docs
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/sol/babel-platform-learning-fire)" ]; then
+            git push origin HEAD:sol/babel-platform-learning-fire
+          fi
