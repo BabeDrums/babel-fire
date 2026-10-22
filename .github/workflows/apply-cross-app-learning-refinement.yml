@@ -1,0 +1,36 @@
+name: Apply cross-app learning refinement
+
+on:
+  push:
+    branches: [sol/cross-app-growth-ambient-fire]
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: sol/cross-app-growth-ambient-fire
+      - name: Apply refinement
+        run: python3 scripts/apply_cross_app_learning_refinement.py
+      - name: Commit durable docs locally
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add BABEL_PLATFORM.md START_HERE.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Refine cross-app learning and Babel World hypotheses"
+          fi
+      - name: Validate handoff and doctrine
+        run: |
+          python3 scripts/check_product_doctrine.py
+          python3 scripts/check_handoff.py "$(git merge-base HEAD origin/main)" HEAD
+      - name: Push durable docs
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/sol/cross-app-growth-ambient-fire)" ]; then
+            git push origin HEAD:sol/cross-app-growth-ambient-fire
+          fi
