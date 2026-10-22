@@ -21,133 +21,197 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 
 Always distinguish shipped production work from experimental V7 preview work.
 
-## Current verified state — October 21, 2026
+## Current verified continuity — October 21, 2026
 
-PR #34, **Simplify V7 Projects empty state**, is merged to `main` at merge commit `dc93b591dbc15772678f34ec48d22aca8bdd6448`.
+PR #34, **Simplify V7 Projects empty state**, is merged and deployed. PR #35, **Finalize FIRE handoff continuity**, is also merged. The post-merge `main` regression and Pages deployment completed successfully.
 
-The post-merge `main` FIRE regression run #160 completed successfully, and Pages deployment run #59 completed successfully. The deployed V7 preview therefore includes the latest Projects micro-polish.
+The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
-The PR-triggered regression run #158 became abnormally stuck in all three browser jobs even though static checks and handoff freshness had passed. The same merged code then passed the complete regression suite on `main`, confirming this was a CI-run hang rather than a product failure. The follow-up continuity pass adds a 15-minute browser-job timeout so a future stuck runner cannot wait indefinitely.
+The current V7 shell-consolidation direction removes the temporary Projects enhancer architecture: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet belong directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are superseded.
 
-## Current production state — V6
+## Production state — V6
 
 - Root `/` remains V6 on schema 5 using `production-projects-v1`.
 - Preserve stable project/section/track/range/event IDs, migrations, timeline semantics, durable notes, browser persistence, and Map → Skeleton dependencies.
-- V6 still contains the Phase/Step shell and center context navigator. Physical review rejected that shell as the direction to keep polishing.
-- Project actions are Edit Project / Reset Progress / Delete Project.
-- Song Setup no longer collapses.
-- Backup/Restore is not part of the active product.
+- V6 remains the production fallback until V7 is physically approved and deliberately promoted.
+- Do not use V6 screenshots as the redesign target merely because production is visible there.
 
-## Current redesign state — V7 preview
+## V7 architecture — settled at the shell level
 
-The V7 preview is intentionally isolated at `/v7-preview/` and uses `production-projects-v1-v7-preview`.
+The isolated preview lives at `/v7-preview/` and uses `production-projects-v1-v7-preview`. It must never mutate V6 production data.
 
-Latest physical iPhone review moved V7 into a **fundamentals polish gate**. The shell direction is promising, but **not yet approved to replace production**.
-
-The redesign question remains:
+The core question is:
 
 > Can FIRE get the musician into useful musical work without making them think about FIRE's organization?
 
-Current V7 direction:
+The settled shell architecture is:
 
-- Project Home is the hub: **Continue + Journey + Notes**.
-- Separate Roadmap is removed from the redesign direction.
-- No center context navigator.
-- Song Setup is its own focused page.
-- Structure is direct arrangement editing with quick Add Section.
-- Tracks keeps direct multi-select and loses workflow/status chrome.
-- Strong guidance, minimal gating.
-- Work screens return directly to Project Home.
-- Notes will become a true cross-project destination before Projects/Notes top-level navigation is introduced.
-- **Core actions must survive subtraction.** Projects keeps a persistent `+` as the single New Project affordance. The zero-project state is intentionally quiet (`No projects yet.`) and must not duplicate the create action with another large CTA.
-- Project creation remains sandbox-only and must never mutate V6 production data.
-- Projects shows a subtle automatic `FIRE V7 PREVIEW · <commit>` build stamp so physical screenshots can be tied to the deployed revision.
+**Projects → Project Home → direct musical work**
 
-## Latest physical-review feedback to carry forward
+Project Home contains:
 
-The current shell is meaningfully better and Project Home is starting to feel like a real home page.
+- **Continue** — one recommended next destination
+- **Journey** — orientation, direct access, and revisiting
+- **Notes** — project thinking
 
-- The fundamentals pass replaced blanket preview scroll padding with **content-aware visual-viewport fitting**: short phone pages should lock naturally while genuinely tall pages receive Safari end clearance.
-- The Page Necessity Audit is being applied route by route: redundant bottom “Back to Project” controls and duplicated completion wording are removed instead of restyled.
-- Shared spacing, heading offsets, row density, action placement, and placeholder presentation are being normalized before more editors migrate.
-- Subtraction is not allowed to remove a core route or primary task. Verify create/open/edit/reset/delete/navigation affordances after every declutter pass.
-- Do not duplicate a core action merely to make it more obvious when one clear, persistent affordance is sufficient.
-- Fundamentals come before personality. Do not add decorative brand behavior until page purpose, navigation, scrolling, spacing, and consistency are stable.
-- A future Babel/FIRE signature is desirable but not yet approved. One promising exploration is a subtle music-native progress path / signal-path treatment in Project Home Journey, inspired only by the useful part of path-based products like Duolingo: visible forward movement and one obvious next action. Do not copy game mechanics, fake percentages, XP, or lesson-board visuals literally.
+V7 does **not** carry forward:
+
+- the center context navigator
+- a separate Roadmap destination
+- a required The Map intermediary menu
+- Step 1 of 3 workflow chrome
+- broad `Locked` status rows
+- completion percentages everywhere
+
+**The Map is a phase/grouping inside Journey, not a screen the musician must enter to reach Structure, Tracks, or Section Study.**
+
+Rule: **guided forward, flexible backward.** Completed work stays revisitable. Upcoming work stays understandable. Hard-block only when a task literally cannot operate without missing context.
+
+## Current V7 fundamentals direction
+
+Projects:
+
+- one job: open or create a project
+- persistent `+` is the single create affordance
+- zero state is only `No projects yet.`
+- no duplicate giant New Project CTA
+- temporary subtle `FIRE V7 PREVIEW · <commit>` stamp remains for physical-review traceability
+- the Projects subtitle is intentionally removed in the consolidation pass because it did not add useful context
+
+Project Home:
+
+- project identity + project actions
+- Continue + Journey + Notes
+- restrained Journey state treatment only; exact signature styling remains experimental
+- current work is visually distinct without another status label
+- completed work is still tappable
+- future phases remain visible but quiet
+
+Work pages:
+
+- default heuristic is **title → minimum useful instruction → actual musical task → continuation when it becomes useful**
+- do not show premature disabled continuation controls just to explain the workflow
+- Song Setup is dedicated
+- Structure edits the arrangement directly
+- Tracks keeps direct multi-select
+- Section Study and Review Map specialized editors remain deferred
+
+Viewport:
+
+- short phone pages that fit the actual visual viewport should not create fake root scrolling
+- genuinely tall pages scroll naturally and receive enough Safari end clearance
+- do not globally disable scrolling or globally reserve a giant bottom tail
+
+## What is locked vs still experimental
+
+### Locked / current direction
+
+- Project Home = Continue + Journey + Notes
+- no center navigator in V7
+- no separate Roadmap in V7
+- The Map is a Journey grouping, not a required intermediary
+- Song Setup is a dedicated page
+- Structure and Tracks are directly revisitable
+- persistent `+` is the Projects create affordance
+- quiet Projects empty state
+- content-aware viewport behavior
+- V7 sandbox isolation
+- core preview UI should render directly from `app.js` / `styles.css`, not through visual MutationObserver overlays
+
+### Testing
+
+- exact Journey visual treatment
+- exact Continue emphasis
+- exact future-phase weight/placement
+- shell spacing/density refinements
+- how much explanatory copy individual work pages need
+
+### Parking lot / later experiment
+
+- fully stylized Babel/FIRE signal-path Journey
+- stronger music-native signature identity
+- signature animation/interactions
+- app-level Projects/Notes navigation
+- game-like progression mechanics (likely reject most literal forms)
+
+Duolingo is a **logic reference**, not a visual target: one obvious next action, ordered progression, visible movement, completed work remains accessible. Do not import XP, streaks, cartoon lesson paths, fake percentages, or hard locks everywhere.
+
+## Page necessity + design process
+
+For every substantive pass, automatically use the lightweight FIRE loop:
+
+**Discover → Define → Develop → Deliver → Verify + consolidate**
+
+Before polishing a page ask:
+
+1. What is this page's one job?
+2. What does the musician need here?
+3. What is duplicated elsewhere?
+4. What can be hidden, moved, or deleted?
+5. Does the page itself need to exist?
+
+Subtraction comes before addition, but subtraction must never remove the only path to a core action.
+
+Gabriel's brainstormed ideas are hypotheses unless explicitly locked. Use product judgment. Fundamentals come before signature personality.
+
+Target feeling remains roughly **70% calm Apple-like app hierarchy / 30% focused creative-tool density**: calm shell, density where the musical task genuinely requires it, then calm shell again.
 
 ## Gabriel's approval / execution contract
 
-This is important for continuity across chats:
+- Gabriel uses **“bet”** to mean **approved — go execute it now**.
+- Approved FIRE work means **implement → test → fix → PR → green checks → merge → Pages deploy → verify → live V7 link**.
+- Do not make Gabriel repeatedly say “continue,” “merge it,” “deploy it,” or “give me the link.”
+- Standing permission exists to merge FIRE PRs when checks are green, production-data safety is clear, and no genuine product decision remains unresolved.
+- Stop instead when tests fail, production data safety is uncertain, destructive behavior is unresolved, or a genuine product decision remains open.
+- Never claim a change is live until merge and Pages deployment are verified.
 
-- Gabriel uses **“bet”** to mean **approved — go execute it now**, not merely acknowledge the idea.
-- Once Gabriel approves a FIRE implementation, do not stop after editing code or opening a PR. The expected unit of work is **implement → test → fix failures → merge → deploy → verify → provide the live V7 link**.
-- Do not make Gabriel repeatedly say “continue,” “merge it,” or “give me the link.” Continue through the safe workflow automatically under the standing merge permission.
-- If CI is genuinely stuck, failed, unsafe, or requires Gabriel's intervention, diagnose it and take the safest available corrective action. Do not repeatedly return status-only messages while an actionable next step remains.
-- Never claim a change is live until merge and Pages deployment are actually verified.
+## Deferred scope
 
-## Default FIRE iteration behavior
+Do not lose track of:
 
-Gabriel does **not** want to repeatedly request research, project review, cleanup, or handoff maintenance.
+- full V7 Section Study timeline/editor
+- full Review Map workspace
+- Skeleton interiors
+- The Sounds
+- The Balance
+- The Shape
+- The World
+- The Finish
+- true cross-project Notes destination
+- final production-shell replacement
+- FIRE/Babel signature visual experiment
 
-For nontrivial FIRE design/product passes, automatically:
-
-- review the latest physical feedback and current repo state,
-- research relevant current platform/product references when they can improve the decision,
-- define the root problem before changing UI,
-- treat user suggestions as hypotheses unless explicitly locked,
-- perform the Page Necessity Audit from `AGENTS.md`,
-- prototype the smallest coherent solution,
-- run relevant tests,
-- remove superseded UI/code,
-- update project documentation and this handoff when durable/current direction changes.
-
-The lightweight FIRE loop is **Discover → Define → Develop → Deliver → Verify + consolidate**. It is a guardrail against solving the wrong problem, not a rigid bureaucracy.
-
-## Current preview scope
-
-The preview currently covers:
-
-- Projects, including sandbox New Project creation from the persistent `+`
-- Project Home
-- Song Setup
-- simplified Structure
-- Tracks
-- Section Study prerequisite/handoff
-- Review Map placeholder
-- project Notes view
-
-Full Section Study timeline, full Review Map, Skeleton interiors, and production-shell replacement stay deferred until the shell passes the declutter/polish physical gate.
+These are intentionally deferred until the shell/fundamentals pass is physically approved.
 
 ## Automatic handoff rule
 
-Gabriel should **never need to ask for a handoff update again**.
+Gabriel should never need to request a handoff update.
 
-- `START_HERE.md` is the canonical zero-context continuation file.
-- Product/runtime or durable-rule PRs that change `app.js`, `styles.css`, `index.html`, `V6.md`, `V7_DRAFT.md`, `CONTEXT.md`, `AGENTS.md`, or `v7-preview/` must refresh this file when the current handoff materially changes.
-- `scripts/check_handoff.py` and CI enforce handoff freshness for relevant changes.
-- A new chat pointed at `BabeDrums/babel-fire` should read `README.md` → `START_HERE.md` and continue without requesting a long context prompt.
+Product/runtime or durable-rule PRs that materially change `app.js`, `styles.css`, `index.html`, V7 preview runtime, or durable product rules must refresh this file. `scripts/check_handoff.py` and CI enforce handoff freshness.
 
 ## Operating workflow
 
-- **No Codex for FIRE.** Use normal GitHub connector/direct repository tools.
-- Work on a task branch → review diff → run static/browser regressions → PR → merge when safe/verified under standing permission → Pages deploy → verify live URL → physical-device review for visual work.
-- It is acceptable to ship isolated `/v7-preview/` iterations while leaving the root V6 app unchanged.
-- Stop instead of merging when tests fail, production data safety is uncertain, destructive behavior is unresolved, or a genuine product decision remains open.
-- Browser CI jobs have a 15-minute timeout so infrastructure hangs become explicit failures instead of indefinite blockers.
+- **No Codex for FIRE.** Use direct GitHub/repository tools.
+- Fresh `main` → task branch → implementation → tests → PR → merge when safe/green → Pages deploy → verify live → physical-device review.
+- It is acceptable to ship isolated `/v7-preview/` iterations while root V6 remains unchanged.
 
-## Next action in the new chat
+## Next physical-review gate
 
-Start from the **deployed V7 preview**, not from PR #34 or the old stuck run.
+Review the deployed V7 preview, not root V6:
 
-1. Have Gabriel physically review the current Projects screen: persistent `+`, quiet `No projects yet.` state, subtle build SHA, and no duplicate New Project CTA.
-2. Continue physical review of the fundamentals pass: short-page scrolling, tall-page Safari clearance, spacing/density, and route-by-route subtraction.
-3. Fix physical-only issues without expanding scope.
-4. Once the fundamentals gate passes, decide whether to migrate more editors or run a separate Babel signature/progress-path experiment.
+https://babedrums.github.io/babel-fire/v7-preview/
 
-Do **not** reopen already-settled architecture or re-research from zero unless new evidence requires it.
+Review in this order:
 
-Fallback continuation phrase:
+1. Projects — `+`, one create path, quiet empty state, build stamp, no needless subtitle
+2. Project Home — Continue hierarchy, restrained Journey, completed/current/upcoming clarity, future-phase density, Notes
+3. Song Setup — focused task, no duplicated status copy
+4. Structure — arrangement first, verification quieter than musical content, continuation only when useful
+5. Tracks — direct selection and clear separation of custom entry vs continuation
+6. Section Study / Review Map placeholders — truthful, concise, no fake completion
 
-> Babel FIRE — continue from GitHub repo BabeDrums/babel-fire. Read START_HERE.md and resume from the latest verified state.
+Specifically test short-page scrolling, tall-page Safari clearance, spacing/density, direct revisiting, Back behavior, and core action discoverability.
+
+Do not promote the stylized signal-path concept until this restrained shell passes physical review.
 
 `V5.md` is historical. `V6.md` remains production truth until V7 is physically approved and formally promoted.
