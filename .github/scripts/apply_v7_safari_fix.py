@@ -19,13 +19,11 @@ def replace(path, old, new, *, count=1):
         raise SystemExit(f"{path}: expected {count} exact occurrence(s), got {n}: {old[:80]!r}")
     p.write_text(text.replace(old, new))
 
-# --- V7 runtime -----------------------------------------------------------
 app = "v7-preview/app.js"
 replace(app, 'let viewportFitFrame = 0;\n', '')
 sub(app, r'function applyViewportFit\(\) \{.*?\n\}\n\nfunction queueViewportFit\(\) \{.*?\n\}\n\n', '', flags=re.S)
 replace(app, '  queueViewportFit();\n', '', count=3)
 replace(app, '\nqueueViewportFit();', '')
-
 sub(app, r'function referenceRow\(setup\) \{.*?\n\}\n\nfunction setupRow', '''function referenceRow(setup) {
   return `
     <button class="form-row reference-row" data-action="toggle-setup" data-field="reference">
@@ -35,20 +33,16 @@ sub(app, r'function referenceRow\(setup\) \{.*?\n\}\n\nfunction setupRow', '''fu
 }
 
 function setupRow''', flags=re.S)
-
 replace(app, '    body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">The full timeline editor stays in V6 until this lighter shell is approved.</p></div>`;', '    body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">Section Study isn\\\'t available in this preview yet.</p></div>`;')
 replace(app, '  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">The full Review Map workspace still uses V6 while this lighter shell is being evaluated.</p></div></main>`;', '  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">Review Map isn\\\'t available in this preview yet.</p></div></main>`;')
-
 sub(app, r'function openReferenceSheet\(\) \{.*?\n\}\n\nfunction createProject', 'function createProject', flags=re.S)
 replace(app, '      setup: { reference: false, referenceName: "", tempo: "", meter: "4/4", grid: false, firstListen: false },', '      setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },')
-
 replace(app, '''  if (action === "import-reference") {
     document.getElementById("referenceFileInput")?.click();
     return;
   }
   if (action === "reference-actions") return openReferenceSheet();
 ''', '')
-
 replace(app, '''  if (event.target.id === "referenceFileInput") {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -59,7 +53,6 @@ replace(app, '''  if (event.target.id === "referenceFileInput") {
     return;
   }
 ''', '')
-
 replace(app, '''  if (action === "replace-reference") {
     closeSheet();
     requestAnimationFrame(() => document.getElementById("referenceFileInput")?.click());
@@ -73,7 +66,6 @@ replace(app, '''  if (action === "replace-reference") {
     return renderSetup();
   }
 ''', '')
-
 replace(app, '''app.addEventListener("click", () => requestAnimationFrame(queueViewportFit));
 app.addEventListener("input", queueViewportFit);
 app.addEventListener("change", queueViewportFit);
@@ -82,7 +74,6 @@ window.visualViewport?.addEventListener("resize", queueViewportFit);
 
 ''', '')
 
-# --- CSS: stable natural scrolling, clearer tappable Journey rows ---------
 css = "v7-preview/styles.css"
 sub(css, r'@media \(max-width: 699px\) \{\n  html\[data-v7-fit="true"\],.*?\n\}\n\n', '', flags=re.S)
 replace(css, '.root-screen { padding-top: 18px; }\n', '.root-screen { padding-top: 18px; }\n.scroll-safe { padding-bottom: 64px; }\n')
@@ -92,18 +83,16 @@ replace(css, '''.journey-row.done .chevron,
 .journey-row.upcoming .chevron { opacity: .9; }''')
 replace(css, '.reference-detail { max-width: 430px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; }\n', '')
 
-# --- Regression tests -----------------------------------------------------
 tests = "tests/test_v7_preview.py"
 replace(tests, 'import os\nimport unittest\n', 'import os\nimport unittest\nfrom pathlib import Path\n')
 sub(tests, r'    def assert_short_page_locked\(self, page\):.*?(?=    def test_projects_is_one_job_open_or_create)', '', flags=re.S)
-replace(tests, '        self.assert_short_page_locked(page)\n', '')
+replace(tests, '        self.assert_short_page_locked(page)\n', '', count=3)
 sub(tests, r'    def test_short_work_pages_do_not_fake_scroll\(self\):.*?(?=    def test_project_home_is_continue_journey_notes_without_v6_chrome)', '''    def test_phone_pages_use_natural_document_scrolling(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True), height=720)
         self.assertNotEqual(page.evaluate("getComputedStyle(document.documentElement).overflowY"), "hidden")
         self.assertNotEqual(page.evaluate("getComputedStyle(document.body).overflowY"), "hidden")
         self.assertFalse(page.evaluate("'v7Fit' in document.documentElement.dataset"))
         self.assertFalse(page.evaluate("'scrollable' in document.querySelector('#app').dataset"))
-
         source = Path("v7-preview/app.js").read_text()
         styles = Path("v7-preview/styles.css").read_text()
         self.assertNotIn("visualViewport", source)
@@ -111,7 +100,6 @@ sub(tests, r'    def test_short_work_pages_do_not_fake_scroll\(self\):.*?(?=    
         self.assertNotIn("data-v7-fit", styles)
 
 ''', flags=re.S)
-
 replace(tests, '''        reference = page.locator(".reference-row")
         expect(reference.locator(".reference-detail")).to_have_text("Imported reference")
         expect(reference.locator(".checkmark")).to_be_visible()
@@ -119,14 +107,12 @@ replace(tests, '''        reference = page.locator(".reference-row")
         expect(reference.locator(".form-help")).to_have_text("Import the reference into your session.")
         expect(reference.locator(".checkmark")).to_be_visible()
 ''')
-
 sub(tests, r'    def test_reference_import_has_identity_feedback_and_replace_remove_actions\(self\):.*?(?=    def test_song_setup_continuation_reacts_to_tempo_without_rerendering_input)', '''    def test_reference_is_a_setup_requirement_not_a_file_picker(self):
         page = self.open("setup")
         reference = page.locator(".reference-row")
         expect(reference.locator(".form-help")).to_have_text("Import the reference into your session.")
         expect(reference.locator(".completion-ring")).to_be_visible()
         self.assertEqual(page.locator('input[type="file"]').count(), 0)
-
         reference.click()
         reference = page.locator(".reference-row")
         expect(reference.locator(".checkmark")).to_be_visible()
@@ -135,7 +121,6 @@ sub(tests, r'    def test_reference_import_has_identity_feedback_and_replace_rem
         setup = preview["projects"][0]["map"]["setup"]
         self.assertTrue(setup["reference"])
         self.assertNotIn("referenceName", setup)
-
         reference.click()
         expect(page.locator(".reference-row .completion-ring")).to_be_visible()
         preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
@@ -147,14 +132,12 @@ sub(tests, r'    def test_reference_import_has_identity_feedback_and_replace_rem
         expect(page.get_by_text("Section Study isn't available in this preview yet.")).to_be_visible()
         self.assertEqual(page.get_by_text("V6", exact=False).count(), 0)
         self.assertEqual(page.get_by_text("approved", exact=False).count(), 0)
-
         page = self.open("review-map", complete)
         expect(page.get_by_text("Review Map isn't available in this preview yet.")).to_be_visible()
         self.assertEqual(page.get_by_text("V6", exact=False).count(), 0)
 
 ''', flags=re.S)
 
-# --- Durable V7 spec + handoff -------------------------------------------
 draft = "V7_DRAFT.md"
 replace(draft, '''Reference is a special case: the filename/identity answers **what** is loaded, while a completion mark answers whether the setup requirement is satisfied. The preview should use a real file picker, persist the selected filename as metadata, and offer Replace / Remove rather than treating Reference like a silent boolean toggle.''', '''Reference is a setup requirement, not media FIRE needs to own. The user confirms that the reference has been imported into their production/session environment; FIRE stores only the completion state. Use the same ring/check completion language as other setup requirements. Do not request, upload, retain, or identify the reference file unless a future musical feature genuinely needs the media itself.''')
 replace(draft, '''- **Content-aware scrolling:** short phone pages that fit the real visual viewport do not create root scrolling or rubber-band drift. Only genuinely tall pages receive Safari scroll-end clearance.''', '''- **Natural scrolling:** document height determines whether a page scrolls. Never switch root overflow in response to `VisualViewport` changes while the user is scrolling; mobile browser chrome must not cause content to lock, jump, disappear, or reappear. Short pages simply remain shorter than the viewport, while tall pages get modest CSS-only end clearance.''')
@@ -176,7 +159,6 @@ replace(handoff, '- content-aware viewport behavior', '- natural CSS document sc
 replace(handoff, '''- grayscale interaction-fidelity refinements: material contrast, primary-action weight, field focus, Reference import/replace/remove, and compact-vs-regular composition''', '''- grayscale interaction-fidelity refinements: material contrast, primary-action weight, field focus, Reference completion semantics, and compact-vs-regular composition''')
 replace(handoff, '''3. Song Setup — real Reference file-selection feedback with filename + completion, Replace/Remove behavior, and no fake boolean toggle semantics''', '''3. Song Setup — Reference as a clear ring/check setup requirement with no file picker, filename, Replace/Remove sheet, or media ownership implication''')
 
-# Sanity checks that define this corrective pass.
 app_text = Path(app).read_text()
 css_text = Path(css).read_text()
 assert "referenceFileInput" not in app_text
