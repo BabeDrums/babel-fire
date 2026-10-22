@@ -38,7 +38,8 @@ function showBuildStamp(screen) {
     .then((info) => /^[0-9a-f]{40}$/i.test(info.commit) ? info.commit.slice(0, 7) : "unavailable")
     .catch(() => "unavailable");
   buildCommitRequest.then((commit) => {
-    if (stamp.isConnected) stamp.textContent = `FIRE V7 PREVIEW · ${commit}`;
+    const label = `FIRE V7 PREVIEW · ${commit}`;
+    if (stamp.isConnected && stamp.textContent !== label) stamp.textContent = label;
   });
 }
 
