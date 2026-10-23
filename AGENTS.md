@@ -11,6 +11,8 @@ There are two continuity lanes:
 - **FIRE implementation/product work:** read `START_HERE.md` first.
 - **Wider Babel ecosystem / surrounding apps / Babel World / learning app / visual identity:** read `BABEL_START_HERE.md` first.
 
+After the relevant authority/handoff files, inspect **relevant unresolved items** in `CONTINUITY_INBOX.md` before asking Babel to reconstruct recent feedback or ideas.
+
 Do not ask Babel to reconstruct decisions already documented in the appropriate handoff.
 
 ## Authority and scope
@@ -25,7 +27,8 @@ When FIRE sources conflict, use:
 4. **`V7_DRAFT.md`** — current G7 successor-shell behavior where compatible with FIRE Core.
 5. **`START_HERE.md`** — current verified implementation/review/next-step state.
 6. **`CONTEXT.md`** — durable supporting context/history not superseded above.
-7. **Current code/tests** — implementation evidence, not product authority.
+7. **`CONTINUITY_INBOX.md`** — unresolved low-authority deltas only; never overrides canonical sources.
+8. **Current code/tests** — implementation evidence, not product authority.
 
 ### Wider Babel ecosystem authority
 
@@ -36,8 +39,9 @@ For surrounding-app/platform work:
 3. `BABEL_APPS.md` — sibling-app concept ledger: real/candidate/unassigned/open.
 4. `BABEL_PLATFORM.md` — shared architecture/infrastructure/progression hypotheses.
 5. `FIRE_CORE.md` — FIRE semantics that ecosystem work must not redefine.
-6. `REFERENCES.md` — inspiration/research only.
-7. older prototypes/context — historical evidence only.
+6. `CONTINUITY_INBOX.md` — unresolved low-authority deltas only.
+7. `REFERENCES.md` — inspiration/research only.
+8. older prototypes/context — historical evidence only.
 
 Do not use old Smithereens/FIRE_CONTEXT/Babel World prototypes to override current product docs.
 
@@ -66,9 +70,29 @@ Normal sequence:
 
 **branch → implement → test → reconcile docs → PR → checks → merge → Pages deploy → verify → physical-device approval when relevant**
 
+## Parallel-chat ownership
+
+Babel may intentionally keep multiple chats open so FIRE implementation and wider ecosystem brainstorming do not compete for one context window.
+
+### FIRE build lane
+
+- owns active FIRE runtime/spec implementation
+- follows `START_HERE.md` + `AGENTS.md`
+- may create/merge/deploy implementation PRs under the standing workflow
+
+### Ecosystem brainstorm lane
+
+- follows `BABEL_START_HERE.md` + `BABEL_APPS.md` + `BABEL_PLATFORM.md`
+- is **read-mostly by default** while FIRE implementation is active
+- may research, brainstorm, compare concepts, and form hypotheses without touching FIRE runtime
+- may make narrowly scoped docs-only continuity updates when a genuinely durable idea needs preservation
+- must not edit FIRE runtime, G7 behavior/spec, storage/schema, or implementation files merely to preserve a brainstorm
+
+Before any parallel chat writes, re-read latest `main` and open PRs/branches. If two chats might edit the same durable file, the later writer reconciles latest `main` first rather than creating competing truth.
+
 ## Product/design iteration protocol
 
-Babel should not need to repeatedly request research, consistency review, cleanup, or handoff maintenance. Treat them as part of nontrivial product work when materially relevant.
+Babel should not need to repeatedly request research, consistency review, cleanup, handoff maintenance, or durable-idea capture. Treat them as part of nontrivial product work when materially relevant.
 
 User ideas/examples are inputs and hypotheses unless explicitly locked/approved/required. Evaluate them against product goals, platform guidance, evidence, and architecture.
 
@@ -200,9 +224,19 @@ Do not use sheets for visual variety or force object creation inline merely to a
 - `BABEL_PLATFORM.md` = future shared architecture/platform/progression hypotheses.
 - `REFERENCES.md` = inspiration/research, not authority.
 
+### Continuity capture buffer
+
+- `CONTINUITY_INBOX.md` = unresolved low-authority deltas that are important enough to survive a chat boundary but not mature enough for a canonical spec/ledger.
+- Do **not** update it for every message.
+- Capture when Babel explicitly says a detail is important/should be remembered, when it changes scope/semantics/guardrails/next step, when concrete device feedback would otherwise be lost, or when a promising hypothesis is specific enough that reconstructing it later would cost work.
+- Batch capture at natural checkpoints: with/before a substantive PR, after a coherent brainstorm batch, when switching lanes, before likely context exhaustion, or immediately for an explicit “do not lose this” instruction.
+- Do not capture jokes, transient wording, every unresolved option, already-canonical facts, or immediately rejected ideas.
+- Mature items are promoted into the correct authority and then removed from the active inbox; Git history is the archive.
+- The inbox is intentionally **not** a trigger for rewriting handoffs on every small capture. The handoffs permanently instruct new chats to read relevant unresolved inbox items after authority.
+
 ### Automatic maintenance
 
-Babel should never need to ask for a routine handoff update or consistency sweep.
+Babel should never need to ask for a routine handoff update, consistency sweep, or continuity capture.
 
 For every substantive product/durable-rule change:
 
@@ -212,6 +246,8 @@ For every substantive product/durable-rule change:
 4. keep history only when clearly scoped/useful; rely on Git otherwise
 5. refresh the relevant handoff(s)
 6. run handoff/doctrine guards
+
+For smaller but durable unpromoted deltas, update `CONTINUITY_INBOX.md` at the next natural consolidation checkpoint instead of opening a PR per sentence.
 
 `scripts/check_handoff.py` enforces watched handoff freshness. `scripts/check_product_doctrine.py` protects known settled markers but cannot prove semantic consistency; human/product review remains required.
 

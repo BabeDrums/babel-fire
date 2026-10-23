@@ -14,9 +14,12 @@ This handoff is for **brainstorming and preserving future product concepts**, no
 2. `BABEL_APPS.md` — durable app-concept ledger: what is real, candidate, unassigned, or intentionally open
 3. `BABEL_PLATFORM.md` — deeper cross-app architecture, accounts/sync, learning evidence, Fire/badges, monetization/social/lore hypotheses
 4. `FIRE_CORE.md` — canonical FIRE product doctrine
-5. `START_HERE.md` — current FIRE implementation/build state
-6. `REFERENCES.md` — inspiration/research only
-7. old prototypes/context files only as historical evidence, never as current ecosystem authority
+5. `START_HERE.md` — current FIRE implementation/build state when FIRE boundaries matter
+6. **relevant unresolved ecosystem items** in `CONTINUITY_INBOX.md`
+7. `REFERENCES.md` — inspiration/research only
+8. old prototypes/context files only as historical evidence, never as current ecosystem authority
+
+`CONTINUITY_INBOX.md` is a low-authority capture buffer. Read it only after the authority files above; it preserves concrete new ideas/feedback that have not yet earned promotion into canonical docs.
 
 If the conversation switches back to **building FIRE**, follow `START_HERE.md` and `V7_DRAFT.md`. If it is about the surrounding product family, remain in this ecosystem lane.
 
@@ -178,6 +181,30 @@ Particularly useful ecosystem lessons:
 
 `REFERENCES.md` remains inspiration/research, not authority.
 
+## Continuity capture for ecosystem brainstorms
+
+Babel should not have to interrupt a brainstorm to say “remember this” every time a useful detail appears.
+
+During an ecosystem conversation, maintain a lightweight **continuity delta** mentally while working. At natural consolidation points, preserve only the durable pieces:
+
+- mature app/job/boundary decisions → `BABEL_APPS.md`
+- mature shared architecture/progression semantics → `BABEL_PLATFORM.md`
+- current ecosystem handoff changes → this file
+- useful but still immature specifics → `CONTINUITY_INBOX.md`
+
+Use the capture threshold defined in `AGENTS.md` / `CONTINUITY_INBOX.md`. Do not turn every speculative option into doctrine and do not create a repository commit for every message.
+
+A good default consolidation point is after a coherent brainstorm batch, when switching topics/lanes, when the chat is getting long, or when Babel explicitly says a detail must not be lost.
+
+## Parallel-chat rule
+
+It is expected that Babel may keep:
+
+- one **FIRE build chat** continuing implementation/review from `START_HERE.md`
+- one **ecosystem brainstorm chat** exploring sibling products from this file
+
+The ecosystem chat is **read-mostly by default** while active FIRE implementation is happening. It can research/brainstorm freely. If a genuinely durable ecosystem idea emerges, it may make a narrow docs-only continuity update from the latest `main` after checking open PRs/branches. It must not casually modify FIRE runtime/G7 implementation just because both conversations share the repository.
+
 ## Anti-drift rules for new chats
 
 Do **not** reconstruct the current ecosystem from older files simply because they contain Babel concepts.
@@ -199,7 +226,7 @@ When an older source conflicts with `BABEL_APPS.md`, `BABEL_PLATFORM.md`, `FIRE_
 
 ## Scope boundary
 
-It is completely fine to brainstorm surrounding-app concepts in a separate conversation. Preserve durable hypotheses in `BABEL_APPS.md`, `BABEL_PLATFORM.md`, and this handoff when they become worth inheriting.
+It is completely fine to brainstorm surrounding-app concepts in a separate conversation. Preserve durable hypotheses in `BABEL_APPS.md`, `BABEL_PLATFORM.md`, this handoff, or `CONTINUITY_INBOX.md` when they become worth inheriting.
 
 Do **not** interrupt current FIRE implementation to build Babel World, a learning app, the Visual Identity app, shared runtime infrastructure, accounts, or a giant universal Babel design system.
 
