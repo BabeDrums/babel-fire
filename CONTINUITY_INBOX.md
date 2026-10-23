@@ -70,20 +70,8 @@ If two chats could touch the same durable file at the same time, the later write
 
 ## Pending FIRE deltas
 
-### Physical review after PR #50/#51 — review still incomplete
-
-Status: **PENDING REVIEW**
-
-Babel's first impression of the corrected G7 shell is broadly positive: **"looks pretty good"** and the simplification direction appears meaningfully better. This is **not shell approval yet**; the full header/text/system review is still incomplete.
-
-Specific observations to carry into the next FIRE build chat:
-
-1. **Projects card actions affordance** — the new three-dot area looks visually "stapled on" / attached as a separate strip because the divider/bar makes it feel disconnected from the main project card. Preserve the direct management capability, but revisit how the affordance belongs to the card if the completed physical review confirms the issue.
-2. **Tempo input focus/composition** — the tempo entry field on Song Setup has a weird square/highlighted focus appearance when tapped; it felt cleaner before. Review actual iPhone focus/keyboard composition rather than assuming Chromium focus styling tells the whole story.
-3. **Headers / overall text hierarchy** — Babel has **not finished checking this yet**. Do not infer that typography/header consistency is approved simply because the rest of the shell looks better.
-
-Next FIRE action remains: finish physical-device review of the corrected G7 shell, reconcile any confirmed issues, then explicitly approve/freeze before FIRE Core breadboarding.
+None currently. The latest post-#50 physical-device observations were mature enough to become current build/review state and are now recorded directly in `START_HERE.md`.
 
 ## Pending ecosystem deltas
 
-None currently. The current learning-app boundary, Visual Identity candidate, Babel World hub hypothesis, elemental-name rules, xAPI/evidence-first model, Open Badges-inspired achievement truth, source marks vs achievement badges, Fire/River local-metaphor separation, original pixel-language hypothesis, and centralized future badge/mark collection are already promoted into `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md`.
+None currently. The learning-app boundary, Visual Identity candidate, Babel World hub hypothesis, elemental-name rules, xAPI/evidence-first model, Open Badges-inspired achievement truth, source marks vs achievement badges, Fire/River local-metaphor separation, original pixel-language hypothesis, and centralized future badge/mark collection are already promoted into `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md`.
