@@ -153,17 +153,26 @@ PR **#51** sealed the zero-context FIRE handoff at **`f69a6427eccf8da84b04dabcbc
 
 Later docs-only ecosystem/continuity commits may make `main` newer than those runtime SHAs. Determine current `main`/PR state from Git rather than treating the runtime SHA as forever-latest.
 
+A narrow physical-review follow-up is intentionally limited to confirmed shell details rather than reopening the whole design system:
+
+- project-card `•••` remains a separate semantic action but visually belongs to the card instead of living in a divider-backed side strip
+- Tempo remains an inline value field, keeps 16px+ text/input behavior, and does not inherit the generic square standalone-input focus ring
+- Original's unfinished placeholder uses plain musician-facing language instead of the internal phrase `FIRE Core spine`
+- the root/project/work title scale is **not** being changed speculatively while Babel's physical hierarchy review remains incomplete
+
+This follow-up does **not** count as shell approval. Physical iPhone review remains the gate.
+
 ### Latest physical-device impression after #50/#51
 
 Babel's first impression is **broadly positive — the corrected shell "looks pretty good"** — but this is **not shell approval yet** and the physical review is incomplete.
 
 Carry these specific observations into the next FIRE build conversation:
 
-1. **Projects three-dot actions affordance:** the new actions area looks visually "stapled on" / attached as a separate strip because the divider makes it feel disconnected from the main project card. Preserve direct project management, but revisit how the affordance belongs to the card if the completed review confirms the problem.
-2. **Tempo input focus/composition:** the Tempo entry on Song Setup gets a weird square/highlighted focus appearance when tapped and felt cleaner before. Review the actual iPhone focus/keyboard state rather than assuming simulated Chromium focus styling is sufficient.
-3. **Headers / overall text hierarchy:** Babel has **not finished checking these yet**. Do not infer typography/header approval from the otherwise positive first impression.
+1. **Projects three-dot actions affordance:** the divider-backed version looked visually "stapled on" / attached as a separate strip. The narrow follow-up removes that visual split while preserving direct project management. Babel still needs to judge the refined card on the real device.
+2. **Tempo input focus/composition:** the Tempo entry on Song Setup showed a weird square/highlighted focus appearance when tapped. The narrow follow-up gives the inline field its own integrated focus treatment instead of the generic input outline. Actual iPhone focus/keyboard composition still requires physical verification.
+3. **Headers / overall text hierarchy:** Babel has **not finished checking these yet**. Do not infer typography/header approval from the otherwise positive first impression, and do not change the current hierarchy without new evidence.
 
-**Current next action:** finish physical-device review of the corrected G7 shell, reconcile any confirmed issues, then explicitly approve/freeze it before beginning FIRE Core breadboarding.
+**Current next action:** physically review the narrow G7 follow-up on iPhone, finish the header/text-hierarchy check, reconcile any remaining confirmed issue, then explicitly approve/freeze the shell before beginning FIRE Core breadboarding.
 
 ## G7 Shell Simplification + Interaction Grammar
 
@@ -182,6 +191,7 @@ The correction is intentionally narrow; it does not add FIRE Core musical functi
 
 - `Projects` remains root identity; `+` shares one stable header alignment
 - project cards separate primary open behavior from a quiet per-card actions affordance
+- the `•••` affordance visually belongs to the card; do not split it into a divider-backed side strip
 - Edit/Reset/Delete can be reached from Projects without entering the project first
 - New Project explicitly exposes **Original** and **Recreation**
 - Original creation requires title; artist optional
@@ -199,6 +209,7 @@ The correction is intentionally narrow; it does not add FIRE Core musical functi
 - one tiny `Later` label may remain because it communicates chronology
 - saved Notes may appear as a utility row; empty Notes stays hidden
 - Original Project Home remains truthful even before its FIRE Core spine exists
+- unfinished Original copy stays musician-facing and does not expose internal architecture terminology
 
 ### Work headers/copy
 
@@ -230,6 +241,7 @@ The correction is intentionally narrow; it does not add FIRE Core musical functi
 - sheets are concise create/edit/manage surfaces, not hidden navigation pages
 - spacing/control sizing remains compact
 - CSS scroll padding/margins help focused fields/actions breathe above the software keyboard without VisualViewport root-scroll logic
+- inline Tempo focus stays integrated with the row rather than taking the generic square field outline
 
 ## Physical approval checklist
 
@@ -237,14 +249,14 @@ Babel should inspect the corrected G7 preview on iPhone:
 
 1. Does `Projects` + `+` feel aligned/intended?
 2. Is `G7 · <commit>` quiet bottom-center rather than part of content?
-3. Can project Edit/Reset/Delete be reached naturally from Projects?
+3. Can project Edit/Reset/Delete be reached naturally from Projects, and does `•••` now feel like part of the card rather than a stapled-on strip?
 4. Are Original/Recreation both obvious without excess chrome?
 5. Does removing Continue/Journey labels simplify Project Home without making it ambiguous?
 6. Do Song Setup / Structure / Tracks feel like one typography/hierarchy system?
 7. Does Add Section logically earn a sheet as object creation?
 8. Do normal track choices feel direct while custom creation logically earns a sheet?
 9. Are primary actions compact/intended rather than giant bars?
-10. Is keyboard/input composition usable and less awkward?
+10. Is Tempo focus/keyboard composition usable and visually integrated on the actual iPhone?
 11. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
 
 If approved, record approval and **stop broad shell polishing**.
