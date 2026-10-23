@@ -179,7 +179,7 @@ Additional references can change over time. Current useful candidates include Ab
 
 ## Documentation authority and conflict policy
 
-Historical/versioned specs remain useful library material and must not be erased merely because a newer generation exists. Their rules are scoped to the generation they describe.
+Git history is the canonical archive for retired implementation generations. Keep the **current production generation specification and the active successor/preview specification** in the working documentation by default. An older generation spec should remain only when a concrete maintenance, migration, compatibility, or recovery need still depends on it; otherwise remove it from the working tree and retrieve it from Git history if needed later.
 
 Authority order:
 
