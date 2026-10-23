@@ -2,6 +2,10 @@
 
 Meaningful product milestones only; Git history records detailed technical changes. Determine shipped/unmerged state from `main` and open pull requests.
 
+## G7
+
+- Shell Freeze: Project Home gives the current task one home in Continue instead of repeating it in Journey; Journey stays useful for completed/upcoming work, later phases are quieter, empty Notes stops competing for attention, work-page headers use a compact task hierarchy, Structure verification joins the arrangement group, Tracks becomes denser, unfinished Section Study/Review Map states become intentionally quiet, and Projects exposes a tiny preview-only `G7 · <commit>` trace for physical review. Natural document scrolling, V6 data isolation, and one adaptive compact/wide product model remain intact.
+
 ## V6
 
 - Phase progression/navigation consolidation: user-facing Checkpoints become ordered Steps with derived done/current/locked state; Map and Skeleton share one Phase Home system; a real center context navigator provides fast project-local jumps while Back remains truthful history; true scrolling pages gain Safari end clearance; dormant Backup/Restore code is removed; and zero-context handoff freshness is CI-enforced.
