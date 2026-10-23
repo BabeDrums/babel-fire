@@ -25,26 +25,19 @@ export const SECTION_TYPES = [
 ];
 
 export const WORK = {
-  setup: { title: "Song Setup", copy: "Prepare the reference before studying it." },
-  structure: { title: "Structure", copy: "Build the song one section at a time." },
-  tracks: { title: "Tracks", copy: "Choose everything you hear in the song." },
-  "section-study": { title: "Section Study", copy: "Study what changes from section to section." },
-  "review-map": { title: "Review Map", copy: "Review the song map before rebuilding it." },
+  setup: { title: "Song Setup", copy: "Set up the reference." },
+  structure: { title: "Structure", copy: "Map the sections." },
+  tracks: { title: "Tracks", copy: "Choose what you hear." },
+  "section-study": { title: "Section Study", copy: "Study the sections." },
+  "review-map": { title: "Review Map", copy: "Review the map." },
 };
 
 const clean = (value) => String(value ?? "").trim();
 const uid = () => crypto?.randomUUID?.() || `preview-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const deepCopy = (value) => JSON.parse(JSON.stringify(value));
 
-function seedDb() {
-  const project = {
-    id: "preview-creep",
-    type: "study",
-    schemaVersion: 5,
-    title: "Creep",
-    artist: "Radiohead",
-    createdAt: Date.now(),
-    notes: [],
+function studyState() {
+  return {
     map: {
       setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
       sections: [],
@@ -63,6 +56,25 @@ function seedDb() {
       bounce: { exported: false, listened: false },
     },
   };
+}
+
+export function createPreviewProject(type, title, artist = "") {
+  const item = {
+    id: uid(),
+    type: type === "study" ? "study" : "original",
+    schemaVersion: 5,
+    title: clean(title) || "Untitled",
+    artist: clean(artist),
+    createdAt: Date.now(),
+    notes: [],
+  };
+  if (item.type === "study") Object.assign(item, studyState());
+  return item;
+}
+
+function seedDb() {
+  const project = createPreviewProject("study", "Creep", "Radiohead");
+  project.id = "preview-creep";
   return { version: 5, currentProjectId: project.id, projects: [project] };
 }
 
@@ -70,7 +82,10 @@ function normalizeProject(project) {
   project.title = clean(project.title) || "Untitled";
   project.artist = clean(project.artist || "");
   project.notes = Array.isArray(project.notes) ? project.notes : [];
-  if (project.type !== "study") return project;
+  if (project.type !== "study") {
+    project.type = "original";
+    return project;
+  }
 
   project.map = project.map || {};
   project.map.setup = {
@@ -93,11 +108,7 @@ function normalizeProject(project) {
     .filter((track) => track.name);
   project.map.timeline = project.map.timeline || { presence: [], events: [] };
   project.map.sectionData = project.map.sectionData || {};
-  project.skeleton = project.skeleton || {
-    session: { tracks: {}, markers: {} },
-    draft: { parts: {} },
-    bounce: { exported: false, listened: false },
-  };
+  project.skeleton = project.skeleton || studyState().skeleton;
   return project;
 }
 
@@ -159,6 +170,7 @@ export function tracksComplete(item) {
 }
 
 export function recommendedWork(item) {
+  if (item?.type !== "study") return null;
   if (!setupComplete(item)) return "setup";
   if (!structureComplete(item)) return "structure";
   if (!tracksComplete(item)) return "tracks";
@@ -173,31 +185,16 @@ export function workDone(item, route) {
 }
 
 export function projectMeta(item) {
-  return item.type === "study"
-    ? `${item.artist || "Unknown artist"} · Recreation`
-    : `${item.artist || "Original"} · Original`;
+  if (item.type === "study") return `${item.artist || "Unknown artist"} · Recreation`;
+  return item.artist ? `${item.artist} · Original` : "Original";
 }
 
 export function resetPreviewProject(item) {
   if (item.type !== "study") return;
   const notes = deepCopy(item.notes || []);
-  item.map = {
-    setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
-    sections: [],
-    structureVerified: false,
-    tracks: [],
-    timeline: { presence: [], events: [] },
-    sectionData: {},
-    mapVerified: false,
-    teachBack: false,
-    phaseParking: "",
-    phaseTakeaway: "",
-  };
-  item.skeleton = {
-    session: { tracks: {}, markers: {} },
-    draft: { parts: {} },
-    bounce: { exported: false, listened: false },
-  };
+  const reset = studyState();
+  item.map = reset.map;
+  item.skeleton = reset.skeleton;
   item.notes = notes;
 }
 
