@@ -111,6 +111,18 @@ Useful official references:
 - https://culturedcode.com/things/features/
 - https://culturedcode.com/things/
 
+### Procreate
+Use for:
+- keeping the creative work itself visually dominant over application chrome
+- revealing power through gestures, shortcuts, and contextual controls instead of permanently showing every tool
+- proving that a professional creative tool can stay visually minimal while still supporting deep workflows
+- optional focus states that remove nonessential interface when attention should stay on the work
+
+Do not copy gesture-heavy behavior where discoverability or accessibility would suffer. FIRE should hide complexity only when the user can still understand how to reach it.
+
+Useful official reference:
+- https://help.procreate.com/procreate/handbook/interface-gestures
+
 ### Instagram / TikTok / Snapchat
 Use primarily as **observational interaction references**, not as doctrine.
 

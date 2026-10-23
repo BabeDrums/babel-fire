@@ -3,7 +3,7 @@
 - **Repository:** `BabeDrums/babel-fire`
 - **Production branch:** `main`
 - **Live production app:** https://babedrums.github.io/babel-fire/
-- **Live V7 preview:** https://babedrums.github.io/babel-fire/v7-preview/
+- **Live G7/V7 preview:** https://babedrums.github.io/babel-fire/v7-preview/
 - **Cross-generation product doctrine:** [FIRE_CORE.md](FIRE_CORE.md)
 - **Future Babel platform hypotheses:** [BABEL_PLATFORM.md](BABEL_PLATFORM.md)
 - **External references / inspiration:** [REFERENCES.md](REFERENCES.md)
@@ -50,11 +50,11 @@ Use **FIRE Core** for the first complete functional product spine. Do not introd
 
 ## Current verified continuity — October 22, 2026
 
-PR #43, **Add FIRE reference registry**, is merged at `7113d14…`; its post-merge static and Chromium 390px / 440px / 820px regression jobs all passed. It created `REFERENCES.md` and preserved external product/design/learning/visual references without changing runtime behavior.
+PR #44, **Finalize G7 preflight and Babel badge/evidence doctrine**, is merged at `0bce359…`. Its PR gate passed handoff/doctrine, static checks, and Chromium 390px / 440px / 820px. It reconciled the latest badge/evidence/pixel-Fire hypotheses into authoritative future-platform doctrine, expanded the reference registry, adopted human shorthand `G7`, and refreshed this handoff without changing runtime behavior, storage, schema, or user data.
 
-PR #42, **Refine shared learning and Babel World hypotheses**, is merged at `d8d43fc…` and established the shared-evidence/local-identity direction, Babel Learning Contract hypothesis, Babel World as an optional hub, and ambient Fire discovery without expanding current runtime scope. PR #41 remains the broader future-platform/monetization/learning-Fire milestone; PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
+PR #43, **Add FIRE reference registry**, is merged at `7113d14…`; it created `REFERENCES.md`. PR #42 established shared evidence/local identity, the Babel Learning Contract hypothesis, Babel World as an optional hub, and ambient Fire discovery. PR #41 remains the broader future-platform/monetization/learning-Fire milestone; PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
 
-The V7 shell is consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
+The G7/V7 shell is consolidated: New Project, the persistent `+`, quiet zero state, build metadata, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
 The current active direction is **G7 Shell Freeze → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**.
 
@@ -83,7 +83,7 @@ Project Home contains:
 
 - **Continue** — one recommended next destination
 - **Journey** — orientation, direct access, and revisiting
-- **Notes** — project thinking
+- **Notes** — project thinking at the architecture level; do not let a dead/empty Notes destination compete for attention before it has a useful action
 
 G7 does **not** carry forward:
 
@@ -106,13 +106,13 @@ Projects:
 - persistent `+` is the single create affordance
 - zero state is only `No projects yet.`
 - no duplicate giant New Project CTA
-- preview build/commit traceability stays available in subordinate project actions/debug UI rather than occupying the main Projects canvas
-- the Projects subtitle is intentionally removed in the consolidation pass because it did not add useful context
+- during G7 preview/physical review, keep a **tiny, quiet, preview-only `G7 · <commit>` identifier** on the main Projects/home surface so Gabriel can confirm he is looking at the newly deployed build even when a pass is mostly underground; it must remain subordinate and should not read like product chrome or a prototype banner
+- the Projects subtitle is intentionally removed because it did not add useful context
 
 Project Home:
 
 - project identity + project actions
-- Continue + Journey + Notes
+- Continue + Journey + Notes at the architecture level, while Shell Freeze may reduce/hide dead or duplicated presentation
 - restrained Journey state treatment only; exact signature styling remains experimental
 - current work is visually distinct without another status label
 - completed work is still tappable
@@ -201,7 +201,7 @@ Target feeling remains roughly **70% calm Apple-like app hierarchy / 30% focused
 ## Gabriel's approval / execution contract
 
 - Gabriel uses **“bet”** to mean **approved — go execute it now**.
-- Approved FIRE work means **implement → test → fix → PR → green checks → merge → Pages deploy → verify → live V7 link**.
+- Approved FIRE work means **implement → test → fix → PR → green checks → merge → Pages deploy → verify → live G7/V7 preview link**.
 - Do not make Gabriel repeatedly say “continue,” “merge it,” “deploy it,” or “give me the link.”
 - Standing permission exists to merge FIRE PRs when checks are green, production-data safety is clear, and no genuine product decision remains unresolved.
 - Stop instead when tests fail, production data safety is uncertain, destructive behavior is unresolved, or a genuine product decision remains open.
@@ -248,7 +248,7 @@ https://babedrums.github.io/babel-fire/v7-preview/
 
 The Shell Freeze pass should be **visibly cleaner but not a dramatic redesign**. Review in this order:
 
-1. Projects — preserve the already-good simple create/open surface; avoid unnecessary churn
+1. Projects — preserve the already-good simple create/open surface; avoid unnecessary churn; verify the tiny preview-only `G7 · <commit>` identifier matches the newly deployed build
 2. Project Home — reduce duplicated/current-work density; one obvious continuation path, quieter Journey, cleaner future-phase presentation, and no dead destination competing for attention
 3. Song Setup — compact, consistent work-page header/rhythm; Reference remains a clear ring/check setup requirement with no media-ownership implication
 4. Structure — arrangement first; verification integrated/quieter rather than floating as a competing card
