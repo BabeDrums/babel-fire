@@ -391,7 +391,10 @@ class V7Preview(unittest.TestCase):
     def test_tracks_keep_compact_grid_and_integrate_other(self):
         page = self.open("tracks")
         self.assertEqual(page.locator(".track-grid").count(), 1)
-        expect(page.get_by_role("button", name="Other")).to_have_class(lambda value: "track-tile" in value and "track-other" in value)
+        other = page.get_by_role("button", name="Other")
+        classes = other.get_attribute("class") or ""
+        self.assertIn("track-tile", classes)
+        self.assertIn("track-other", classes)
         page.locator('.track-tile[data-name="Vocal"]').click()
         expect(page.locator('.track-tile[data-name="Vocal"] .track-check')).to_have_text("✓")
 
