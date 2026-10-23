@@ -18,9 +18,16 @@ REQUIRED = {
         "Experiment",
         "Evaluate",
         "Documentation authority and conflict policy",
+        "Git history is the canonical archive for retired implementation generations",
     ],
-    "AGENTS.md": ["FIRE_CORE.md", "Historical/versioned specifications are a library"],
-    "START_HERE.md": ["FIRE_CORE.md", "FIRE Core product doctrine", "BABEL_PLATFORM.md", "REFERENCES.md"],
+    "AGENTS.md": ["FIRE_CORE.md"],
+    "START_HERE.md": [
+        "FIRE_CORE.md",
+        "FIRE Core product doctrine",
+        "BABEL_PLATFORM.md",
+        "REFERENCES.md",
+        "Generation-spec retention rule",
+    ],
     "BABEL_PLATFORM.md": [
         "# Babel Platform — Future Hypotheses",
         "Future/platform exploration only",
@@ -49,6 +56,9 @@ FORBIDDEN = {
     ],
     "AGENTS.md": [
         "The current approved next step is a global FIRE Design System foundation pass",
+    ],
+    "START_HERE.md": [
+        "`V5.md` is historical",
     ],
 }
 
