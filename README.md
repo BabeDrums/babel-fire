@@ -9,7 +9,11 @@ Babel FIRE is an iPhone/iPad-first music-production workflow app.
 
 ## Continue the project
 
-Start with [`START_HERE.md`](START_HERE.md). It is the canonical zero-context handoff entry point for a new ChatGPT conversation or collaborator. Follow the source-of-truth order defined in [`AGENTS.md`](AGENTS.md), then inspect current `main`, open PRs, relevant branches, and tests before making changes.
+For **Babel FIRE implementation/product work**, start with [`START_HERE.md`](START_HERE.md). It is the canonical zero-context FIRE handoff entry point for a new ChatGPT conversation or collaborator.
+
+For **the wider Babel ecosystem** — surrounding apps, Babel World, learning-app questions, visual identity, cross-app concepts, Fire/badges, or future product-family brainstorming — start with [`BABEL_START_HERE.md`](BABEL_START_HERE.md) before inferring anything from older prototypes or context files.
+
+Follow the source-of-truth order defined in [`AGENTS.md`](AGENTS.md), then inspect current `main`, open PRs, relevant branches, and tests before making changes.
 
 FIRE's pull-request checks enforce handoff freshness when core product/runtime or durable-rule files change, so merged states stay resumable without a separate manual handoff step.
 

@@ -1,4 +1,4 @@
-"""Protect FIRE product-doctrine authority wiring and known stale definitions.
+"""Protect FIRE/Babel product-doctrine authority wiring and known stale definitions.
 
 This is intentionally a small guard, not an attempt to prove semantic consistency in
 natural-language product documents. Human doctrine review remains required.
@@ -30,6 +30,16 @@ REQUIRED = {
         "Shell Freeze was NOT approved",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
+    ],
+    "BABEL_START_HERE.md": [
+        "# Babel Ecosystem — Start Here",
+        "Product need earns an app",
+        "Recreation is **not** merely a learning mode",
+        "Dedicated learning app — not currently earned",
+        "Visual Identity app — promising candidate, deliberately underdefined",
+        "Babel World — optional future hub hypothesis",
+        "Shared evidence, local identity",
+        "Do **not** reconstruct the current ecosystem from older files",
     ],
     "BABEL_PLATFORM.md": [
         "# Babel Platform — Future Hypotheses",
@@ -72,6 +82,12 @@ FORBIDDEN = {
         "`V5.md` is historical",
         "awaiting Babel's physical-device approval. Do not begin the FIRE Core breadboard until that review is complete.",
     ],
+    "BABEL_START_HERE.md": [
+        "FIRE = making the music.\nThe learning app = studying.",
+        "Babel WATER",
+        "AIR",
+        "EARTH",
+    ],
 }
 
 
@@ -88,11 +104,11 @@ def main() -> int:
             if needle in text:
                 failures.append(f"{path}: stale/conflicting doctrine remains: {needle!r}")
     if failures:
-        print("FIRE product doctrine consistency check failed:")
+        print("FIRE/Babel product doctrine consistency check failed:")
         for failure in failures:
             print(f"  - {failure}")
         return 1
-    print("FIRE product doctrine consistency check passed.")
+    print("FIRE/Babel product doctrine consistency check passed.")
     return 0
 
 

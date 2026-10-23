@@ -1,19 +1,18 @@
-"""Fail a FIRE pull request when product work leaves START_HERE.md stale.
+"""Fail a Babel/FIRE pull request when zero-context handoffs are left stale.
 
 Usage:
     python3 scripts/check_handoff.py <base_sha> <head_sha>
 
-The check is intentionally simple: if a PR changes the product/runtime, active
-or experimental specification, preview runtime, or durable repository rules, it
-must also refresh START_HERE.md. That keeps every merged state resumable from a
-zero-context chat without asking the user to remember a handoff step.
+FIRE product/runtime/spec work must refresh START_HERE.md.
+Cross-app ecosystem doctrine must also refresh BABEL_START_HERE.md.
+This keeps merged states resumable without asking Babel to reconstruct context.
 """
 from __future__ import annotations
 
 import subprocess
 import sys
 
-WATCHED_PATHS = {
+FIRE_WATCHED_PATHS = {
     "app.js",
     "styles.css",
     "index.html",
@@ -24,8 +23,14 @@ WATCHED_PATHS = {
     "CONTEXT.md",
     "AGENTS.md",
 }
-WATCHED_PREFIXES = ("v7-preview/",)
-HANDOFF_PATH = "START_HERE.md"
+FIRE_WATCHED_PREFIXES = ("v7-preview/",)
+FIRE_HANDOFF_PATH = "START_HERE.md"
+
+ECOSYSTEM_WATCHED_PATHS = {
+    "BABEL_PLATFORM.md",
+    "FIRE_CORE.md",
+}
+ECOSYSTEM_HANDOFF_PATH = "BABEL_START_HERE.md"
 
 
 def changed_files(base: str, head: str) -> set[str]:
@@ -42,15 +47,16 @@ def main() -> int:
         return 2
 
     changed = changed_files(sys.argv[1], sys.argv[2])
-    relevant = sorted(
+
+    fire_relevant = sorted(
         path
         for path in changed
-        if path in WATCHED_PATHS or path.startswith(WATCHED_PREFIXES)
+        if path in FIRE_WATCHED_PATHS or path.startswith(FIRE_WATCHED_PREFIXES)
     )
-    if relevant and HANDOFF_PATH not in changed:
+    if fire_relevant and FIRE_HANDOFF_PATH not in changed:
         print(
             "FIRE handoff is stale. Product/durable files changed without "
-            "refreshing START_HERE.md:\n  - " + "\n  - ".join(relevant),
+            "refreshing START_HERE.md:\n  - " + "\n  - ".join(fire_relevant),
             file=sys.stderr,
         )
         print(
@@ -60,7 +66,21 @@ def main() -> int:
         )
         return 1
 
-    print("FIRE handoff freshness check passed.")
+    ecosystem_relevant = sorted(path for path in changed if path in ECOSYSTEM_WATCHED_PATHS)
+    if ecosystem_relevant and ECOSYSTEM_HANDOFF_PATH not in changed:
+        print(
+            "Babel ecosystem handoff is stale. Cross-app doctrine changed without "
+            "refreshing BABEL_START_HERE.md:\n  - " + "\n  - ".join(ecosystem_relevant),
+            file=sys.stderr,
+        )
+        print(
+            "Update BABEL_START_HERE.md so a new ecosystem/surrounding-app chat "
+            "inherits the current app-concept boundaries instead of reconstructing them from old files.",
+            file=sys.stderr,
+        )
+        return 1
+
+    print("Babel/FIRE handoff freshness check passed.")
     doctrine = subprocess.run([sys.executable, "scripts/check_product_doctrine.py"], check=False)
     if doctrine.returncode:
         return doctrine.returncode
