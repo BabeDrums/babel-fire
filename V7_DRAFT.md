@@ -65,6 +65,7 @@ Projects has one job: open or create.
 - Empty state remains `No projects yet.`
 - Project title is primary; artist + type are secondary.
 - Each existing project has a quiet secondary actions affordance so Edit/Reset/Delete do not require entering the project first.
+- The per-card actions affordance must visually belong to the project card; do not split it into a divider-backed side strip that reads like a separate attachment.
 - New Project must explicitly expose **Original** and **Recreation** as first-class types.
 - During physical review, the tiny preview-only `G7 · <commit>` identifier sits at the quiet bottom-center of the viewport, outside normal content hierarchy.
 - The build trace is temporary review metadata, never permanent product chrome.
@@ -82,7 +83,7 @@ Project Home should feel like a document home, not a labeled dashboard.
 - Future phases may use one quiet `Later` label because it communicates chronology the interface cannot otherwise show.
 - Saved Notes may appear as a quiet utility row; empty Notes remains hidden.
 
-Original is first-class in creation and project identity even before the Original FIRE Core workflow is breadboarded. Until that spine exists, Original Project Home must remain a truthful quiet placeholder rather than silently forcing Recreation behavior.
+Original is first-class in creation and project identity even before the Original FIRE Core workflow is breadboarded. Until that spine exists, Original Project Home must remain a truthful quiet placeholder rather than silently forcing Recreation behavior. Placeholder copy must be musician-facing and must not expose internal FIRE Core architecture terminology.
 
 ### Work pages
 
@@ -202,6 +203,7 @@ Sheets are for brief create/edit/manage tasks closely related to the current con
 - Use CSS safe-area/end clearance.
 - Inputs stay at 16px+ to avoid iOS zoom.
 - Use CSS scroll padding/margins so focused fields and following actions have breathing room above the software keyboard where the browser honors them.
+- Inline values such as Tempo should keep focus treatment integrated with their row and must not inherit the generic square input focus ring used for standalone fields.
 
 ## Acceptance gate before FIRE Core breadboard
 

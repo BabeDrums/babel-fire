@@ -150,30 +150,37 @@ h3 { font-size: 17px; line-height: 1.25; }
 .project-card {
   min-height: 66px;
   display: grid;
-  grid-template-columns: minmax(0,1fr) 48px;
-  align-items: stretch;
+  grid-template-columns: minmax(0,1fr) 52px;
+  align-items: center;
   border-bottom: 1px solid var(--line);
 }
 .project-card:last-child { border-bottom: 0; }
 .project-open {
   min-width: 0;
-  padding: 11px 8px 11px 14px;
+  min-height: 66px;
+  padding: 11px 4px 11px 14px;
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
   align-items: center;
   gap: 10px;
   text-align: left;
 }
-.project-open:active, .project-card-actions:active { background: rgba(255,255,255,.045); }
+.project-open:active { background: rgba(255,255,255,.045); }
 .project-copy strong { display: block; font-size: 17px; letter-spacing: -.018em; }
 .project-copy > span { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; }
 .project-card-actions {
-  min-width: 48px;
+  width: var(--touch);
+  height: var(--touch);
+  min-width: var(--touch);
+  justify-self: center;
+  display: inline-grid;
+  place-items: center;
   color: var(--quiet);
   font-size: 17px;
   letter-spacing: 1px;
-  border-left: 1px solid rgba(255,255,255,.045);
+  border-radius: 10px;
 }
+.project-card-actions:active { background: rgba(255,255,255,.06); color: var(--muted); }
 .projects-empty { min-height: 66px; display: grid; place-items: center; }
 .build-info {
   color: var(--quiet);
@@ -281,12 +288,25 @@ h3 { font-size: 17px; line-height: 1.25; }
 .form-value { color: #dddde2; display: inline-flex; gap: 8px; align-items: center; }
 .inline-input {
   width: 76px;
+  min-height: var(--touch);
   border: 0;
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   color: var(--text);
+  caret-color: var(--text);
   text-align: right;
   outline: none;
   font-size: 16px;
+}
+.inline-input:focus,
+.inline-input:focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+.inline-input:focus-visible {
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.5);
 }
 .inline-input::placeholder { color: var(--quiet); }
 .inline-select {

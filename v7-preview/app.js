@@ -137,7 +137,7 @@ function renderOriginalHome(item) {
     <main class="screen scroll-safe">
       ${topbar(backButton("projects", "Projects"), `<button class="top-action" data-action="project-actions" aria-label="Project actions">•••</button>`)}
       <div class="project-identity"><h1>${esc(item.title)}</h1><p class="sub">${esc(projectMeta(item))}</p></div>
-      <div class="placeholder-state original-placeholder"><p>Original workflow comes with the FIRE Core spine.</p></div>
+      <div class="placeholder-state original-placeholder"><p>Original workflow isn't built yet.</p></div>
       ${projectNotesRow(item) ? `<div class="group utility-group">${projectNotesRow(item)}</div>` : ""}
     </main>`;
 }

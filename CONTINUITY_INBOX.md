@@ -70,19 +70,7 @@ If two chats could touch the same durable file at the same time, the later write
 
 ## Pending FIRE deltas
 
-### Original placeholder still exposes internal architecture language
-
-During the G7 shell-simplification pass, the intended user-facing correction was to replace the internal phrase:
-
-> `Original workflow comes with the FIRE Core spine.`
-
-with plain musician-facing language such as:
-
-> `Original workflow isn't built yet.`
-
-That copy cleanup was discussed but did **not** land in PR #50. Current `v7-preview/app.js` and `tests/test_v7_preview.py` still preserve the internal phrase. The next FIRE build lane should reconcile the runtime + regression together when it next touches the shell. Do not let a new chat mistake the existing phrase for deliberate product copy.
-
-The latest post-#50 physical-device observations are otherwise mature enough to live directly in `START_HERE.md`.
+None currently. The narrow physical-device follow-up for project-card action integration, Tempo focus treatment, and the Original placeholder copy is promoted into `V7_DRAFT.md` / `START_HERE.md` and protected by G7 regression coverage. Physical approval itself remains a current-state gate in `START_HERE.md`, not an inbox item.
 
 ## Pending repository/process deltas
 
