@@ -1,13 +1,15 @@
 # Babel FIRE — Core Product Doctrine
 
-**Status:** Canonical cross-generation product doctrine. Version specs describe implementation generations; they do not override this file unless the doctrine is deliberately changed in the same work.
+**Status:** canonical cross-generation FIRE product doctrine. Generation specs describe implementation behavior; they do not override this file unless doctrine is deliberately changed in the same work.
 
 ## Naming
 
-- **V6 / V7 / future Vx** = implementation, shell, and interaction generations.
-- **FIRE Core** = the first complete functional product: idea or reference → finished, release-ready audio file with FIRE acting as a useful production companion.
-- **FIRE 1.0** = a future release milestone after FIRE Core is validated on real projects and intentionally promoted.
-- Do not call FIRE Core “V1.”
+- **V6** = established name of the current production implementation generation.
+- **G7** = normal human-facing name for the active successor/shell generation.
+- Technical G7 identifiers remain `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears.
+- **FIRE Core** = first complete functional product: idea or reference → finished, release-ready audio with FIRE acting as a useful production companion.
+- **FIRE 1.0** = future validated release milestone after FIRE Core proves itself on real projects and is intentionally promoted.
+- Do not call FIRE Core “V1” and do not invent an `M1` taxonomy merely to create another label.
 
 ## Product promise
 
@@ -21,7 +23,7 @@ Success criterion:
 
 > **After a useful FIRE session, the musician should know what to do in the DAW that they did not clearly know before opening FIRE. If they only updated FIRE, FIRE failed.**
 
-FIRE Core ends at a finished, release-ready audio file plus essential delivery checks/basic metadata. Distribution, artwork, marketing, and scheduling are outside the current Core boundary.
+FIRE Core ends at a finished, release-ready audio file plus essential delivery checks/basic metadata. Distribution, artwork, marketing, and scheduling remain outside the current Core boundary.
 
 ## One FIRE brain, two first-class project types
 
@@ -31,9 +33,9 @@ Start with any musical material or idea and develop it into a finished record. O
 
 ### Recreation
 
-Use an existing song to make a faithful cover, reconstruction, interpretation, reimagining, or production study. Recreation is a complete standalone workflow. A person may use FIRE only to make covers quickly and never engage with learning history or Original mode.
+Use an existing song to make a faithful cover, reconstruction, interpretation, reimagining, or production study. Recreation is a complete standalone workflow. A person may use FIRE only to make covers quickly and never engage with learning history or Original.
 
-Recreation can also build production judgment that later helps Original work, but learning is a benefit of the workflow, not a prerequisite for completing it.
+Recreation can also build production judgment that later helps Original work, but learning is a benefit—not a prerequisite for completing it.
 
 ## Shared reasoning engine
 
@@ -42,42 +44,44 @@ The FIRE loop is:
 1. **Feel** — what do you perceive and what matters?
 2. **Identify** — where is the meaningful difference/problem/opportunity?
 3. **Reason** — what likely causes it and what kind of decision is this?
-4. **Experiment** — make one intentional change or test in the DAW.
+4. **Experiment** — make one intentional change/test in the DAW.
 5. **Evaluate** — did it move toward the target, teach something useful, or reveal another problem?
 
-Recreation gets its target from the reference plus the musician’s chosen relationship to it. Original gets its target from the musician’s own intention.
+Recreation gets its target from the reference plus the musician's chosen relationship to it. Original gets its target from the musician's own intention.
 
 ## Knowledge model
 
 FIRE combines:
 
-- **Shared production knowledge** — research-backed principles and tradeoffs.
-- **Project knowledge** — what is true about this song: structure, tracks/elements, roles, intentions, observations, decisions, experiments, unresolved problems.
+- **Shared production knowledge** — research-backed principles/tradeoffs.
+- **Project knowledge** — what is true about this song: structure, elements, roles, intentions, observations, decisions, experiments, unresolved problems.
 - **Musician knowledge** — what this person seems comfortable with, struggles with, repeatedly chooses, or has learned across projects.
 
-Adapt by **domain**, not one global Beginner/Intermediate/Advanced label. A musician can be strong at arrangement and inexperienced at mastering.
+Adapt by **domain**, not one global Beginner/Intermediate/Advanced label. A musician may be strong at arrangement and inexperienced at mastering.
 
 ## Learning is ambient, optional, and applied
 
 Making the record is always the primary task.
 
 - Teach through real production decisions whenever possible.
-- **“I don’t know” / “Not sure” is a valid answer.** It should open a small diagnostic or explanation, not block progress.
+- **“I don't know” / “Not sure” is a valid answer.** It should open a small diagnostic/explanation, not block progress.
 - Default to concise guidance; offer **Why?** and deeper help progressively.
-- Any instructional detour must be skippable.
-- A quick-cover user should be able to keep moving with minimal explanation.
-- FIRE may quietly track skills practiced, useful lessons, repeated weaknesses, and successful approaches, but learning progress must not become mandatory workflow chrome.
+- Instructional detours must be skippable.
+- A quick-cover user must be able to keep moving with minimal explanation.
+- FIRE may quietly retain skill evidence, useful lessons, repeated weaknesses, and successful approaches, but learning progress must not become mandatory workflow chrome.
 - Do not treat page completion as mastery.
-- Duolingo is inspiration for adaptive learning and learn-by-doing, not a requirement to add XP, streaks, cartoon paths, or forced lessons.
+- Duolingo is inspiration for adaptive learning/learn-by-doing, not permission to add XP, streak pressure, cartoon paths, or forced lessons.
 
-A future optional Skills/Growth/Insights or Practice surface may summarize development and offer targeted category practice without being required to finish music. A living, shareable visualization of growth (working concept: the user’s **Fire**) is also worth prototyping, but it must represent credible learning evidence rather than raw usage, page completion, or a punitive daily streak. These remain future hypotheses; see `BABEL_PLATFORM.md`.
+A future optional Practice / Skills / Growth surface may summarize development and offer targeted category practice without being required to finish music. A living visualization of growth (working concept: the user's **Fire**) is also worth prototyping later, but it must represent credible evidence rather than raw usage or punitive streaks.
+
+A separate learning product is **not currently required or approved** merely because FIRE teaches. See `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md` before discussing sibling-app learning concepts.
 
 ## Recreation creative intent
 
-Do not create separate giant cover workflows. Use one Recreation engine with a mutable creative bias:
+Do not create separate giant cover workflows. Use one Recreation engine with mutable creative bias:
 
 - **Match** — approach the reference as faithfully as practical.
-- **Interpret** — preserve the song’s identity while making meaningful production choices your own.
+- **Interpret** — preserve identity while making meaningful production choices your own.
 - **Reimagine** — freely change arrangement, instrumentation, feel, pacing, sound, or other production dimensions.
 
 This bias can change during the project. A Match project may intentionally reinterpret one element without becoming a different project type.
@@ -94,11 +98,11 @@ A Recreation can therefore change nothing, one thing, or nearly everything.
 
 FIRE can be firm when a technical/dependency problem has a clear consequence and open when the decision is artistic.
 
-Useful recommendation framing:
+Useful framing:
 
 - **Recommended** — strongest next move for the current diagnosis.
 - **Alternative** — another valid solution with a different tradeoff.
-- **Explore** — an unconventional direction when breaking convention may create identity.
+- **Explore** — unconventional direction when breaking convention may create identity.
 
 Every recommendation to add, remove, process, automate, double, widen, or otherwise change something should answer:
 
@@ -112,10 +116,10 @@ Do not recreate the DAW inside FIRE.
 
 FIRE should mainly retain meaning the DAW does not understand well:
 
-- intention and hierarchy
+- intention/hierarchy
 - what was heard
 - diagnosis
-- meaningful experiment and result
+- meaningful experiment + result
 - accepted decision/difference
 - unresolved problem
 - reusable lesson
@@ -123,19 +127,25 @@ FIRE should mainly retain meaning the DAW does not understand well:
 
 Do not require plugin settings, detailed routing, every take/region, every automation value, or every knob movement unless a future feature proves that information is necessary.
 
+Default rhythm:
+
+**FIRE → Logic → FIRE → Logic**
+
 ## Track / Element / Role — hypothesis to test
 
 Current breadboarding hypothesis:
 
-- **Track** — a represented DAW/recorded part.
-- **Element** — one perceptual production object that may contain one or several tracks.
-- **Role** — the job that element performs, such as focal point, pulse, harmonic support, low-end movement, atmosphere, width, or texture.
+- **Track** — represented DAW/recorded part.
+- **Element** — perceptual production object that may contain one or several tracks.
+- **Role** — job the element performs: focal point, pulse, harmonic support, low-end movement, atmosphere, width, texture, etc.
 
-This exists to let FIRE reason about what the listener perceives without duplicating Logic’s mixer. Do not lock the exact data model before real projects prove it.
+Purpose: let FIRE reason about listener perception without duplicating Logic's mixer.
+
+Do not lock exact data/UI before real projects prove it.
 
 ## Decision sequencing and finishing
 
-FIRE should provide a reliable default order of operations while allowing diagnosis to send the musician backward when an upstream issue is the real cause.
+FIRE should provide a reliable default order while allowing diagnosis to send the musician backward when an upstream issue is the real cause.
 
 Conceptual order:
 
@@ -143,9 +153,9 @@ Conceptual order:
 
 This is guidance, not a creative prison.
 
-An **Arrangement Ready** state may be a soft commitment that the current ingredients are sufficient to move into production/mixing. It must remain reversible.
+An **Arrangement Ready** state may be a soft commitment that current ingredients are sufficient to move into production/mixing. It must remain reversible.
 
-Sparse arrangements are valid. Never recommend adding a track simply because a conventional instrument or frequency area is absent; adding something needs a musical job and a reason.
+Sparse arrangements are valid. Never recommend adding a track simply because a conventional instrument/frequency area is absent; adding something needs a musical job and reason.
 
 Meaningful issues can finish as:
 
@@ -157,52 +167,89 @@ This prevents perfection loops. Recreation does not require an indistinguishable
 
 ## Design references
 
-Use references as lenses, not templates:
+Use references as lenses, not templates. `REFERENCES.md` is the registry.
 
-- **Apple** — hierarchy, familiarity, restraint, accessibility, optional/contextual guidance.
-- **Logic Pro / other DAWs** — music-native mental models, grouping, creative flexibility, professional density when needed.
-- **Duolingo** — adaptive learning, learn-by-doing, personal progress; reject distracting gamification.
-- **Basecamp** — lots of content/actions with calm organization; breadboard behavior before pixel polish.
-- **GitHub** — history, reversibility, progressive disclosure.
-- **ChatGPT** — layered explanation depth.
-- **Instagram / TikTok / Snapchat** — immediacy and low-friction capture/action, not engagement addiction.
+Particularly useful FIRE lenses:
 
-Additional references can change over time. Current useful candidates include Ableton Live, Things, Linear, and Figma.
+- **Apple** — hierarchy, familiarity, restraint, accessibility, contextual help.
+- **Logic / Ableton / DAWs** — music-native mental models, creative flexibility, purposeful expert density.
+- **Duolingo** — adaptive learning underneath; reject distracting gamification.
+- **Basecamp / Shape Up** — calm organization; breadboard behavior before pixels.
+- **GitHub / Primer** — stable vocabulary/hierarchy; naming is interface design.
+- **ChatGPT** — layered explanation/presentation depth.
+- **Things / Procreate** — substantial capability with restrained chrome.
+- **Instagram / TikTok / Snapchat** — immediacy and low-friction interaction without engagement addiction.
 
-## Shell vs Core
+## G7 shell vs FIRE Core
 
-- **V7 Shell** = current implementation/design generation.
-- **FIRE Core** = complete functional product and shared reasoning/learning system.
-- Finish the Shell once: shared headers, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, adaptive presentation, and declutter rules should become reusable defaults instead of being re-debated route by route.
-- Then breadboard the complete Original + Recreation Core end-to-end before deeply designing later phases.
-- Understand the whole journey; deeply design only the next area being built. Real songs drive depth.
+- **G7 shell** = current successor implementation/design generation.
+- **FIRE Core** = complete functional product + shared reasoning/learning system.
+- Finish shell fundamentals once: headers, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, adaptive presentation, declutter/interaction grammar.
+- Physical-device approval is required before calling the shell frozen.
+- Then breadboard Original + Recreation Core end-to-end before deeply designing later phases.
+- Understand the whole journey; deeply design only the next area being built.
+- Real songs drive depth.
+
+Current G7 route/shell behavior lives in `V7_DRAFT.md`; current review/build state lives in `START_HERE.md`. Do not duplicate those moving details here.
+
+## Wider Babel ecosystem boundary
+
+FIRE Core does not define sibling-product jobs.
+
+When discussion moves to surrounding apps, Babel World, a dedicated learning product, Visual Identity, WATER, badges/pixel language, or cross-app architecture, use:
+
+1. `BABEL_START_HERE.md`
+2. `BABEL_APPS.md`
+3. `BABEL_PLATFORM.md`
+
+Core ecosystem rule:
+
+> **Product need earns an app. Naming/metaphor follows the job.**
+
+Do not broaden FIRE or invent sibling products merely to complete an ecosystem diagram.
 
 ## Documentation authority and conflict policy
 
-Git history is the canonical archive for retired implementation generations. Keep the **current production generation specification and the active successor/preview specification** in the working documentation by default. An older generation spec should remain only when a concrete maintenance, migration, compatibility, or recovery need still depends on it; otherwise remove it from the working tree and retrieve it from Git history if needed later.
+Git history is the canonical archive for retired implementation generations.
 
-Authority order:
+Keep the **current production generation specification + active successor/preview specification** in working documentation by default. Older generation specs remain only when a concrete maintenance, migration, compatibility, or recovery need still depends on them.
 
-1. `AGENTS.md` — repository/workflow/documentation process.
+### FIRE authority
+
+1. `AGENTS.md` — repository/process rules.
 2. `FIRE_CORE.md` — current cross-generation product doctrine.
-3. Active production spec (`V6.md` today) — behavior actually shipped in that generation.
-4. `V7_DRAFT.md` — V7 shell behavior where compatible with FIRE Core.
-5. `CONTEXT.md` — supporting history/details not superseded above.
-6. Current code/tests — implementation evidence, not product authority.
+3. active production spec (`V6.md` today) — behavior shipped in that generation.
+4. `V7_DRAFT.md` — G7 shell behavior where Core-compatible.
+5. `START_HERE.md` — current verified state/next step.
+6. `CONTEXT.md` — durable supporting context not superseded above.
+7. code/tests — implementation evidence, not product authority.
 
-When a durable idea changes FIRE Core doctrine, the same PR must update this file, scan/reconcile affected guidance in `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, and relevant specs, and clearly scope historical behavior instead of letting contradictory live rules accumulate.
+### Wider ecosystem authority
 
-Automated guards may catch known stale phrases and authority wiring, but no script can prove natural-language product documents are semantically contradiction-free. Human consistency review remains required.
+1. `AGENTS.md`
+2. `BABEL_START_HERE.md`
+3. `BABEL_APPS.md`
+4. `BABEL_PLATFORM.md`
+5. `FIRE_CORE.md` where FIRE semantics matter
+6. `REFERENCES.md`
+7. older prototypes/history
 
-## Open hypotheses for breadboarding
+When durable FIRE doctrine changes, the same work must scan/reconcile affected `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, relevant generation specs, and ecosystem docs when cross-app semantics are affected.
+
+Automated guards can catch known stale phrases/authority wiring, but no script can prove natural-language semantic consistency. Human/product consistency review remains required.
+
+## Open hypotheses for FIRE Core breadboarding
 
 Do not prematurely lock:
 
 - exact Track → Element → Role data/UI
-- whether coaching depth needs an explicit control or remains contextual
+- whether coaching depth needs explicit control or remains contextual
 - how skill confidence is represented without fake mastery
-- exact optional Practice/Skills/Growth surface and how project lessons feed targeted practice
-- whether/how the user’s Fire visualizes growth without becoming a fake global producer score
-- exact Recreation intent copy and whether it is chosen, inferred, or edited later
+- exact optional Practice / Skills / Growth surface
+- how project lessons feed targeted practice
+- exact Fire visualization/growth mapping
+- exact Recreation intent copy and whether chosen/inferred/edited later
 - which later phases truly need which earlier information
 - future audio-aware analysis; FIRE Core does not require it today
+
+Sibling-app questions are intentionally not listed here; keep them in `BABEL_APPS.md`/`BABEL_PLATFORM.md` so FIRE doctrine remains focused.
