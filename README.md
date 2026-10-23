@@ -13,4 +13,6 @@ Start with [`START_HERE.md`](START_HERE.md). It is the canonical zero-context ha
 
 FIRE's pull-request checks enforce handoff freshness when core product/runtime or durable-rule files change, so merged states stay resumable without a separate manual handoff step.
 
+For substantive FIRE product work, also perform a **consistency sweep** across the current doctrine, active generation docs, platform hypotheses, handoff state, and implementation. Fix clear stale/duplicate contradictions as part of the task. Do not silently auto-resolve a genuine product conflict when two sources represent materially different decisions; surface and reconcile that conflict using the documented authority order and product judgment. CI catches known markers and stale handoff wiring, but semantic consistency still requires this review step.
+
 Do not ask the user to reconstruct decisions that are already documented in the repository.
