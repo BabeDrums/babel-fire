@@ -5,6 +5,7 @@ Babel FIRE is an iPhone/iPad-first music-production workflow app.
 - **Live app:** https://babedrums.github.io/babel-fire/
 - **Production branch:** `main`
 - **Active product generation:** V6
+- **External references / inspiration registry:** [`REFERENCES.md`](REFERENCES.md)
 
 ## Continue the project
 
