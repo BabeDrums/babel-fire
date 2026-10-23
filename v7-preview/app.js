@@ -434,6 +434,7 @@ function addSectionFromSheet() {
   item.map.structureVerified = false;
   noteActivity(item);
   save();
+  renderStructure();
   const notice = document.getElementById("sectionAddedNotice");
   if (notice) notice.textContent = `Added ${name} · ${bars} bars`;
   sheetState.sectionName = "";
