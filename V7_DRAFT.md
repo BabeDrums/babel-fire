@@ -86,7 +86,7 @@ Projects should read like a calm grouped list rather than a grid of large cards.
 - No empty toolbar on the root screen.
 - Project title is primary; artist + type are secondary.
 - Keep project rows concise; detailed progress belongs inside Project Home.
-- Preview-only sandbox information stays out of the main Projects canvas; build/version traceability belongs in a subordinate project-actions/debug location during review.
+- During G7 preview/physical review, a tiny subordinate `G7 · <commit>` identifier may remain visible on the main Projects/home surface so Gabriel can confirm the deployed build even when a pass is mostly underground. It is review traceability, not permanent product chrome; no large prototype/build banner.
 
 ## Project Home
 
