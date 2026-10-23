@@ -23,10 +23,13 @@ REQUIRED = {
     "AGENTS.md": ["FIRE_CORE.md"],
     "START_HERE.md": [
         "FIRE_CORE.md",
-        "FIRE Core product doctrine",
+        "FIRE Core doctrine",
         "BABEL_PLATFORM.md",
         "REFERENCES.md",
-        "Generation-spec retention rule",
+        "Generation-spec retention",
+        "Shell Freeze was NOT approved",
+        "Inline = choose/toggle/classify/confirm/evaluate",
+        "Sheet = create/edit/manage a discrete thing",
     ],
     "BABEL_PLATFORM.md": [
         "# Babel Platform — Future Hypotheses",
@@ -46,7 +49,15 @@ REQUIRED = {
         "Pixel-art Fire + badge language hypothesis",
     ],
     "CONTEXT.md": ["FIRE_CORE.md", "standalone cover/reconstruction workflow"],
-    "V7_DRAFT.md": ["`FIRE_CORE.md` governs cross-generation product doctrine"],
+    "V7_DRAFT.md": [
+        "`FIRE_CORE.md` governs cross-generation product doctrine",
+        "Delete before styling.",
+        "## Interaction grammar",
+        "**Inline**",
+        "**Sheet**",
+        "Original",
+        "Recreation",
+    ],
 }
 
 FORBIDDEN = {
@@ -59,6 +70,7 @@ FORBIDDEN = {
     ],
     "START_HERE.md": [
         "`V5.md` is historical",
+        "awaiting Babel's physical-device approval. Do not begin the FIRE Core breadboard until that review is complete.",
     ],
 }
 

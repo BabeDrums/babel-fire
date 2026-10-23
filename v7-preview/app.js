@@ -2,6 +2,7 @@ import {
   COMMON_TRACKS,
   SECTION_TYPES,
   WORK,
+  createPreviewProject,
   currentProject,
   helpers,
   loadDb,
@@ -43,8 +44,8 @@ function topbar(left = "", right = "") {
   return `<header class="topbar"><div>${left}</div><div>${right}</div></header>`;
 }
 
-function backButton(label, route) {
-  return `<button class="back" data-route="${route}" data-nav="replace"><span class="arrow" aria-hidden="true">‹</span><span>${esc(label)}</span></button>`;
+function backButton(route, label = "Back") {
+  return `<button class="back icon-back" data-route="${route}" data-nav="replace" aria-label="${esc(label)}"><span class="arrow" aria-hidden="true">‹</span></button>`;
 }
 
 function pageHeader(title, copy = "") {
@@ -89,18 +90,22 @@ function showBuildInfo() {
 
 function renderProjects() {
   const rows = db.projects.map((item) => `
-    <button class="project-row" data-project="${esc(item.id)}">
-      <span class="project-copy"><strong>${esc(item.title)}</strong><span>${esc(projectMeta(item))}</span></span>
-      <span class="chevron" aria-hidden="true">›</span>
-    </button>`).join("");
+    <div class="project-card">
+      <button class="project-open" data-project="${esc(item.id)}">
+        <span class="project-copy"><strong>${esc(item.title)}</strong><span>${esc(projectMeta(item))}</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </button>
+      <button class="project-card-actions" data-project-actions="${esc(item.id)}" aria-label="Actions for ${esc(item.title)}">•••</button>
+    </div>`).join("");
 
   app.innerHTML = `
     <main class="screen root-screen scroll-safe">
       <div class="projects-heading">
-        <div class="projects-title-stack"><h1>Projects</h1><div class="build-info root-build-info">G7 · …</div></div>
+        <h1>Projects</h1>
         <button class="new-project-button" data-action="new-project" aria-label="New Project">+</button>
       </div>
       <div class="project-list group">${rows || `<div class="empty-state projects-empty">No projects yet.</div>`}</div>
+      <div class="build-info root-build-info" aria-label="Preview build">G7 · …</div>
     </main>`;
   showBuildInfo();
 }
@@ -117,13 +122,30 @@ function journeyRow(item, route) {
     </button>`;
 }
 
+function projectNotesRow(item) {
+  const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
+  if (!notesCount) return "";
+  return `
+    <button class="row notes-row" data-route="notes">
+      <span><span class="row-title">Notes</span><span class="row-sub">${notesCount} saved</span></span>
+      <span class="chevron" aria-hidden="true">›</span>
+    </button>`;
+}
+
+function renderOriginalHome(item) {
+  app.innerHTML = `
+    <main class="screen scroll-safe">
+      ${topbar(backButton("projects", "Projects"), `<button class="top-action" data-action="project-actions" aria-label="Project actions">•••</button>`)}
+      <div class="project-identity"><h1>${esc(item.title)}</h1><p class="sub">${esc(projectMeta(item))}</p></div>
+      <div class="placeholder-state original-placeholder"><p>Original workflow comes with the FIRE Core spine.</p></div>
+      ${projectNotesRow(item) ? `<div class="group utility-group">${projectNotesRow(item)}</div>` : ""}
+    </main>`;
+}
+
 function renderProjectHome() {
   const item = project();
   if (!item) return navigate("projects", "replace");
-  if (item.type !== "study") {
-    app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton("Projects", "projects"), "")}${pageHeader(item.title, "Original workflow is not part of this shell prototype yet.")}<div class="placeholder-state"><p>This preview is intentionally proving the Recreation shell first.</p></div></main>`;
-    return;
-  }
+  if (item.type !== "study") return renderOriginalHome(item);
 
   const recommended = recommendedWork(item);
   const rec = WORK[recommended];
@@ -131,38 +153,25 @@ function renderProjectHome() {
   const workRows = workRoutes
     .filter((route) => route !== recommended)
     .map((route) => journeyRow(item, route)).join("");
-  const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
+  const notesRow = projectNotesRow(item);
   const future = ["The Skeleton", "The Sounds", "The Balance", "The Shape", "The World", "The Finish"]
     .map((name) => `<span>${esc(name)}</span>`).join("");
-  const notesMarkup = notesCount ? `
-      <div class="section-title"><span>Notes</span></div>
-      <div class="group">
-        <button class="row" data-route="notes">
-          <span><span class="row-title">Project Notes</span><span class="row-sub">${notesCount} saved note${notesCount === 1 ? "" : "s"}</span></span>
-          <span class="chevron" aria-hidden="true">›</span>
-        </button>
-      </div>` : "";
 
   app.innerHTML = `
     <main class="screen scroll-safe">
-      ${topbar(backButton("Projects", "projects"), `<button class="top-action" data-action="project-actions" aria-label="Project actions">•••</button>`)}
+      ${topbar(backButton("projects", "Projects"), `<button class="top-action" data-action="project-actions" aria-label="Project actions">•••</button>`)}
       <div class="project-identity"><h1>${esc(item.title)}</h1><p class="sub">${esc(projectMeta(item))}</p></div>
 
-      <div class="section-title"><span>Continue</span></div>
       <button class="continue-row" data-route="${recommended}">
         <span><span class="continue-title">${esc(rec.title)}</span><span class="continue-copy">${esc(rec.copy)}</span></span>
         <span class="chevron" aria-hidden="true">›</span>
       </button>
 
-      <div class="section-title"><span>Journey</span></div>
-      <section class="journey">
-        <div class="group journey-group">${workRows}</div>
-        <div class="future-phases" aria-label="Later phases">
-          <span class="future-label">Later</span>
-          <div class="future-phase-list">${future}</div>
-        </div>
-      </section>
-      ${notesMarkup}
+      <div class="group journey-group">${workRows}${notesRow}</div>
+      <div class="future-phases" aria-label="Later phases">
+        <span class="future-label">Later</span>
+        <div class="future-phase-list">${future}</div>
+      </div>
     </main>`;
 }
 
@@ -175,7 +184,7 @@ function completionAccessory(checked) {
 function referenceRow(setup) {
   return `
     <button class="form-row reference-row" data-action="toggle-setup" data-field="reference">
-      <span><span class="form-label">Reference</span><span class="form-help">Import the reference into your session.</span></span>
+      <span><span class="form-label">Reference</span><span class="form-help">Import it into your session.</span></span>
       ${completionAccessory(!!setup.reference)}
     </button>`;
 }
@@ -191,7 +200,7 @@ function setupRow(label, field, value, help = "") {
 
 function setupContinuationMarkup(item) {
   return setupComplete(item)
-    ? `<div class="action-row"><button id="setupContinue" class="primary-action" data-action="continue-structure">Continue to Structure</button></div>`
+    ? `<div class="action-row"><button id="setupContinue" class="primary-action" data-action="continue-structure">Continue</button></div>`
     : "";
 }
 
@@ -206,14 +215,14 @@ function renderSetup() {
   const setup = item.map.setup;
   app.innerHTML = `
     <main class="screen scroll-safe">
-      ${topbar(backButton(item.title, "project"), "")}
-      ${pageHeader("Song Setup", "Prepare the reference before studying it.")}
+      ${topbar(backButton("project", item.title), "")}
+      ${pageHeader("Song Setup")}
       <div class="form-group">
         ${referenceRow(setup)}
         <div class="form-row"><span class="form-label">Tempo</span><span class="form-value"><input id="tempoInput" class="inline-input" inputmode="decimal" aria-label="Tempo" value="${esc(setup.tempo)}" placeholder="—"><span>BPM</span></span></div>
         <div class="form-row"><span class="form-label">Meter</span><select id="meterInput" class="inline-select" aria-label="Meter"><option ${setup.meter === "4/4" ? "selected" : ""}>4/4</option><option ${setup.meter === "3/4" ? "selected" : ""}>3/4</option><option ${setup.meter === "6/8" ? "selected" : ""}>6/8</option></select></div>
-        ${setupRow("Grid", "grid", setup.grid, "Align the reference to the bar grid.")}
-        ${setupRow("First Listen", "firstListen", setup.firstListen, "Play the full song once without stopping.")}
+        ${setupRow("Grid", "grid", setup.grid, "Align it to the bar grid.")}
+        ${setupRow("First Listen", "firstListen", setup.firstListen, "Play the full song once.")}
       </div>
       <div id="setupContinuation">${setupContinuationMarkup(item)}</div>
     </main>`;
@@ -232,16 +241,18 @@ function renderStructure() {
     </button>`).join("");
 
   const continuation = structureComplete(item)
-    ? `<div class="action-row"><button class="primary-action" data-action="continue-tracks">Continue to Tracks</button></div>`
+    ? `<div class="action-row"><button class="primary-action" data-action="continue-tracks">Continue</button></div>`
+    : "";
+
+  const verification = sections.length
+    ? `<button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Matches the song</span>${completionAccessory(item.map.structureVerified)}</button>`
     : "";
 
   app.innerHTML = `
     <main class="screen scroll-safe">
-      ${topbar(backButton(item.title, "project"), "")}
-      ${pageHeader("Structure", "Build the song one section at a time.")}
-      ${sections.length
-        ? `<div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${completionAccessory(item.map.structureVerified)}</button></div>`
-        : `<div class="structure-empty"><p>Add the first section you hear.</p><button class="primary-action compact-primary" data-action="open-add-section">Add Section</button></div>`}
+      ${topbar(backButton("project", item.title), "")}
+      ${pageHeader("Structure")}
+      <div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button>${verification}</div>
       ${continuation}
     </main>`;
 }
@@ -254,15 +265,15 @@ function renderTracks() {
   const names = [...COMMON_TRACKS, ...extra];
   const tiles = names.map((name) => `<button class="track-tile${selectedNames.has(name) ? " selected" : ""}" data-action="toggle-track" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("");
   const continuation = tracksComplete(item)
-    ? `<div class="action-row action-separated"><button class="primary-action" data-action="continue-section-study">Continue to Section Study</button></div>`
+    ? `<div class="action-row"><button class="primary-action" data-action="continue-section-study">Continue</button></div>`
     : "";
 
   app.innerHTML = `
     <main class="screen scroll-safe">
-      ${topbar(backButton(item.title, "project"), "")}
-      ${pageHeader("Tracks", "Choose everything you hear in the song.")}
+      ${topbar(backButton("project", item.title), "")}
+      ${pageHeader("Tracks", "Choose everything you hear.")}
       <div class="track-grid">${tiles}</div>
-      <div class="custom-track-control"><input id="customTrackInput" class="field" placeholder="Other…" aria-label="Other track"><button class="inline-add-button" data-action="add-custom-track" aria-label="Add custom track">＋</button></div>
+      <button class="custom-track-button" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
       ${continuation}
     </main>`;
 }
@@ -275,20 +286,20 @@ function renderSectionStudy() {
   let body = "";
   if (missingStructure || missingTracks) {
     const actions = [
-      missingStructure ? `<button data-route="structure">Add the song structure <span class="chevron">›</span></button>` : "",
-      missingTracks ? `<button data-route="tracks">Choose the tracks <span class="chevron">›</span></button>` : "",
+      missingStructure ? `<button data-route="structure">Structure <span class="chevron">›</span></button>` : "",
+      missingTracks ? `<button data-route="tracks">Tracks <span class="chevron">›</span></button>` : "",
     ].join("");
-    body = `<div class="prereq-card"><h3>Finish the missing context first.</h3><p>Section Study needs a structure and at least one track.</p><div class="prereq-actions">${actions}</div></div>`;
+    body = `<div class="prereq-card"><p>Section Study needs structure and tracks first.</p><div class="prereq-actions">${actions}</div></div>`;
   } else {
-    body = `<div class="placeholder-state"><p>Section Study isn\'t available in this preview yet.</p></div>`;
+    body = `<div class="placeholder-state"><p>Section Study isn\'t built yet.</p></div>`;
   }
-  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}</main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton("project", item.title), "")}${pageHeader("Section Study")}${body}</main>`;
 }
 
 function renderReviewMap() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
-  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="placeholder-state"><p>Review Map isn\'t available in this preview yet.</p></div></main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton("project", item.title), "")}${pageHeader("Review Map")}<div class="placeholder-state"><p>Review Map isn\'t built yet.</p></div></main>`;
 }
 
 function renderNotes() {
@@ -299,7 +310,7 @@ function renderNotes() {
     if (!clean(entry?.text)) return "";
     return `<article class="note-card"><div class="meta">${esc(entry.type || "General")} · ${esc(entry.context || "Project")}</div><p>${esc(entry.text)}</p></article>`;
   }).join("");
-  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Notes", "Your project notes, in one place.")}<div class="notes-list">${notes || `<div class="empty-state">No saved notes yet.</div>`}</div></main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton("project", item.title), "")}${pageHeader("Notes")}<div class="notes-list">${notes || `<div class="empty-state">No saved notes.</div>`}</div></main>`;
 }
 
 function render() {
@@ -329,22 +340,51 @@ function closeSheet(clear = true) {
   if (clear) sheetState = null;
 }
 
-function openNewProjectSheet() {
-  openSheet(`
-    <div class="grabber"></div>
-    <h2>New Project</h2>
-    <p class="sheet-kicker">Recreation</p>
-    <div class="stack-fields">
-      <label class="field-label" for="newProjectTitle">Song</label>
-      <input id="newProjectTitle" class="field" autocomplete="off" placeholder="Song title" aria-label="Song title">
-      <label class="field-label" for="newProjectArtist">Artist</label>
+function projectTypeControl(selected = "") {
+  return `
+    <div class="project-type-control" aria-label="Project type">
+      <button class="project-type-option${selected === "original" ? " selected" : ""}" data-action="choose-project-type" data-project-type="original" aria-pressed="${selected === "original"}">Original</button>
+      <button class="project-type-option${selected === "study" ? " selected" : ""}" data-action="choose-project-type" data-project-type="study" aria-pressed="${selected === "study"}">Recreation</button>
+    </div>`;
+}
+
+function newProjectFields(type) {
+  if (!type) return "";
+  const recreation = type === "study";
+  return `
+    <div class="stack-fields new-project-fields">
+      <label class="field-label" for="newProjectTitle">${recreation ? "Song" : "Title"}</label>
+      <input id="newProjectTitle" class="field" autocomplete="off" placeholder="${recreation ? "Song title" : "Project title"}" aria-label="${recreation ? "Song title" : "Project title"}">
+      <label class="field-label" for="newProjectArtist">${recreation ? "Artist" : "Artist (optional)"}</label>
       <input id="newProjectArtist" class="field" autocomplete="off" placeholder="Artist" aria-label="Artist">
     </div>
     <div class="sheet-actions">
       <button class="sheet-close" data-action="close-sheet">Cancel</button>
-      <button class="sheet-primary" data-action="create-project" disabled>Create Project</button>
-    </div>`, { type: "new-project" });
-  requestAnimationFrame(() => document.getElementById("newProjectTitle")?.focus());
+      <button class="sheet-primary" data-action="create-project" disabled>Create</button>
+    </div>`;
+}
+
+function renderNewProjectSheet(type = "") {
+  const previousTitle = clean(document.getElementById("newProjectTitle")?.value);
+  const previousArtist = clean(document.getElementById("newProjectArtist")?.value);
+  sheetState = { type: "new-project", projectType: type };
+  sheetRoot.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">
+    <div class="grabber"></div>
+    <h2>New Project</h2>
+    ${projectTypeControl(type)}
+    ${newProjectFields(type)}
+  </div>`;
+  if (type) {
+    const title = document.getElementById("newProjectTitle");
+    const artist = document.getElementById("newProjectArtist");
+    if (title) title.value = previousTitle;
+    if (artist) artist.value = previousArtist;
+    requestAnimationFrame(() => title?.focus());
+  }
+}
+
+function openNewProjectSheet() {
+  openSheet(`<div class="grabber"></div><h2>New Project</h2>${projectTypeControl()}`, { type: "new-project", projectType: "" });
 }
 
 function syncNewProjectAction() {
@@ -352,40 +392,16 @@ function syncNewProjectAction() {
   if (!button) return;
   const title = clean(document.getElementById("newProjectTitle")?.value);
   const artist = clean(document.getElementById("newProjectArtist")?.value);
-  button.disabled = !(title && artist);
+  button.disabled = !title || (sheetState?.projectType === "study" && !artist);
 }
 
 function createProject() {
+  const type = sheetState?.projectType;
   const title = clean(document.getElementById("newProjectTitle")?.value);
   const artist = clean(document.getElementById("newProjectArtist")?.value);
-  if (!title || !artist) return;
+  if (!type || !title || (type === "study" && !artist)) return;
 
-  const item = {
-    id: uid(),
-    type: "study",
-    schemaVersion: 5,
-    title,
-    artist,
-    createdAt: Date.now(),
-    notes: [],
-    map: {
-      setup: { reference: false, tempo: "", meter: "4/4", grid: false, firstListen: false },
-      sections: [],
-      structureVerified: false,
-      tracks: [],
-      timeline: { presence: [], events: [] },
-      sectionData: {},
-      mapVerified: false,
-      teachBack: false,
-      phaseParking: "",
-      phaseTakeaway: "",
-    },
-    skeleton: {
-      session: { tracks: {}, markers: {} },
-      draft: { parts: {} },
-      bounce: { exported: false, listened: false },
-    },
-  };
+  const item = createPreviewProject(type, title, artist);
   db.projects.push(item);
   db.currentProjectId = item.id;
   save();
@@ -395,7 +411,17 @@ function createProject() {
 
 function openAddSectionSheet() {
   const choices = SECTION_TYPES.map((name) => `<button class="sheet-choice" data-action="quick-add-section" data-name="${esc(name)}">${esc(name)}</button>`).join("");
-  openSheet(`<div class="grabber"></div><h2>Add Section</h2><div class="sheet-grid">${choices}<button class="sheet-choice" data-action="show-custom-section">Custom</button></div><div id="customSectionArea"></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "add-section" });
+  openSheet(`<div class="grabber"></div><h2>Add Section</h2><div class="sheet-grid">${choices}<button class="sheet-choice" data-action="show-custom-section">Custom</button></div><div id="customSectionArea"></div><div class="sheet-actions single-action"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "add-section" });
+}
+
+function openCustomTrackSheet() {
+  openSheet(`<div class="grabber"></div><h2>Add Track</h2><input id="customTrackInput" class="field" placeholder="Track name" aria-label="Track name"><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="add-custom-track" disabled>Add</button></div>`, { type: "custom-track" });
+  requestAnimationFrame(() => document.getElementById("customTrackInput")?.focus());
+}
+
+function syncCustomTrackAction() {
+  const button = sheetRoot.querySelector('[data-action="add-custom-track"]');
+  if (button) button.disabled = !clean(document.getElementById("customTrackInput")?.value);
 }
 
 function openEditSectionSheet(sectionId) {
@@ -411,19 +437,24 @@ function openEditSectionSheet(sectionId) {
 function openProjectActions() {
   const item = project();
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div><div class="sheet-meta build-info">G7 · …</div>`, { type: "project-actions" });
-  showBuildInfo();
+  const reset = item.type === "study" ? `<button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button>` : "";
+  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit</span><span class="chevron">›</span></button>${reset}<button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions single-action"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions" });
 }
 
 function openEditProjectSheet() {
   const item = project();
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>Edit Project</h2><div class="stack-fields"><input id="editProjectTitle" class="field" value="${esc(item.title)}" aria-label="Song title"><input id="editProjectArtist" class="field" value="${esc(item.artist || "")}" aria-label="Artist"></div><div class="sheet-actions"><button class="compact-button" data-action="save-project">Save</button><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "edit-project" });
+  openSheet(`<div class="grabber"></div><h2>Edit Project</h2><div class="stack-fields"><label class="field-label" for="editProjectTitle">Title</label><input id="editProjectTitle" class="field" value="${esc(item.title)}" aria-label="Project title"><label class="field-label" for="editProjectArtist">Artist${item.type === "study" ? "" : " (optional)"}</label><input id="editProjectArtist" class="field" value="${esc(item.artist || "")}" aria-label="Artist"></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="compact-button" data-action="save-project">Save</button></div>`, { type: "edit-project" });
 }
 
 app.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
+  if (button.dataset.projectActions) {
+    db.currentProjectId = button.dataset.projectActions;
+    save();
+    return openProjectActions();
+  }
   if (button.dataset.project) {
     db.currentProjectId = button.dataset.project;
     save();
@@ -459,14 +490,7 @@ app.addEventListener("click", (event) => {
     save();
     return renderTracks();
   }
-  if (action === "add-custom-track") {
-    const input = document.getElementById("customTrackInput");
-    const name = clean(input?.value);
-    if (!name || item.map.tracks.some((track) => track.name.toLowerCase() === name.toLowerCase())) return;
-    item.map.tracks.push({ id: uid(), name });
-    save();
-    return renderTracks();
-  }
+  if (action === "open-custom-track") return openCustomTrackSheet();
   if (action === "continue-section-study") return continueTo("section-study");
 });
 
@@ -482,6 +506,7 @@ app.addEventListener("input", (event) => {
 
 sheetRoot.addEventListener("input", () => {
   if (sheetState?.type === "new-project") syncNewProjectAction();
+  if (sheetState?.type === "custom-track") syncCustomTrackAction();
 });
 
 app.addEventListener("change", (event) => {
@@ -501,6 +526,7 @@ sheetRoot.addEventListener("click", (event) => {
   const item = project();
 
   if (action === "close-sheet") return closeSheet();
+  if (action === "choose-project-type") return renderNewProjectSheet(button.dataset.projectType);
   if (action === "create-project") return createProject();
   if (action === "quick-add-section") {
     item.map.sections.push({ id: uid(), name: button.dataset.name, lengthBars: 8 });
@@ -523,6 +549,14 @@ sheetRoot.addEventListener("click", (event) => {
     save();
     closeSheet();
     return renderStructure();
+  }
+  if (action === "add-custom-track") {
+    const name = clean(document.getElementById("customTrackInput")?.value);
+    if (!name || item.map.tracks.some((track) => track.name.toLowerCase() === name.toLowerCase())) return;
+    item.map.tracks.push({ id: uid(), name });
+    save();
+    closeSheet();
+    return renderTracks();
   }
   if (action === "edit-section-bars") {
     sheetState.bars = Number(button.dataset.bars);
@@ -571,32 +605,28 @@ sheetRoot.addEventListener("click", (event) => {
   if (action === "edit-project") return openEditProjectSheet();
   if (action === "save-project") {
     const title = clean(document.getElementById("editProjectTitle")?.value);
-    if (!title) return;
+    const artist = clean(document.getElementById("editProjectArtist")?.value);
+    if (!title || (item.type === "study" && !artist)) return;
     item.title = title;
-    item.artist = clean(document.getElementById("editProjectArtist")?.value);
+    item.artist = artist;
     save();
     closeSheet();
-    return renderProjectHome();
+    return render();
   }
   if (action === "reset-project-preview") {
     resetPreviewProject(item);
     save();
     closeSheet();
-    return renderProjectHome();
+    return render();
   }
   if (action === "delete-project-preview") {
     db.projects = db.projects.filter((entry) => entry.id !== item.id);
     db.currentProjectId = db.projects[0]?.id || null;
     save();
     closeSheet();
+    if (currentRoute === "projects") return renderProjects();
     return navigate("projects", "replace");
   }
-});
-
-app.addEventListener("keydown", (event) => {
-  if (currentRoute !== "tracks" || event.target.id !== "customTrackInput" || event.key !== "Enter") return;
-  event.preventDefault();
-  app.querySelector('[data-action="add-custom-track"]')?.click();
 });
 
 document.addEventListener("keydown", (event) => {
