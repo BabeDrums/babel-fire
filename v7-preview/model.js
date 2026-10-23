@@ -42,6 +42,7 @@ function studyState() {
       sections: [],
       structureVerified: false,
       tracks: [],
+      tracksVerified: false,
       timeline: { presence: [], events: [] },
       sectionData: {},
       mapVerified: false,
@@ -109,6 +110,7 @@ function normalizeProject(project) {
       ? { id: uid(), name: track }
       : { id: track?.id || uid(), name: clean(track?.name) })
     .filter((track) => track.name);
+  project.map.tracksVerified = !!project.map.tracksVerified;
   project.map.timeline = project.map.timeline || { presence: [], events: [] };
   project.map.sectionData = project.map.sectionData || {};
   project.skeleton = project.skeleton || studyState().skeleton;
@@ -173,7 +175,7 @@ export function structureComplete(item) {
 }
 
 export function tracksComplete(item) {
-  return (item?.map?.tracks?.length || 0) > 0;
+  return !!item?.map?.tracksVerified && (item?.map?.tracks?.length || 0) > 0;
 }
 
 export function recommendedWork(item) {
