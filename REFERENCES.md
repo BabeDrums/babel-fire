@@ -260,7 +260,7 @@ Do not imitate specific Pokémon sprites, characters, palettes, UI, or copyright
 A future version of the user’s Fire — and potentially Babel achievement/source marks — could use one original pixel visual grammar rather than smooth/vector-only artwork.
 
 Why it is interesting:
-- gives FIRE/Babel a distinctive, personal visual language tied to Gabriel’s genuine taste
+- gives FIRE/Babel a distinctive, personal visual language tied to Babel’s genuine taste
 - small sprite states can make progression feel collectible and alive
 - frame-by-frame flame movement, embers, sparks, palette shifts, silhouette changes, and badge details can communicate growth without requiring photorealistic effects
 - crisp integer-scale rendering could adapt from tiny source marks/profile badges to larger dedicated Fire views
