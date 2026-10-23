@@ -1,62 +1,94 @@
 # Babel FIRE — Guided Workspace Redesign (Draft)
 
-**Status:** G7 is the isolated successor preview under `/v7-preview/`; V6 remains production until G7 is physically approved and deliberately promoted. `FIRE_CORE.md` governs cross-generation product doctrine; this file governs the G7 shell and must not redefine Recreation, Original, or learning semantics in conflict with FIRE Core.
+**Status:** G7 is the isolated successor preview under `/v7-preview/`; V6 remains production until G7 is physically approved and deliberately promoted. `FIRE_CORE.md` governs cross-generation product doctrine; this file governs the G7 shell and must not redefine Original, Recreation, or learning semantics in conflict with FIRE Core.
 
 ## Why G7 exists
 
-V6 became too focused on representing workflow hierarchy. Phase homes, Step states, Roadmap, Back history, and a custom center navigator made the musician think about FIRE's organization instead of the music.
+V6 made the musician think too much about FIRE's organization. G7 exists to make the shell disappear behind the music.
 
-G7 asks a simpler question:
+Core question:
 
-> Can FIRE get the musician into useful musical work without making them think about FIRE's organization?
+> Can FIRE get the musician into useful musical work without making them think about how FIRE is organized?
 
-The shell should feel like a calm production companion: one obvious next action, automatic preservation of work, direct revisiting, and only as much interface as the current decision needs.
+Use **G7** in normal conversation. Keep technical identifiers `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears. G7 must never write to V6's `production-projects-v1` key.
 
-## Naming + technical continuity
+## Current correction after physical review
 
-Use **G7** in normal product conversation. Keep existing technical identifiers unless a separate migration reason appears:
+The first Shell Freeze implementation (#48) improved duplication and density but did **not** pass physical visual review. Babel's feedback identified two system-level problems:
 
-- `V7_DRAFT.md`
-- `/v7-preview/`
-- `production-projects-v1-v7-preview`
+1. **Too much explanatory hierarchy** — titles, subtitles, section labels, helper copy, and repeated instructions stacked into unnecessary layers.
+2. **Unpredictable interaction grammar** — similar-looking work sometimes happened inline, sometimes in a sheet, sometimes through navigation, making the interface harder to anticipate.
 
-The preview must never write to V6's `production-projects-v1` key.
+The shell therefore remains **unfrozen** until the simplification correction passes physical review.
 
-## Core shell principles
+## Shell rules
 
-1. **One obvious next action.** Project Home recommends one current task through Continue.
-2. **Do not repeat the current task.** Journey must not duplicate the same current work already presented by Continue.
-3. **Flatten before adding navigation.** Do not solve hierarchy with another navigator.
-4. **One job per work screen.** Song Setup, Structure, Tracks, Section Study, Review Map, Session, Draft, and Bounce get focused workspaces when they contain real work.
-5. **Progress is inferred.** The musician edits musical information; FIRE derives completion.
-6. **Guided forward, flexible backward.** Continue guides forward; completed work remains revisitable; upcoming work can remain inspectable unless missing context makes it impossible.
-7. **Project Home is the hub.** Continue + Journey + useful Notes access replace duplicate overview/roadmap navigation.
-8. **Notes must earn attention.** A dead/empty Notes destination does not compete on Project Home. Existing useful project notes remain reachable.
-9. **Use familiar platform patterns.** Prefer standard back navigation, grouped lists, forms, concise sheets, and shallow hierarchy.
-10. **Keep the musical engines.** Preserve stable IDs, migrations, timeline semantics, invalidation, Skeleton dependencies, durable notes, and browser persistence.
+1. **Delete before styling.** If removing a label/subtitle/helper sentence does not make the next action harder to understand, remove it rather than making it smaller.
+2. **One obvious next action.** Project Home recommends one current task and does not repeat it elsewhere.
+3. **One job per work screen.** Each work page should explain itself primarily through the task and controls, not stacked prose.
+4. **Progress is inferred.** The musician edits musical information; FIRE derives completion.
+5. **Guided forward, flexible backward.** Forward guidance is clear; completed work stays revisitable; upcoming work remains inspectable when meaningful.
+6. **Project Home is a hub, not a dashboard.** Project identity, one current destination, quiet revisiting/orientation, and only useful utilities.
+7. **Notes earn attention.** Empty Notes does not appear. Existing notes stay reachable.
+8. **One product across device classes.** iPhone/iPad share logic, hierarchy, actions, and states; only presentation adapts.
+9. **Natural document scrolling only.** No VisualViewport-driven root overflow switching.
+10. **No signature-feature creep during shell correction.** Fire, badges, Babel World, accounts, learning hub, monetization, and lore remain deferred.
+
+## Interaction grammar
+
+G7 uses a small semantic interaction language. Consistency comes from the **meaning** of the action, not making every control use the same container.
+
+- **Inline** — choose, toggle, classify, confirm, or evaluate something already in the current task.
+- **Sheet** — create, edit, or manage a discrete thing while staying in the current context.
+- **Navigation** — enter another meaningful workspace.
+- **Menu / secondary actions** — utility actions that should not compete with musical work.
+
+Examples:
+
+- Reference / Grid / First Listen → inline toggles.
+- Common track choices → inline multi-select.
+- Add custom track → sheet because a new named object is being created.
+- Add/Edit Section → sheet because a section object is being created/edited.
+- Project Edit / Reset / Delete → secondary management sheet.
+- Structure → Tracks → Section Study → navigation between workspaces.
+
+Do not introduce a sheet merely because a screen needs visual variety, and do not force object creation inline merely to avoid a sheet.
 
 ## Information architecture
 
-### App level
+### Projects
 
-Future genuine top-level areas may include Projects and Notes, but do not add a Projects/Notes tab bar until a real cross-project Notes hub exists.
+Projects has one job: open or create.
 
-### Project level
+- `Projects` is the strongest root identity.
+- Persistent `+` is the single create affordance.
+- Empty state remains `No projects yet.`
+- Project title is primary; artist + type are secondary.
+- Each existing project has a quiet secondary actions affordance so Edit/Reset/Delete do not require entering the project first.
+- New Project must explicitly expose **Original** and **Recreation** as first-class types.
+- During physical review, the tiny preview-only `G7 · <commit>` identifier sits at the quiet bottom-center of the viewport, outside normal content hierarchy.
+- The build trace is temporary review metadata, never permanent product chrome.
 
-Opening a project lands on one Project Home containing:
+### Project Home
 
-- project identity + project actions
-- **Continue** — exactly one recommended current destination
-- **Journey** — orientation, completed-work revisiting, and understandable upcoming work
-- project Notes access only when it has something useful to show in the current shell
+Project Home should feel like a document home, not a labeled dashboard.
 
-There is no separate Roadmap destination.
+- Project identity + project actions.
+- One emphasized current destination.
+- No visible `Continue` heading above the current destination.
+- No visible `Journey` heading above the revisitable/upcoming work list.
+- The current task is not repeated in the list below it.
+- Completed work remains revisitable; upcoming work remains understandable.
+- Future phases may use one quiet `Later` label because it communicates chronology the interface cannot otherwise show.
+- Saved Notes may appear as a quiet utility row; empty Notes remains hidden.
 
-### Work level
+Original is first-class in creation and project identity even before the Original FIRE Core workflow is breadboarded. Until that spine exists, Original Project Home must remain a truthful quiet placeholder rather than silently forcing Recreation behavior.
+
+### Work pages
 
 Work pages push directly from Project Home and return directly to it.
 
-For Recreation / The Map, the current G7 work sequence is:
+Current Recreation / The Map sequence:
 
 - Song Setup
 - Structure
@@ -64,165 +96,157 @@ For Recreation / The Map, the current G7 work sequence is:
 - Section Study
 - Review Map
 
-The UI does not need Step/Checkpoint labels. The Map is a Journey grouping in product logic, not an intermediary screen the musician must enter.
+No Step/Checkpoint labels. No required The Map intermediary screen. No duplicate project-name text inside work headers.
 
-## Navigation model
+Nested work pages use a compact icon-only Back affordance with an accessible label; the project title does not need to be printed above every work-page title.
 
-The V6 center context navigator does not carry forward.
+## Typography and copy hierarchy
 
-Navigation remains shallow:
+Use a stable three-level hierarchy:
 
-- Projects → Project Home → Work screen
-- Back from work returns to Project Home
-- Continue advances through recommended work without building unnecessary browser-history depth
-- Journey revisits completed work and exposes upcoming work
-- the current recommended work is represented by Continue, not repeated as a second Journey row
+1. **Projects root** — strongest app/root title.
+2. **Project Home** — strong project identity.
+3. **Work page** — one consistent compact task-title scale.
 
-## Projects
+Work-page title size must remain consistent across Song Setup, Structure, Tracks, Section Study, Review Map, and Notes.
 
-Projects has one job: open or create a project.
+A subtitle is optional, not default. Keep it only when it gives information the controls/title do not already communicate.
 
-- Persistent `+` is the single create affordance.
-- Empty state is only `No projects yet.`
-- Project title is primary; artist + type are secondary.
-- No root-screen Roadmap/progress chrome.
-- During G7 physical review, keep one tiny subordinate **`G7 · <commit>`** identifier near the Projects title so Babel can confirm a newly deployed build even when a pass is mostly underground.
-- The identifier is review traceability, not permanent product chrome or a prototype banner.
+Current copy decisions:
 
-## Project Home — Shell Freeze behavior
-
-Project Home should feel like a document home, not a dashboard.
-
-### Continue
-
-- One emphasized grouped destination.
-- Owns the current recommended task.
-- Shows only the task name + minimum useful context.
-
-### Journey
-
-- Does **not** repeat the current Continue task.
-- Shows completed work with quiet completion language so it remains revisitable.
-- Shows upcoming work quietly and directly.
-- Do not stack `Journey` + `The Map` as two adjacent labels when there is only one active phase worth showing; avoid double-label hierarchy.
-- Future phases remain visible as a quiet compact collection rather than one dense explanatory sentence.
-- Avoid Recommended / In progress / Current / Phase X of Y / percentages when hierarchy already communicates position.
-
-### Notes
-
-- If the project already has saved notes, expose Project Notes quietly and keep them revisitable.
-- If Notes has no creation/action value and there are no notes, hide that dead destination from Project Home.
-- A future real Notes system can restore a stronger entry once it earns the space.
-
-## Shared header hierarchy
-
-Shell Freeze establishes three header archetypes:
-
-1. **Projects root** — strongest app/root identity.
-2. **Project Home** — strong song/project identity.
-3. **Work page** — compact task title + optional minimum-useful subtitle.
-
-Work pages must not use the same oversized title scale as Projects or Project Home. Content-heavy musical tasks need more vertical room than root identity screens.
+- **Song Setup:** title only; row-level guidance carries the useful detail.
+- **Structure:** title only; no `Build the song one section at a time` + `Add the first section you hear` duplication.
+- **Tracks:** keep one concise instruction, `Choose everything you hear.` because the task benefits from it.
+- **Section Study / Review Map:** title + truthful quiet built-later state; no extra explanatory subtitle.
+- **Notes:** title only.
 
 ## Visual semantics
 
 Use one meaning per visual state:
 
-- **Selection** — restrained selected surface/border; no completion checkmark.
+- **Selection** — selected surface/border; no completion checkmark.
 - **Completion** — ring/check language.
-- **Status/value** — concise text when text is the information itself.
-- **Navigation** — row + chevron when opening another destination.
-- **Primary progression** — strongest compact button treatment on the work page.
+- **Navigation** — row + chevron when opening another workspace.
+- **Primary progression** — compact strong action after current work is sufficient.
+- **Secondary management** — ellipsis or equivalent quiet utility affordance.
 
-Do not show two indicators for one state. Prove hierarchy in grayscale before adding signature color/personality.
+Primary Continue actions should not become giant full-width bars merely because the viewport is narrow.
 
-Reference is a setup requirement, not media FIRE needs to own. The user confirms the reference is imported into their production/session environment; FIRE stores only completion state. Do not request/upload/retain the media unless a future feature genuinely needs it.
+Prove hierarchy in grayscale before adding signature color/personality.
 
 ## Song Setup
 
-Song Setup is one dedicated grouped form:
+Song Setup is one grouped form:
 
 - Reference
 - Tempo
 - Meter
-- Grid alignment
+- Grid
 - First Listen
 
-No collapse state. No Step list. No competing phase navigation. Continue to Structure only appears when Setup is complete.
+Reference is a requirement, not media FIRE owns. The musician confirms the reference is imported into the production/session environment; FIRE stores only completion state.
+
+Useful row-level guidance stays concise:
+
+- Reference — `Import it into your session.`
+- Grid — `Align it to the bar grid.`
+- First Listen — `Play the full song once.`
+
+Continue appears only when setup is complete.
 
 ## Structure
 
-Structure makes the arrangement itself the interface.
+Structure makes the arrangement itself the interface from the empty state forward.
 
-- Show the ordered section list directly.
-- Add Section is part of the same arrangement group once sections exist.
-- Common section types add immediately at an 8-bar preview default.
-- Tap a section row to rename, change bars, reorder, duplicate, or delete.
-- **Structure matches the song** is integrated as a quiet final row of the arrangement group rather than a competing standalone card.
-- Continue to Tracks appears only after Structure is verified.
+- The arrangement group exists even before the first section.
+- `Add Section` is always part of that same group.
+- Common section types add at an 8-bar preview default.
+- Tap a section row to edit name/bars/order/duplicate/delete.
+- `Matches the song` is the quiet final verification row once sections exist.
+- Continue appears only after verification.
+
+Add/Edit Section uses a concise sheet because it creates/edits a section object.
 
 ## Tracks
 
 Tracks keeps direct multi-select.
 
-- Instruction: **Choose everything you hear in the song.**
-- No Step/Checkpoint/status chrome.
-- Tiles are intentionally denser than before so musical content, not shell chrome, owns the page.
-- Custom-track entry remains one compact control.
-- Continue is separated from selection/custom controls and appears once the task has started.
+- Common track choices are direct inline selection.
+- Custom track creation uses a concise `Add Track` sheet.
+- Selection and completion remain distinct.
+- Continue appears once at least one track exists.
+- Keep density calm; do not turn the page into a wall of giant controls.
 
 ## Section Study + Review Map placeholders
 
-These editors are not migrated during Shell Freeze.
+These editors are not built yet.
 
-- Missing real prerequisites may use an actionable prerequisite surface with direct routes to fix context.
-- If prerequisites are satisfied but the editor is simply not built yet, use a quiet truthful placeholder rather than a large card that looks like a feature.
-- Do not expose internal V6 migration/approval language.
+- Missing prerequisites may show direct repair routes.
+- When prerequisites are satisfied, use a quiet truthful placeholder.
+- Do not expose internal migration/approval language.
 
-## Natural scrolling + adaptive layout
+## Sheets
 
-FIRE has one product logic across device classes.
+Sheets are for brief create/edit/manage tasks closely related to the current context.
 
-- Document height determines whether a page scrolls naturally.
-- Never toggle root overflow from `VisualViewport` movement.
-- Tall pages get modest CSS-only Safari end clearance.
-- Modal sheets may temporarily lock body scrolling while open.
-- Project logic, navigation semantics, completion, selection, Journey, and Continue behavior do not change between iPhone and iPad.
-- Presentation may adapt: column count, spacing, content width, and sheet placement can change with available space.
+- Keep titles concise.
+- Avoid giant empty vertical regions.
+- Avoid turning sheets into hidden navigation pages.
+- Body scrolling may be locked while a sheet is open.
+- On wide layouts, sheets may become centered dialogs without changing product logic.
 
-Do not create separate iPhone and iPad FIRE products.
+## Natural scrolling + keyboard behavior
 
-## Shell Freeze acceptance gate
+- Document height decides whether the page scrolls.
+- No VisualViewport-driven root scrolling logic.
+- Use CSS safe-area/end clearance.
+- Inputs stay at 16px+ to avoid iOS zoom.
+- Use CSS scroll padding/margins so focused fields and following actions have breathing room above the software keyboard where the browser honors them.
 
-Before FIRE Core breadboarding begins, the deployed G7 preview should pass physical review for:
+## Acceptance gate before FIRE Core breadboard
 
-- Projects remains calm and the tiny `G7 · <commit>` trace is readable but subordinate.
-- Project Home shows the current task once.
-- Journey is understandable without Journey/The Map label clutter.
-- Empty Notes does not compete; existing Notes remains reachable.
-- Work-page headers are compact and consistent.
-- Structure verification feels like part of the arrangement.
-- Tracks is denser without becoming cramped.
-- Section Study / Review Map unfinished states are truthful and quiet.
-- Natural scrolling works on short and tall Safari pages.
-- 390px / 440px / 820px layouts preserve the same product model.
-- Back behavior and direct revisiting remain reliable.
+G7 is not frozen until physical review says the shell feels coherent enough to stop discussing generic UI fundamentals.
 
-This is the final broad generic shell-polish pass for a while. Once physically approved, stop re-litigating ordinary headers/spacing/cards and move to the FIRE Core breadboard.
+Review for:
 
-## After Shell Freeze
+- Projects `+` alignment and root rhythm feel intentional.
+- Build trace is visible only when sought and no longer sits inside content hierarchy.
+- Project cards can be managed without entering them.
+- Original and Recreation are both explicit in New Project.
+- Project Home has no redundant Continue/Journey headings.
+- Work pages do not stack unnecessary title/subtitle/helper layers.
+- Work titles use one stable scale.
+- Inline vs sheet vs navigation behavior becomes predictable after only a few interactions.
+- Structure uses one arrangement surface from empty → populated.
+- Tracks stays direct for normal selection and uses a sheet only for custom creation.
+- Primary actions are compact rather than giant phone-width bars.
+- Natural scrolling and sheets remain reliable at 390 / 440 / 820.
+- V6 production data remains untouched.
 
-Next sequence:
+Approval question:
 
-**G7 Shell Freeze → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**
+> **Can Babel move through the shell without wondering what kind of UI is going to happen next?**
 
-The breadboard is expected to be primarily underground product-logic/documentation work: places, affordances/actions, connections, decisions, evidence, Logic handoffs, evaluation, and carry-forward context for Original + Recreation end to end.
+If yes, stop broad shell polishing and move immediately to the FIRE Core breadboard.
 
-Only after that agreement should the thin complete FIRE Core spine become runtime functionality. Signature FIRE glow, pixel Fire/badges, Babel World, accounts, learning hub, and broader platform work remain deferred.
+## After approval
+
+Sequence:
+
+**physical G7 shell approval → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**
+
+Breadboard Original + Recreation end to end using places / affordances / connections. For every phase define entering problem, what FIRE asks the musician to notice, decision, Logic action/experiment, evaluation, done criteria, evidence retained, and carry-forward context.
+
+Then build the thinnest complete walking spine from start → release-ready audio and validate on:
+
+- Recreation: **Creep**
+- Original: **Even**
+
+Deepen only where real use proves need.
 
 ## Technical stability
 
-Until a requirement proves otherwise, preserve:
+Preserve unless a real requirement proves otherwise:
 
 - V6 `production-projects-v1`
 - schema 5 compatibility
