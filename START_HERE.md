@@ -139,11 +139,9 @@ Keep only the **current production generation spec + active successor/preview sp
 
 ## Current verified continuity — Shell Freeze was NOT approved
 
-PR **#48 — Freeze the G7 shell system** merged to `main` at `20d5d26a652648083dc3695ea60e0889dc415eb8` and deployed successfully. Its automated 390 / 440 / 820 regression matrix passed.
+PR **#48 — Freeze the G7 shell system** merged to `main` at `20d5d26a652648083dc3695ea60e0889dc415eb8` and deployed successfully. Babel's physical iPhone review **did not approve that shell freeze**. The structural direction was better, but the shell still felt ugly, text-heavy, inconsistent, and interactionally unpredictable.
 
-Babel then performed physical iPhone review and **did not approve the shell freeze**. The structural direction was better, but the shell still felt ugly, text-heavy, inconsistent, and interactionally unpredictable.
-
-Key physical-review evidence:
+Key physical-review evidence from #48:
 
 - no project-card management action existed on Projects; Edit required entering the project first
 - Projects title / `+` alignment felt off
@@ -156,11 +154,11 @@ Key physical-review evidence:
 - interaction behavior felt unpredictable: some choices were inline, others opened sheets, with no obvious semantic rule
 - narrow-phone input/keyboard composition still looked rough enough to keep under review
 
-**Therefore G7 is still unfrozen. Do not begin the FIRE Core breadboard until the shell simplification correction receives physical approval.**
+PR **#50 — Simplify the G7 shell interaction system** then corrected those system-level problems. It is merged to `main` at **`9095116ae1f791f85e6842124a64210da593c085`**, deployed successfully through GitHub Pages **#77**, and the exact merged SHA passed the post-merge static gate plus Chromium regression suites at **390 / 440 / 820**.
 
-## Active correction — G7 Shell Simplification + Interaction Grammar
+**Current state: the simplification correction is live and awaiting Babel's physical-device review. G7 is still unfrozen. Do not begin the FIRE Core breadboard until Babel approves this corrected shell.**
 
-Current working branch: **`sol/g7-shell-simplification`**. Check open PRs before doing new work; if this branch/PR is still open, continue it rather than starting another competing shell pass.
+## Deployed correction — G7 Shell Simplification + Interaction Grammar
 
 The correction is intentionally narrow. It does not add FIRE Core musical functionality.
 
@@ -173,17 +171,17 @@ The correction is intentionally narrow. It does not add FIRE Core musical functi
 - **Menu/secondary affordance = utilities that should not compete with musical work.**
 - Consistency comes from semantic meaning, not making every interaction use the same container.
 
-### Implemented correction direction
+### Implemented correction
 
 **Projects**
 
 - `Projects` remains root identity; `+` shares one stable header alignment.
-- project cards now separate primary open behavior from a quiet per-card actions affordance
+- project cards separate primary open behavior from a quiet per-card actions affordance
 - Edit/Reset/Delete can be reached from Projects without entering the project first
 - New Project explicitly exposes **Original** and **Recreation**
 - Original creation requires a title; artist is optional
 - Recreation requires song title + artist
-- tiny `G7 · <commit>` moves back to quiet bottom-center fixed review trace, outside normal content hierarchy
+- tiny `G7 · <commit>` is back at quiet bottom-center fixed review trace, outside normal content hierarchy
 - build trace is removed from project-management sheets
 
 **Project Home**
@@ -193,13 +191,13 @@ The correction is intentionally narrow. It does not add FIRE Core musical functi
 - one current recommendation remains visually primary
 - current task is not repeated below
 - revisitable/upcoming work remains in one quiet grouped list
-- one tiny `Later` label may remain because it communicates chronology
+- one tiny `Later` label remains because it communicates chronology
 - saved Notes may appear as a utility row; empty Notes remains hidden
-- Original Project Home exists truthfully even before its FIRE Core spine is built; it must not silently behave like Recreation
+- Original Project Home exists truthfully even before its FIRE Core spine is built; it does not silently behave like Recreation
 
 **Work headers/copy**
 
-- nested work Back becomes icon-only with accessible label instead of printing project title above every work title
+- nested work Back is icon-only with accessible label instead of printing project title above every work title
 - Song Setup: title only
 - Structure: title only
 - Tracks: keeps one useful instruction, `Choose everything you hear.`
@@ -213,14 +211,14 @@ The correction is intentionally narrow. It does not add FIRE Core musical functi
 - `Add Section` is always inside that same group
 - no `Build the song one section at a time` + `Add the first section you hear` duplication
 - Add/Edit Section uses a sheet because it creates/edits a section object
-- verification becomes concise `Matches the song`
-- Continue becomes a compact action after verification
+- verification is concise `Matches the song`
+- Continue is a compact action after verification
 
 **Tracks**
 
 - common tracks stay direct inline multi-select
 - custom `Other` opens an `Add Track` sheet because it creates a named custom object
-- Continue becomes compact rather than a giant phone-width bar
+- Continue is compact rather than a giant phone-width bar
 
 **Sheets / keyboard**
 
@@ -228,9 +226,9 @@ The correction is intentionally narrow. It does not add FIRE Core musical functi
 - sheet spacing/control sizing is reduced
 - CSS scroll padding/margins help focused fields keep breathing room above software keyboard without reintroducing VisualViewport logic
 
-### Physical approval checklist for this correction
+### Physical approval checklist
 
-After deploy, Babel should inspect the same iPhone path again:
+Babel should inspect the same iPhone path again:
 
 1. Projects header: does `Projects` + `+` feel aligned/intended?
 2. Build trace: is `G7 · <commit>` back where it belongs—quiet bottom-center, not part of content?
