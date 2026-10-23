@@ -137,13 +137,19 @@ Keep only the **current production generation spec + active successor/preview sp
 
 `V5.md` is intentionally removed from the working tree and remains recoverable from Git history.
 
-## Current active direction
+## Current verified continuity — G7 Shell Freeze
 
-**G7 Shell Freeze → physical review → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**
+PR **#48 — Freeze the G7 shell system** is merged to `main` at `20d5d26a652648083dc3695ea60e0889dc415eb8` and deployed through GitHub Pages deployment #75.
 
-PR **#48 — Freeze the G7 shell system** is the active Shell Freeze implementation.
+The exact merged SHA passed the post-merge static gate and full Chromium regression suite at **390px / 440px / 820px**; the suite ran **105 tests** successfully at each width (one intentional phone-density skip where applicable). V6 production data/storage was not changed.
 
-This is the final broad generic shell/system pass for a while. It must not expand FIRE Core functionality or add signature/platform features.
+**Current state: the G7 Shell Freeze is deployed and awaiting Babel's physical-device approval. Do not begin the FIRE Core breadboard until that review is complete.**
+
+Current sequence:
+
+**physical G7 Shell Freeze review → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**
+
+This Shell Freeze is the final broad generic shell/system pass for a while. If the physical review is approved, stop re-litigating ordinary headers, spacing, cards, density, and basic hierarchy and move into FIRE Core product logic.
 
 ### #48 Shell Freeze decisions
 
@@ -160,9 +166,9 @@ This is the final broad generic shell/system pass for a while. It must not expan
 - **Continue owns the current recommended task**
 - Journey does **not** repeat the same current task
 - Journey shows completed work for revisiting + upcoming work for orientation/direct access
-- remove adjacent `Journey` + `The Map` double-label clutter
+- no adjacent `Journey` + `The Map` double-label clutter
 - later phases remain visible as a quieter compact collection rather than one dense sentence
-- hide empty/dead Notes chrome; if real saved notes exist, Project Notes remains reachable
+- empty/dead Notes chrome is hidden; if real saved notes exist, Project Notes remains reachable
 
 **Shared header hierarchy**
 
@@ -182,13 +188,13 @@ Work pages must not use root-sized titles.
 
 - arrangement first
 - Add Section stays inside the arrangement group once sections exist
-- `Structure matches the song` becomes a quiet final arrangement row rather than a separate competing card
+- `Structure matches the song` is a quiet final arrangement row rather than a separate competing card
 - Continue appears after verification
 
 **Tracks**
 
 - direct multi-select remains
-- tiles become denser without changing logic
+- tiles are denser without changing logic
 - custom-track control stays compact
 - Continue appears once the task has started
 
@@ -204,13 +210,13 @@ Work pages must not use root-sized titles.
 - sheets may lock body scroll while open
 - 390 / 440 / 820 layouts keep identical product hierarchy/actions/states and adapt presentation only
 
-## What Babel should inspect after #48 deploys
+## What Babel should inspect now
 
-This pass should be **visibly cleaner but not a dramatic redesign**.
+The deployed G7 preview should be **visibly cleaner but not a dramatic redesign**.
 
 Review in order:
 
-1. **Projects** — still calm; confirm `G7 · <commit>` matches the deployed build and is visually subordinate
+1. **Projects** — still calm; confirm the `G7 · <commit>` identifier is present and visually subordinate
 2. **Project Home** — current task appears once; Journey feels lighter; no Journey/The Map label clutter; later phases are quiet; empty Notes no longer competes
 3. **Song Setup** — work title is smaller/cleaner; form still obvious
 4. **Structure** — verification feels attached to the arrangement rather than floating separately
@@ -222,7 +228,7 @@ Approval question:
 
 > **Can the musician open a project and start useful musical work without thinking about how FIRE is organized?**
 
-Do not judge #48 by new functionality; it intentionally adds almost none.
+Do not judge the Shell Freeze by new functionality; it intentionally adds almost none.
 
 ## After physical Shell Freeze approval
 
