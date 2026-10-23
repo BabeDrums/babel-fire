@@ -6,6 +6,7 @@
 - **Live V7 preview:** https://babedrums.github.io/babel-fire/v7-preview/
 - **Cross-generation product doctrine:** [FIRE_CORE.md](FIRE_CORE.md)
 - **Future Babel platform hypotheses:** [BABEL_PLATFORM.md](BABEL_PLATFORM.md)
+- **External references / inspiration:** [REFERENCES.md](REFERENCES.md)
 - **Active production specification:** [V6.md](V6.md)
 - **Experimental next-shell direction:** [V7_DRAFT.md](V7_DRAFT.md)
 
@@ -16,14 +17,21 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 1. `START_HERE.md`
 2. `AGENTS.md`
 3. `FIRE_CORE.md` for current cross-generation product doctrine
-4. `BABEL_PLATFORM.md` only when the task involves future accounts/sync, cross-app ecosystem, monetization/entitlements, the deeper learning/practice surface, the user’s Fire, social sharing, or lore/Easter eggs
-5. `V6.md` for shipped production-generation requirements
-6. `V7_DRAFT.md` for the redesign shell
-7. `CONTEXT.md` for supporting history/detail not superseded above
-8. Current `main`, open PRs, relevant branches, and tests
-9. `CHANGELOG.md` for shipped milestones
+4. `BABEL_PLATFORM.md` only when the task involves future accounts/sync, cross-app ecosystem, monetization/entitlements, the deeper learning/practice surface, the user’s Fire, badges/collections, social sharing, or lore/Easter eggs
+5. `REFERENCES.md` when doing product/design research or comparing external systems; references are inspiration/evidence, never authority
+6. `V6.md` for shipped production-generation requirements
+7. `V7_DRAFT.md` for the redesign shell
+8. `CONTEXT.md` for supporting history/detail not superseded above
+9. Current `main`, open PRs, relevant branches, and tests
+10. `CHANGELOG.md` for shipped milestones
 
 Always distinguish shipped production work from experimental V7 preview work.
+
+## Naming shorthand
+
+Use **G7** in normal product conversation for the current seventh FIRE implementation/shell generation. Keep existing technical identifiers (`V7_DRAFT.md`, `/v7-preview/`, `production-projects-v1-v7-preview`) unchanged unless there is a separate migration reason; renaming stable routes/storage/docs solely for wording would add risk without product value.
+
+Use **FIRE Core** for the first complete functional product spine. Do not introduce an `M1` label merely to create another taxonomy; FIRE Core already communicates the milestone. **FIRE 1.0** remains the future release-quality milestone after Core has been validated and refined.
 
 ## FIRE Core product doctrine
 
@@ -35,28 +43,31 @@ Always distinguish shipped production work from experimental V7 preview work.
 - Recreation can **Match, Interpret, or Reimagine** a reference; individual differences can be matched, intentional, or explored.
 - One shared FIRE reasoning engine serves both modes: **Feel → Identify → Reason → Experiment → Evaluate**.
 - Historical V6/V7 rules remain useful generation-specific evidence but cannot override current FIRE Core doctrine.
-- Future accounts/sync, Babel app harmony, monetization/entitlements, the deeper Practice/Skills surface, the user’s Fire, social sharing, and lore/Easter eggs are preserved as **future hypotheses** in `BABEL_PLATFORM.md`; they do not expand current Shell/Core implementation scope.
+- Future accounts/sync, Babel app harmony, monetization/entitlements, the deeper Practice/Skills surface, the user’s Fire, badges/collections, social sharing, and lore/Easter eggs are preserved as **future hypotheses** in `BABEL_PLATFORM.md`; they do not expand current Shell/Core implementation scope.
 - Cross-app learning follows **shared evidence, local identity**: overlapping production skills should eventually use a shared versioned Babel Learning Contract and familiar progress/learning primitives, while app-specific journeys/metaphors stay distinct. A future Babel World is only a hub hypothesis and must never become a dependency or global skill score.
-
+- Learning architecture is **evidence first, interpretation second**: preserve meaningful evidence/provenance/context and derive current skill state from it rather than storing only an unexplained score.
+- Source/origin marks and achievement badges are separate semantics. Pixel-art Fire/badge language is a later visual hypothesis, not current shell scope.
 
 ## Current verified continuity — October 22, 2026
 
-PR #41, **Capture Babel platform, monetization, and learning-Fire hypotheses**, is merged at `ec5c7a8…`; its PR regression matrix passed at 390px, 440px, and 820px. It preserves future accounts/sync, ecosystem, entitlements, Practice/Growth, the user's Fire, social, and lore ideas without changing runtime behavior or user data. PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
+PR #43, **Add FIRE reference registry**, is merged at `7113d14…`; its post-merge static and Chromium 390px / 440px / 820px regression jobs all passed. It created `REFERENCES.md` and preserved external product/design/learning/visual references without changing runtime behavior.
 
-The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
+PR #42, **Refine shared learning and Babel World hypotheses**, is merged at `d8d43fc…` and established the shared-evidence/local-identity direction, Babel Learning Contract hypothesis, Babel World as an optional hub, and ambient Fire discovery without expanding current runtime scope. PR #41 remains the broader future-platform/monetization/learning-Fire milestone; PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
 
-The V7 shell is now consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
+The V7 shell is consolidated: New Project, the persistent `+`, quiet zero state, build stamp, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
-The current direction is **V7 Shell Freeze + FIRE Core shaping**: perform one deliberate declutter/system pass so headers, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, and adaptive presentation stop being re-litigated route by route; then breadboard the complete FIRE Core Original + Recreation journeys before deeply designing later phases.
+The current active direction is **G7 Shell Freeze → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**.
+
+The next pass is the final deliberate generic shell/system cleanup for a while. It should make headers, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, density, and adaptive presentation consistent enough that those fundamentals stop being re-litigated route by route. After physical approval, move away from shell polishing and breadboard the complete Original + Recreation product journeys before deeply designing later phases.
 
 ## Production state — V6
 
 - Root `/` remains V6 on schema 5 using `production-projects-v1`.
 - Preserve stable project/section/track/range/event IDs, migrations, timeline semantics, durable notes, browser persistence, and Map → Skeleton dependencies.
-- V6 remains the production fallback until V7 is physically approved and deliberately promoted.
+- V6 remains the production fallback until G7/V7 is physically approved and deliberately promoted.
 - Do not use V6 screenshots as the redesign target merely because production is visible there.
 
-## V7 architecture — settled at the shell level
+## G7 / V7 architecture — settled at the shell level
 
 The isolated preview lives at `/v7-preview/` and uses `production-projects-v1-v7-preview`. It must never mutate V6 production data.
 
@@ -74,7 +85,7 @@ Project Home contains:
 - **Journey** — orientation, direct access, and revisiting
 - **Notes** — project thinking
 
-V7 does **not** carry forward:
+G7 does **not** carry forward:
 
 - the center context navigator
 - a separate Roadmap destination
@@ -87,7 +98,7 @@ V7 does **not** carry forward:
 
 Rule: **guided forward, flexible backward.** Completed work stays revisitable. Upcoming work stays understandable. Hard-block only when a task literally cannot operate without missing context.
 
-## Current V7 fundamentals direction
+## Current G7 fundamentals direction
 
 Projects:
 
@@ -136,9 +147,9 @@ Viewport:
 
 ### Locked / current direction
 
-- Project Home = Continue + Journey + Notes
-- no center navigator in V7
-- no separate Roadmap in V7
+- Project Home = Continue + Journey + Notes at the architecture level; exact density/presentation is still part of Shell Freeze
+- no center navigator in G7
+- no separate Roadmap in G7
 - The Map is a Journey grouping, not a required intermediary
 - Song Setup is a dedicated page
 - Structure and Tracks are directly revisitable
@@ -163,6 +174,7 @@ Viewport:
 - signature animation/interactions
 - app-level Projects/Notes navigation
 - meaningful optional learning/progression experiments — including a targeted Practice/Skills surface and the user’s evolving Fire; reject fake mastery, mandatory XP/streak pressure, and default global leaderboards
+- pixel-art Fire / badge language, ambient Fire glow, Babel World collections, source marks, and achievement badge presentation
 
 Duolingo is a **logic reference**, not a visual target: one obvious next action, ordered progression, visible movement, completed work remains accessible. Do not import XP, streaks, cartoon lesson paths, fake percentages, or hard locks everywhere.
 
@@ -210,14 +222,17 @@ Do not lose track of:
 - true cross-project Notes destination
 - final production-shell replacement
 - FIRE/Babel signature visual experiment
+- optional Practice/Growth system, Fire, badges, and cross-app platform work
 
-These are intentionally deferred until the shell/fundamentals pass is physically approved.
+These are intentionally deferred until the shell/fundamentals pass is physically approved and FIRE Core is breadboarded.
 
-## Automatic handoff rule
+## Automatic handoff + consistency rule
 
-Gabriel should never need to request a handoff update.
+Gabriel should never need to request a handoff update or a routine consistency sweep.
 
 Product/runtime or durable-rule PRs that materially change `app.js`, `styles.css`, `index.html`, V7 preview runtime, or durable product rules must refresh this file. `scripts/check_handoff.py` and CI enforce handoff freshness.
+
+For every substantive FIRE pass, also perform a semantic consistency sweep across current doctrine, active generation docs, future platform hypotheses, reference wiring, handoff state, and implementation. Fix clear stale/duplicate contradictions automatically. CI protects known settled markers through `scripts/check_product_doctrine.py`; genuine ambiguous product conflicts still require authority-order/product judgment rather than blind rewriting.
 
 ## Operating workflow
 
@@ -225,23 +240,28 @@ Product/runtime or durable-rule PRs that materially change `app.js`, `styles.css
 - Fresh `main` → task branch → implementation → tests → PR → merge when safe/green → Pages deploy → verify live → physical-device review.
 - It is acceptable to ship isolated `/v7-preview/` iterations while root V6 remains unchanged.
 
-## Next physical-review gate
+## Next physical-review gate — G7 Shell Freeze
 
 Review the deployed V7 preview, not root V6:
 
 https://babedrums.github.io/babel-fire/v7-preview/
 
-Review in this order:
+The Shell Freeze pass should be **visibly cleaner but not a dramatic redesign**. Review in this order:
 
-1. Projects — `+`, one create path, quiet empty state, no visible prototype stamp, no needless subtitle
-2. Project Home — Continue hierarchy, restrained Journey, completed/current/upcoming clarity, future-phase density, Notes
-3. Song Setup — Reference as a clear ring/check setup requirement with no file picker, filename, Replace/Remove sheet, or media ownership implication
-4. Structure — arrangement first, verification quieter than musical content, continuation only when useful
-5. Tracks — direct selection and clear separation of custom entry vs continuation
-6. Section Study / Review Map placeholders — truthful, concise, no fake completion
+1. Projects — preserve the already-good simple create/open surface; avoid unnecessary churn
+2. Project Home — reduce duplicated/current-work density; one obvious continuation path, quieter Journey, cleaner future-phase presentation, and no dead destination competing for attention
+3. Song Setup — compact, consistent work-page header/rhythm; Reference remains a clear ring/check setup requirement with no media-ownership implication
+4. Structure — arrangement first; verification integrated/quieter rather than floating as a competing card
+5. Tracks — denser direct selection where useful; consistent header/action spacing
+6. Section Study / Review Map placeholders — truthful and visually quiet
+7. Shared shell system — consistent header archetypes, typography, section/group spacing, row rhythm, states, action placement, safe-area behavior, sheets, and natural scrolling across compact/wide layouts
 
 Specifically test short-page scrolling, tall-page Safari clearance, spacing/density, direct revisiting, Back behavior, core action discoverability, and that one adaptive interface preserves identical product logic across compact and wide layouts.
 
+Do **not** add the Fire glow, pixel art, badge collection, signature signal-path treatment, learning hub, accounts, or new FIRE Core phase functionality during Shell Freeze.
+
+After Shell Freeze is physically approved, expect the **FIRE Core breadboard** to be primarily product-logic/documentation work with little or no visible runtime change. It should define places, actions, connections, decisions, evidence, and carry-forward context for Original + Recreation end to end. After the breadboard is agreed, build the **thin end-to-end FIRE Core spine** so the whole journey works in plain form before deepening individual phases.
+
 Do not promote the stylized signal-path concept until this restrained shell passes physical review.
 
-`V5.md` is historical. `V6.md` remains production truth until V7 is physically approved and formally promoted.
+`V5.md` is historical. `V6.md` remains production truth until G7/V7 is physically approved and formally promoted.
