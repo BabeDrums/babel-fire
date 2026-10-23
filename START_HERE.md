@@ -10,7 +10,7 @@
 - **Active production specification:** [V6.md](V6.md)
 - **Experimental next-shell direction:** [V7_DRAFT.md](V7_DRAFT.md)
 
-When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**, resume this project immediately. Do not ask Gabriel to reconstruct documented FIRE decisions.
+When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**, resume this project immediately. Do not ask Babel to reconstruct documented FIRE decisions.
 
 ## Read in this order
 
@@ -28,6 +28,8 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 Always distinguish shipped production work from experimental V7 preview work.
 
 ## Naming shorthand
+
+Use **Babel** as the project-facing name for the reference user. Do not use Gabriel in current FIRE handoff, approval, review, or product-facing project instructions. Preserve external account names, artist-history references, and immutable identifiers when they are genuinely historical or technical.
 
 Use **G7** in normal product conversation for the current seventh FIRE implementation/shell generation. Keep existing technical identifiers (`V7_DRAFT.md`, `/v7-preview/`, `production-projects-v1-v7-preview`) unchanged unless there is a separate migration reason; renaming stable routes/storage/docs solely for wording would add risk without product value.
 
@@ -106,7 +108,7 @@ Projects:
 - persistent `+` is the single create affordance
 - zero state is only `No projects yet.`
 - no duplicate giant New Project CTA
-- during G7 preview/physical review, keep a **tiny, quiet, preview-only `G7 · <commit>` identifier** on the main Projects/home surface so Gabriel can confirm he is looking at the newly deployed build even when a pass is mostly underground; it must remain subordinate and should not read like product chrome or a prototype banner
+- during G7 preview/physical review, keep a **tiny, quiet, preview-only `G7 · <commit>` identifier** on the main Projects/home surface so Babel can confirm the newly deployed build even when a pass is mostly underground; it must remain subordinate and should not read like product chrome or a prototype banner
 - the Projects subtitle is intentionally removed because it did not add useful context
 
 Project Home:
@@ -194,15 +196,15 @@ Before polishing a page ask:
 
 Subtraction comes before addition, but subtraction must never remove the only path to a core action.
 
-Gabriel's brainstormed ideas are hypotheses unless explicitly locked. Use product judgment. Fundamentals come before signature personality.
+Babel's brainstormed ideas are hypotheses unless explicitly locked. Use product judgment. Fundamentals come before signature personality.
 
 Target feeling remains roughly **70% calm Apple-like app hierarchy / 30% focused creative-tool density**: calm shell, density where the musical task genuinely requires it, then calm shell again.
 
-## Gabriel's approval / execution contract
+## Babel's approval / execution contract
 
-- Gabriel uses **“bet”** to mean **approved — go execute it now**.
+- Babel uses **“bet”** to mean **approved — go execute it now**.
 - Approved FIRE work means **implement → test → fix → PR → green checks → merge → Pages deploy → verify → live G7/V7 preview link**.
-- Do not make Gabriel repeatedly say “continue,” “merge it,” “deploy it,” or “give me the link.”
+- Do not make Babel repeatedly say “continue,” “merge it,” “deploy it,” or “give me the link.”
 - Standing permission exists to merge FIRE PRs when checks are green, production-data safety is clear, and no genuine product decision remains unresolved.
 - Stop instead when tests fail, production data safety is uncertain, destructive behavior is unresolved, or a genuine product decision remains open.
 - Never claim a change is live until merge and Pages deployment are verified.
@@ -228,7 +230,7 @@ These are intentionally deferred until the shell/fundamentals pass is physically
 
 ## Automatic handoff + consistency rule
 
-Gabriel should never need to request a handoff update or a routine consistency sweep.
+Babel should never need to request a handoff update or a routine consistency sweep.
 
 Product/runtime or durable-rule PRs that materially change `app.js`, `styles.css`, `index.html`, V7 preview runtime, or durable product rules must refresh this file. `scripts/check_handoff.py` and CI enforce handoff freshness.
 
