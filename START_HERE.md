@@ -44,7 +44,7 @@ Use **FIRE Core** for the first complete functional product spine. Do not introd
 - Learning is ambient and adaptive: concise action by default, optional `Why?` / deeper help, domain-specific growth, and `I don't know` as a valid path.
 - Recreation can **Match, Interpret, or Reimagine** a reference; individual differences can be matched, intentional, or explored.
 - One shared FIRE reasoning engine serves both modes: **Feel → Identify → Reason → Experiment → Evaluate**.
-- Historical V6/V7 rules remain useful generation-specific evidence but cannot override current FIRE Core doctrine.
+- Historical generation rules remain useful evidence when retrieved from Git/history but cannot override current FIRE Core doctrine.
 - Future accounts/sync, Babel app harmony, monetization/entitlements, the deeper Practice/Skills surface, the user’s Fire, badges/collections, social sharing, and lore/Easter eggs are preserved as **future hypotheses** in `BABEL_PLATFORM.md`; they do not expand current Shell/Core implementation scope.
 - Cross-app learning follows **shared evidence, local identity**: overlapping production skills should eventually use a shared versioned Babel Learning Contract and familiar progress/learning primitives, while app-specific journeys/metaphors stay distinct. A future Babel World is only a hub hypothesis and must never become a dependency or global skill score.
 - Learning architecture is **evidence first, interpretation second**: preserve meaningful evidence/provenance/context and derive current skill state from it rather than storing only an unexplained score.
@@ -52,9 +52,11 @@ Use **FIRE Core** for the first complete functional product spine. Do not introd
 
 ## Current verified continuity — October 22, 2026
 
-PR #44, **Finalize G7 preflight and Babel badge/evidence doctrine**, is merged at `0bce359…`. Its PR gate passed handoff/doctrine, static checks, and Chromium 390px / 440px / 820px. It reconciled the latest badge/evidence/pixel-Fire hypotheses into authoritative future-platform doctrine, expanded the reference registry, adopted human shorthand `G7`, and refreshed this handoff without changing runtime behavior, storage, schema, or user data.
+PR #46, **Use Babel as project-facing name**, standardized the project-facing reference-user name as Babel without changing runtime behavior. PR #45 sealed the G7 handoff details, including the tiny preview-only `G7 · <commit>` identifier and Procreate reference. PR #44, **Finalize G7 preflight and Babel badge/evidence doctrine**, passed handoff/doctrine, static checks, and Chromium 390px / 440px / 820px and remains the latest substantive pre-Shell-Freeze doctrine/reference consolidation.
 
-PR #43, **Add FIRE reference registry**, is merged at `7113d14…`; it created `REFERENCES.md`. PR #42 established shared evidence/local identity, the Babel Learning Contract hypothesis, Babel World as an optional hub, and ambient Fire discovery. PR #41 remains the broader future-platform/monetization/learning-Fire milestone; PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
+PR #43 created `REFERENCES.md`. PR #42 established shared evidence/local identity, the Babel Learning Contract hypothesis, Babel World as an optional hub, and ambient Fire discovery. PR #41 remains the broader future-platform/monetization/learning-Fire milestone; PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
+
+The working documentation now follows a lean generation-retention rule: keep the **current production generation spec plus the active successor/preview spec**. Git history is the archive for retired generations. `V5.md` has no current maintenance/migration role and is therefore removed from the working tree; it remains recoverable from Git history.
 
 The G7/V7 shell is consolidated: New Project, the persistent `+`, quiet zero state, build metadata, and creation sheet live directly in the V7 renderer/styles. `new-project.js`, MutationObserver visual patching, and runtime CSS injection are gone.
 
@@ -266,4 +268,4 @@ After Shell Freeze is physically approved, expect the **FIRE Core breadboard** t
 
 Do not promote the stylized signal-path concept until this restrained shell passes physical review.
 
-`V5.md` is historical. `V6.md` remains production truth until G7/V7 is physically approved and formally promoted.
+Generation-spec retention rule: keep **V6.md** while V6 is production and **V7_DRAFT.md** while G7/V7 is the active successor. When G7/V7 is formally promoted, retire the older spec from the working tree once it no longer has an explicit maintenance/migration role; Git history remains the archive.
