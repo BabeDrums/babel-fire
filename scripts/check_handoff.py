@@ -1,11 +1,11 @@
-"""Fail a Babel/FIRE pull request when zero-context handoffs are left stale.
+"""Fail a Babel/FIRE pull request when the relevant zero-context handoff is stale.
 
 Usage:
     python3 scripts/check_handoff.py <base_sha> <head_sha>
 
-FIRE product/runtime/spec work must refresh START_HERE.md.
-Cross-app ecosystem doctrine must also refresh BABEL_START_HERE.md.
-This keeps merged states resumable without asking Babel to reconstruct context.
+FIRE product/runtime/spec work refreshes START_HERE.md.
+Wider Babel ecosystem/app/platform doctrine refreshes BABEL_START_HERE.md.
+Files that govern both lanes (for example AGENTS/FIRE_CORE) refresh both.
 """
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ FIRE_WATCHED_PATHS = {
     "V6.md",
     "V7_DRAFT.md",
     "FIRE_CORE.md",
-    "BABEL_PLATFORM.md",
     "CONTEXT.md",
     "AGENTS.md",
 }
@@ -27,8 +26,10 @@ FIRE_WATCHED_PREFIXES = ("v7-preview/",)
 FIRE_HANDOFF_PATH = "START_HERE.md"
 
 ECOSYSTEM_WATCHED_PATHS = {
+    "BABEL_APPS.md",
     "BABEL_PLATFORM.md",
     "FIRE_CORE.md",
+    "AGENTS.md",
 }
 ECOSYSTEM_HANDOFF_PATH = "BABEL_START_HERE.md"
 
@@ -55,13 +56,12 @@ def main() -> int:
     )
     if fire_relevant and FIRE_HANDOFF_PATH not in changed:
         print(
-            "FIRE handoff is stale. Product/durable files changed without "
+            "FIRE handoff is stale. FIRE product/durable files changed without "
             "refreshing START_HERE.md:\n  - " + "\n  - ".join(fire_relevant),
             file=sys.stderr,
         )
         print(
-            "Update START_HERE.md with the current shipped/preview/planned state so "
-            "a new chat can resume without reconstructing context.",
+            "Update START_HERE.md so a fresh FIRE chat sees the current state/next step.",
             file=sys.stderr,
         )
         return 1
@@ -69,13 +69,12 @@ def main() -> int:
     ecosystem_relevant = sorted(path for path in changed if path in ECOSYSTEM_WATCHED_PATHS)
     if ecosystem_relevant and ECOSYSTEM_HANDOFF_PATH not in changed:
         print(
-            "Babel ecosystem handoff is stale. Cross-app doctrine changed without "
+            "Babel ecosystem handoff is stale. Ecosystem/app/platform doctrine changed without "
             "refreshing BABEL_START_HERE.md:\n  - " + "\n  - ".join(ecosystem_relevant),
             file=sys.stderr,
         )
         print(
-            "Update BABEL_START_HERE.md so a new ecosystem/surrounding-app chat "
-            "inherits the current app-concept boundaries instead of reconstructing them from old files.",
+            "Update BABEL_START_HERE.md so a fresh surrounding-app chat inherits the current boundaries.",
             file=sys.stderr,
         )
         return 1
