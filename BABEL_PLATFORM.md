@@ -46,6 +46,43 @@ Rules:
 
 Potential name for this concept is still open (`Babel Harmony`, `Babel Link`, `Babel Platform`, etc.). Do not lock naming yet.
 
+
+### Shared learning architecture — shared evidence, local identity
+
+Future Babel apps should not each invent their own meaning for the same learned capability. When two apps genuinely teach or observe the same skill, they should read and write the same underlying learning evidence through a shared, versioned contract.
+
+Working principle: **shared evidence, local identity.**
+
+- Progress belongs to a real skill/domain, not blindly to the app that happened to generate it.
+- A future learning-focused Babel app may contribute evidence to FIRE's production-skill model only when the evidence genuinely measures the same production capability.
+- Merely opening, using, or progressing through another Babel app must never grow the user's Fire by association.
+- App-specific progression metaphors can remain separate. A future learning app might have its own journey/metaphor while the same credible production evidence can also strengthen the shared production model.
+- Do not collapse unrelated domains into one Babel-wide level or score.
+
+Before a second app exists, FIRE should be designed against a **Babel Learning Contract**, not against guessed details of a hypothetical sibling app. The contract should eventually define stable semantic identifiers and meanings for things such as skill/domain, evidence type, source context/app, guidance depth, demonstrated transfer, and confidence/strength. Exact fields are not locked yet; stable meaning and versionability matter more than the first schema.
+
+For overlapping learning surfaces, prefer shared design primitives and information architecture where the meaning is the same: skill status, evidence history, explanation depth, lesson/practice state, and achievement semantics should feel familiar across Babel products. A shared component/token library can later enforce those fundamentals while allowing each app to compose them for its own job and atmosphere. Consistency is for transferable meaning, not for making every app visually identical.
+
+This removes the need to build FIRE and a future learning app simultaneously. Build one validated product at a time, but avoid FIRE-only learning semantics that would be impossible for another Babel product to consume later.
+
+### Dedicated learning-app split — only if earned
+
+Do not create a second learning app merely to complete an elemental naming set. FIRE should keep enough contextual teaching and optional Practice/Growth depth to help a musician make records successfully.
+
+A dedicated learning product becomes justified only if deliberate training grows into a distinct job that would make FIRE worse if kept inside it — for example, a substantial curriculum, ear-training laboratory, structured drills, courses, or other training experiences that no longer depend on an active production project. If that split happens, it should consume the same Babel Learning Contract rather than rebuilding progress from scratch.
+
+### Babel World — optional ecosystem hub hypothesis
+
+A future **Babel World** (working concept/name only) could become a calm hub for cross-app identity, progress, discoveries, entitlements, and handoff between Babel products once enough real apps exist to justify it.
+
+Guardrails:
+
+- Babel World must never be required to use FIRE or another Babel app.
+- It should aggregate shared meaning rather than duplicate every app's task UI.
+- App-specific progress metaphors can remain native to their apps while Babel World shows a coherent ecosystem-level view.
+- Do not create a single global Babel skill score simply because a hub exists.
+- Build Babel World only after multiple real products create a clear cross-app job; do not reverse-engineer products to give the hub content.
+
 ## 3. Monetization + entitlements
 
 The goal is **desire, not deprivation**. Free users should have a complete, respectable experience rather than feeling like the real product is missing.
@@ -147,6 +184,17 @@ Avoid default global leaderboards. Competitive ranking can motivate some people 
 
 A shareable Fire card/profile could let people show off their Fire without claiming that a bigger animation makes someone objectively “better” at production.
 
+
+### Ambient discovery in FIRE
+
+The Fire should be discoverable without becoming homepage chrome. Strong visual hypothesis for a later personality pass: keep Projects/current work dominant, but let the Fire exist spatially below or beyond the main work surface so a restrained glow or ambient light subtly reaches the home page and invites curiosity.
+
+- The glow is atmosphere, not a notification or required call to action.
+- A person who only wants to make music can ignore it indefinitely.
+- Do not let Fire color, animation, or decoration reduce readability or compete with project actions.
+- Respect Reduce Motion and accessibility; a static light treatment must be sufficient.
+- Do not implement this during the current Shell Freeze. First lock the shared shell fundamentals; prototype ambient Fire personality later as optional product evidence.
+
 ## 6. Achievements, cosmetics, and collectibility
 
 Achievements can be fun when they acknowledge meaningful musical behavior instead of replacing it.
@@ -232,6 +280,9 @@ Do not prematurely lock:
 - whether social comparison goes beyond sharing/encouragement
 - whether Babel-wide purchases eventually use a shared subscription/bundle
 - what cross-app data is genuinely useful enough to justify sharing
+- exact Babel Learning Contract semantics/versioning and which learning UI primitives should be shared across apps
+- whether a dedicated learning product ever earns a separate app boundary
+- whether Babel World ever becomes a real product and what unique cross-app job would justify it
 - final ecosystem naming and visual family system
 
 These decisions should be made from FIRE Core breadboards, real user behavior, future Babel app needs, App Store/platform constraints at implementation time, and explicit product testing — not from enthusiasm alone.

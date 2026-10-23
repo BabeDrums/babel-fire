@@ -36,11 +36,12 @@ Always distinguish shipped production work from experimental V7 preview work.
 - One shared FIRE reasoning engine serves both modes: **Feel → Identify → Reason → Experiment → Evaluate**.
 - Historical V6/V7 rules remain useful generation-specific evidence but cannot override current FIRE Core doctrine.
 - Future accounts/sync, Babel app harmony, monetization/entitlements, the deeper Practice/Skills surface, the user’s Fire, social sharing, and lore/Easter eggs are preserved as **future hypotheses** in `BABEL_PLATFORM.md`; they do not expand current Shell/Core implementation scope.
+- Cross-app learning follows **shared evidence, local identity**: overlapping production skills should eventually use a shared versioned Babel Learning Contract and familiar progress/learning primitives, while app-specific journeys/metaphors stay distinct. A future Babel World is only a hub hypothesis and must never become a dependency or global skill score.
 
 
 ## Current verified continuity — October 22, 2026
 
-PR #40, **Define FIRE Core doctrine and adaptive Recreation learning**, is merged at `9a3935c…`; its PR regression matrix passed at 390px, 440px, and 820px, and Pages deployment #65 succeeded on the same SHA. It establishes `FIRE_CORE.md` as canonical cross-generation doctrine without changing runtime behavior or user data. PR #39 remains the preceding V7 Safari/setup milestone and the latest physical iPhone runtime review.
+PR #41, **Capture Babel platform, monetization, and learning-Fire hypotheses**, is merged at `ec5c7a8…`; its PR regression matrix passed at 390px, 440px, and 820px. It preserves future accounts/sync, ecosystem, entitlements, Practice/Growth, the user's Fire, social, and lore ideas without changing runtime behavior or user data. PR #40 remains the FIRE Core doctrine milestone; PR #39 remains the latest physical iPhone runtime review.
 
 The earlier PR #34 browser-run hang was infrastructure-only; the merged code passed on `main`. Browser jobs now have a 15-minute timeout so a stuck runner becomes an explicit failure instead of waiting indefinitely.
 
