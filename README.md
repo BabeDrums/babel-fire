@@ -1,22 +1,23 @@
 # Babel FIRE
 
-Babel FIRE is an iPhone/iPad-first music-production workflow app.
+Babel FIRE is an iPhone/iPad-first music-production companion.
 
 - **Live app:** https://babedrums.github.io/babel-fire/
 - **Production branch:** `main`
-- **Active product generation:** V6
-- **External references / inspiration registry:** [`REFERENCES.md`](REFERENCES.md)
+- **Active production generation:** V6
+- **Experimental successor:** G7 at `/v7-preview/`
+- **External references / inspiration:** [`REFERENCES.md`](REFERENCES.md)
 
 ## Continue the project
 
-For **Babel FIRE implementation/product work**, start with [`START_HERE.md`](START_HERE.md). It is the canonical zero-context FIRE handoff entry point for a new ChatGPT conversation or collaborator.
+For **Babel FIRE implementation/product work**, start with [`START_HERE.md`](START_HERE.md). It is the canonical zero-context FIRE handoff.
 
-For **the wider Babel ecosystem** — surrounding apps, Babel World, learning-app questions, visual identity, cross-app concepts, Fire/badges, or future product-family brainstorming — start with [`BABEL_START_HERE.md`](BABEL_START_HERE.md) before inferring anything from older prototypes or context files.
+For **the wider Babel ecosystem** — surrounding apps, Babel World, learning-app questions, visual identity, cross-app concepts, Fire/badges, elemental names, or future product-family brainstorming — start with [`BABEL_START_HERE.md`](BABEL_START_HERE.md), then read [`BABEL_APPS.md`](BABEL_APPS.md) and [`BABEL_PLATFORM.md`](BABEL_PLATFORM.md).
 
-Follow the source-of-truth order defined in [`AGENTS.md`](AGENTS.md), then inspect current `main`, open PRs, relevant branches, and tests before making changes.
+Do not reconstruct current product definitions from older prototypes/context files when a current handoff/authority exists.
 
-FIRE's pull-request checks enforce handoff freshness when core product/runtime or durable-rule files change, so merged states stay resumable without a separate manual handoff step.
+Follow the source-of-truth rules in [`AGENTS.md`](AGENTS.md), then inspect current `main`, open PRs/branches, and tests before changing implementation.
 
-For substantive FIRE product work, also perform a **consistency sweep** across the current doctrine, active generation docs, platform hypotheses, handoff state, and implementation. Fix clear stale/duplicate contradictions as part of the task. Do not silently auto-resolve a genuine product conflict when two sources represent materially different decisions; surface and reconcile that conflict using the documented authority order and product judgment. CI catches known markers and stale handoff wiring, but semantic consistency still requires this review step.
+Handoff freshness and known doctrine markers are CI-protected, but natural-language semantic consistency still requires a real consistency sweep on substantive product work.
 
-Do not ask the user to reconstruct decisions that are already documented in the repository.
+Babel should not need to request routine handoff maintenance or contradiction cleanup; those are part of the definition of done.

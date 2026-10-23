@@ -1,187 +1,270 @@
 # Babel Platform — Future Hypotheses
 
-**Status:** Future/platform exploration only. This file preserves cross-app ideas that may matter later without expanding current FIRE Core scope. It does **not** override `FIRE_CORE.md`, the active production spec, or G7/V7 shell work. Revalidate technical/platform assumptions before implementation.
+**Status:** Future/platform exploration only. This file preserves cross-app architecture ideas that may matter later. It does **not** authorize implementation, override `FIRE_CORE.md`, or define sibling-product jobs.
+
+Use:
+
+- `BABEL_START_HERE.md` for zero-context ecosystem continuity
+- `BABEL_APPS.md` for current sibling-app concepts and boundaries
+- this file for shared architecture/infrastructure/progression hypotheses
+- `START_HERE.md` for the active FIRE build state
+
+Do not copy FIRE's current PR/SHA/review status into this file. Platform hypotheses should remain useful even as FIRE implementation changes.
 
 ## Why this exists
 
-Babel may eventually become an ecosystem of focused creative apps rather than a collection of unrelated products. Shared infrastructure should appear only where it reduces friction or creates meaningful continuity. Every app must remain understandable and useful on its own.
+Babel may eventually become an ecosystem of focused creative products rather than unrelated apps. Shared infrastructure should appear only where it reduces friction or creates meaningful continuity. Every product must remain understandable and useful on its own.
 
-Current FIRE work remains: **G7 Shell Freeze → FIRE Core breadboard → real project validation**. Nothing in this file is permission to build accounts, payments, social systems, lore, or cross-app infrastructure now.
+Working rule:
+
+> **Prepare the joints where future products can connect; do not build the future products prematurely.**
+
+Do not build accounts, a shared runtime, Babel World, or a universal design system merely because they could be useful someday.
 
 ## 1. Babel identity + sync
 
 Future direction to explore:
 
-- One **Babel-level account**, not separate unrelated accounts for every Babel app.
-- Each person gets a stable internal Babel user ID; authentication provider identities attach to that account rather than becoming the account model itself.
-- **Sign in with Apple** is the strongest first authentication candidate for an Apple-first product family because it can support native apps and associated web experiences while avoiding a Babel-managed password system.
-- Keep the identity architecture open enough for additional sign-in methods later if the ecosystem expands beyond Apple platforms.
-- Account creation should be optional until a feature genuinely needs cloud identity. Local/offline usefulness should not disappear merely because cloud accounts arrive.
-- Cloud sync should let projects, preferences, learning evidence, entitlements, and supported cross-app state follow the user across devices.
-- A future migration from local FIRE data must be explicit, tested, non-destructive, and preserve existing projects.
+- one optional **Babel-level account**, not unrelated accounts for every app
+- stable internal Babel user ID; sign-in providers attach to that identity rather than becoming the account model
+- **Sign in with Apple** is the strongest initial Apple-first candidate; revalidate before implementation
+- architecture should remain open to other providers/platforms later
+- account creation stays optional until a feature genuinely requires cloud identity
+- local/offline usefulness should survive the arrival of accounts
+- supported projects/preferences/learning evidence/entitlements may eventually follow the user across devices
+- migration from local FIRE data must be explicit, tested, non-destructive, and preserve existing projects
 
-Do not choose the final backend yet. Apple-native options such as iCloud/CloudKit and App Groups may be useful for Apple-only sharing; a Babel-owned service may make more sense if identity, entitlements, or future platforms need to span more than Apple devices. This is an architecture decision for a later dedicated pass.
+Do not choose the final backend yet. Apple-native services may be useful for Apple-only continuity; a Babel-owned service may make more sense if identity, entitlements, social features, or future platforms need to span ecosystems.
 
-## 2. Babel app harmony
+## 2. Shared ecosystem, distinct products
 
-Working idea: **shared ecosystem, distinct products**.
+Working principle:
 
-Potential shared layers:
+> **Shared ecosystem, distinct products.**
 
-- Babel account/profile
-- cloud sync and device continuity
-- shared entitlements/purchases where appropriate
-- a small shared design foundation: typography philosophy, interaction quality, motion/haptics principles, account/settings patterns, accessibility expectations
-- deep links or handoffs between Babel apps when one app can genuinely continue work from another
-- narrowly scoped shared data models where meaning transfers cleanly
-- shared lore/world-building hooks when they add delight without confusing the product task
+Possible shared layers:
+
+- account/profile
+- cloud/device continuity
+- entitlements/purchases where appropriate
+- small shared design foundation: typography philosophy, interaction quality, motion/haptics principles, settings/account patterns, accessibility expectations
+- purposeful deep links/handoffs
+- narrowly scoped shared semantic models
+- optional lore/cross-product references when they add delight without confusing the task
 
 Rules:
 
-- Apps should feel related without looking like skins of the same app.
-- Do not make apps talk to each other merely because they can.
-- Cross-app data sharing should be purposeful, minimal, understandable, and permission-aware.
-- Each app owns its task-specific data; ecosystem infrastructure owns only what truly needs to be shared.
-- A person should never need multiple Babel apps to complete a core workflow in one of them.
+- apps should feel related without becoming skins of one template
+- do not make apps communicate merely because they can
+- cross-app sharing should be purposeful, minimal, understandable, and permission-aware
+- each product owns task-specific data
+- shared infrastructure owns only what genuinely needs to transfer
+- no Babel app may be required to complete another app's core workflow
+- do not build a giant speculative Babel component library before multiple real products prove reusable patterns
 
-Potential name for this concept is still open (`Babel Harmony`, `Babel Link`, `Babel Platform`, etc.). Do not lock naming yet.
+When a second product exists, extract proven shared UI/components from FIRE and the sibling rather than inventing universal components in advance.
 
-### Shared learning architecture — shared evidence, local identity
+## 3. Shared learning architecture — shared evidence, local identity
 
-Future Babel apps should not each invent their own meaning for the same learned capability. When two apps genuinely teach or observe the same skill, they should read and write the same underlying learning evidence through a shared, versioned contract.
+Core principle:
 
-Working principle: **shared evidence, local identity.**
+> **Shared evidence, local identity.**
 
-- Progress belongs to a real skill/domain, not blindly to the app that happened to generate it.
-- A future learning-focused Babel app may contribute evidence to FIRE's production-skill model only when the evidence genuinely measures the same production capability.
-- Merely opening, using, or progressing through another Babel app must never grow the user's Fire by association.
-- App-specific progression metaphors can remain separate. A future learning app might have its own journey/metaphor while the same credible production evidence can also strengthen the shared production model.
-- Do not collapse unrelated domains into one Babel-wide level or score.
+Future products should not invent different meanings for the same learned capability when they genuinely overlap. At the same time, they should not collapse unrelated domains into one Babel-wide score or progression system.
 
-Before a second app exists, FIRE should be designed against a **Babel Learning Contract**, not against guessed details of a hypothetical sibling app. The contract should eventually define stable semantic identifiers and meanings for things such as skill/domain, evidence type, source context/app, guidance depth, demonstrated transfer, and confidence/strength. Exact fields are not locked yet; stable meaning and versionability matter more than the first schema.
+- progress belongs to a real capability/domain, not blindly to the app that generated it
+- credible evidence from another product may inform FIRE's production-skill model only when it genuinely measures the same capability
+- merely opening/using/progressing through another app proves nothing by itself
+- app-specific progression metaphors remain local
+- no global Babel Beginner/Intermediate/Advanced label
+- no universal Babel XP/level
+
+### Babel Learning Contract
+
+Before a second learning-aware product exists, FIRE should avoid FIRE-only semantics that would make future interoperability impossible.
+
+A future versioned **Babel Learning Contract** should define stable meanings for concepts such as:
+
+- skill/domain identity
+- evidence type
+- meaningful action/demonstration
+- source app/feature
+- project / Recreation / Original / Practice context
+- guidance/assistance depth
+- result/outcome
+- demonstrated transfer
+- confidence/strength interpretation inputs
+- timestamp and schema/version provenance
+
+Exact fields are intentionally not locked.
 
 ### Evidence first, interpretation second
 
-A strong architecture hypothesis, informed by xAPI-style learning records: Babel should persist **what happened and in what context** before persisting a simplistic conclusion about what the person "is."
+Architecture principle inspired by xAPI-style learning records:
 
-Future learning evidence should be able to preserve concepts such as:
+> **Store what was demonstrated and in what context; derive what it means later.**
 
-- a stable skill/domain identifier independent of the visible label
-- the meaningful action or demonstrated behavior
-- the source app and feature/workflow
-- project / recreation / original / practice context when relevant
-- how much guidance or assistance was used
-- result/outcome and whether the person later transferred the idea into a different context
-- timestamp and schema/contract version
+Do not store only a conclusion such as “Babel is 74% at Balance.” Preserve the evidence history that produced the interpretation.
 
-The exact schema is deliberately not locked. The important rule is that **derived skill state is a projection of evidence, not the only stored truth**. A skill view should eventually be able to answer "why does Babel think this is developing/strong?" by showing the evidence underneath it. New evidence may change the interpretation without silently rewriting the historical events that produced it.
+Future skill views should be able to answer:
 
-For overlapping learning surfaces, prefer shared design primitives and information architecture where the meaning is the same: skill status, evidence history, explanation depth, lesson/practice state, source marks, and achievement semantics should feel familiar across Babel products. A shared component/token library can later enforce those fundamentals while allowing each app to compose them for its own job and atmosphere. Consistency is for transferable meaning, not for making every app visually identical.
+> **Why does Babel think this skill is developing/strong?**
 
-This removes the need to build FIRE and a future learning app simultaneously. Build one validated product at a time, but avoid FIRE-only learning semantics that would be impossible for another Babel product to consume later.
+Evidence history may include examples such as:
 
-### Dedicated learning-app split — only if earned
+- diagnosed masking
+- compared balance decisions
+- resolved a hierarchy problem
+- practiced a weak domain deliberately
+- used a concept independently
+- transferred the same judgment into another project/context
 
-Do not create a second learning app merely to complete an elemental naming set. FIRE should keep enough contextual teaching and optional Practice/Growth depth to help a musician make records successfully.
+New evidence may change current interpretation without silently rewriting historical events.
 
-A dedicated learning product becomes justified only if deliberate training grows into a distinct job that would make FIRE worse if kept inside it — for example, a substantial curriculum, ear-training laboratory, structured drills, courses, or other training experiences that no longer depend on an active production project. If that split happens, it should consume the same Babel Learning Contract rather than rebuilding progress from scratch.
+### Shared UI only where meaning transfers
 
-### Babel World — optional ecosystem hub hypothesis
+Where the same semantics recur across products, familiar component families may eventually help:
 
-A future **Babel World** (working concept/name only) could become a calm hub for cross-app identity, progress, discoveries, entitlements, collections, and handoff between Babel products once enough real apps exist to justify it.
+- skill status
+- evidence history
+- explanation/guidance depth
+- practice state
+- source marks
+- achievement semantics
 
-Guardrails:
+Consistency is for transferable meaning, not for making entire apps visually identical.
 
-- Babel World must never be required to use FIRE or another Babel app.
-- It should aggregate shared meaning rather than duplicate every app's task UI.
-- App-specific progress metaphors can remain native to their apps while Babel World shows a coherent ecosystem-level view.
-- Do not create a single global Babel skill score simply because a hub exists.
-- Build Babel World only after multiple real products create a clear cross-app job; do not reverse-engineer products to give the hub content.
+## 4. Dedicated learning-product split — only if earned
 
-#### Shared skill identity + source/origin marks
+The product boundary is defined in `BABEL_APPS.md`.
 
-A shared skill should remain one identity even when multiple Babel apps contribute credible evidence to it. Small **source/origin marks** may show which apps have contributed evidence without turning every evidence event into another icon.
+Current default: FIRE keeps contextual learning plus optional Practice / Skills / Growth.
 
-Working semantics:
+A separate learning product is justified only if deliberate training becomes a distinct enough job that keeping it inside FIRE harms FIRE's primary production workflow.
 
-- show each contributing app once per skill/context summary rather than one mark per event
-- a source mark answers **where credible evidence came from**, not how skilled the person is
-- tapping/expanding a skill can reveal the actual evidence history, source apps, projects/practice contexts, and guidance depth
-- multiple source marks can accumulate without becoming a global level or a popularity score
-- the same source-mark component/language should mean the same thing anywhere in the Babel ecosystem
+If a split happens, it should consume the same Babel Learning Contract rather than rebuilding progress from scratch.
 
-#### Source marks vs achievement badges
+Do not assume the future learning product is WATER or that it covers every creative discipline.
 
-Keep two meanings separate even if both belong to the same eventual pixel visual language:
+## 5. Cross-app objects and ownership
 
-1. **Source/origin marks** — small provenance indicators showing which app(s) contributed evidence to a shared skill or record.
-2. **Achievement badges** — collectible recognitions for meaningful accomplishments, milestones, discoveries, or deliberately cross-app achievements.
+Future products may eventually need shared identifiers or handoffs for concepts such as person, project, song, era, asset, or achievement.
 
-An achievement badge should eventually have an inspectable meaning: stable identity, criteria/meaning, source/provenance, and supporting evidence or milestone context when useful. Babel can borrow that truthfulness principle from Open Badges without turning itself into a formal credential/LMS product.
+That model is intentionally open.
 
-A cross-app achievement can intentionally combine several app source marks when the accomplishment genuinely depended on evidence across contexts.
+Do not currently assume:
 
-#### Badge collection presentation — intentionally open
+- Babel World owns every creative object
+- every app edits one central project record
+- FIRE's schema becomes the universal Babel schema
+- sibling products can read/write each other's private task data
 
-A future Babel World should offer a satisfying way to inspect the person's accumulated badges and app/domain identities, but **do not lock the container yet**.
+A strong default is:
 
-Possible forms include:
+> **Each product owns its working data; shared infrastructure owns only stable concepts that actually need to cross boundaries.**
 
-- a simple gallery/collection
-- a trophy-case-like space
-- a spatial map, neighborhood, park, path, or other traversable world
-- another more original format discovered from the actual badges and apps that eventually exist
+If a real workflow later proves that a shared song/project identifier removes friction, design that deliberately then.
 
-The collection should "earn its shape" from real content rather than forcing future apps into a preselected map. Pokémon GO's medal/profile and badge-map ideas are useful collection references, not a visual target.
+## 6. Babel World — optional ecosystem hub
 
-## 3. Monetization + entitlements
+See `BABEL_APPS.md` for the product concept. Platform guardrails:
 
-The goal is **desire, not deprivation**. Free users should have a complete, respectable experience rather than feeling like the real product is missing.
+- World must never be required to use FIRE or a sibling product
+- aggregate shared meaning; do not duplicate every app's task UI
+- app-specific progress metaphors remain native
+- no single global Babel skill/level score
+- build World only after multiple real products create a real cross-app job
+- do not reverse-engineer filler apps to populate it
 
-Current monetization hypotheses:
+Potential platform-level jobs include identity/profile, entitlements, app handoffs, shared evidence views, discoveries, and collections.
 
-- Prefer **freemium enhancement** over crippling the base workflow.
-- A basic Recreation/cover workflow is a strong candidate to remain broadly useful for free.
-- Premium value should come from meaningful depth, acceleration, continuity, personalization, cloud features, advanced practice, richer insights, customization, or other capabilities people are excited to add.
-- Do not automatically lock all of Original behind payment. Test whether premium can improve Original rather than making free users feel that creativity itself is paywalled.
-- Optional learning/practice depth may be a strong premium dimension, but core contextual guidance should remain good enough that free users can still make music successfully.
-- Premium should never buy a fake skill score or make learning evidence dishonest.
+### Personal-world metaphor interactions
+
+A future World may visually let app-specific artifacts coexist — for example Fire plus another product's local metaphor — without merging their underlying semantics.
+
+Visual interaction is not evidence. A River reflecting Fire light, for example, does not mean River activity mathematically levels Fire.
+
+## 7. Shared skill identity + source/origin marks
+
+One shared skill may receive credible evidence from several products.
+
+Small **source/origin marks** may show provenance:
+
+- show each contributing app once in a useful summary rather than one icon per event
+- answer **where evidence came from**, not how skilled the person is
+- expanding a skill can reveal evidence history, source apps, project/practice context, and guidance depth
+- multiple source marks can coexist without becoming popularity or a global level
+- the same source-mark language should mean the same thing across Babel
+
+## 8. Source marks vs achievement badges vs identity marks
+
+Keep the semantics separate even if they eventually share one pixel visual language:
+
+1. **Source/origin marks** — provenance of evidence.
+2. **Achievement badges** — meaningful accomplishments, milestones, discoveries, or genuinely cross-app achievements.
+3. **App/domain identity marks** — identity for a real product/domain when useful; not automatically evidence or achievement.
+
+Achievement badges should eventually have inspectable truth: stable identity, criteria/meaning, source/provenance, and supporting evidence/milestone context where appropriate.
+
+A cross-app achievement may intentionally combine several source marks only when the accomplishment genuinely depended on several contexts.
+
+### Collection presentation remains open
+
+Possible forms include gallery, trophy-case-like space, spatial map, neighborhood, park, path, traversable world, or another format discovered from real content.
+
+> **The collection earns its shape.**
+
+Do not preselect a world and then invent rewards/apps to fill it.
+
+## 9. Monetization + entitlements
+
+Core philosophy:
+
+> **Desire, not deprivation.**
+>
+> **Pay to go deeper, not to be allowed to make music.**
+
+Future hypotheses:
+
+- free experience should be useful, complete, and respectable
+- a basic Recreation/cover workflow is a strong candidate to remain broadly useful for free
+- premium should add meaningful depth, acceleration, personalization, continuity, cloud features, advanced practice, richer insights, customization, or other desired capability
+- do not automatically paywall all Original creativity
+- contextual guidance should remain good enough for free users to make music successfully
+- premium must never buy fake skill or dishonest learning evidence
 
 ### Entitlement model
 
-Treat purchases, gifts, trials, creator grants, bundles, and promo access as **entitlements on one account**, not scattered feature flags.
+Treat purchases, gifts, trials, creator grants, bundles, and promo access as **entitlements on one account**, not scattered permanent feature flags.
 
-Future entitlement sources may include:
+Potential sources:
 
 - App Store purchase/subscription
 - App Store offer code
 - limited-time trial
 - gift
 - creator/friend grant
-- future multi-app Babel bundle/suite
+- future multi-app bundle/suite
 
-A creator should be able to give a friend legitimate access without maintaining a separate permanently-unlocked app build.
+Avoid a secret universal premium password or a permanently-unlocked alternate binary. Those create security, ambiguity, drift, and maintenance problems.
 
-**Recommendation:** avoid a secret universal password and avoid a separate “fully unlocked” binary. Those approaches create security problems, entitlement ambiguity, update drift, and multiple app versions to maintain. Use one app with account-level entitlements.
+Any future creator-grant code that controls real entitlement must be validated securely; client-only secret codes are for fun/lore, not licensing.
 
-If Babel later ships through the App Store, Apple offer codes can support free or discounted In-App Purchase access, including non-consumables and subscriptions. Apple also supports multi-app subscription approaches; revalidate the current StoreKit/App Store capabilities when implementation begins.
+Revalidate current App Store/StoreKit capabilities before implementation.
 
-If Babel later supports its own creator-grant codes, they must be server-validated, revocable where appropriate, and mapped to entitlements. A code embedded only in client JavaScript is an Easter egg, not secure licensing.
+## 10. FIRE Practice / Skills / Growth
 
-## 4. FIRE learning/practice surface
-
-FIRE can have a deeper optional learning surface **without becoming a mandatory course**.
+FIRE can expose deeper optional deliberate practice without becoming a mandatory course.
 
 Working shape:
 
-- Production projects remain the primary way to make music and learn in context.
-- A dedicated optional **Practice / Skills / Growth** destination can expose the skill model for people who want to accelerate specific areas.
-- People can see production domains individually and jump into targeted practice, review, diagnostics, or challenges.
-- Practice should reuse lessons and evidence discovered during real projects when possible rather than creating a disconnected school curriculum.
-- FIRE can also offer isolated drills when deliberate practice is genuinely more efficient than waiting for the right project problem to appear.
-- Personalized practice should prioritize weak/uncertain domains and meaningful transfer, not simply repeat whatever has the lowest completion percentage.
+- production projects remain the primary way to make music and learn in context
+- optional Practice / Skills / Growth can expose domains for targeted training
+- reuse lessons/evidence discovered in real projects when possible
+- isolated drills are appropriate when deliberate practice is more efficient than waiting for a project problem
+- personalization should target weak/uncertain areas and transfer, not lowest completion percentage
 
-Possible domains remain hypotheses until the full breadboard validates them, for example:
+Possible production domains remain hypotheses until breadboarding validates them:
 
 - critical listening / diagnosis
 - arrangement
@@ -194,173 +277,152 @@ Possible domains remain hypotheses until the full breadboard validates them, for
 - finishing
 - mastering / delivery
 
-A person's profile is multi-dimensional. Never collapse all production ability into one authoritative Beginner/Intermediate/Advanced label.
+A person's production profile is multi-dimensional. Never collapse it into one authoritative level.
 
-## 5. The user’s Fire — meaningful progression metaphor
+## 11. The user's Fire — meaningful progression artifact
 
-Strong future concept to prototype: a dedicated optional surface where the musician can see **their Fire** grow as their production judgment develops.
+Strong future FIRE concept: a dedicated optional surface where the musician sees **their Fire** evolve as production judgment develops.
 
 ### Core meaning
 
-- The Fire is a **visualization of accumulated growth**, not the source of truth for skill.
-- It begins extremely small — fuel, embers, a spark, or another minimal state — and becomes more alive as credible evidence accumulates.
-- Growth should come from meaningful evidence: real decisions, successful diagnosis, deliberate practice, transfer across projects, completed productions, and demonstrated improvement.
-- Opening the app, tapping Complete, farming easy exercises, or maintaining an arbitrary daily streak must not manufacture mastery.
-- The Fire should not reset or dramatically shrink because someone took time away from music. Learning is not invalidated by missing a day.
+- Fire visualizes accumulated growth; it is not the source of truth
+- begins very small: fuel/coal/wood/ember/spark or another minimal state
+- becomes more alive as credible evidence accumulates
+- growth may come from real decisions, successful diagnoses, deliberate practice, transfer, finished productions, and demonstrated improvement
+- opening the app, tapping Complete, farming easy drills, or maintaining a streak must not manufacture mastery
+- Fire should not reset/shrink dramatically after time away
 
-### Skill categories + the Fire
+### Categories + Fire
 
-The Fire can be the emotional summary while individual domains provide the truthful detail.
+> **The categories tell the truth. The Fire makes that truth feel alive.**
 
-Potential model:
-
-- **Category views** show evidence/confidence/progress in specific production domains.
-- **The Fire** visualizes the person's broader journey in a more emotional, collectible, shareable form.
-- Flame behavior, texture, glow, sparks, fuel, surrounding atmosphere, or other traits could respond to milestones, breadth, sustained practice, or domain development.
-- Colors/glows may represent achievements, specialties, eras, or earned visual traits, but should not falsely imply a scientifically precise ranking.
-
-Do not copy Apple Activity rings or another product's progress visualization. FIRE needs its own metaphor and visual grammar.
+- category/domain views show truthful evidence/confidence/progress
+- Fire is the emotional, collectible summary
+- size/structure, flame characteristics, sparks/embers, glow/atmosphere, colors, or traits may eventually communicate different dimensions
+- exact visual meaning is not locked
+- bigger must never mean objectively better producer
 
 ### Pixel-art Fire hypothesis
 
-A deliberately **pixel-art Fire** is now a strong later visual hypothesis. The goal is not retro decoration; it is a small living progress artifact whose state is readable, collectible, expressive, and distinctly Babel.
+A deliberately **pixel-art Fire** is a strong later hypothesis.
 
 Potential benefits:
 
-- strong silhouettes can make growth visible even at small sizes
-- sprite/state changes can make the Fire visibly different from week to week without needing a fake numeric level
-- sparks, embers, palette/glow changes, shape changes, and surrounding atmosphere can create character within a constrained visual system
-- the same original pixel language could later inform achievement badges/source marks without forcing the functional FIRE UI itself to become retro
-- lightweight frame-by-frame animation is possible, while Reduce Motion can use a static representative state
+- strong silhouettes at small sizes
+- visible week-to-week state change without fake numeric level
+- sparks/embers/palette/glow/shape/atmosphere can add character
+- original pixel language can extend to badges/source marks without turning FIRE's whole UI retro
+- frame-by-frame animation can stay lightweight; Reduce Motion gets a static representative state
 
-Do **not** lock pixel dimensions, palette count, frame count, exact growth stages, or whether the Fire becomes character-like until visual prototyping proves what reads well. The Fire can be both a clean progress artifact and increasingly expressive/collectible, but truth in the underlying evidence remains more important than visual spectacle.
+Do not lock pixel dimensions, palette count, frame count, exact stages, or characterfulness before visual prototyping.
 
-### Motivation philosophy
+### Ambient discovery
 
-Aim for meaningful gamification:
+Future personality hypothesis: keep Projects/current work dominant while a restrained glow/light from the Fire subtly reaches the home surface from below/beyond it.
 
-- competence: visible evidence that the person can now do things they previously could not
-- autonomy: choose what to practice and how deeply to engage
-- relatedness: optional sharing, encouragement, collaboration, or celebration
-- curiosity: evolving visual states, hidden details, achievements, and discoveries
-- identity: “this is my Fire” rather than “I have 4,820 points”
+- atmosphere, not notification
+- discoverable, not required
+- no fiery borders, glowing text, badges demanding attention, or mandatory CTA
+- respect readability and Reduce Motion
 
-Avoid default global leaderboards. Competitive ranking can motivate some people and demotivate others; the safer default is **personal progression + optional social sharing**.
+Do not implement this merely because the concept exists.
 
-A shareable Fire card/profile could let people show off their Fire without claiming that a bigger animation makes someone objectively “better” at production.
+## 12. Motivation / achievements / cosmetics
 
-### Ambient discovery in FIRE
+Aim for:
 
-The Fire should be discoverable without becoming homepage chrome. Strong visual hypothesis for a later personality pass: keep Projects/current work dominant, but let the Fire exist spatially below or beyond the main work surface so a restrained glow or ambient light subtly reaches the home page and invites curiosity.
+- competence
+- autonomy
+- relatedness
+- curiosity
+- identity: “this is my Fire” rather than raw points
 
-- The glow is atmosphere, not a notification or required call to action.
-- A person who only wants to make music can ignore it indefinitely.
-- Do not let Fire color, animation, or decoration reduce readability or compete with project actions.
-- Respect Reduce Motion and accessibility; a static light treatment must be sufficient.
-- Do not implement this during the current Shell Freeze. First lock the shared shell fundamentals; prototype ambient Fire personality later as optional product evidence.
+Avoid default global leaderboards and punitive streak resets.
 
-## 6. Achievements, badges, cosmetics, and collectibility
+Start achievement taxonomy small. A few meaningful badges implemented extremely well are better than hundreds of low-value rewards.
 
-Achievements can be fun when they acknowledge meaningful musical behavior instead of replacing it.
+Possible meaningful sources:
 
-### Achievement badge principles
+- first finished Recreation
+- first finished Original
+- intentional accepted difference
+- recurring diagnosis resolved across projects
+- demonstrated transfer
+- deliberate practice of an underdeveloped domain
+- full production completed from start to finished audio
+- genuinely cross-app accomplishment after multiple products exist
 
-Start deliberately small. A few meaningful badges implemented extremely well are better than a giant taxonomy of low-value rewards.
+Possible expressions:
 
-Potential achievement sources:
-
-- finish a first Recreation
-- finish a first Original
-- intentionally accept a reference difference
-- correctly resolve a recurring diagnostic problem across multiple projects
-- demonstrate transfer of a learned concept in a later project
-- practice an underdeveloped domain
-- complete a production from idea/reference to finished file
-- explore an unfamiliar production role or workflow
-- genuinely cross-app learning/transfer when more than one real Babel product exists
-
-Potential rewards / expressions:
-
-- collectible **pixel achievement badges** using an original Babel pixel grammar
-- Fire visual evolution
-- glows / sparks / atmosphere / visual traits
+- pixel achievement badges
+- Fire traits/evolution
+- glows/sparks/atmosphere
 - profile/display cosmetics
-- lore fragments or optional discoveries
+- lore/discoveries
 - celebratory motion/haptics
 
-Paid cosmetics may eventually coexist with earned traits, but paid visuals must not masquerade as skill achievements.
+Paid cosmetics may coexist with earned traits, but paid visuals must never masquerade as skill achievement.
 
-The badge language should be reusable enough that Babel World can show a person's app/domain badges plus specific achievement badges in one coherent collection, while preserving the distinction between **identity/source**, **achievement**, and **skill evidence**.
+## 13. Social without turning production into ranking
 
-## 7. Social + bragging without turning production into ranking
+Future possibilities:
 
-Future social possibilities:
+- share Fire snapshot/card
+- share completed-project milestone
+- display selected badges/collection
+- reactions/encouragement
+- optional comparison of journeys/achievements
+- collaborative challenges only if they serve learning/music-making
 
-- share a Fire snapshot/card
-- share a completed-project milestone
-- share or display selected achievement badges / collection views
-- friends can react/encourage
-- optionally compare personal journeys or achievements
-- collaborative challenges only if they serve learning or music-making
+Default should be personal progression + optional sharing, not public rank competition.
 
-Do not default to public rank-based competition. FIRE should celebrate growth without making a developing musician feel objectively inferior because someone else used the app longer.
+## 14. Lore / Easter eggs / secret codes
 
-## 8. Lore, Easter eggs, secret codes, and the Babel world
-
-This is a promising **delight layer**, not core navigation.
+Promising delight layer, never core navigation.
 
 Possible uses:
 
 - hidden visual details
-- secret code inputs
+- secret-code inputs
 - lore fragments
 - teasers for future Babel projects/apps/releases
 - alternate Fire visuals
-- seasonal or project-linked discoveries
+- seasonal/project-linked discoveries
 - subtle cross-app references
 
-Rules:
+Never hide required workflow, accessibility, privacy, account recovery, safety, or paid functionality behind lore.
 
-- Never hide required workflow, accessibility, privacy, safety, account recovery, or purchased functionality behind an Easter egg.
-- Secret client-side codes are for fun only. Anything that grants paid/permanent entitlement must use the real entitlement system.
-- Hidden content should reward curiosity without making normal users feel that the visible product is incomplete.
-- Lore should support the creative identity; it should not make a focused production tool feel like an ARG when someone just wants to work.
+Client-only secret codes are fun; they are not secure entitlement.
 
-## 9. Current research-informed guardrails
+## 15. Research-informed guardrails
 
-Revalidate these when building, but preserve the product implications:
+Preserve these implications and revalidate details when implementation begins:
 
-- Adaptive learning works best when difficulty/help responds to the learner rather than forcing one fixed level.
-- Visible progress and immediate feedback can support motivation, but gamification effects are highly design-dependent.
-- Autonomy, competence, and relatedness are more durable targets than raw points/badges.
-- Public ranking/leaderboards can harm motivation for people who receive discouraging comparative feedback; social comparison should therefore be optional, not FIRE's foundation.
-- Personalized practice hubs are a useful precedent for allowing targeted review without replacing the main forward workflow.
-- Accounts, cross-device sync, and multi-app entitlements introduce backend/security/privacy responsibilities and should be designed as one platform system rather than patched individually into each app.
-- Evidence-event history should remain inspectable so skill conclusions can be explained instead of appearing as unexplained scores.
+- adaptive learning works best when support/difficulty responds to the learner rather than forcing one level
+- visible progress can motivate, but gamification is design-dependent
+- autonomy/competence/relatedness are stronger targets than raw points/badges
+- public ranking can demotivate; comparison should be optional
+- targeted practice can complement the main forward workflow without replacing it
+- accounts/sync/entitlements create real security/privacy/backend responsibilities and should be designed as one platform system
+- evidence history should remain inspectable so skill conclusions are explainable
 
-## 10. Questions to validate later
+## 16. Questions to validate later
 
 Do not prematurely lock:
 
-- final account/authentication stack
+- final account/authentication/backend stack
 - Apple-only cloud architecture vs broader Babel backend
-- whether Babel account creation is optional forever or becomes required for specific cloud/social/purchase features
-- exact free vs premium boundary
-- one-time purchase vs subscription vs hybrid
-- whether learning/practice is partly premium and which contextual guidance must always stay free
-- exact Babel Learning Contract event/evidence schema
-- exact Fire growth model and how skill evidence maps to visuals
-- pixel-art Fire resolution, palette, animation system, and growth-state grammar
-- whether Fire size, intensity, complexity, color, or another dimension should mean anything specific
-- which achievements are meaningful enough to earn permanent traits/badges
-- final source-mark and achievement-badge visual language
-- final Babel World badge/collection presentation (gallery, case, spatial map/world, or something else)
+- when account creation becomes required, if ever
+- exact free/premium boundary and pricing model
+- exact Babel Learning Contract schema
+- exact cross-app object/ID model
+- exact Fire growth → visual mapping
+- Fire pixel resolution/palette/animation/growth grammar
+- first permanent achievements/badges
+- source/identity/achievement visual language
+- Babel World collection form
 - whether social comparison goes beyond sharing/encouragement
-- whether Babel-wide purchases eventually use a shared subscription/bundle
-- what cross-app data is genuinely useful enough to justify sharing
-- exact Babel Learning Contract semantics/versioning and which learning UI primitives should be shared across apps
-- whether a dedicated learning product ever earns a separate app boundary
-- whether Babel World ever becomes a real product and what unique cross-app job would justify it
-- final ecosystem naming and visual family system
+- whether multi-app purchases become a bundle/subscription
+- what cross-app data is useful enough to justify sharing
 
-These decisions should be made from FIRE Core breadboards, real user behavior, future Babel app needs, App Store/platform constraints at implementation time, and explicit product testing — not from enthusiasm alone.
+When a platform hypothesis becomes a real implementation decision, move it into the appropriate product/platform authority rather than leaving an outdated speculative version beside it.

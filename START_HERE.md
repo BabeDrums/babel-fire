@@ -1,4 +1,6 @@
-# Babel FIRE
+# Babel FIRE — Start Here
+
+**Purpose:** zero-context continuity for building/reviewing Babel FIRE.
 
 - **Repository:** `BabeDrums/babel-fire`
 - **Production branch:** `main`
@@ -7,12 +9,24 @@
 - **Cross-generation doctrine:** `FIRE_CORE.md`
 - **Active G7 shell spec:** `V7_DRAFT.md`
 - **Production-generation spec:** `V6.md`
-- **Future platform hypotheses:** `BABEL_PLATFORM.md`
-- **External references / inspiration:** `REFERENCES.md`
 
 When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**, resume immediately. Do not ask Babel to reconstruct documented decisions.
 
-## Read in this order
+## If the conversation switches to surrounding Babel apps
+
+Do **not** reconstruct the ecosystem from memory, old Smithereens files, old Babel World prototypes, or elemental-name guesses.
+
+Switch to:
+
+1. `BABEL_START_HERE.md`
+2. `BABEL_APPS.md`
+3. `BABEL_PLATFORM.md`
+
+That lane preserves the learning-app boundary, Visual Identity candidate, Babel World, elemental-name rule, Fire/badges/pixel language, cross-app evidence, and open ecosystem questions.
+
+If the conversation switches back to FIRE implementation, return here.
+
+## Read in this order for FIRE work
 
 1. `START_HERE.md`
 2. `AGENTS.md`
@@ -20,19 +34,18 @@ When a new ChatGPT conversation begins with or clearly refers to **Babel FIRE**,
 4. `V7_DRAFT.md`
 5. current `main`, open PRs/branches, tests, and `CHANGELOG.md`
 6. `V6.md` when production/migration compatibility matters
-7. `BABEL_PLATFORM.md` only for future account/sync/ecosystem/monetization/Practice/Fire/badges/social/lore work
-8. `REFERENCES.md` for design/research lenses only
-9. `CONTEXT.md` for supporting history not superseded above
+7. `CONTEXT.md` for durable supporting context not superseded above
+8. `REFERENCES.md` for inspiration/research only
 
 Always distinguish production V6 from experimental G7.
 
 ## Naming
 
-Use **Babel** as the project-facing reference-user name. Do not use Gabriel in current FIRE handoff, approval, review, or product-facing instructions. Preserve immutable external account names and genuine artist/history references where appropriate.
+Use **Babel** as the project-facing reference-user name. Do not use Gabriel in current FIRE handoff, approval, review, or product-facing instructions. Preserve immutable external account names and genuine historical artist references where appropriate.
 
 Use **G7** in normal conversation for the seventh FIRE implementation/shell generation. Keep technical identifiers `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears.
 
-Use **FIRE Core** for the first complete functional product spine. Do not introduce an `M1` taxonomy merely to create another name. **FIRE 1.0** remains the later validated release milestone.
+Use **FIRE Core** for the first complete functional product spine. Do not introduce `M1` merely to create another taxonomy. **FIRE 1.0** remains the later validated release milestone.
 
 ## FIRE Core doctrine
 
@@ -46,7 +59,7 @@ North star:
 
 > **After a useful FIRE session, the musician should know what to do in the DAW that they did not clearly know before opening FIRE. If they only updated FIRE, FIRE failed.**
 
-FIRE is a production companion / decision engine, not a DAW replacement, plugin encyclopedia, generic checklist, auto-song generator, or mandatory course.
+FIRE is a production companion / decision engine, not a DAW replacement, plugin encyclopedia, generic checklist, automatic song generator, or mandatory course.
 
 ### First-class project types
 
@@ -58,7 +71,7 @@ Both share one reasoning engine:
 
 **Feel → Identify → Reason → Experiment → Evaluate**
 
-Recreation can **Match / Interpret / Reimagine**. Individual differences can be **Match / Intentional / Explore**. Do not force the intent question before a meaningful difference exists.
+Recreation can **Match / Interpret / Reimagine**. Individual differences can be **Match / Intentional / Explore**. Do not force an intent question before a meaningful difference exists.
 
 ### Adaptive learning
 
@@ -75,92 +88,72 @@ Default guidance:
 
 Skill understanding is domain-specific, not one global Beginner/Intermediate/Advanced label. Strong evidence comes from intentional decisions, successful diagnosis/evaluation, independence, transfer, and repeated application—not taps or page completion.
 
-Likely evidence ladder remains a hypothesis: **Encountered → Guided → Independent → Transfer → Consistent**.
+Likely evidence ladder remains a hypothesis:
+
+**Encountered → Guided → Independent → Transfer → Consistent**
 
 ### FIRE ↔ Logic boundary
 
-Default rhythm: **FIRE → Logic → FIRE → Logic**.
+Default rhythm:
 
-Logic owns detailed regions/takes, plugin settings, routing, automation values, and mixer state unless a future feature proves otherwise.
+**FIRE → Logic → FIRE → Logic**
+
+Logic owns detailed regions/takes, plugin settings, routing, automation values, and mixer/session detail unless a future feature proves otherwise.
 
 FIRE retains intention/hierarchy, perceived issue, diagnosis, meaningful experiment/result, accepted decision, unresolved problem, reusable lesson, and next useful decision.
-
-## Future platform state — preserved, not current scope
-
-Read `BABEL_PLATFORM.md` before changing future ecosystem semantics.
-
-Important preserved future rules/hypotheses:
-
-- one optional Babel-level identity/account rather than separate accounts invented per app
-- **shared evidence, local identity** across apps
-- future versioned Babel Learning Contract for overlapping skills/evidence meanings
-- **evidence first, interpretation second** — preserve what was demonstrated + provenance/context and derive current skill state later
-- source/origin marks and achievement badges are separate semantics
-- future learning-focused app only if a distinct product job actually emerges
-- Babel World is an optional hub hypothesis, never a dependency or global producer score
-- Babel World's collection shape is intentionally open: gallery/trophy case/map/neighborhood/park/world should be earned by real content and relationships
-- evolving **Fire** is both a truthful progress artifact and expressive collectible identity layer; bigger never means objectively better producer
-- pixel-art Fire/badge language is a later visual hypothesis inspired by constrained, readable game-art qualities—not copied assets/styles
-- ambient Fire glow on FIRE home is a later discovery/personality hypothesis, never required navigation or engagement pressure
-- other Babel apps may contribute to the same production-skill evidence only when they genuinely demonstrate the same capability; app usage alone never grows Fire
-- an app-specific River/other metaphor may represent that app's local journey while shared production evidence can still inform production growth
-- monetization: **desire, not deprivation; pay to go deeper, not to be allowed to make music**
-- account-level entitlements are preferred over hidden universal premium passwords/permanent friend builds
-- lore/Easter eggs may reward curiosity but never hide required workflow/accessibility/privacy/account recovery/purchased functionality
-
-Do **not** build Babel World, Fire/badges, accounts, cloud sync, monetization, social, lore, or a second app during the G7 shell correction or FIRE Core breadboarding.
-
-## Reference registry
-
-`REFERENCES.md` is the central inspiration/evidence registry. Current useful lenses include Apple, Logic, Ableton, Basecamp/Shape Up, Duolingo, Google/Material, Figma, GitHub/Primer, ChatGPT, Things, Procreate, Snapchat, Instagram/TikTok as observational interaction references, Pokémon GO collection/spatial patterns, xAPI/xAPI Profiles, Open Badges 3.0, Minecraft, and classic Pokémon-era pixel-art qualities.
-
-Borrow principles, not branding/assets/templates. References never override product doctrine.
 
 ## Repository state
 
 ### Production — V6
 
-- Root `/` remains V6.
-- V6 uses `production-projects-v1` and schema 5.
-- Preserve stable project/section/track/range/event IDs, migrations, timeline semantics, durable notes, browser persistence, and Map → Skeleton dependencies.
-- V6 remains fallback until G7 is physically approved and deliberately promoted.
+- root `/` remains V6
+- V6 uses `production-projects-v1` and schema 5
+- preserve stable identities, migrations, timeline semantics, durable notes, browser persistence, and downstream dependencies
+- V6 remains fallback until G7 is physically approved and deliberately promoted
 
 ### Successor — G7
 
-- Preview lives at `/v7-preview/`.
-- G7 uses `production-projects-v1-v7-preview` and must never mutate V6 production data.
-- Technical filenames/routes retain V7 wording for continuity; normal conversation says G7.
+- preview lives at `/v7-preview/`
+- G7 uses `production-projects-v1-v7-preview`
+- G7 must never mutate V6 production data
+- technical filenames/routes retain V7 wording for continuity; normal conversation says G7
 
 ### Generation-spec retention
 
-Keep only the **current production generation spec + active successor/preview spec** in the working tree by default. Git history is the archive for retired generations. Older specs remain only when a concrete maintenance/migration/compatibility/recovery reason still depends on them.
+Git history is the archive.
 
-`V5.md` is intentionally removed from the working tree and remains recoverable from Git history.
+Keep only the **current production generation spec + active successor/preview spec** in the working tree by default. Older specs remain only when a concrete maintenance/migration/compatibility/recovery reason still depends on them.
+
+`V5.md` is intentionally absent from the working tree and remains recoverable from Git history.
 
 ## Current verified continuity — Shell Freeze was NOT approved
 
-PR **#48 — Freeze the G7 shell system** merged to `main` at `20d5d26a652648083dc3695ea60e0889dc415eb8` and deployed successfully. Babel's physical iPhone review **did not approve that shell freeze**. The structural direction was better, but the shell still felt ugly, text-heavy, inconsistent, and interactionally unpredictable.
+PR **#48 — Freeze the G7 shell system** merged and deployed, but Babel's physical iPhone review **did not approve that shell freeze**. The structural direction improved, but the shell still felt ugly, text-heavy, inconsistent, and interactionally unpredictable.
 
 Key physical-review evidence from #48:
 
-- no project-card management action existed on Projects; Edit required entering the project first
+- no project-card management action on Projects
 - Projects title / `+` alignment felt off
-- `G7 · <commit>` under the Projects title polluted content hierarchy; Babel preferred the old quiet bottom-center review trace
-- New Project exposed only Recreation even though Original and Recreation are both first-class FIRE project types
+- `G7 · <commit>` under Projects polluted content hierarchy; Babel preferred quiet bottom-center
+- New Project exposed only Recreation although Original/Recreation are both first-class
 - title/text scale felt inconsistent screen-to-screen
 - too many headers/subtitles/helper layers repeated information
-- Project Home `Continue` + `Journey` labels felt like unnecessary taxonomy
+- visible Continue/Journey taxonomy felt unnecessary
 - Structure repeated the same idea through title/subtitle/helper/button
-- interaction behavior felt unpredictable: some choices were inline, others opened sheets, with no obvious semantic rule
-- narrow-phone input/keyboard composition still looked rough enough to keep under review
+- interaction behavior was unpredictable: similar work sometimes inline, sometimes sheet, sometimes navigation
+- narrow-phone keyboard/input composition needed improvement
 
-PR **#50 — Simplify the G7 shell interaction system** then corrected those system-level problems. It is merged to `main` at **`9095116ae1f791f85e6842124a64210da593c085`**, deployed successfully through GitHub Pages **#77**, and the exact merged SHA passed the post-merge static gate plus Chromium regression suites at **390 / 440 / 820**.
+PR **#50 — Simplify the G7 shell interaction system** corrected those system-level problems. It merged to `main` at **`9095116ae1f791f85e6842124a64210da593c085`**, deployed successfully through GitHub Pages **#77**, and that exact runtime passed post-merge static + Chromium regressions at **390 / 440 / 820**.
 
-**Current state: the simplification correction is live and awaiting Babel's physical-device review. G7 is still unfrozen. Do not begin the FIRE Core breadboard until Babel approves this corrected shell.**
+PR **#51** then sealed the zero-context FIRE handoff at **`f69a6427eccf8da84b04dabcbc984eb79855b162`**; Pages deployment **#78** succeeded and the unchanged runtime again passed 390 / 440 / 820.
 
-## Deployed correction — G7 Shell Simplification + Interaction Grammar
+A later docs-only ecosystem-handoff commit may make `main` newer than those SHAs. Determine current `main`/PR state from Git rather than treating the runtime SHA as the forever-latest commit.
 
-The correction is intentionally narrow. It does not add FIRE Core musical functionality.
+**Current product state remains: the simplification correction is live and awaits Babel's physical-device review. G7 is still unfrozen. Do not begin the FIRE Core breadboard until Babel approves the corrected shell.**
+
+## G7 Shell Simplification + Interaction Grammar
+
+The correction is intentionally narrow; it does not add FIRE Core musical functionality.
 
 ### Core rules
 
@@ -169,80 +162,78 @@ The correction is intentionally narrow. It does not add FIRE Core musical functi
 - **Sheet = create/edit/manage a discrete thing.**
 - **Navigation = enter another meaningful workspace.**
 - **Menu/secondary affordance = utilities that should not compete with musical work.**
-- Consistency comes from semantic meaning, not making every interaction use the same container.
+- consistency comes from semantic meaning, not making every interaction use the same container
 
-### Implemented correction
+### Projects
 
-**Projects**
-
-- `Projects` remains root identity; `+` shares one stable header alignment.
+- `Projects` remains root identity; `+` shares one stable header alignment
 - project cards separate primary open behavior from a quiet per-card actions affordance
 - Edit/Reset/Delete can be reached from Projects without entering the project first
 - New Project explicitly exposes **Original** and **Recreation**
-- Original creation requires a title; artist is optional
+- Original creation requires title; artist optional
 - Recreation requires song title + artist
-- tiny `G7 · <commit>` is back at quiet bottom-center fixed review trace, outside normal content hierarchy
-- build trace is removed from project-management sheets
+- tiny `G7 · <commit>` is quiet bottom-center review trace outside content hierarchy
+- build trace is temporary review metadata, not permanent chrome
 
-**Project Home**
+### Project Home
 
-- visible `Continue` heading removed
-- visible `Journey` heading removed
+- no visible `Continue` heading
+- no visible `Journey` heading
 - one current recommendation remains visually primary
 - current task is not repeated below
 - revisitable/upcoming work remains in one quiet grouped list
-- one tiny `Later` label remains because it communicates chronology
-- saved Notes may appear as a utility row; empty Notes remains hidden
-- Original Project Home exists truthfully even before its FIRE Core spine is built; it does not silently behave like Recreation
+- one tiny `Later` label may remain because it communicates chronology
+- saved Notes may appear as a utility row; empty Notes stays hidden
+- Original Project Home remains truthful even before its FIRE Core spine exists
 
-**Work headers/copy**
+### Work headers/copy
 
-- nested work Back is icon-only with accessible label instead of printing project title above every work title
+- nested work Back is icon-only with accessible label
+- do not print project name above every work title
 - Song Setup: title only
 - Structure: title only
-- Tracks: keeps one useful instruction, `Choose everything you hear.`
+- Tracks: one useful instruction, `Choose everything you hear.`
 - Section Study / Review Map: title + quiet built-later state only
 - Notes: title only
-- one stable work-title size across work pages
+- one stable work-title scale across work pages
 
-**Structure**
+### Structure
 
-- arrangement group exists from the empty state onward
-- `Add Section` is always inside that same group
-- no `Build the song one section at a time` + `Add the first section you hear` duplication
-- Add/Edit Section uses a sheet because it creates/edits a section object
+- arrangement group exists from empty state forward
+- `Add Section` stays inside that group
+- Add/Edit Section uses a sheet because it creates/edits an object
 - verification is concise `Matches the song`
-- Continue is a compact action after verification
+- Continue is compact after verification
 
-**Tracks**
+### Tracks
 
-- common tracks stay direct inline multi-select
-- custom `Other` opens an `Add Track` sheet because it creates a named custom object
+- common tracks use direct inline multi-select
+- custom `Other` uses an `Add Track` sheet because it creates a named custom object
 - Continue is compact rather than a giant phone-width bar
 
-**Sheets / keyboard**
+### Sheets / keyboard
 
 - sheets are concise create/edit/manage surfaces, not hidden navigation pages
-- sheet spacing/control sizing is reduced
-- CSS scroll padding/margins help focused fields keep breathing room above software keyboard without reintroducing VisualViewport logic
+- spacing/control sizing remains compact
+- CSS scroll padding/margins help focused fields/actions breathe above the software keyboard without VisualViewport root-scroll logic
 
-### Physical approval checklist
+## Physical approval checklist
 
-Babel should inspect the same iPhone path again:
+Babel should inspect the corrected G7 preview on iPhone:
 
-1. Projects header: does `Projects` + `+` feel aligned/intended?
-2. Build trace: is `G7 · <commit>` back where it belongs—quiet bottom-center, not part of content?
-3. Project card: can Edit/Reset/Delete be reached naturally without opening the project?
-4. New Project: are Original/Recreation both obvious without feeling like extra chrome?
-5. Project Home: does removing Continue/Journey labels make the page easier rather than ambiguous?
-6. Song Setup / Structure / Tracks: do titles feel like one system rather than changing personalities?
-7. Structure: does Add Section feel predictable as object creation rather than a random modal?
-8. Tracks: do normal choices feel direct while custom creation logically earns a sheet?
-9. Primary actions: are they compact and intentional rather than giant bars?
-10. Keyboard/input state: does the composition remain usable and less awkward?
+1. Does `Projects` + `+` feel aligned/intended?
+2. Is `G7 · <commit>` quiet bottom-center rather than part of content?
+3. Can project Edit/Reset/Delete be reached naturally from Projects?
+4. Are Original/Recreation both obvious without excess chrome?
+5. Does removing Continue/Journey labels simplify Project Home without making it ambiguous?
+6. Do Song Setup / Structure / Tracks feel like one typography/hierarchy system?
+7. Does Add Section logically earn a sheet as object creation?
+8. Do normal track choices feel direct while custom creation logically earns a sheet?
+9. Are primary actions compact/intended rather than giant bars?
+10. Is keyboard/input composition usable and less awkward?
 11. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
 
-If approved, record approval and **stop broad shell polishing**. Then begin the FIRE Core breadboard.
+If approved, record approval and **stop broad shell polishing**.
 
 ## After shell approval
 
@@ -250,7 +241,7 @@ Sequence:
 
 **physical G7 shell approval → FIRE Core breadboard → thin end-to-end FIRE Core spine → real-project validation**
 
-Breadboard the whole Original + Recreation journey before deeply designing later phases. Use Shape Up-style places / affordances / connections.
+Breadboard the entire Original + Recreation journey before deeply designing later phases. Use Shape Up-style places / affordances / connections.
 
 For every phase define:
 
@@ -265,12 +256,30 @@ For every phase define:
 
 Breadboard work is primarily underground product logic/documentation; Babel should expect little or no visible runtime change.
 
-After agreement, build the thinnest complete walking spine from start → finished release-ready audio, then validate on real music:
+Then build the thinnest complete walking spine from start → finished release-ready audio and validate on real music:
 
 - Recreation: **Creep**
 - Original: **Even**
 
 Deepen only where real use proves need.
+
+## Wider Babel ecosystem — preserve but do not build during this phase
+
+Do not use this FIRE handoff to define sibling products.
+
+For learning app / Visual Identity / Babel World / WATER / Fire/badges / pixel language / shared evidence / future accounts or cross-app questions, switch to `BABEL_START_HERE.md` + `BABEL_APPS.md` + `BABEL_PLATFORM.md`.
+
+Core boundary worth remembering here:
+
+> **Product need earns an app. Naming/metaphor follows the job.**
+
+Do not interrupt current FIRE work to build hypothetical sibling products or shared infrastructure.
+
+## Reference registry
+
+`REFERENCES.md` is the central inspiration/evidence registry. Current useful lenses include Apple, Logic/Ableton, Basecamp/Shape Up, Duolingo, Google/Material, Figma, GitHub/Primer, ChatGPT, Things, Procreate, Snapchat, Instagram/TikTok observationally, Pokémon GO collection/spatial patterns, xAPI/xAPI Profiles, Open Badges 3.0, Minecraft, and classic Pokémon-era pixel-art qualities.
+
+Borrow principles, not branding/assets/templates. References never override product doctrine.
 
 ## Approval / execution contract
 
@@ -278,35 +287,49 @@ Deepen only where real use proves need.
 - Approved FIRE work means **implement → test → fix → PR → green checks → merge → Pages deploy → verify → live G7 preview link**.
 - Do not make Babel repeatedly say continue/merge/deploy/link.
 - Standing permission exists to merge when checks are green, production-data safety is clear, and no genuine product decision remains unresolved.
-- Stop only when tests fail, production-data safety is uncertain, destructive behavior is unresolved, or a genuine product decision is actually open.
+- Stop only when tests fail, production-data safety is uncertain, destructive behavior is unresolved, or a genuine product decision is open.
 - Never claim a change is live before merge + Pages verification.
 
 ## Automatic handoff + consistency
 
 Babel should never need to request a handoff update or routine consistency sweep.
 
-Any substantive product/runtime/durable-rule PR must:
+Any substantive FIRE product/runtime/durable-rule work must:
 
 1. update the correct authority/spec
-2. sweep other active docs/implementation for stale contradictions
+2. sweep active docs/implementation for stale contradictions
 3. rewrite/remove/qualify superseded live rules
-4. preserve historical material only when clearly scoped and still useful
+4. preserve historical material only when clearly scoped/useful; rely on Git otherwise
 5. refresh `START_HERE.md`
-6. run handoff/doctrine guards
+6. refresh `BABEL_START_HERE.md` too if the change affects wider ecosystem semantics
+7. run handoff/doctrine guards
 
-`scripts/check_handoff.py` enforces START_HERE freshness for watched product/runtime/spec changes. `scripts/check_product_doctrine.py` protects known settled doctrine markers. Semantic consistency still requires product judgment; scripts must not blindly rewrite genuine ambiguity.
+`scripts/check_handoff.py` enforces watched handoff freshness. `scripts/check_product_doctrine.py` protects known settled markers. Scripts cannot prove natural-language semantic consistency; product judgment remains required.
 
-Clear contradiction → reconcile automatically. Historical statement → scope it. Genuine product conflict → resolve through authority/product judgment rather than silently guessing.
+Clear contradiction → reconcile automatically.
+Historical statement → scope it.
+Genuine product conflict → resolve through authority/product judgment rather than silently guessing.
 
-## Authority order
+## Authority summary
 
-1. `AGENTS.md` — repository/workflow rules
-2. `FIRE_CORE.md` — current cross-generation product doctrine
-3. `V6.md` — shipped production-generation behavior while V6 is live
-4. `V7_DRAFT.md` — G7 shell behavior where Core-compatible
-5. `BABEL_PLATFORM.md` — future/platform hypotheses only
-6. `REFERENCES.md` — inspiration/research only
-7. `CONTEXT.md` — supporting history/detail
-8. code/tests — implementation evidence
+For FIRE:
+
+1. `AGENTS.md`
+2. `FIRE_CORE.md`
+3. `V6.md` for live production-generation behavior
+4. `V7_DRAFT.md` for G7 shell behavior
+5. `START_HERE.md` for current verified state/next step
+6. `CONTEXT.md` for durable supporting context
+7. code/tests as implementation evidence
+
+For the wider ecosystem:
+
+1. `AGENTS.md`
+2. `BABEL_START_HERE.md`
+3. `BABEL_APPS.md`
+4. `BABEL_PLATFORM.md`
+5. `FIRE_CORE.md` where FIRE semantics matter
+6. `REFERENCES.md`
+7. older prototypes/history
 
 When a lower source conflicts with a higher current authority, reconcile the lower source instead of preserving both as competing truth.
