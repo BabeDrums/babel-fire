@@ -1,150 +1,238 @@
 # Babel FIRE — Repository Instructions
 
-Babel FIRE is an iPhone/iPad-first music-production workflow app. Production runs on GitHub Pages from `main`. Resume through `START_HERE.md`; do not ask the user to re-explain documented FIRE decisions.
+Babel FIRE is an iPhone/iPad-first music-production companion. Production runs on GitHub Pages from `main`.
 
-## Source-of-truth order
+Use **Babel** as the project-facing reference-user name.
 
-Apply this hierarchy when sources conflict:
+## Zero-context entry points
 
-1. **AGENTS.md** — repository workflow, engineering, maintenance, review, and documentation rules.
-2. **FIRE_CORE.md** — current cross-generation product doctrine: purpose, shared reasoning/learning model, project-type semantics, and product boundaries.
-3. **Active production specification, currently V6.md** — approved requirements for behavior that ships in the active production generation. Generation-specific rules do not override FIRE Core doctrine unless the doctrine is deliberately changed in the same work.
-4. **V7_DRAFT.md** — experimental V7 shell behavior and interaction direction, scoped to that generation.
-5. **CONTEXT.md** — durable supporting history, detailed learning/workflow context, and decisions not superseded above.
-6. **Current code and tests** — implementation evidence; they do not override explicit approved product requirements.
+There are two continuity lanes:
 
-Historical/versioned specifications are a library of generation-specific truth, not current universal doctrine. If a genuine conflict remains after applying this hierarchy, reconcile the durable product documents rather than silently choosing one. Inspect `main`, open PRs, relevant branches, and the working tree to distinguish shipped, unmerged, and planned work. Never mistake a local implementation or a passing test for a production release.
+- **FIRE implementation/product work:** read `START_HERE.md` first.
+- **Wider Babel ecosystem / surrounding apps / Babel World / learning app / visual identity:** read `BABEL_START_HERE.md` first.
+
+Do not ask Babel to reconstruct decisions already documented in the appropriate handoff.
+
+## Authority and scope
+
+### FIRE authority
+
+When FIRE sources conflict, use:
+
+1. **AGENTS.md** — repository workflow, engineering, maintenance, review, documentation rules.
+2. **FIRE_CORE.md** — current cross-generation FIRE product doctrine.
+3. **Active production spec, currently `V6.md`** — shipped behavior for the live production generation.
+4. **`V7_DRAFT.md`** — current G7 successor-shell behavior where compatible with FIRE Core.
+5. **`START_HERE.md`** — current verified implementation/review/next-step state.
+6. **`CONTEXT.md`** — durable supporting context/history not superseded above.
+7. **Current code/tests** — implementation evidence, not product authority.
+
+### Wider Babel ecosystem authority
+
+For surrounding-app/platform work:
+
+1. `AGENTS.md` — process/maintenance rules.
+2. `BABEL_START_HERE.md` — current zero-context ecosystem boundaries.
+3. `BABEL_APPS.md` — sibling-app concept ledger: real/candidate/unassigned/open.
+4. `BABEL_PLATFORM.md` — shared architecture/infrastructure/progression hypotheses.
+5. `FIRE_CORE.md` — FIRE semantics that ecosystem work must not redefine.
+6. `REFERENCES.md` — inspiration/research only.
+7. older prototypes/context — historical evidence only.
+
+Do not use old Smithereens/FIRE_CONTEXT/Babel World prototypes to override current product docs.
+
+## History and working-document retention
+
+**Git history is the archive.**
+
+Keep the current production-generation spec plus the active successor/preview spec in the working tree by default. Retain an older generation spec only when a concrete maintenance, migration, compatibility, or recovery need still depends on it.
+
+Do not rewrite or destroy Git history. Removing a retired working spec from the current tree is not erasing its history.
+
+Likewise, durable docs should contain current useful truth, not every phrasing the project has ever used. Scope historical evidence clearly or remove it from active guidance when Git already preserves it.
 
 ## Git and review workflow
 
-- Never perform implementation work directly on `main`.
-- Begin implementation tasks from the latest appropriate production state on a dedicated task branch. An isolated cloud checkout is sufficient; do not create a worktree unless explicitly requested.
-- Inspect and preserve unfinished local work before syncing or switching branches. Never reset, overwrite, or discard work to obtain a clean tree. Existing unfinished work takes priority over syncing first.
-- Commit and push completed task work, then open a pull request against `main`.
-- PRs are the review checkpoint before production. Include the PR link in the completion report; if access prevents opening it, report that blocker and do not claim completion.
-- The user has granted standing permission to merge FIRE PRs once the diff is reviewed and required checks are green. Stop instead of merging when tests fail, data safety is uncertain, the change is risky/destructive, or a genuine product decision remains unresolved.
-- Preserve Git history. Do not erase old versions simply because a newer version exists.
+- Never do implementation work directly on `main`.
+- Start from the latest appropriate `main` state on a dedicated task branch.
+- Inspect and preserve unfinished work before syncing/switching; never reset/discard work just to obtain a clean tree.
+- Commit/push completed task work and open a PR to `main`.
+- PRs are the review checkpoint before production.
+- Babel has standing permission to merge FIRE PRs once the diff is reviewed, required checks are green, production-data safety is clear, and no genuine product decision remains unresolved.
+- Stop instead of merging when tests fail, data safety is uncertain, behavior is destructive/risky, or a real product decision is unresolved.
+- For visual/interaction work, automated CI does not replace physical-device review.
 
-Normal sequence: task branch → implementation → tests → commit → push → PR → review/checks → merge under standing permission → Pages deploy → physical-device approval when visual/interaction work is involved.
+Normal sequence:
 
-## Default product/design iteration protocol
+**branch → implement → test → reconcile docs → PR → checks → merge → Pages deploy → verify → physical-device approval when relevant**
 
-The user should not need to repeatedly request research, project review, file cleanup, or handoff maintenance. For every nontrivial FIRE product/design pass, treat those activities as implied when they materially improve the work.
+## Product/design iteration protocol
 
-User ideas and examples are **inputs and hypotheses, not locked requirements**, unless the user explicitly says to lock, approve, or require them. Evaluate suggestions against the product goal, platform guidance, current evidence, and project architecture. Improve, reinterpret, defer, or reject an idea when that produces a better FIRE.
+Babel should not need to repeatedly request research, consistency review, cleanup, or handoff maintenance. Treat them as part of nontrivial product work when materially relevant.
 
-Use a lightweight FIRE adaptation of established divergent/convergent and iterative design practice:
+User ideas/examples are inputs and hypotheses unless explicitly locked/approved/required. Evaluate them against product goals, platform guidance, evidence, and architecture.
 
-1. **Discover** — review physical-device feedback, current app behavior, relevant repo state, and current external/platform references when useful.
-2. **Define** — state the actual problem and success condition before changing UI. Distinguish architecture, usability, correctness, polish, and delight problems so a visual symptom is not mistaken for the root cause.
-3. **Develop** — consider more than one plausible solution when the problem is open-ended. Prefer the smallest coherent approach that removes complexity rather than adding compensating UI.
-4. **Deliver** — prototype or implement the chosen approach in the safest appropriate surface (currently the isolated V7 preview for experimental shell work), then run relevant static/browser tests.
-5. **Verify + consolidate** — use physical-device evidence for visual work, remove superseded UI/code, reconcile documentation, and refresh the zero-context handoff before treating a pass as complete.
+Use a lightweight cycle:
 
-Do not make the process bureaucratic. The framework exists to make iteration faster and prevent solving the wrong problem; it does not replace creative exploration or judgment.
+1. **Discover** — review device feedback, current behavior, repo state, and relevant references.
+2. **Define** — identify the actual problem and success condition; distinguish architecture, usability, correctness, polish, and delight.
+3. **Develop** — consider plausible solutions; prefer removing complexity over adding compensating UI.
+4. **Deliver** — implement/prototype in the safest surface and run relevant checks.
+5. **Verify + consolidate** — physical review when visual, remove superseded UI/code, reconcile docs, refresh handoffs.
+
+Do not turn the process into bureaucracy.
 
 ### Page necessity audit
 
-Before adding or polishing a screen, explicitly ask what job the page performs. For each visible element, classify it as one of:
+Before adding/polishing a screen, ask what job it performs.
 
-- essential to the page’s primary task,
-- necessary context or navigation,
-- conditional/advanced information that can be progressively disclosed,
-- duplicated/system-explanation content that should be removed or moved elsewhere.
+Classify visible elements as:
 
-Every focused work page should have a clear primary task, the minimum information needed to perform it, an obvious continuation or exit when appropriate, and no redundant workflow explanation. Also ask whether the page needs to exist at all or can be merged into a more natural surface.
+- essential to primary task
+- necessary context/navigation
+- conditional/advanced detail for progressive disclosure
+- duplicated/system-explanation content that should disappear/move
+
+Every focused work page should have one clear primary task, minimum required context, obvious continuation/exit where appropriate, and no redundant explanation. Also ask whether the page needs to exist at all.
+
+### Delete before styling
+
+If removing a label/subtitle/helper sentence does not make the next action harder to understand, remove it instead of merely shrinking it.
 
 ### Fundamentals before signature polish
 
-Stabilize information architecture, navigation, page purpose, scrolling/viewport behavior, spacing, interaction states, and consistency before adding decorative or brand-signature behavior. Distinctive Babel/FIRE touches are welcome after the fundamentals work, but prototype them as optional product evidence rather than letting personality compensate for structural problems.
+Stabilize information architecture, navigation, task purpose, scrolling, spacing, interaction states, and consistency before signature personality.
 
-## Engineering and product rules
+Distinctive Fire/pixel/glow/lore behavior must not compensate for weak fundamentals.
 
-- Read `FIRE_CORE.md`, `CONTEXT.md`, the relevant generation specification, and relevant code/tests before product work. The active shipped implementation scope is **V6**; V7 remains an isolated preview until deliberately promoted.
-- Preserve existing user data and the localStorage key `production-projects-v1`. Schema changes require a tested forward migration; never wipe projects.
-- Preserve stable section, track, presence-range, and change IDs. When a genuine split/merge needs new identities, retain surviving identities wherever possible.
-- The continuous timeline is the source of truth. Do not recreate duplicate Parts / Enters / Leaves state. Preserve downstream Skeleton Session → Draft → Bounce dependencies and browser-history behavior.
-- Keep GitHub Pages deployment simple: `index.html`, `app.js`, and `styles.css` are plain static files deployed together. Do not add a framework, backend, database, build pipeline, or runtime dependency without a clear approved need.
-- Approximately 44px touch targets, Pointer Events, whole-bar snapping, reduced-motion support, and tap-based alternatives are required. No essential action may depend on a skinny line or an undiscoverable gesture.
-- Favor direct manipulation, progressive disclosure, and visual hierarchy over forms, redundant readouts, nested menus, and unnecessary modals. Do not retain awkward V4 UI merely for compatibility.
-- Keep FIRE neutral and premium. Smithereens is a Recreation inside FIRE, not its visual identity.
-- Do not introduce features outside the active approved scope unless required for correctness.
-- Remove replaced/dead interactions. Do not commit screenshots, temporary/debug fixtures, browser artifacts, caches, or environment-only files. Permanent regression tests and their representative test data belong in `tests/`.
+## Current G7 shell principles
 
-## Progression and navigation model — production V6 vs experimental V7
+Do **not** duplicate current route-by-route state here. `V7_DRAFT.md` owns G7 shell rules and `START_HERE.md` owns current review/next-step status.
 
-Keep the production and redesign models distinct.
-
-**V6 production behavior** remains governed by `V6.md`. Its Phase/Step homes, center context navigator, and Roadmap are production-generation behavior only; do not treat them as universal FIRE rules or reintroduce them into V7 merely because V6 still ships at `/`.
-
-**V7 redesign direction** is governed by `V7_DRAFT.md` and the latest verified `START_HERE.md`:
+Permanent current principles worth protecting:
 
 - **Projects → Project Home → direct musical work.**
-- Project Home owns **Continue + Journey + Notes**.
-- A Phase such as The Map is a grouping in Journey, not necessarily another intermediary screen.
-- Continue recommends one useful next action; Journey provides orientation and direct revisiting.
-- Completed work stays navigable. Upcoming work stays visible when it improves orientation. Hard-block only when a task literally cannot function without missing data.
-- No center context navigator and no separate Roadmap destination in V7.
-- Back/navigation should remain shallow and truthful to the current V7 route model.
-- A future Projects/Notes top-level navigation surface is allowed only when Notes becomes a genuine app-level destination.
+- Project Home is a hub, not a dashboard.
+- one current recommendation is visually primary and is not repeated below
+- visible `Continue` / `Journey` taxonomy is not required
+- saved Notes may earn a utility row; empty Notes stays hidden
+- completed work remains revisitable; upcoming work remains understandable when useful
+- no V6 center navigator or separate Roadmap should be reintroduced merely because V6 still ships
+- one product logic/hierarchy/actions/states across iPhone/iPad; presentation adapts
+- document height determines scrolling; no VisualViewport-driven root overflow switching
+- G7 data stays isolated from V6 production data
 
-## FIRE design-system operating rules — October 2026
+### Interaction grammar
 
-- **No Codex for FIRE.** Use the normal ChatGPT GitHub connector/direct repository tools for implementation and repository maintenance.
-- Projects + New Project are the current visual reference implementation. Extract their rules; do not copy one layout blindly onto every screen.
-- The current design objective is **V7 Shell Freeze**: one deliberate declutter/system pass should lock reusable header archetypes, typography, spacing/rhythm, grouping, states, sheets, natural scrolling, and adaptive presentation. After that, stop broad shell churn and breadboard FIRE Core end-to-end before deeply designing later phases.
-- Use one coherent hierarchy for page title, subtitle, section title, row title, supporting text, and metadata/status. Remove redundant labels and excessive tracked uppercase when layout already communicates hierarchy.
-- Use one coherent interaction-state system: normal, hover (fine pointer only), pressed, selected, focus-visible, disabled, destructive, and completed. Geometry must not change between states.
-- Selection and completion are distinct semantics. Do not use completion checkmarks as generic selection decoration.
-- Prefer grouped rows/lists for structured text-heavy workflows; reserve cards for meaningful conceptual groups.
-- Primary actions should fit the composition. Do not default to giant full-width light slabs on iPad/desktop.
-- Leading toolbar = navigation; trailing toolbar = contextual action. Keep the V7 center toolbar quiet; the V6 center context navigator is production-generation behavior and does not carry into V7.
-- The same task sheet behavior applies across device classes; presentation may adapt to available space (for example, centered on wider canvases and bottom-oriented on compact canvases) without changing product logic.
-- Document height determines page scrolling. Never switch root overflow based on live `VisualViewport` measurements while Safari chrome moves; short pages remain naturally short and genuinely tall pages scroll normally.
-- Tall iOS Safari pages may use modest CSS-only end clearance so final controls can rise above browser chrome. Short pages must not reserve a fake-scroll tail. Modal sheets may temporarily lock background scrolling while open.
-- Dense narrow-phone layouts should reduce redundant secondary copy and compact non-current states before shrinking controls. Preserve ~44px touch targets and progression/state clarity.
-- Do not imitate Liquid Glass decoratively. FIRE remains a near-black creative tool with restrained surfaces and clear functional hierarchy.
-- Do not add overlay polish files or MutationObserver visual rewrites. Modify core shared components and `styles.css` directly.
-- Visual work is not complete merely because CI is green. Verify the same adaptive interface in physical iOS/iPadOS Safari at representative compact and wide sizes; device class must not change FIRE’s product logic, hierarchy, or interaction model.
-- Update `START_HERE.md`, `AGENTS.md`, `CONTEXT.md`, `V6.md`, and `CHANGELOG.md` whenever a durable design-system rule or major shipped milestone changes, so a new chat can resume without reconstructing decisions.
+Use semantic consistency:
 
-## Product versioning
+- **Inline** — choose/toggle/classify/confirm/evaluate something already in the task.
+- **Sheet** — create/edit/manage a discrete thing while staying in context.
+- **Navigation** — enter another meaningful workspace.
+- **Menu/secondary affordance** — utility actions that should not compete with musical work.
 
-- **V6 / V7 / future Vx** are implementation/product-interaction generations. **FIRE Core** is the first complete functional product definition, not `V1`. **FIRE 1.0** is reserved for a future validated release milestone.
-- Major approved product/interaction generations increment the whole version: V5 → V6.
-- Meaningful approved refinements within the same generation may use a minor version: V6 → V6.1.
-- Tiny bug fixes normally do not require a FIRE product-version bump.
-- Git commit history is independent of FIRE product-version numbers. Never silently invent or increment a product version; a new version must represent an actual approved product milestone.
-- When the active generation changes, update its specification, `START_HERE.md`, and `CHANGELOG.md` together. Committing the current work does not create V5.1 or V6.
+Do not use sheets for visual variety or force object creation inline merely to avoid a sheet.
+
+## Engineering/product rules
+
+- Read `FIRE_CORE.md`, current `START_HERE.md`, relevant generation spec, and relevant code/tests before FIRE work.
+- Production V6 uses localStorage key `production-projects-v1`; preserve it.
+- G7 preview uses `production-projects-v1-v7-preview`; never mutate V6 production data from G7.
+- Schema changes require tested forward migration; never wipe projects.
+- Preserve stable project/section/track/range/event IDs where applicable. Real split/merge may create identities, but preserve surviving identities whenever possible.
+- V6 continuous timeline remains V6 production source of truth; do not recreate duplicate Parts/Enters/Leaves state in V6 maintenance.
+- Preserve downstream Skeleton Session → Draft → Bounce dependencies and browser-history behavior in V6 maintenance.
+- Keep GitHub Pages simple static HTML/CSS/JS unless a clear approved need justifies architecture change.
+- Roughly 44px touch targets, accessible alternatives, reduced-motion support, and discoverable interactions are required.
+- No essential action should depend on a skinny line or undiscoverable gesture.
+- Favor direct manipulation, progressive disclosure, and hierarchy over forms/readouts/nested menus/unnecessary modals.
+- FIRE remains neutral/premium. Smithereens is a Recreation project, not FIRE's brand identity.
+- Remove replaced/dead interactions. Do not commit screenshots, temporary/debug fixtures, browser artifacts, caches, or environment-only files.
+- Permanent regression tests/test data belong in `tests/`.
+
+## FIRE design-system operating rules
+
+- **No Codex for FIRE.** Use the normal ChatGPT GitHub connector/direct repository tools.
+- Use one coherent hierarchy for root title, project identity, work title, row title, support text, metadata/status.
+- Subtitle/helper text is optional, not default.
+- Use coherent interaction states: normal, hover (fine pointer only), pressed, selected, focus-visible, disabled, destructive, completed.
+- Geometry should not jump between states.
+- Selection and completion are different semantics.
+- Prefer grouped rows/lists for structured text-heavy work; reserve cards for meaningful conceptual groups.
+- Primary actions should fit the composition; do not default to giant full-width slabs.
+- Leading toolbar = navigation; trailing toolbar = contextual/secondary action.
+- Same task semantics across device sizes; sheets/dialog presentation may adapt without changing logic.
+- Short pages remain genuinely short; tall pages scroll naturally.
+- Tall iOS Safari pages may use modest CSS-only end clearance; do not reserve fake-scroll tails.
+- Modal sheets may temporarily lock background scrolling.
+- Dense phone layouts should remove/compact secondary detail before shrinking touch targets.
+- Do not imitate Liquid Glass decoratively.
+- Do not add overlay polish files or MutationObserver visual rewrites; modify core components/styles directly.
+- Automated viewport tests are not physical iOS Safari verification.
+
+## Product versioning / naming
+
+- **V6** remains the production generation's established name.
+- Use **G7** in normal conversation for the active successor generation.
+- Keep technical identifiers `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears.
+- **FIRE Core** = first complete functional product definition/spine, not “V1.”
+- **FIRE 1.0** = future validated release milestone.
+- Do not invent `M1` or other taxonomy merely to create another label.
+- Major approved implementation/interaction generations may increment whole generation numbers; meaningful approved refinements may use minor versions if genuinely useful.
+- Git commits are independent of product-generation numbers.
+- Never silently invent/increment a product version.
 
 ## Documentation hygiene and automatic handoff
 
-- `FIRE_CORE.md` is the canonical current cross-generation product doctrine. A durable doctrine change must update it and reconcile affected guidance in `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, and relevant generation specs in the same PR.
-- `CONTEXT.md` is not a changelog. It stores durable supporting history, detailed workflow knowledge, and decisions that remain valid under FIRE Core. Preserve useful historical evidence, but scope it clearly when superseded so it cannot compete with current doctrine.
-- Task-specific implementation details, validation results, and review findings belong in the PR/completion report.
-- `START_HERE.md` is the canonical zero-context handoff entry point, not a second context document. Keep its active-specification reference, current shipped/approved direction, physical-device review state, and next approved chunk current.
-- Every product/runtime or durable-rule PR that changes `app.js`, `styles.css`, `index.html`, `V6.md`, `CONTEXT.md`, or `AGENTS.md` must also refresh `START_HERE.md`. `scripts/check_handoff.py` and the CI **Handoff freshness** job enforce this automatically.
-- The user should never need to remember to request a handoff update. Handoff maintenance is part of FIRE's definition of done.
-- A brand-new chat should be able to continue after being pointed at `BabeDrums/babel-fire` by reading `README.md` → `START_HERE.md` and following this file's source-of-truth order.
-- `CHANGELOG.md` records meaningful product milestones, not every technical commit. Do not fabricate unverifiable history; Git contains detailed technical history.
-- Changelog milestone text describes the product milestone itself; avoid temporary PR-state wording that automatically becomes false on merge. Determine shipped/unmerged state from `main` and open PRs.
-- Avoid duplicating large bodies of information across files. Remove obsolete filenames and contradictory guidance rather than retaining duplicate context/specification files.
+### FIRE docs
 
-## Verification and definition of done
+- `FIRE_CORE.md` = canonical cross-generation doctrine.
+- `START_HERE.md` = canonical zero-context current FIRE state/handoff.
+- `V6.md` = live production-generation behavior while V6 ships.
+- `V7_DRAFT.md` = current G7 shell behavior.
+- `CONTEXT.md` = durable supporting context/history only; it must not contain current G7 rules that compete with `V7_DRAFT.md`.
+- `CHANGELOG.md` = meaningful milestones, not every commit.
 
-An implementation task is not complete until:
+### Ecosystem docs
 
-- Requested behavior is implemented and reviewed against the active specification.
-- Existing user data is preserved or has a tested forward migration, including imported legacy data.
-- Relevant regression tests pass; startup/JavaScript is clean with no known application console errors.
-- Touch interaction is checked at representative iPhone and iPad viewport widths.
-- Replaced/dead interaction code and temporary/debug artifacts are removed.
-- Documentation is updated only when durable rules changed, with milestones recorded in the changelog when appropriate.
-- `START_HERE.md` passes the handoff freshness check whenever the product/runtime or durable rules changed.
-- Remaining risks are explicitly stated, and completed work is committed, pushed, and opened as a PR for review.
+- `BABEL_START_HERE.md` = canonical zero-context ecosystem handoff.
+- `BABEL_APPS.md` = current app-concept ledger.
+- `BABEL_PLATFORM.md` = future shared architecture/platform/progression hypotheses.
+- `REFERENCES.md` = inspiration/research, not authority.
 
-For V6, verify section add/edit/reorder/remove; open presence through existing and newly added sections; boundary/internal trimming; change creation/selection/trimming/removal/supersession; section slides; collapsed/expanded track states; forgiving hit targets; migration/data safety; history; and downstream invalidation.
+### Automatic maintenance
 
-Serve the checkout with `python3 scripts/serve.py`. Run `node --check app.js` and `python3 -B -m unittest discover -s tests -v`; repeat the browser suite with `FIRE_TEST_WIDTH=820`. Test tools require Python Playwright and Chromium (`CHROMIUM_PATH` can override the executable); they are not application dependencies.
+Babel should never need to ask for a routine handoff update or consistency sweep.
 
-Testing reports must distinguish **automated tests**, **responsive viewport testing**, **browser interaction testing**, and **physical-device Safari testing**. Chromium touch injection and iPhone/iPad-sized viewports are simulated/browser tests, not physical-device evidence. Never claim physical iPhone/iPad Safari verification unless it actually occurred on physical hardware. Physical iOS Safari verification must be reported separately.
+For every substantive product/durable-rule change:
+
+1. update the correct authority
+2. sweep active docs/implementation for stale contradictions
+3. rewrite/remove/qualify superseded live rules
+4. keep history only when clearly scoped/useful; rely on Git otherwise
+5. refresh the relevant handoff(s)
+6. run handoff/doctrine guards
+
+`scripts/check_handoff.py` enforces watched handoff freshness. `scripts/check_product_doctrine.py` protects known settled markers but cannot prove semantic consistency; human/product review remains required.
+
+Clear contradiction → reconcile automatically.
+Historical statement → scope it.
+Genuine product conflict → resolve through authority/product judgment rather than silently guessing.
+
+## Verification / definition of done
+
+Implementation work is not complete until:
+
+- behavior matches the active product/spec
+- user data is preserved or migrated safely
+- relevant regressions pass
+- startup/JS is clean with no known application console errors
+- touch/responsive behavior is checked at representative compact/wide widths
+- replaced/dead code and temporary artifacts are removed
+- durable docs/handoffs are reconciled
+- remaining risks are stated
+- work is committed/pushed/PR'd and merged/deployed under standing permission when gates are satisfied
+
+For visual/interaction work, physical-device Safari review remains a distinct gate. Never call simulated Chromium viewports physical verification.
+
+For detailed V6 regression requirements, use `V6.md` and the tests rather than duplicating them here.
