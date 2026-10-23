@@ -21,6 +21,7 @@ Switch to:
 1. `BABEL_START_HERE.md`
 2. `BABEL_APPS.md`
 3. `BABEL_PLATFORM.md`
+4. relevant pending items in `CONTINUITY_INBOX.md`
 
 That lane preserves the learning-app boundary, Visual Identity candidate, Babel World, elemental-name rule, Fire/badges/pixel language, cross-app evidence, and open ecosystem questions.
 
@@ -35,7 +36,10 @@ If the conversation switches back to FIRE implementation, return here.
 5. current `main`, open PRs/branches, tests, and `CHANGELOG.md`
 6. `V6.md` when production/migration compatibility matters
 7. `CONTEXT.md` for durable supporting context not superseded above
-8. `REFERENCES.md` for inspiration/research only
+8. **relevant unresolved items only** in `CONTINUITY_INBOX.md`
+9. `REFERENCES.md` for inspiration/research only
+
+`CONTINUITY_INBOX.md` is a low-authority capture buffer, never a substitute for the sources above it. It exists so concrete feedback and promising-but-unpromoted ideas survive chat boundaries without bloating canonical specs.
 
 Always distinguish production V6 from experimental G7.
 
@@ -126,7 +130,7 @@ Keep only the **current production generation spec + active successor/preview sp
 
 `V5.md` is intentionally absent from the working tree and remains recoverable from Git history.
 
-## Current verified continuity — Shell Freeze was NOT approved
+## Current verified continuity — corrected G7 shell is live but NOT frozen
 
 PR **#48 — Freeze the G7 shell system** merged and deployed, but Babel's physical iPhone review **did not approve that shell freeze**. The structural direction improved, but the shell still felt ugly, text-heavy, inconsistent, and interactionally unpredictable.
 
@@ -145,11 +149,21 @@ Key physical-review evidence from #48:
 
 PR **#50 — Simplify the G7 shell interaction system** corrected those system-level problems. It merged to `main` at **`9095116ae1f791f85e6842124a64210da593c085`**, deployed successfully through GitHub Pages **#77**, and that exact runtime passed post-merge static + Chromium regressions at **390 / 440 / 820**.
 
-PR **#51** then sealed the zero-context FIRE handoff at **`f69a6427eccf8da84b04dabcbc984eb79855b162`**; Pages deployment **#78** succeeded and the unchanged runtime again passed 390 / 440 / 820.
+PR **#51** sealed the zero-context FIRE handoff at **`f69a6427eccf8da84b04dabcbc984eb79855b162`**; Pages deployment **#78** succeeded and the unchanged runtime again passed 390 / 440 / 820.
 
-A later docs-only ecosystem-handoff commit may make `main` newer than those SHAs. Determine current `main`/PR state from Git rather than treating the runtime SHA as the forever-latest commit.
+Later docs-only ecosystem/continuity commits may make `main` newer than those runtime SHAs. Determine current `main`/PR state from Git rather than treating the runtime SHA as forever-latest.
 
-**Current product state remains: the simplification correction is live and awaits Babel's physical-device review. G7 is still unfrozen. Do not begin the FIRE Core breadboard until Babel approves the corrected shell.**
+### Latest physical-device impression after #50/#51
+
+Babel's first impression is **broadly positive — the corrected shell "looks pretty good"** — but this is **not shell approval yet** and the physical review is incomplete.
+
+Carry these specific observations into the next FIRE build conversation:
+
+1. **Projects three-dot actions affordance:** the new actions area looks visually "stapled on" / attached as a separate strip because the divider makes it feel disconnected from the main project card. Preserve direct project management, but revisit how the affordance belongs to the card if the completed review confirms the problem.
+2. **Tempo input focus/composition:** the Tempo entry on Song Setup gets a weird square/highlighted focus appearance when tapped and felt cleaner before. Review the actual iPhone focus/keyboard state rather than assuming simulated Chromium focus styling is sufficient.
+3. **Headers / overall text hierarchy:** Babel has **not finished checking these yet**. Do not infer typography/header approval from the otherwise positive first impression.
+
+**Current next action:** finish physical-device review of the corrected G7 shell, reconcile any confirmed issues, then explicitly approve/freeze it before beginning FIRE Core breadboarding.
 
 ## G7 Shell Simplification + Interaction Grammar
 
@@ -267,7 +281,7 @@ Deepen only where real use proves need.
 
 Do not use this FIRE handoff to define sibling products.
 
-For learning app / Visual Identity / Babel World / WATER / Fire/badges / pixel language / shared evidence / future accounts or cross-app questions, switch to `BABEL_START_HERE.md` + `BABEL_APPS.md` + `BABEL_PLATFORM.md`.
+For learning app / Visual Identity / Babel World / WATER / Fire/badges / pixel language / shared evidence / future accounts or cross-app questions, switch to `BABEL_START_HERE.md` + `BABEL_APPS.md` + `BABEL_PLATFORM.md`, then inspect relevant unresolved entries in `CONTINUITY_INBOX.md`.
 
 Core boundary worth remembering here:
 
@@ -290,11 +304,11 @@ Borrow principles, not branding/assets/templates. References never override prod
 - Stop only when tests fail, production-data safety is uncertain, destructive behavior is unresolved, or a genuine product decision is open.
 - Never claim a change is live before merge + Pages verification.
 
-## Automatic handoff + consistency
+## Automatic handoff + continuity capture
 
-Babel should never need to request a handoff update or routine consistency sweep.
+Babel should never need to request a routine handoff update, consistency sweep, or reminder that a durable new idea should be preserved.
 
-Any substantive FIRE product/runtime/durable-rule work must:
+For every substantive FIRE product/runtime/durable-rule change:
 
 1. update the correct authority/spec
 2. sweep active docs/implementation for stale contradictions
@@ -304,11 +318,22 @@ Any substantive FIRE product/runtime/durable-rule work must:
 6. refresh `BABEL_START_HERE.md` too if the change affects wider ecosystem semantics
 7. run handoff/doctrine guards
 
+For smaller durable deltas that are important enough to survive but not mature enough for authority, use `CONTINUITY_INBOX.md` according to its capture threshold and promotion rules. **Batch these at natural checkpoints rather than writing a repo commit for every message.**
+
 `scripts/check_handoff.py` enforces watched handoff freshness. `scripts/check_product_doctrine.py` protects known settled markers. Scripts cannot prove natural-language semantic consistency; product judgment remains required.
 
 Clear contradiction → reconcile automatically.
 Historical statement → scope it.
 Genuine product conflict → resolve through authority/product judgment rather than silently guessing.
+
+## Parallel-chat ownership
+
+Babel may intentionally keep two or more conversations open.
+
+- **FIRE build chat:** owns active runtime/spec implementation and follows this handoff.
+- **Ecosystem brainstorm chat:** follows `BABEL_START_HERE.md` and is read-mostly by default while FIRE implementation is active; it can research/brainstorm freely and may make narrowly scoped docs-only continuity updates when a durable idea genuinely needs preservation.
+
+Before any parallel chat writes, it must re-read latest `main` and open PRs. Do not let an ecosystem brainstorm casually edit FIRE runtime/G7 behavior or create competing branches against active implementation.
 
 ## Authority summary
 
@@ -320,7 +345,8 @@ For FIRE:
 4. `V7_DRAFT.md` for G7 shell behavior
 5. `START_HERE.md` for current verified state/next step
 6. `CONTEXT.md` for durable supporting context
-7. code/tests as implementation evidence
+7. `CONTINUITY_INBOX.md` for unresolved low-authority deltas only
+8. code/tests as implementation evidence
 
 For the wider ecosystem:
 
@@ -329,7 +355,8 @@ For the wider ecosystem:
 3. `BABEL_APPS.md`
 4. `BABEL_PLATFORM.md`
 5. `FIRE_CORE.md` where FIRE semantics matter
-6. `REFERENCES.md`
-7. older prototypes/history
+6. `CONTINUITY_INBOX.md` for unresolved low-authority deltas only
+7. `REFERENCES.md`
+8. older prototypes/history
 
 When a lower source conflicts with a higher current authority, reconcile the lower source instead of preserving both as competing truth.
