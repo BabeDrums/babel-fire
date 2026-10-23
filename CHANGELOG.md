@@ -4,7 +4,8 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 ## G7
 
-- Shell Freeze: Project Home gives the current task one home in Continue instead of repeating it in Journey; Journey stays useful for completed/upcoming work, later phases are quieter, empty Notes stops competing for attention, work-page headers use a compact task hierarchy, Structure verification joins the arrangement group, Tracks becomes denser, unfinished Section Study/Review Map states become intentionally quiet, and Projects exposes a tiny preview-only `G7 · <commit>` trace for physical review. Natural document scrolling, V6 data isolation, and one adaptive compact/wide product model remain intact.
+- Shell simplification correction: physical review rejected the first Shell Freeze as still too text-heavy, visually inconsistent, and interactionally unpredictable. G7 now removes redundant Continue/Journey/work-page copy, restores the preview build trace to a quiet bottom-center review position, gives project cards direct secondary management access, exposes Original + Recreation explicitly at creation, normalizes work-title scale, keeps Structure on one arrangement surface from empty state forward, and defines one interaction grammar: inline for choose/toggle/evaluate, sheets for create/edit/manage, navigation for workspaces, menus for secondary utilities.
+- Shell Freeze candidate: Project Home gave the current task one home instead of repeating it, later phases became quieter, empty Notes stopped competing for attention, work-page headers became more compact, Structure verification joined the arrangement group, Tracks became denser, and unfinished Section Study/Review Map states became intentionally quiet. Physical review found this direction structurally better but not yet ready to freeze, leading to the simplification correction above.
 
 ## V6
 
@@ -33,10 +34,3 @@ Meaningful product milestones only; Git history records detailed technical chang
 
 - One cohesive section builder with section/name and bar-length selection before insertion.
 - Direct presence/change editing with whole-bar handles, tap-based timing controls, large selectors, and contextual gap editing.
-- Common changes available in one sheet, immediate creation, coherent state supersession, and Undo for routine timeline edits/removal.
-- Restrained collapsed timeline visuals, quiet Mix controls, and preserved section slides and downstream workflow.
-- Existing storage key retained; forward migration preserves V4 projects, stable identities, fractional timing, notes, and valid progress. Existing legacy cues remain readable while new Transition cue creation is removed.
-- Plain static HTML/CSS/JavaScript separation, plus browser regressions for migration, touch interaction, history, and responsive layouts.
-- Repository continuity entry point, source-of-truth hierarchy, and task-branch/PR review workflow.
-
-Automated Chromium/browser tests at iPhone and iPad viewport widths do not establish physical iOS Safari verification; that testing remains unverified.
