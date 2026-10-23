@@ -70,7 +70,46 @@ If two chats could touch the same durable file at the same time, the later write
 
 ## Pending FIRE deltas
 
-None currently. The latest post-#50 physical-device observations were mature enough to become current build/review state and are now recorded directly in `START_HERE.md`.
+### Original placeholder still exposes internal architecture language
+
+During the G7 shell-simplification pass, the intended user-facing correction was to replace the internal phrase:
+
+> `Original workflow comes with the FIRE Core spine.`
+
+with plain musician-facing language such as:
+
+> `Original workflow isn't built yet.`
+
+That copy cleanup was discussed but did **not** land in PR #50. Current `v7-preview/app.js` and `tests/test_v7_preview.py` still preserve the internal phrase. The next FIRE build lane should reconcile the runtime + regression together when it next touches the shell. Do not let a new chat mistake the existing phrase for deliberate product copy.
+
+The latest post-#50 physical-device observations are otherwise mature enough to live directly in `START_HERE.md`.
+
+## Pending repository/process deltas
+
+### Ecosystem authority order should be clarified
+
+`BABEL_APPS.md` explicitly describes itself as the future product-concept authority for sibling apps, while some current authority summaries list `BABEL_START_HERE.md` above it. They agree today because handoff freshness is enforced, but this creates avoidable future ambiguity.
+
+Recommended cleanup when the documentation lane next changes these files:
+
+- keep `BABEL_START_HERE.md` as the **entry point / current ecosystem handoff / routing summary**
+- let `BABEL_APPS.md` own sibling-app jobs/boundaries
+- let `BABEL_PLATFORM.md` own cross-app architecture/progression hypotheses
+- let `FIRE_CORE.md` own FIRE semantics
+- make it explicit that the handoff summarizes those authorities rather than overriding them
+
+### Branch existence is not product authority
+
+The repository retains many historical task branches. A fresh chat should not treat a branch as active/current merely because it still exists.
+
+Recommended durable process clarification:
+
+- current `main` + authoritative handoff/specs are the baseline truth
+- open PRs and explicit current handoff/user direction identify active work
+- an old task branch without an open PR/current handoff reference is historical working state, not doctrine
+- parallel chats should still re-check latest `main` and open PRs before writing
+
+Do not delete branches automatically merely to solve this documentation problem; branch cleanup is a separate repository-maintenance decision.
 
 ## Pending ecosystem deltas
 
