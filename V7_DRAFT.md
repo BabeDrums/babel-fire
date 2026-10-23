@@ -20,7 +20,7 @@ The shell is the reusable interaction and layout grammar: headers, navigation, s
 2. One obvious current action; do not duplicate it elsewhere.
 3. One stable page scaffold across root, project, and work pages.
 4. Subtitle/helper text is exceptional, not default.
-5. Progress is inferred from musical state where practical.
+5. Progress is inferred from musical state where practical; when FIRE cannot truthfully infer completion, use an explicit lightweight confirmation.
 6. Project Home is a hub, not a dashboard.
 7. One product across iPhone/iPad; presentation adapts, semantics do not.
 8. Natural document scrolling only; no VisualViewport-driven root overflow switching.
@@ -60,35 +60,41 @@ Projects has one job: open or create.
 - public project types are **Original** and **Cover**
 - internal legacy `study` compatibility is preserved
 - per-card `•••` visually belongs to the card and remains a 44px-equivalent target
+- opening a card's action menu must not silently change the active/current project
 - build trace remains quiet bottom-center review metadata only
 
-## New Project
+## New Project / Edit Project
 
 New Project opens in one stable sheet. Do not reveal required fields only after project-type selection.
 
-- **Original | Cover** is visible immediately
+- **Original | Cover** is visible immediately in New Project
 - fields are always **Title** and **Artist** in the same positions for both types
-- switching type changes validation/behavior, not geometry or field labels
+- switching type changes validation/behavior, not geometry or field semantics
 - Original requires Title; Artist may be empty
 - Cover requires Title + Artist
+- compact project create/edit sheets do not need redundant visible `New Project` / `Edit Details` headings or visible Title/Artist field labels when the two-field context is already clear
+- Title/Artist remain the input placeholders and accessible semantic labels so clearing a field restores visible context and assistive technology still receives the field meaning
 - text/name inputs request word capitalization from the mobile keyboard with `autocapitalize="words"`
 - do not programmatically force title casing; intentional stylization must remain possible
 - avoid aggressive autocorrection for song/artist/section/track names
 - opening the sheet itself should not summon a keyboard
+
+This compact placeholder-only treatment is specific to the simple project form; do not remove labels from more complex forms merely for visual minimalism.
 
 ## Project Home
 
 Project Home answers: what project is this, and what deserves attention next?
 
 - title + quiet metadata
-- one current destination when work remains
-- no helper sentence under the current destination when the title already explains it
+- current Cover shell work remains **Song Setup → Structure → Tracks**
+- all current mapping steps live in **one coherent progression group** rather than splitting the recommended step into a separate card
+- completed steps use a quiet completed state, the current step is visually strongest, and upcoming work stays understandable without competing
+- the progression itself communicates completion; do not add a separate `Song map complete.` card when all three checked rows already say the same thing
+- no helper sentence under the current destination when the title/state already explains it
 - no visible `Continue` or `Journey` taxonomy
-- current shell Cover work is **Song Setup → Structure → Tracks**
 - Section Study is not a mandatory shell waypoint
 - Review Map is not exposed as a placeholder destination merely to fill progression
-- after current mapped shell work is complete, show a truthful quiet completion state rather than forcing an unbuilt learning/review route
-- saved Notes may appear; empty Notes stays hidden
+- saved Notes may appear as a separate utility group; empty Notes stays hidden
 - do not dump future phases onto Project Home merely to imply completeness
 
 Original remains first-class even before its full FIRE Core workflow is breadboarded; unfinished copy stays musician-facing.
@@ -152,22 +158,36 @@ Reordering belongs to the visible row handle:
 
 ### Tracks
 
-Common tracks remain direct inline multi-select. `Other` opens a compact named-track sheet. Name fields request word capitalization. Once at least one track exists, the final shell action is **Done**, returning to Project Home rather than forcing Section Study.
+Tracks remains a fast musician-facing multi-select **grid**, not a generic settings list.
+
+- common tracks remain direct inline multi-select
+- phone grid stays compact and two-column by default; selected state should be clear without turning every choice into a heavy slab
+- selected tracks use a subtle state plus a visible check
+- `Other` belongs to the same selection surface and opens a compact named-track sheet
+- custom names request word capitalization
+- selecting one track does **not** prove the track map is complete
+- once at least one track exists, **Done** becomes available as the explicit lightweight confirmation that the current track selection represents the song
+- track selection changes invalidate that confirmation; pressing Done restores it
+- only a confirmed non-empty track selection counts as Tracks complete on Project Home
+- Done returns to Project Home rather than forcing Section Study
+
+The data model records this distinction as track selection plus a separate confirmation state (`tracksVerified`); older preview data without the field normalizes safely to unverified rather than inventing completion.
 
 ## Project management sheets
 
-The project-actions sheet does not repeat the song title. It contains only useful management actions:
+The project-actions sheet does not repeat the song title or add explanatory chrome. It contains only useful management actions:
 
-- Edit Details
-- Reset Progress (Cover only)
-- Delete Project
+- Edit
+- Reset (Cover only)
+- Delete
 - Cancel
 
-Edit Details uses the same **Title / Artist** labels and capitalization behavior as New Project.
+Edit opens the compact Title/Artist form above. Reset and Delete are uncommon destructive actions and require a short confirmation step because G7 does not provide a real undo path. The first action menu stays terse; confirmation is where consequence/context belongs.
 
 ## Sheets / keyboard / scrolling
 
 - sheets are concise create/edit/manage surfaces, not hidden navigation pages
+- do not show a grabber/drag indicator on custom sheets that cannot actually drag, resize, or dismiss through that affordance
 - opening a selection/manage sheet does not automatically summon a keyboard
 - controls remain reachable above the iOS software keyboard
 - background scrolling locks only while the modal sheet is open
@@ -183,14 +203,20 @@ Review for:
 - stable title position/scale across Projects → Project → work
 - Cover naming feels natural
 - New Project no longer changes shape when type changes
-- Title/Artist fields keep stable labels and mobile word capitalization
-- `•••` feels like one control everywhere
+- compact New/Edit project forms remain obvious without redundant visible headings/labels
+- Title/Artist fields keep stable semantics and mobile word capitalization
+- `•••` feels like one control everywhere and card actions do not mutate active-project state
+- project action wording is terse; destructive actions do not execute accidentally
 - recent-first Projects order feels useful without category clutter
-- Project Home feels lean and focused
+- Project Home reads as one calm progression rather than a current-task card plus a second system
+- completed mapping does not need a redundant completion card
 - Song Setup has enough context without helper-copy noise
 - Structure builder is fast, predictable, and does not assume 8 bars prematurely
 - reorder feels direct on device; Edit remains compact
+- Tracks grid remains fast while selected state, `Other`, and Done feel integrated
+- Tracks completion reflects explicit confirmation rather than merely having one selected track
 - no mandatory learning-flavored route blocks a quick Cover
+- custom sheets do not advertise dead drag/resize behavior
 - natural scrolling/sheets remain reliable at 390 / 440 / 820
 - V6 production data remains untouched
 
