@@ -12,6 +12,7 @@ Use for:
 - familiar platform behavior on iPhone/iPad
 - progressive disclosure and restraint
 - accessibility, motion restraint, and system-native expectations
+- concise language and consistent visual/interaction semantics
 
 Do not use as a reason to make FIRE generic, sterile, or visually indistinguishable from Apple apps.
 
@@ -21,6 +22,7 @@ Use as a **logic reference**, especially for:
 - understandable progression
 - visible movement through a journey
 - completed work remaining accessible
+- adaptive help/practice that responds to demonstrated need
 
 Do not import XP, streak pressure, cartoon lesson paths, fake progress percentages, or unnecessary hard locks.
 
@@ -51,6 +53,119 @@ Useful official references:
 - https://help.figma.com/hc/en-us/articles/360041051154-Guide-to-libraries-in-Figma
 - https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma
 - https://www.figma.com/design-systems/
+
+### GitHub / Primer
+Use for:
+- organizing an enormous amount of information without flattening everything into one screen
+- stable, concise vocabulary that makes complex concepts learnable (`branch`, `merge`, `pull request`, etc.)
+- breadcrumbs, hierarchy, and wayfinding that help people understand where they are
+- familiar reusable metaphors/components across many product areas
+- responsive design foundations that let dense tools remain coherent across sizes
+
+Babel lesson: **naming is interface design.** Prefer short, durable, meaningful nouns/verbs when one word can carry the concept cleanly.
+
+Do not copy developer-centric density, terminology, or GitHub's exact navigation patterns where a musician would need simpler language.
+
+Useful official references:
+- https://primer.style/
+- https://primer.style/product/getting-started/
+- https://primer.style/product/ui-patterns/navigation/
+- https://github.blog/news-insights/product-news/exploring-github-with-the-redesigned-navigation-now-in-public-beta/
+
+### ChatGPT
+Use for:
+- a calm shell that can expose very different capabilities without making every capability permanently visible
+- choosing the presentation that fits the task rather than forcing one UI format everywhere
+- allowing simple text/content to remain simple when richer interaction is unnecessary
+- progressive, contextual capability discovery
+- conversation/history as continuity without requiring the user to manually reconstruct context
+
+Do not make FIRE conversational merely because ChatGPT is; FIRE should use the interaction model that best serves production decisions.
+
+Useful official references:
+- https://help.openai.com/en/articles/20001598-intelligent-ui-in-chatgpt
+- https://developers.openai.com/plugins/concepts/ui-guidelines
+
+### Basecamp / Shape Up
+Use for:
+- calm organization of substantial work
+- keeping actions/content intentional even when a product supports many jobs
+- **breadboarding**: define places, affordances, and connections before debating visual treatment
+- solving the product at the right abstraction level before polishing the enclosure
+
+Do not copy Basecamp's information architecture literally; FIRE has a different creative workflow and needs music-native structures.
+
+Useful official reference:
+- https://basecamp.com/shapeup/1.3-chapter-04
+
+### Things
+Use for:
+- a simple surface that remains powerful for people who want depth
+- hiding optional detail until it is actually needed
+- clear content structure, quiet hierarchy, and polished interaction
+- making functionality feel deliberate instead of configurable for configuration's sake
+
+Do not copy Things' task-management metaphors into music-production work.
+
+Useful official references:
+- https://culturedcode.com/things/features/
+- https://culturedcode.com/things/
+
+### Instagram / TikTok / Snapchat
+Use primarily as **observational interaction references**, not as doctrine.
+
+Useful qualities to study:
+- immediate entry into the primary content/job
+- low-chrome, content-first presentation
+- repeated interaction patterns that become muscle memory quickly
+- strong creation/discovery affordances with very little explanatory UI
+- personalization and identity expressed without making every screen visually noisy
+- Snapchat's willingness to simplify navigation around a smaller set of core jobs
+
+Important guardrail: FIRE should **not** import engagement-maximizing dark patterns, infinite-feed pressure, social comparison loops, notification pressure, or attention capture that conflicts with making music.
+
+Useful official Snapchat reference:
+- https://newsroom.snap.com/sps-2024-simple-snapchat
+
+Instagram and TikTok can remain live-product observation references when official design-system material is not public enough to justify treating them as authoritative sources.
+
+### Logic Pro / Ableton / other DAWs
+Use for:
+- domain-native musical vocabulary and mental models
+- accepting purposeful density where expert work genuinely needs it
+- track/group/stack abstractions and progressive detail
+- preserving creative flexibility rather than forcing one “correct” production workflow
+- understanding that beginning, progressing, and finishing are different creative problems
+
+FIRE must remain a **companion**, not a second DAW. Borrow production mental models where they reduce translation cost; do not reproduce plugin/routing/session data merely because the DAW has it.
+
+Useful references:
+- Logic Pro / Apple documentation for current DAW behavior
+- https://makingmusic.ableton.com/
+
+### Pokémon GO
+Use as a collection/progress reference for:
+- medals with inspectable progress
+- a profile that gathers many different progression artifacts without requiring them all to mean the same thing
+- the idea that a badge collection can have both list/gallery and spatial/map presentations
+- optional world/progression discovery around a primary experience
+
+Do not copy XP ladders, medal tiers, map styling, Pokémon branding, or reward structures. Babel World should earn its own collection language from the apps/achievements that eventually exist.
+
+Useful references:
+- https://niantic.helpshift.com/hc/en/6-pokemon-go/faq/101-how-do-i-level-up-and-earn-medals/
+- https://niantic.helpshift.com/hc/en/6-pokemon-go/faq/2409-collecting-gym-badges/
+
+### Additional references worth watching, not locking
+
+These are useful comparison products when a specific problem calls for them, but they do not need to become permanent doctrine merely because they are strong products:
+
+- **Notion** — flexible information organization; can be minimal or powerful depending on need
+- **Spotify** — library/discovery/playback hierarchy and personalization
+- **Linear** — focused, fast information-dense work surfaces
+- **Pinterest** — visual discovery/collection patterns when future mood/reference workflows need them
+
+Add them to durable doctrine only if a specific transferable lesson becomes important to FIRE.
 
 ## Learning / interoperability references
 
@@ -109,6 +224,8 @@ This prevents a tiny “came from FIRE” marker from being confused with “you
 
 Possible later idea: a cross-app achievement can intentionally combine multiple app source marks when the accomplishment genuinely required evidence across contexts.
 
+The eventual collection surface could be a gallery, trophy-like display, spatial map/neighborhood/park, or something more original. Do not choose the container before real Babel apps and badges give it content.
+
 ## FIRE visual references
 
 ### Minecraft
@@ -127,14 +244,14 @@ Use for:
 
 Do not imitate specific Pokémon sprites, characters, palettes, UI, or copyrighted assets.
 
-### Pixel-art Fire hypothesis
-A future version of the user’s Fire could be deliberately pixelated rather than smooth/vector-based.
+### Pixel-art Fire + badge language hypothesis
+A future version of the user’s Fire — and potentially Babel achievement/source marks — could use one original pixel visual grammar rather than smooth/vector-only artwork.
 
 Why it is interesting:
-- gives FIRE a distinctive, personal visual language tied to Gabriel’s genuine taste
+- gives FIRE/Babel a distinctive, personal visual language tied to Gabriel’s genuine taste
 - small sprite states can make progression feel collectible and alive
-- frame-by-frame flame movement, embers, sparks, palette shifts, and silhouette changes can communicate growth without requiring photorealistic effects
-- crisp integer-scale rendering could adapt from tiny profile marks to larger dedicated Fire views
+- frame-by-frame flame movement, embers, sparks, palette shifts, silhouette changes, and badge details can communicate growth without requiring photorealistic effects
+- crisp integer-scale rendering could adapt from tiny source marks/profile badges to larger dedicated Fire views
 - motion can remain lightweight, and Reduce Motion can fall back to a static sprite/state
 
 Guardrails:
@@ -142,6 +259,7 @@ Guardrails:
 - test whether pixel art feels intentional beside FIRE’s calm modern UI rather than pasted on top of it
 - draw an original Babel visual grammar; inspiration must not become imitation
 - accessibility and legibility remain more important than nostalgia
+- do not lock pixel dimensions, palette, or sprite complexity before prototyping at actual UI sizes
 
 ## Reference-maintenance rule
 
