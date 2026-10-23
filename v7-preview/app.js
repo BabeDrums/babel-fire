@@ -48,7 +48,7 @@ function backButton(label, route) {
 }
 
 function pageHeader(title, copy = "") {
-  return `<div class="page-header"><h1>${esc(title)}</h1>${copy ? `<p class="sub">${esc(copy)}</p>` : ""}</div>`;
+  return `<div class="page-header work-header"><h1>${esc(title)}</h1>${copy ? `<p class="sub">${esc(copy)}</p>` : ""}</div>`;
 }
 
 function setHistory(route, mode = "push") {
@@ -82,7 +82,7 @@ function showBuildInfo() {
     .catch(() => "unavailable");
   buildCommitPromise.then((commit) => {
     targets.forEach((target) => {
-      if (target.isConnected) target.textContent = `V7 Preview · ${commit}`;
+      if (target.isConnected) target.textContent = `G7 · ${commit}`;
     });
   });
 }
@@ -97,20 +97,20 @@ function renderProjects() {
   app.innerHTML = `
     <main class="screen root-screen scroll-safe">
       <div class="projects-heading">
-        <h1>Projects</h1>
+        <div class="projects-title-stack"><h1>Projects</h1><div class="build-info root-build-info">G7 · …</div></div>
         <button class="new-project-button" data-action="new-project" aria-label="New Project">+</button>
       </div>
       <div class="project-list group">${rows || `<div class="empty-state projects-empty">No projects yet.</div>`}</div>
     </main>`;
+  showBuildInfo();
 }
 
 function journeyRow(item, route) {
   const done = workDone(item, route);
-  const current = route === recommendedWork(item);
-  const stateClass = done ? "done" : current ? "current" : "upcoming";
-  const mark = done ? "✓" : current ? "●" : "○";
+  const stateClass = done ? "done" : "upcoming";
+  const mark = done ? "✓" : "○";
   return `
-    <button class="row journey-row ${stateClass}" data-route="${route}" ${current ? `aria-current="step"` : ""}>
+    <button class="row journey-row ${stateClass}" data-route="${route}">
       <span class="journey-mark ${stateClass}" aria-hidden="true">${mark}</span>
       <span class="row-title">${esc(WORK[route].title)}</span>
       <span class="chevron" aria-hidden="true">›</span>
@@ -121,17 +121,27 @@ function renderProjectHome() {
   const item = project();
   if (!item) return navigate("projects", "replace");
   if (item.type !== "study") {
-    app.innerHTML = `<main class="screen">${topbar(backButton("Projects", "projects"), "")}${pageHeader(item.title, "Original workflow is not part of this shell prototype yet.")}<div class="prereq-card"><p class="prototype-end">This preview is intentionally proving the Recreation shell first.</p></div></main>`;
+    app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton("Projects", "projects"), "")}${pageHeader(item.title, "Original workflow is not part of this shell prototype yet.")}<div class="placeholder-state"><p>This preview is intentionally proving the Recreation shell first.</p></div></main>`;
     return;
   }
 
   const recommended = recommendedWork(item);
   const rec = WORK[recommended];
-  const workRows = ["setup", "structure", "tracks", "section-study", "review-map"]
+  const workRoutes = ["setup", "structure", "tracks", "section-study", "review-map"];
+  const workRows = workRoutes
+    .filter((route) => route !== recommended)
     .map((route) => journeyRow(item, route)).join("");
   const notesCount = item.notes.filter((note) => clean(typeof note === "string" ? note : note?.text)).length;
   const future = ["The Skeleton", "The Sounds", "The Balance", "The Shape", "The World", "The Finish"]
-    .map((name) => esc(name)).join(" · ");
+    .map((name) => `<span>${esc(name)}</span>`).join("");
+  const notesMarkup = notesCount ? `
+      <div class="section-title"><span>Notes</span></div>
+      <div class="group">
+        <button class="row" data-route="notes">
+          <span><span class="row-title">Project Notes</span><span class="row-sub">${notesCount} saved note${notesCount === 1 ? "" : "s"}</span></span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+      </div>` : "";
 
   app.innerHTML = `
     <main class="screen scroll-safe">
@@ -146,21 +156,13 @@ function renderProjectHome() {
 
       <div class="section-title"><span>Journey</span></div>
       <section class="journey">
-        <div class="phase-label">The Map</div>
         <div class="group journey-group">${workRows}</div>
         <div class="future-phases" aria-label="Later phases">
           <span class="future-label">Later</span>
           <div class="future-phase-list">${future}</div>
         </div>
       </section>
-
-      <div class="section-title"><span>Notes</span></div>
-      <div class="group">
-        <button class="row" data-route="notes">
-          <span><span class="row-title">Project Notes</span><span class="row-sub">${notesCount ? `${notesCount} saved note${notesCount === 1 ? "" : "s"}` : "Questions, takeaways, and ideas."}</span></span>
-          <span class="chevron" aria-hidden="true">›</span>
-        </button>
-      </div>
+      ${notesMarkup}
     </main>`;
 }
 
@@ -238,9 +240,8 @@ function renderStructure() {
       ${topbar(backButton(item.title, "project"), "")}
       ${pageHeader("Structure", "Build the song one section at a time.")}
       ${sections.length
-        ? `<div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button></div>`
+        ? `<div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${completionAccessory(item.map.structureVerified)}</button></div>`
         : `<div class="structure-empty"><p>Add the first section you hear.</p><button class="primary-action compact-primary" data-action="open-add-section">Add Section</button></div>`}
-      ${sections.length ? `<button class="confirm-row" data-action="toggle-structure-verified"><span class="row-title">Structure matches the song</span>${completionAccessory(item.map.structureVerified)}</button>` : ""}
       ${continuation}
     </main>`;
 }
@@ -279,15 +280,15 @@ function renderSectionStudy() {
     ].join("");
     body = `<div class="prereq-card"><h3>Finish the missing context first.</h3><p>Section Study needs a structure and at least one track.</p><div class="prereq-actions">${actions}</div></div>`;
   } else {
-    body = `<div class="prereq-card"><h3>Ready for Section Study.</h3><p class="prototype-end">Section Study isn\'t available in this preview yet.</p></div>`;
+    body = `<div class="placeholder-state"><p>Section Study isn\'t available in this preview yet.</p></div>`;
   }
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}</main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Section Study", "Study what changes from section to section.")}${body}</main>`;
 }
 
 function renderReviewMap() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
-  app.innerHTML = `<main class="screen">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="prereq-card"><p class="prototype-end">Review Map isn\'t available in this preview yet.</p></div></main>`;
+  app.innerHTML = `<main class="screen scroll-safe">${topbar(backButton(item.title, "project"), "")}${pageHeader("Review Map", "Review the song map before rebuilding it.")}<div class="placeholder-state"><p>Review Map isn\'t available in this preview yet.</p></div></main>`;
 }
 
 function renderNotes() {
@@ -410,7 +411,7 @@ function openEditSectionSheet(sectionId) {
 function openProjectActions() {
   const item = project();
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div><div class="sheet-meta build-info">V7 Preview · …</div>`, { type: "project-actions" });
+  openSheet(`<div class="grabber"></div><h2>${esc(item.title)}</h2><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Project</span><span class="chevron">›</span></button><button class="row" data-action="reset-project-preview"><span><span class="row-title">Reset Progress</span><span class="row-sub">Keeps title, artist, and notes.</span></span><span></span></button><button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button></div><div class="sheet-meta build-info">G7 · …</div>`, { type: "project-actions" });
   showBuildInfo();
 }
 
