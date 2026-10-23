@@ -11,14 +11,15 @@ PREVIEW_KEY = "production-projects-v1-v7-preview"
 URL = os.environ.get("FIRE_URL", "http://127.0.0.1:8000").rstrip("/") + "/v7-preview/"
 
 
-def study_db(*, setup=False, structure=False, tracks=False, notes=None):
-    project = {
-        "id": "p1",
+def study_project(project_id="p1", title="Creep", artist="Radiohead", *, setup=False, sections=None, verified=False, tracks=None, activity=1, notes=None):
+    return {
+        "id": project_id,
         "type": "study",
         "schemaVersion": 5,
-        "title": "Creep",
-        "artist": "Radiohead",
+        "title": title,
+        "artist": artist,
         "createdAt": 1,
+        "lastActivityAt": activity,
         "notes": notes or [],
         "map": {
             "setup": {
@@ -28,9 +29,9 @@ def study_db(*, setup=False, structure=False, tracks=False, notes=None):
                 "grid": setup,
                 "firstListen": setup,
             },
-            "sections": ([{"id": "s1", "name": "Intro", "lengthBars": 8}] if structure else []),
-            "structureVerified": structure,
-            "tracks": ([{"id": "t1", "name": "Vocal"}] if tracks else []),
+            "sections": sections or [],
+            "structureVerified": verified,
+            "tracks": tracks or [],
             "timeline": {"presence": [], "events": []},
             "sectionData": {},
             "mapVerified": False,
@@ -44,6 +45,12 @@ def study_db(*, setup=False, structure=False, tracks=False, notes=None):
             "bounce": {"exported": False, "listened": False},
         },
     }
+
+
+def study_db(*, setup=False, structure=False, tracks=False, notes=None):
+    sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}] if structure else []
+    selected_tracks = [{"id": "t1", "name": "Vocal"}] if tracks else []
+    project = study_project(setup=setup, sections=sections, verified=structure, tracks=selected_tracks, notes=notes)
     return {"version": 5, "currentProjectId": "p1", "projects": [project]}
 
 
@@ -58,6 +65,7 @@ def original_db():
             "title": "Even",
             "artist": "Babel",
             "createdAt": 1,
+            "lastActivityAt": 1,
             "notes": [],
         }],
     }
@@ -87,13 +95,11 @@ class V7Preview(unittest.TestCase):
         self.addCleanup(context.close)
         state = study_db() if data is None else data
         scripts = [
-            "localStorage.setItem(%s,%s);"
-            % (json.dumps(PREVIEW_KEY), json.dumps(json.dumps(state)))
+            "localStorage.setItem(%s,%s);" % (json.dumps(PREVIEW_KEY), json.dumps(json.dumps(state)))
         ]
         if source_data is not None:
             scripts.append(
-                "localStorage.setItem(%s,%s);"
-                % (json.dumps(SOURCE_KEY), json.dumps(json.dumps(source_data)))
+                "localStorage.setItem(%s,%s);" % (json.dumps(SOURCE_KEY), json.dumps(json.dumps(source_data)))
             )
         context.add_init_script("".join(scripts))
         page = context.new_page()
@@ -111,164 +117,130 @@ class V7Preview(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
-    def test_projects_keeps_build_trace_out_of_content_hierarchy(self):
+    def test_projects_build_trace_and_integrated_actions(self):
         page = self.open("projects")
-        expect(page.locator("h1")).to_have_text("Projects")
+        expect(page.locator(".title-block h1")).to_have_text("Projects")
         expect(page.get_by_role("button", name="New Project")).to_be_visible()
         expect(page.locator(".root-build-info")).to_contain_text("G7 ·")
-        self.assertEqual(page.locator(".projects-heading .build-info").count(), 0)
-        self.assertEqual(page.locator(".sheet-meta").count(), 0)
-        self.assertEqual(page.locator(".root-build-info").evaluate("el => getComputedStyle(el).position"), "fixed")
-
-    def test_project_card_has_open_and_secondary_actions_without_entering_project(self):
-        page = self.open("projects")
-        expect(page.locator(".project-open")).to_contain_text("Creep")
         actions = page.get_by_role("button", name="Actions for Creep")
         expect(actions).to_be_visible()
-        self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderLeftStyle"), "none")
         self.assertGreaterEqual(actions.bounding_box()["width"], 44)
         self.assertGreaterEqual(actions.bounding_box()["height"], 44)
-        actions.click()
-        expect(page.locator(".sheet")).to_be_visible()
-        expect(page.get_by_role("button", name="Edit")).to_be_visible()
-        page.get_by_role("button", name="Edit").click()
-        title = page.get_by_role("textbox", name="Project title")
-        title.fill("Creep Edit")
-        page.get_by_role("button", name="Save").click()
-        expect(page.locator(".project-open")).to_contain_text("Creep Edit")
-        self.assertEqual(page.locator(".project-identity").count(), 0)
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderLeftStyle"), "none")
 
-    def test_new_project_explicitly_supports_original_and_recreation(self):
-        source = study_db(setup=True, structure=True, tracks=True)
-        page = self.open("projects", empty_db(), source_data=source)
-        page.get_by_role("button", name="New Project").click()
-        expect(page.get_by_role("button", name="Original")).to_be_visible()
-        expect(page.get_by_role("button", name="Recreation")).to_be_visible()
-        self.assertEqual(page.locator("#newProjectTitle").count(), 0)
+    def test_one_header_scaffold_and_title_scale_across_levels(self):
+        projects = self.open("projects")
+        project_page = self.open("project")
+        setup = self.open("setup")
+        sizes = [
+            float(page.locator(".title-block h1").evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
+            for page in (projects, project_page, setup)
+        ]
+        self.assertEqual(sizes[0], sizes[1])
+        self.assertEqual(sizes[1], sizes[2])
+        for page in (projects, project_page, setup):
+            expect(page.locator(".toolbar")).to_be_visible()
+        self.assertAlmostEqual(
+            projects.locator(".title-block").bounding_box()["y"],
+            project_page.locator(".title-block").bounding_box()["y"],
+            delta=2,
+        )
 
-        page.get_by_role("button", name="Original").click()
-        page.get_by_role("textbox", name="Project title").fill("Even")
-        create = page.get_by_role("button", name="Create")
-        expect(create).to_be_enabled()
-        create.click()
-        expect(page.locator(".project-identity h1")).to_have_text("Even")
-        expect(page.locator(".project-identity .sub")).to_have_text("Original")
-        preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
-        production = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", SOURCE_KEY)
-        self.assertEqual(preview["projects"][0]["type"], "original")
-        self.assertEqual(production, source)
-
+    def test_new_project_is_stable_and_uses_cover_public_label(self):
         page = self.open("projects", empty_db())
         page.get_by_role("button", name="New Project").click()
-        page.get_by_role("button", name="Recreation").click()
-        page.get_by_role("textbox", name="Song title").fill("Smithereens")
-        expect(page.get_by_role("button", name="Create")).to_be_disabled()
-        page.get_by_role("textbox", name="Artist").fill("Twenty One Pilots")
+        original = page.get_by_role("button", name="Original")
+        cover = page.get_by_role("button", name="Cover")
+        title = page.get_by_role("textbox", name="Title")
+        artist = page.get_by_role("textbox", name="Artist")
+        expect(original).to_have_attribute("aria-pressed", "true")
+        expect(cover).to_be_visible()
+        expect(title).to_be_visible()
+        expect(artist).to_be_visible()
+        title_y = title.bounding_box()["y"]
+        artist_y = artist.bounding_box()["y"]
+        expect(title).to_have_attribute("autocapitalize", "words")
+        expect(artist).to_have_attribute("autocapitalize", "words")
+        cover.click()
+        self.assertAlmostEqual(title.bounding_box()["y"], title_y, delta=1)
+        self.assertAlmostEqual(artist.bounding_box()["y"], artist_y, delta=1)
+        self.assertEqual(page.get_by_text("Song", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("Artist (optional)", exact=True).count(), 0)
+
+    def test_original_artist_optional_cover_artist_required(self):
+        page = self.open("projects", empty_db())
+        page.get_by_role("button", name="New Project").click()
+        page.get_by_role("textbox", name="Title").fill("Even")
         expect(page.get_by_role("button", name="Create")).to_be_enabled()
+        page.get_by_role("button", name="Cover").click()
+        expect(page.get_by_role("button", name="Create")).to_be_disabled()
+        page.get_by_role("textbox", name="Artist").fill("Babel")
+        expect(page.get_by_role("button", name="Create")).to_be_enabled()
+        page.get_by_role("button", name="Create").click()
+        expect(page.locator(".screen-meta")).to_have_text("Babel · Cover")
+        preview = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
+        self.assertEqual(preview["projects"][0]["type"], "study")
 
-    def test_project_home_removes_redundant_continue_and_journey_headers(self):
+    def test_project_actions_are_compact_and_do_not_repeat_song_title(self):
+        page = self.open("projects")
+        page.get_by_role("button", name="Actions for Creep").click()
+        expect(page.get_by_role("button", name="Edit Details")).to_be_visible()
+        expect(page.get_by_role("button", name="Reset Progress")).to_be_visible()
+        expect(page.get_by_role("button", name="Delete Project")).to_be_visible()
+        self.assertEqual(page.locator(".sheet h2").count(), 0)
+        self.assertEqual(page.locator(".sheet").get_by_text("Creep", exact=True).count(), 0)
+        page.get_by_role("button", name="Edit Details").click()
+        expect(page.locator(".sheet h2")).to_have_text("Edit Details")
+        expect(page.get_by_role("textbox", name="Title")).to_have_attribute("autocapitalize", "words")
+        expect(page.get_by_role("textbox", name="Artist")).to_have_attribute("autocapitalize", "words")
+
+    def test_more_control_is_same_visual_component_on_card_and_project_home(self):
+        projects = self.open("projects")
+        card_more = projects.get_by_role("button", name="Actions for Creep")
+        card_size = float(card_more.evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
+        home = self.open("project")
+        toolbar_more = home.get_by_role("button", name="Project actions")
+        home_size = float(toolbar_more.evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
+        self.assertEqual(card_size, home_size)
+        self.assertGreaterEqual(toolbar_more.bounding_box()["width"], 44)
+
+    def test_projects_sort_by_meaningful_activity_not_opening(self):
+        old = study_project("old", "Old Song", activity=10)
+        recent = study_project("recent", "Recent Song", activity=20)
+        data = {"version": 5, "currentProjectId": "old", "projects": [old, recent]}
+        page = self.open("projects", data)
+        titles = page.locator(".project-copy strong").all_text_contents()
+        self.assertEqual(titles[:2], ["Recent Song", "Old Song"])
+        page.locator('[data-project="old"]').click()
+        page.get_by_role("button", name="Projects").click()
+        titles = page.locator(".project-copy strong").all_text_contents()
+        self.assertEqual(titles[:2], ["Recent Song", "Old Song"])
+        page.get_by_role("button", name="Actions for Old Song").click()
+        page.get_by_role("button", name="Edit Details").click()
+        page.get_by_role("textbox", name="Title").fill("Old Song Edited")
+        page.get_by_role("button", name="Save").click()
+        titles = page.locator(".project-copy strong").all_text_contents()
+        self.assertEqual(titles[0], "Old Song Edited")
+
+    def test_project_home_is_reduced_to_current_cover_work(self):
         page = self.open("project")
-        expect(page.locator(".project-identity h1")).to_have_text("Creep")
+        expect(page.locator(".title-block h1")).to_have_text("Creep")
+        expect(page.locator(".screen-meta")).to_have_text("Radiohead · Cover")
         expect(page.locator(".continue-title")).to_have_text("Song Setup")
-        self.assertEqual(page.locator(".journey-row", has_text="Song Setup").count(), 0)
-        self.assertEqual(page.locator(".section-title").count(), 0)
-        self.assertEqual(page.get_by_text("Continue", exact=True).count(), 0)
-        self.assertEqual(page.get_by_text("Journey", exact=True).count(), 0)
-        expect(page.locator(".future-label")).to_have_text("Later")
-        expect(page.locator(".future-phase-list span")).to_have_count(6)
+        self.assertEqual(page.get_by_text("Set up the reference.", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("Section Study", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("Review Map", exact=True).count(), 0)
+        self.assertEqual(page.get_by_text("Later", exact=True).count(), 0)
 
-    def test_work_pages_share_one_title_scale_and_remove_redundant_copy(self):
+    def test_work_pages_remove_default_helper_copy(self):
         setup = self.open("setup")
-        structure = self.open("structure")
         tracks = self.open("tracks")
-        setup_size = float(setup.locator(".work-header h1").evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
-        structure_size = float(structure.locator(".work-header h1").evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
-        tracks_size = float(tracks.locator(".work-header h1").evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
-        self.assertEqual(setup_size, structure_size)
-        self.assertEqual(structure_size, tracks_size)
-        self.assertEqual(setup.locator(".work-header .sub").count(), 0)
-        self.assertEqual(structure.locator(".work-header .sub").count(), 0)
-        expect(tracks.locator(".work-header .sub")).to_have_text("Choose everything you hear.")
-        self.assertEqual(setup.get_by_text("Prepare the reference before studying it.", exact=True).count(), 0)
-        self.assertEqual(structure.get_by_text("Build the song one section at a time.", exact=True).count(), 0)
-        self.assertEqual(structure.get_by_text("Add the first section you hear.", exact=True).count(), 0)
+        self.assertEqual(setup.get_by_text("Import it into your session.", exact=True).count(), 0)
+        self.assertEqual(setup.get_by_text("Align it to the bar grid.", exact=True).count(), 0)
+        self.assertEqual(setup.get_by_text("Play the full song once.", exact=True).count(), 0)
+        self.assertEqual(tracks.get_by_text("Choose everything you hear.", exact=True).count(), 0)
 
-    def test_nested_work_uses_icon_back_navigation_not_repeated_project_title(self):
-        page = self.open("setup")
-        back = page.locator(".icon-back")
-        expect(back).to_be_visible()
-        expect(back).to_have_attribute("aria-label", "Creep")
-        self.assertEqual(back.get_by_text("Creep", exact=True).count(), 0)
-
-    def test_interaction_grammar_is_predictable(self):
-        page = self.open("setup")
-        page.locator(".reference-row").click()
-        self.assertEqual(page.locator(".sheet").count(), 0)
-
-        page = self.open("tracks")
-        page.locator('.track-tile[data-name="Vocal"]').click()
-        self.assertEqual(page.locator(".sheet").count(), 0)
-        page.get_by_role("button", name="Other").click()
-        expect(page.locator(".sheet")).to_be_visible()
-        expect(page.locator(".sheet h2")).to_have_text("Add Track")
-
-        page = self.open("structure")
-        page.get_by_role("button", name="Add Section").click()
-        expect(page.locator(".sheet h2")).to_have_text("Add Section")
-
-    def test_structure_uses_one_arrangement_surface_from_empty_state_forward(self):
-        page = self.open("structure")
-        expect(page.locator(".group.arrangement")).to_be_visible()
-        expect(page.get_by_role("button", name="Add Section")).to_be_visible()
-        self.assertEqual(page.locator(".structure-empty").count(), 0)
-        page.get_by_role("button", name="Add Section").click()
-        page.locator('[data-action="quick-add-section"][data-name="Intro"]').click()
-        expect(page.locator(".arrangement-row")).to_contain_text("Intro")
-        expect(page.locator(".structure-confirm-row")).to_contain_text("Matches the song")
-        self.assertEqual(page.get_by_role("button", name="Continue").count(), 0)
-        page.locator(".structure-confirm-row").click()
-        expect(page.get_by_role("button", name="Continue")).to_be_visible()
-
-    def test_tracks_keeps_direct_choices_and_compact_creation_path(self):
-        page = self.open("tracks")
-        vocal = page.locator('.track-tile[data-name="Vocal"]')
-        vocal.click()
-        expect(vocal).to_have_attribute("aria-pressed", "true")
-        expect(page.get_by_role("button", name="Continue")).to_be_visible()
-        other = page.get_by_role("button", name="Other")
-        expect(other).to_be_visible()
-        other.click()
-        field = page.get_by_role("textbox", name="Track name")
-        field.fill("Strings")
-        page.get_by_role("button", name="Add").click()
-        expect(page.locator('.track-tile[data-name="Strings"]')).to_be_visible()
-
-    def test_existing_notes_remain_reachable_without_a_notes_header(self):
-        data = study_db(notes=[{"type": "Idea", "context": "Project", "text": "Keep verse small."}])
-        page = self.open("project", data)
-        expect(page.get_by_role("button", name="Notes 1 saved")).to_be_visible()
-        self.assertEqual(page.get_by_text("Notes", exact=True).count(), 1)
-        page.get_by_role("button", name="Notes 1 saved").click()
-        expect(page.locator(".note-card")).to_contain_text("Keep verse small.")
-
-    def test_original_project_is_first_class_even_before_its_core_spine_is_built(self):
-        page = self.open("project", original_db())
-        expect(page.locator(".project-identity h1")).to_have_text("Even")
-        expect(page.locator(".project-identity .sub")).to_have_text("Babel · Original")
-        expect(page.get_by_text("Original workflow isn't built yet.")).to_be_visible()
-        self.assertEqual(page.get_by_text("FIRE Core spine", exact=False).count(), 0)
-        expect(page.get_by_role("button", name="Project actions")).to_be_visible()
-
-    def test_placeholders_stay_truthful_and_quiet(self):
-        complete = study_db(setup=True, structure=True, tracks=True)
-        page = self.open("section-study", complete)
-        expect(page.get_by_text("Section Study isn't built yet.")).to_be_visible()
-        self.assertEqual(page.locator(".work-header .sub").count(), 0)
-        page = self.open("review-map", complete)
-        expect(page.get_by_text("Review Map isn't built yet.")).to_be_visible()
-        self.assertEqual(page.locator(".work-header .sub").count(), 0)
-
-    def test_song_setup_continuation_reacts_to_tempo_without_rerendering_input(self):
+    def test_song_setup_tempo_focus_and_live_continuation(self):
         data = study_db()
         data["projects"][0]["map"]["setup"].update({"reference": True, "grid": True, "firstListen": True})
         page = self.open("setup", data)
@@ -278,12 +250,104 @@ class V7Preview(unittest.TestCase):
         tempo.focus()
         self.assertEqual(tempo.evaluate("el => getComputedStyle(el).outlineStyle"), "none")
         tempo.fill("111")
-        expect(tempo).to_have_value("111")
         expect(page.get_by_role("button", name="Continue")).to_be_visible()
-        width = page.get_by_role("button", name="Continue").bounding_box()["width"]
-        self.assertLess(width, page.viewport_size["width"] - 40)
 
-    def test_phone_pages_use_natural_document_scrolling(self):
+    def test_structure_builder_chooses_type_and_bars_before_insertion(self):
+        page = self.open("structure")
+        page.get_by_role("button", name="Add Section").click()
+        intro = page.get_by_role("button", name="Intro")
+        intro.click()
+        self.assertEqual(page.locator(".arrangement-row").count(), 0)
+        page.get_by_role("button", name="12").click()
+        page.get_by_role("button", name="Add", exact=True).click()
+        expect(page.locator(".sheet")).to_be_visible()
+        expect(page.locator("#sectionAddedNotice")).to_have_text("Added Intro · 12 bars")
+        page.get_by_role("button", name="Done").click()
+        expect(page.locator(".arrangement-row")).to_contain_text("Intro")
+        expect(page.locator(".arrangement-row")).to_contain_text("12 bars")
+
+    def test_structure_builder_supports_custom_length_without_edit_round_trip(self):
+        page = self.open("structure")
+        page.get_by_role("button", name="Add Section").click()
+        page.get_by_role("button", name="Verse").click()
+        page.get_by_role("button", name="Custom").last.click()
+        custom = page.get_by_role("textbox", name="Custom bars")
+        custom.fill("6")
+        page.get_by_role("button", name="Add", exact=True).click()
+        page.get_by_role("button", name="Done").click()
+        expect(page.locator(".arrangement-row")).to_contain_text("6 bars")
+
+    def test_edit_section_has_no_move_buttons_and_reorder_handle_is_direct(self):
+        sections = [
+            {"id": "s1", "name": "Intro", "lengthBars": 8},
+            {"id": "s2", "name": "Verse", "lengthBars": 16},
+        ]
+        data = {"version": 5, "currentProjectId": "p1", "projects": [study_project(sections=sections)]}
+        page = self.open("structure", data)
+        handle = page.get_by_role("button", name="Reorder Verse")
+        self.assertGreaterEqual(handle.bounding_box()["width"], 44)
+        self.assertGreaterEqual(handle.bounding_box()["height"], 44)
+        page.get_by_role("button", name="Edit Intro").click()
+        self.assertEqual(page.get_by_role("button", name="Move Up").count(), 0)
+        self.assertEqual(page.get_by_role("button", name="Move Down").count(), 0)
+        expect(page.get_by_role("textbox", name="Name")).to_have_attribute("autocapitalize", "words")
+
+    def test_structure_reorders_from_handle_keyboard_without_edit_sheet(self):
+        sections = [
+            {"id": "s1", "name": "Intro", "lengthBars": 8},
+            {"id": "s2", "name": "Verse", "lengthBars": 16},
+        ]
+        data = {"version": 5, "currentProjectId": "p1", "projects": [study_project(sections=sections)]}
+        page = self.open("structure", data)
+        page.get_by_role("button", name="Reorder Verse").focus()
+        page.keyboard.press("ArrowUp")
+        names = page.locator(".arrangement-name").all_text_contents()
+        self.assertEqual(names, ["Verse", "Intro"])
+        self.assertEqual(page.locator(".sheet").count(), 0)
+
+    def test_tracks_finishes_mapping_without_forced_learning_route(self):
+        data = study_db(setup=True, structure=True, tracks=False)
+        page = self.open("tracks", data)
+        page.locator('.track-tile[data-name="Vocal"]').click()
+        expect(page.get_by_role("button", name="Done")).to_be_visible()
+        page.get_by_role("button", name="Done").click()
+        expect(page.locator(".map-complete")).to_have_text("Song map complete.")
+        self.assertEqual(page.get_by_text("Section Study", exact=True).count(), 0)
+        self.assertNotIn("section-study", page.url)
+
+    def test_custom_track_name_uses_word_capitalization(self):
+        page = self.open("tracks")
+        page.get_by_role("button", name="Other").click()
+        field = page.get_by_role("textbox", name="Track name")
+        expect(field).to_have_attribute("autocapitalize", "words")
+        field.fill("Strings")
+        page.get_by_role("button", name="Add").click()
+        expect(page.locator('.track-tile[data-name="Strings"]')).to_be_visible()
+
+    def test_original_project_stays_first_class(self):
+        page = self.open("project", original_db())
+        expect(page.locator(".title-block h1")).to_have_text("Even")
+        expect(page.locator(".screen-meta")).to_have_text("Babel · Original")
+        expect(page.get_by_text("Original workflow isn't built yet.")).to_be_visible()
+        expect(page.get_by_role("button", name="Project actions")).to_be_visible()
+
+    def test_existing_notes_remain_reachable(self):
+        data = study_db(notes=[{"type": "Idea", "context": "Project", "text": "Keep verse small."}])
+        page = self.open("project", data)
+        expect(page.get_by_role("button", name="Notes 1 saved")).to_be_visible()
+        page.get_by_role("button", name="Notes 1 saved").click()
+        expect(page.locator(".note-card")).to_contain_text("Keep verse small.")
+
+    def test_preview_remains_isolated_from_v6_storage(self):
+        source = study_db(setup=True, structure=True, tracks=True)
+        page = self.open("projects", empty_db(), source_data=source)
+        page.get_by_role("button", name="New Project").click()
+        page.get_by_role("textbox", name="Title").fill("Even")
+        page.get_by_role("button", name="Create").click()
+        production = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", SOURCE_KEY)
+        self.assertEqual(production, source)
+
+    def test_phone_pages_use_natural_document_scrolling_and_no_visualviewport_logic(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True), height=720)
         self.assertNotEqual(page.evaluate("getComputedStyle(document.documentElement).overflowY"), "hidden")
         self.assertNotEqual(page.evaluate("getComputedStyle(document.body).overflowY"), "hidden")
@@ -293,15 +357,14 @@ class V7Preview(unittest.TestCase):
         self.assertNotIn("dataset.scrollable", source)
         self.assertNotIn("data-v7-fit", styles)
 
-    def test_preview_remains_isolated_from_v6_storage(self):
-        source = study_db(setup=True, structure=True, tracks=True)
-        page = self.open("projects", empty_db(), source_data=source)
-        page.get_by_role("button", name="New Project").click()
-        page.get_by_role("button", name="Original").click()
-        page.get_by_role("textbox", name="Project title").fill("Still")
-        page.get_by_role("button", name="Create").click()
-        production = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", SOURCE_KEY)
-        self.assertEqual(production, source)
+    def test_superseded_g7_interactions_are_removed(self):
+        source = Path("v7-preview/app.js").read_text()
+        model = Path("v7-preview/model.js").read_text()
+        self.assertNotIn("quick-add-section", source)
+        self.assertNotIn("move-section", source)
+        self.assertNotIn("continue-section-study", source)
+        self.assertNotIn('>Recreation<', source)
+        self.assertIn("Cover", model)
 
 
 if __name__ == "__main__":

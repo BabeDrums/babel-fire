@@ -42,8 +42,9 @@ REQUIRED = {
         "corrected G7 shell is live but NOT frozen",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
-        "Latest physical-device impression after #50/#51",
+        "Latest physical-device review — system correction required",
         "Parallel-chat ownership",
+        "Cover",
     ],
     "BABEL_START_HERE.md": [
         "# Babel Ecosystem — Start Here",
@@ -113,6 +114,7 @@ REQUIRED = {
         "**Sheet**",
         "Original",
         "Recreation",
+        "Cover",
     ],
 }
 
@@ -129,9 +131,7 @@ FORBIDDEN = {
         "Project Home owns **Continue + Journey + Notes**",
         "The current design objective is **V7 Shell Freeze**",
     ],
-    "START_HERE.md": [
-        "`V5.md` is historical",
-    ],
+    "START_HERE.md": ["`V5.md` is historical"],
     "BABEL_START_HERE.md": [
         "FIRE = making the music.\nThe learning app = studying.",
         "WATER = learning",
@@ -148,9 +148,7 @@ FORBIDDEN = {
         "EARTH = app",
         "Babel World = universal database",
     ],
-    "BABEL_PLATFORM.md": [
-        "Current FIRE work remains: **G7 Shell Freeze",
-    ],
+    "BABEL_PLATFORM.md": ["Current FIRE work remains: **G7 Shell Freeze"],
 }
 
 

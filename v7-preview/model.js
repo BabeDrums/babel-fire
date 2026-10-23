@@ -25,16 +25,15 @@ export const SECTION_TYPES = [
 ];
 
 export const WORK = {
-  setup: { title: "Song Setup", copy: "Set up the reference." },
-  structure: { title: "Structure", copy: "Map the sections." },
-  tracks: { title: "Tracks", copy: "Choose what you hear." },
-  "section-study": { title: "Section Study", copy: "Study the sections." },
-  "review-map": { title: "Review Map", copy: "Review the map." },
+  setup: { title: "Song Setup" },
+  structure: { title: "Structure" },
+  tracks: { title: "Tracks" },
 };
 
 const clean = (value) => String(value ?? "").trim();
 const uid = () => crypto?.randomUUID?.() || `preview-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const deepCopy = (value) => JSON.parse(JSON.stringify(value));
+const now = () => Date.now();
 
 function studyState() {
   return {
@@ -59,13 +58,15 @@ function studyState() {
 }
 
 export function createPreviewProject(type, title, artist = "") {
+  const timestamp = now();
   const item = {
     id: uid(),
     type: type === "study" ? "study" : "original",
     schemaVersion: 5,
     title: clean(title) || "Untitled",
     artist: clean(artist),
-    createdAt: Date.now(),
+    createdAt: timestamp,
+    lastActivityAt: timestamp,
     notes: [],
   };
   if (item.type === "study") Object.assign(item, studyState());
@@ -82,6 +83,8 @@ function normalizeProject(project) {
   project.title = clean(project.title) || "Untitled";
   project.artist = clean(project.artist || "");
   project.notes = Array.isArray(project.notes) ? project.notes : [];
+  project.createdAt = Number(project.createdAt) || now();
+  project.lastActivityAt = Number(project.lastActivityAt || project.updatedAt || project.createdAt) || project.createdAt;
   if (project.type !== "study") {
     project.type = "original";
     return project;
@@ -155,6 +158,10 @@ export function currentProject(db) {
   return db.projects.find((item) => item.id === db.currentProjectId) || null;
 }
 
+export function noteActivity(item) {
+  if (item) item.lastActivityAt = now();
+}
+
 export function setupComplete(item) {
   if (item?.type !== "study") return false;
   const setup = item.map.setup;
@@ -174,7 +181,7 @@ export function recommendedWork(item) {
   if (!setupComplete(item)) return "setup";
   if (!structureComplete(item)) return "structure";
   if (!tracksComplete(item)) return "tracks";
-  return "section-study";
+  return null;
 }
 
 export function workDone(item, route) {
@@ -185,7 +192,7 @@ export function workDone(item, route) {
 }
 
 export function projectMeta(item) {
-  if (item.type === "study") return `${item.artist || "Unknown artist"} · Recreation`;
+  if (item.type === "study") return item.artist ? `${item.artist} · Cover` : "Cover";
   return item.artist ? `${item.artist} · Original` : "Original";
 }
 
@@ -196,6 +203,7 @@ export function resetPreviewProject(item) {
   item.map = reset.map;
   item.skeleton = reset.skeleton;
   item.notes = notes;
+  noteActivity(item);
 }
 
 export const helpers = { clean, uid, deepCopy };
