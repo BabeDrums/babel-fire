@@ -14,52 +14,47 @@ This is the canonical zero-context FIRE handoff. For FIRE implementation/product
 
 For wider ecosystem/surrounding-app work instead, route through `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md`. Do not let ecosystem brainstorming rewrite active FIRE runtime/spec behavior.
 
-## Current verified continuity — corrected G7 shell is live but NOT frozen
+## Current verified continuity — G7 shell is live but NOT frozen
 
 Production remains V6. G7 remains the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-The last merged baseline before the current system correction is PR **#56** on `main` at `6a9cfb18fbefd5e97735dabdc8fcb448ba0e9bcd`. At the start of the current task there were no open PRs. Always re-check current `main` and open PRs rather than assuming this SHA remains latest.
+PR **#57** merged the previous G7 system correction to `main` at `38a33779faff6aae9ae3dad596bba3b021bea12b`. At the start of the latest physical-review refinement there were no open PRs. Always re-check current `main` and open PRs rather than assuming this SHA remains latest.
 
 The G7 shell is still **not approved/frozen**. Do not begin FIRE Core breadboarding until Babel physically approves the generic shell fundamentals.
 
-### Latest physical-device review — system correction required
+### Latest physical-device review after #57
 
-Babel's iPhone review after #56 exposed a shared system problem rather than isolated cosmetic bugs:
+The latest iPhone review narrowed the remaining problems instead of reopening the whole shell:
 
-- public `Recreation` naming feels less natural than **Cover**
-- New Project changes shape after project-type choice and changes Title/Song + Artist label semantics
-- mobile text-name fields no longer request word capitalization
-- root/project/work title scale and vertical placement shift too much between screens
-- project-card and toolbar `•••` should feel like one control
-- Projects should surface meaningful recent activity first without permanent Original/Cover sections yet
-- project-actions sheet repeats too much context
-- Project Home still carries too much hierarchy/copy and future-phase clutter
-- Song Setup / Tracks helper copy can be reduced
-- Structure regressed into tap-type → auto-create 8 bars → reopen Edit; this is slower and less truthful than choosing type + length before insertion
-- Move Up / Move Down belongs out of Edit; reorder should happen from the arrangement itself with an accessible alternative
-- Section Study should not be a mandatory learning-flavored waypoint; FIRE Core already says learning is ambient/optional and quick-cover flow must stay usable
+- Projects itself feels solid and should stay stable unless a real issue appears
+- compact New Project / Edit Project sheets still carry redundant visible headings and field labels; the two-field context is clear enough to let Title/Artist placeholders do the visual work while semantic labels remain accessible
+- project actions should read simply **Edit / Reset / Delete / Cancel**
+- custom sheets show a grabber even though they cannot drag/resize, advertising behavior that does not exist
+- Reset/Delete currently execute immediately and need a short confirmation because there is no undo path
+- card `•••` should not silently change `currentProjectId` merely to open another project's management sheet
+- Cover Home still feels split because the recommended step lives in one card while the other mapping steps live in another group
+- completed Cover Home redundantly adds a `Song map complete.` card above three checked rows
+- Tracks' two-column grid is worth keeping; the problem is its heavy selected slabs, detached `Other`, and completion semantics rather than the grid itself
+- Tracks currently counts as complete as soon as one track exists even though `Done` visually implies confirmation; this is not truthful progress
 
-### Current G7 system correction
+### Current refinement contract
 
-The active correction promotes those findings into one coherent shell contract rather than another pile of patches:
+The active refinement resolves those findings as one shell-level cleanup:
 
-- musician-facing **Original / Cover**; internal legacy `study` compatibility remains
-- one shared header scaffold and coherent page-title scale across Projects, Project Home, and work pages
-- one reusable visual `•••` control
-- New Project opens fully formed with stable **Title / Artist** fields; switching type changes validation, not geometry
-- name/title inputs request `autocapitalize="words"` and avoid aggressive autocorrection without rewriting user-entered casing
-- Projects sort by meaningful `lastActivityAt`; merely opening a project does not reorder it
-- project actions become compact and stop repeating the song title
-- Project Home is reduced to current Cover work plus revisitable work/Notes; future-phase dump is removed
-- current Cover shell sequence is **Song Setup → Structure → Tracks**
-- helper copy is removed where labels/controls already explain the task
-- Structure Add Section chooses type + **4 / 8 / 12 / 16 / Custom** before insertion and stays open for fast repeated entry
-- Structure rows expose direct reorder handles; keyboard Arrow Up/Down is the non-drag alternative
-- Edit Section no longer owns Move Up / Move Down
-- Tracks ends with **Done** back to Project Home instead of forcing Section Study
-- completed current shell mapping shows a truthful quiet `Song map complete.` state; unbuilt learning/review placeholders do not masquerade as required progression
+- keep Projects layout/header/project-card behavior otherwise unchanged
+- New Project keeps **Original / Cover** plus stable Title/Artist inputs, but removes redundant visible sheet heading and visible Title/Artist labels; placeholders and accessible labels remain
+- Edit Project uses the same compact Title/Artist pattern without a redundant heading
+- remove fake grabbers from custom sheets rather than implementing drag merely to justify the affordance
+- project management becomes **Edit / Reset / Delete / Cancel** with no unnecessary chevron or repeated title
+- Reset and Delete require small confirmation sheets before changing data
+- per-card project actions target that project through sheet state without changing the globally active project
+- Project Home becomes one coherent **Song Setup → Structure → Tracks** progression group; current/completed/upcoming are states of the same system
+- remove the separate `Song map complete.` card; three completed rows are already truthful completion evidence
+- keep Tracks as a compact multi-select grid, tighten tile weight, use a subtle selected state + check, and integrate `Other` into the same selection surface
+- selecting/editing tracks invalidates track confirmation; **Done** explicitly confirms a non-empty selection and only then counts Tracks complete
+- preserve all #57 Structure, header, Cover naming, recent-ordering, scrolling, and V6-isolation behavior
 
-This correction does **not** equal physical approval. The next meaningful product action after merge/deploy is another real iPhone review.
+This refinement still does **not** equal physical approval. The next meaningful product action after merge/deploy is another real iPhone review of the changed surfaces.
 
 ## G7 interaction grammar
 
@@ -78,16 +73,21 @@ On real iPhone Safari, inspect:
 
 1. Does Projects → project → work keep title position/scale calm and predictable?
 2. Does **Cover** read naturally next to Original?
-3. Does New Project feel complete immediately instead of revealing/reflowing basic fields?
-4. Do Title/Artist keyboard capitalization suggestions behave naturally without forcing casing?
-5. Does `•••` feel like the same control in rows and the toolbar?
-6. Does meaningful recent activity ordering feel useful?
-7. Is Project Home now lean enough to answer “what next?” without acting like a roadmap/dashboard?
-8. Is Song Setup clear without helper-copy stacks, including Tempo focus/keyboard behavior?
-9. Does Structure let Babel enter common/non-8-bar sections quickly without an edit round trip?
-10. Does row reorder feel direct and understandable; is Edit Section compact?
-11. Does the Cover flow stop cleanly after current mapped shell work without forcing learning chrome?
-12. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
+3. Does New Project feel complete immediately and stay understandable without a redundant visible heading/field labels?
+4. Does Edit Project remain obvious with the same compact Title/Artist pattern, including after clearing a field?
+5. Do Title/Artist keyboard capitalization suggestions behave naturally without forcing casing?
+6. Does `•••` feel like the same control in rows and the toolbar, and can a project-card menu open without changing the active project?
+7. Are Edit / Reset / Delete / Cancel terse and understandable, with Reset/Delete confirmation preventing accidental loss?
+8. Does meaningful recent activity ordering still feel useful?
+9. Does Cover Home now read as one calm progression instead of two competing hierarchy systems?
+10. When all three mapping steps are complete, do the checked rows communicate completion without another status card?
+11. Is Song Setup still clear, including Tempo focus/keyboard behavior?
+12. Does Structure still allow quick repeated section entry, direct reorder, and compact Edit without regression?
+13. Does Tracks still feel fast as a grid while selected state, Other, and Done feel like one coherent surface?
+14. Does Tracks remain incomplete until Done explicitly confirms the current non-empty selection, and does editing later invalidate that confirmation?
+15. Do sheets feel honest without a dead grabber/drag affordance?
+16. Does the Cover flow stop cleanly after current mapped shell work without forcing learning chrome?
+17. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
 
 If yes, explicitly record approval and stop broad shell polishing. Small later animation/personality/microinteraction improvements remain allowed after the product logic proves itself.
 
