@@ -42,6 +42,10 @@ function project() {
   return currentProject(db);
 }
 
+function projectById(projectId) {
+  return db.projects.find((item) => item.id === projectId) || null;
+}
+
 function backButton(route, label = "Back") {
   return `<button class="toolbar-button icon-back" data-route="${route}" data-nav="replace" aria-label="${esc(label)}"><span class="back-glyph" aria-hidden="true">‹</span></button>`;
 }
@@ -123,11 +127,14 @@ function renderProjects() {
   showBuildInfo();
 }
 
-function journeyRow(item, route) {
+function journeyRow(item, route, current) {
   const done = workDone(item, route);
+  const active = !done && route === current;
+  const state = done ? "done" : active ? "current" : "upcoming";
+  const mark = done ? "✓" : active ? "→" : "○";
   return `
-    <button class="row journey-row ${done ? "done" : "upcoming"}" data-route="${route}">
-      <span class="journey-mark ${done ? "done" : "upcoming"}" aria-hidden="true">${done ? "✓" : "○"}</span>
+    <button class="row journey-row ${state}" data-route="${route}"${active ? ' aria-current="step"' : ""}>
+      <span class="journey-mark ${state}" aria-hidden="true">${mark}</span>
       <span class="row-title">${esc(WORK[route].title)}</span>
       <span class="chevron" aria-hidden="true">›</span>
     </button>`;
@@ -160,17 +167,14 @@ function renderProjectHome() {
 
   const recommended = recommendedWork(item);
   const routes = ["setup", "structure", "tracks"];
-  const rows = routes.filter((route) => route !== recommended).map((route) => journeyRow(item, route)).join("");
+  const rows = routes.map((route) => journeyRow(item, route, recommended)).join("");
   const notesRow = projectNotesRow(item);
-  const current = recommended
-    ? `<button class="continue-row" data-route="${recommended}"><span class="continue-title">${esc(WORK[recommended].title)}</span><span class="chevron" aria-hidden="true">›</span></button>`
-    : `<div class="map-complete" role="status">Song map complete.</div>`;
 
   app.innerHTML = `
     <main class="screen scroll-safe">
       ${screenHeader(item.title, { backRoute: "projects", backLabel: "Projects", right: moreButton(), meta: projectMeta(item) })}
-      ${current}
-      <div class="group journey-group">${rows}${notesRow}</div>
+      <div class="group journey-group">${rows}</div>
+      ${notesRow ? `<div class="group utility-group">${notesRow}</div>` : ""}
     </main>`;
 }
 
@@ -246,22 +250,28 @@ function renderStructure() {
     </main>`;
 }
 
+function trackTile(name, selected) {
+  return `<button class="track-tile${selected ? " selected" : ""}" data-action="toggle-track" data-name="${esc(name)}" aria-pressed="${selected}"><span>${esc(name)}</span>${selected ? `<span class="track-check" aria-hidden="true">✓</span>` : ""}</button>`;
+}
+
 function renderTracks() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
   const selectedNames = new Set(item.map.tracks.map((track) => track.name));
   const extra = item.map.tracks.map((track) => track.name).filter((name) => !COMMON_TRACKS.includes(name));
   const names = [...COMMON_TRACKS, ...extra];
-  const tiles = names.map((name) => `<button class="track-tile${selectedNames.has(name) ? " selected" : ""}" data-action="toggle-track" data-name="${esc(name)}" aria-pressed="${selectedNames.has(name)}">${esc(name)}</button>`).join("");
-  const continuation = tracksComplete(item)
-    ? `<div class="action-row"><button class="primary-action" data-action="finish-map">Done</button></div>`
+  const tiles = names.map((name) => trackTile(name, selectedNames.has(name))).join("");
+  const continuation = item.map.tracks.length
+    ? `<div class="action-row tracks-action-row"><button class="primary-action" data-action="finish-map">Done</button></div>`
     : "";
 
   app.innerHTML = `
     <main class="screen scroll-safe">
       ${screenHeader("Tracks", { backRoute: "project", backLabel: item.title })}
-      <div class="track-grid">${tiles}</div>
-      <button class="custom-track-button" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
+      <div class="track-grid">
+        ${tiles}
+        <button class="track-tile track-other" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
+      </div>
       ${continuation}
     </main>`;
 }
@@ -302,8 +312,9 @@ function closeSheet(clear = true) {
   if (clear) sheetState = null;
 }
 
-function textField(id, label, value = "", placeholder = "") {
-  return `<label class="field-label" for="${id}">${esc(label)}</label><input id="${id}" class="field" value="${esc(value)}" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">`;
+function textField(id, label, value = "", placeholder = "", { visibleLabel = true } = {}) {
+  const labelClass = visibleLabel ? "field-label" : "visually-hidden";
+  return `<label class="${labelClass}" for="${id}">${esc(label)}</label><input id="${id}" class="field" value="${esc(value)}" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">`;
 }
 
 function projectTypeControl(selected = "original") {
@@ -317,8 +328,8 @@ function projectTypeControl(selected = "original") {
 function newProjectFields() {
   return `
     <div class="stack-fields new-project-fields">
-      ${textField("newProjectTitle", "Title", "", "Title")}
-      ${textField("newProjectArtist", "Artist", "", "Artist")}
+      ${textField("newProjectTitle", "Title", "", "Title", { visibleLabel: false })}
+      ${textField("newProjectArtist", "Artist", "", "Artist", { visibleLabel: false })}
     </div>
     <div class="sheet-actions">
       <button class="sheet-close" data-action="close-sheet">Cancel</button>
@@ -327,7 +338,7 @@ function newProjectFields() {
 }
 
 function openNewProjectSheet() {
-  openSheet(`<div class="grabber"></div><h2>New Project</h2>${projectTypeControl("original")}${newProjectFields()}`, { type: "new-project", projectType: "original" }, "New Project");
+  openSheet(`${projectTypeControl("original")}${newProjectFields()}`, { type: "new-project", projectType: "original" }, "New Project");
 }
 
 function chooseProjectType(type) {
@@ -371,7 +382,6 @@ function sectionBarsControls(selectedBars) {
 function openAddSectionSheet() {
   const choices = [...SECTION_TYPES, "Custom"].map((name) => `<button class="sheet-choice" data-action="choose-section-type" data-name="${esc(name)}" aria-pressed="false">${esc(name)}</button>`).join("");
   openSheet(`
-    <div class="grabber"></div>
     <h2>Add Section</h2>
     <div class="sheet-grid section-types">${choices}</div>
     <div id="customSectionArea" hidden>${textField("customSectionName", "Section name", "", "Section name")}</div>
@@ -448,7 +458,7 @@ function addSectionFromSheet() {
 }
 
 function openCustomTrackSheet() {
-  openSheet(`<div class="grabber"></div><h2>Add Track</h2>${textField("customTrackInput", "Track name", "", "Track name")}<div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="add-custom-track" disabled>Add</button></div>`, { type: "custom-track" }, "Add Track");
+  openSheet(`<h2>Add Track</h2><div class="stack-fields">${textField("customTrackInput", "Track name", "", "Track name", { visibleLabel: false })}</div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="add-custom-track" disabled>Add</button></div>`, { type: "custom-track" }, "Add Track");
 }
 
 function syncCustomTrackAction() {
@@ -464,7 +474,7 @@ function openEditSectionSheet(sectionId) {
   const standard = [4, 8, 12, 16];
   const custom = !standard.includes(selectedBars);
   openSheet(`
-    <div class="grabber"></div><h2>Edit Section</h2>
+    <h2>Edit Section</h2>
     <div class="stack-fields">${textField("editSectionName", "Name", section.name, "Section name")}</div>
     ${sectionBarsControls(selectedBars)}
     <div id="customBarsArea" ${custom ? "" : "hidden"}><label class="field-label" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" value="${custom ? selectedBars : ""}"></div>
@@ -472,17 +482,27 @@ function openEditSectionSheet(sectionId) {
   { type: "edit-section", sectionId, bars: custom ? "custom" : selectedBars }, "Edit Section");
 }
 
-function openProjectActions() {
-  const item = project();
+function openProjectActions(projectId = db.currentProjectId) {
+  const item = projectById(projectId);
   if (!item) return;
-  const reset = item.type === "study" ? `<button class="row" data-action="reset-project-preview"><span class="row-title">Reset Progress</span><span></span></button>` : "";
-  openSheet(`<div class="grabber"></div><div class="group"><button class="row" data-action="edit-project"><span class="row-title">Edit Details</span><span class="chevron">›</span></button>${reset}<button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete Project</span><span></span></button></div><div class="sheet-actions single-action"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions" }, "Project actions");
+  const reset = item.type === "study" ? `<button class="row" data-action="reset-project-preview"><span class="row-title">Reset</span><span></span></button>` : "";
+  openSheet(`<div class="group action-menu"><button class="row" data-action="edit-project"><span class="row-title">Edit</span><span></span></button>${reset}<button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete</span><span></span></button></div><div class="sheet-actions single-action"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions", projectId: item.id }, "Project actions");
 }
 
-function openEditProjectSheet() {
-  const item = project();
+function openEditProjectSheet(projectId = sheetState?.projectId || db.currentProjectId) {
+  const item = projectById(projectId);
   if (!item) return;
-  openSheet(`<div class="grabber"></div><h2>Edit Details</h2><div class="stack-fields">${textField("editProjectTitle", "Title", item.title, "Title")}${textField("editProjectArtist", "Artist", item.artist || "", "Artist")}</div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="save-project">Save</button></div>`, { type: "edit-project" }, "Edit Details");
+  openSheet(`<div class="stack-fields">${textField("editProjectTitle", "Title", item.title, "Title", { visibleLabel: false })}${textField("editProjectArtist", "Artist", item.artist || "", "Artist", { visibleLabel: false })}</div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="save-project">Save</button></div>`, { type: "edit-project", projectId: item.id }, "Edit project");
+}
+
+function openProjectConfirmation(kind, projectId) {
+  const item = projectById(projectId);
+  if (!item) return;
+  if (kind === "reset") {
+    openSheet(`<h2>Reset progress?</h2><p class="sheet-message">This clears Song Setup, Structure, and Tracks.</p><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary sheet-danger-button" data-action="confirm-reset-project">Reset</button></div>`, { type: "confirm-reset-project", projectId: item.id }, "Reset progress");
+    return;
+  }
+  openSheet(`<h2>Delete project?</h2><p class="sheet-message">${esc(item.title)} will be permanently deleted.</p><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary sheet-danger-button" data-action="confirm-delete-project">Delete</button></div>`, { type: "confirm-delete-project", projectId: item.id }, "Delete project");
 }
 
 function moveSection(sectionId, direction) {
@@ -547,11 +567,7 @@ function finishReorder(event, cancelled = false) {
 app.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
-  if (button.dataset.projectActions) {
-    db.currentProjectId = button.dataset.projectActions;
-    save();
-    return openProjectActions();
-  }
+  if (button.dataset.projectActions) return openProjectActions(button.dataset.projectActions);
   if (button.dataset.project) {
     db.currentProjectId = button.dataset.project;
     save();
@@ -581,10 +597,15 @@ app.addEventListener("click", (event) => {
     const index = item.map.tracks.findIndex((track) => track.name === name);
     if (index >= 0) item.map.tracks.splice(index, 1);
     else item.map.tracks.push({ id: uid(), name });
+    item.map.tracksVerified = false;
     noteActivity(item); save(); return renderTracks();
   }
   if (action === "open-custom-track") return openCustomTrackSheet();
-  if (action === "finish-map") return navigate("project", "replace");
+  if (action === "finish-map") {
+    if (!item.map.tracks.length) return;
+    item.map.tracksVerified = true;
+    noteActivity(item); save(); return navigate("project", "replace");
+  }
 });
 
 app.addEventListener("input", (event) => {
@@ -634,7 +655,7 @@ sheetRoot.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
   const action = button.dataset.action;
-  const item = project();
+  const item = sheetState?.projectId ? projectById(sheetState.projectId) : project();
   if (action === "close-sheet") return closeSheet();
   if (action === "choose-project-type") return chooseProjectType(button.dataset.projectType);
   if (action === "create-project") return createProject();
@@ -645,6 +666,7 @@ sheetRoot.addEventListener("click", (event) => {
     const name = clean(document.getElementById("customTrackInput")?.value);
     if (!name || item.map.tracks.some((track) => track.name.toLowerCase() === name.toLowerCase())) return;
     item.map.tracks.push({ id: uid(), name });
+    item.map.tracksVerified = false;
     noteActivity(item); save(); closeSheet(); return renderTracks();
   }
   if (action === "save-section") {
@@ -671,7 +693,7 @@ sheetRoot.addEventListener("click", (event) => {
     item.map.structureVerified = false;
     noteActivity(item); save(); closeSheet(); return renderStructure();
   }
-  if (action === "edit-project") return openEditProjectSheet();
+  if (action === "edit-project") return openEditProjectSheet(item.id);
   if (action === "save-project") {
     const title = clean(document.getElementById("editProjectTitle")?.value);
     const artist = clean(document.getElementById("editProjectArtist")?.value);
@@ -680,15 +702,21 @@ sheetRoot.addEventListener("click", (event) => {
     item.artist = artist;
     noteActivity(item); save(); closeSheet(); return render();
   }
-  if (action === "reset-project-preview") {
-    resetPreviewProject(item); save(); closeSheet(); return render();
+  if (action === "reset-project-preview") return openProjectConfirmation("reset", item.id);
+  if (action === "delete-project-preview") return openProjectConfirmation("delete", item.id);
+  if (action === "confirm-reset-project") {
+    resetPreviewProject(item);
+    save(); closeSheet();
+    return currentRoute === "projects" ? renderProjects() : render();
   }
-  if (action === "delete-project-preview") {
+  if (action === "confirm-delete-project") {
+    const deletingCurrent = db.currentProjectId === item.id;
     db.projects = db.projects.filter((entry) => entry.id !== item.id);
-    db.currentProjectId = sortedProjects().find((entry) => entry.id !== item.id)?.id || db.projects[0]?.id || null;
+    if (deletingCurrent) db.currentProjectId = sortedProjects()[0]?.id || null;
     save(); closeSheet();
     if (currentRoute === "projects") return renderProjects();
-    return navigate("projects", "replace");
+    if (deletingCurrent) return navigate("projects", "replace");
+    return render();
   }
 });
 
