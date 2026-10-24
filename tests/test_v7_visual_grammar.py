@@ -1,4 +1,4 @@
-"""Visual-grammar regressions for the isolated FIRE G7 preview shell."""
+"""Rhythm, navigation, and visual-grammar regressions for the isolated FIRE G7 preview shell."""
 import json
 import os
 import unittest
@@ -101,58 +101,157 @@ class V7VisualGrammar(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         return page
 
-    def test_project_form_groups_fields_and_cancel_has_button_shape(self):
+    def test_project_field_focus_belongs_to_outer_group(self):
         page = self.open("projects", empty_db())
         page.get_by_role("button", name="New Project").click()
-        expect(page.locator(".project-field-group")).to_be_visible()
-        self.assertEqual(page.locator(".project-field-group .project-field-row").count(), 2)
-        self.assertEqual(page.locator(".project-field-group").get_by_role("textbox").count(), 2)
-        cancel = page.get_by_role("button", name="Cancel")
-        self.assertEqual(cancel.evaluate("el => getComputedStyle(el).borderTopStyle"), "solid")
-        self.assertGreater(float(cancel.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")), 0)
+        group = page.locator(".project-field-group")
+        title = page.get_by_role("textbox", name="Title")
+        title.focus()
+        self.assertEqual(title.evaluate("el => getComputedStyle(el).boxShadow"), "none")
+        self.assertGreater(
+            float(group.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")),
+            0,
+        )
+        self.assertNotEqual(group.evaluate("el => getComputedStyle(el).boxShadow"), "none")
 
-    def test_structure_add_moves_to_toolbar_and_verification_is_separate_surface(self):
+    def test_grouped_page_rows_share_one_64px_rhythm(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
-        page = self.open("structure", study_db(sections=sections))
-        add = page.get_by_role("button", name="Add Section")
-        expect(add).to_be_visible()
-        self.assertEqual(add.evaluate("el => el.closest('.toolbar') !== null"), True)
-        self.assertEqual(page.locator(".arrangement").get_by_text("Add Section", exact=True).count(), 0)
-        expect(page.locator(".structure-verification")).to_be_visible()
-        self.assertEqual(page.locator(".structure-verification").evaluate("el => getComputedStyle(el).backgroundColor"), page.locator(".arrangement").evaluate("el => getComputedStyle(el).backgroundColor"))
+        data = study_db(setup=True, sections=sections, verified=True)
+        pages = {
+            "projects": (self.open("projects", data), ".project-card"),
+            "home": (self.open("project", data), ".journey-row"),
+            "setup": (self.open("setup", data), ".form-row"),
+            "structure": (self.open("structure", data), ".arrangement-row"),
+            "verification": (self.open("structure", data), ".structure-confirm-row"),
+        }
+        heights = {}
+        for name, (page, selector) in pages.items():
+            heights[name] = float(page.locator(selector).first.evaluate("el => parseFloat(getComputedStyle(el).minHeight)"))
+        self.assertEqual(set(heights.values()), {64.0})
 
-    def test_projects_and_structure_share_row_rhythm_without_fake_accessories(self):
-        projects = self.open("projects")
-        project_height = projects.locator(".project-card").first.evaluate("el => getComputedStyle(el).minHeight")
-        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
-        structure = self.open("structure", study_db(sections=sections))
-        section_height = structure.locator(".arrangement-row").first.evaluate("el => getComputedStyle(el).minHeight")
-        self.assertEqual(project_height, section_height)
-        self.assertEqual(structure.locator(".arrangement-row .more-button").count(), 0)
-        expect(structure.get_by_role("button", name="Reorder Intro")).to_be_visible()
-
-    def test_choice_tile_family_is_shared_between_tracks_section_types_and_bars(self):
+    def test_connected_selection_surfaces_share_cell_geometry(self):
         tracks = self.open("tracks")
         track = tracks.locator('.track-tile[data-name="Vocal"]')
-        track_radius = track.evaluate("el => getComputedStyle(el).borderRadius")
-        track_height = track.evaluate("el => getComputedStyle(el).minHeight")
+        track_height = float(track.evaluate("el => parseFloat(getComputedStyle(el).minHeight)"))
+        self.assertEqual(track_height, 52.0)
+        self.assertEqual(track.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        expect(tracks.locator(".track-grid.selection-surface")).to_be_visible()
 
         structure = self.open("structure")
         structure.get_by_role("button", name="Add Section").click()
         intro = structure.get_by_role("button", name="Intro")
-        bar = structure.get_by_role("button", name="8", exact=True)
-        self.assertIn("choice-tile", intro.get_attribute("class"))
-        self.assertIn("choice-tile", bar.get_attribute("class"))
-        self.assertEqual(intro.evaluate("el => getComputedStyle(el).borderRadius"), track_radius)
-        self.assertEqual(intro.evaluate("el => getComputedStyle(el).minHeight"), track_height)
-        intro.click()
-        tracks.locator('.track-tile[data-name="Vocal"]').click()
-        self.assertEqual(
-            intro.evaluate("el => getComputedStyle(el).backgroundColor"),
-            tracks.locator('.track-tile[data-name="Vocal"]').evaluate("el => getComputedStyle(el).backgroundColor"),
-        )
+        self.assertEqual(float(intro.evaluate("el => parseFloat(getComputedStyle(el).minHeight)")), track_height)
+        expect(structure.locator(".section-types.selection-surface")).to_be_visible()
+        expect(structure.locator(".bars-grid.segmented-control")).to_be_visible()
+        self.assertEqual(structure.locator(".bars-grid .segment-option").count(), 5)
 
-    def test_context_redundant_sheet_titles_are_removed_but_warning_titles_remain(self):
+    def test_tracks_and_structure_use_toolbar_plus_without_fake_other_row(self):
+        structure = self.open("structure")
+        structure_add = structure.get_by_role("button", name="Add Section")
+        self.assertTrue(structure_add.evaluate("el => el.closest('.toolbar') !== null"))
+
+        tracks = self.open("tracks")
+        track_add = tracks.get_by_role("button", name="Add Track")
+        self.assertTrue(track_add.evaluate("el => el.closest('.toolbar') !== null"))
+        self.assertEqual(tracks.get_by_role("button", name="Other").count(), 0)
+
+    def test_structure_rows_do_not_fake_completion_or_project_accessories(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        page = self.open("structure", study_db(sections=sections))
+        row = page.locator(".arrangement-row")
+        self.assertEqual(row.locator(".checkmark").count(), 0)
+        self.assertEqual(row.locator(".chevron").count(), 0)
+        self.assertEqual(row.locator(".more-button").count(), 0)
+        expect(page.get_by_role("button", name="Reorder Intro")).to_be_visible()
+
+    def test_concise_work_labels_are_current(self):
+        home = self.open("project")
+        expect(home.get_by_role("button", name="Setup")).to_be_visible()
+        self.assertEqual(home.get_by_text("Song Setup", exact=True).count(), 0)
+
+        setup = self.open("setup")
+        expect(setup.locator(".title-block h1")).to_have_text("Setup")
+        expect(setup.get_by_text("Listen", exact=True)).to_be_visible()
+        self.assertEqual(setup.get_by_text("First Listen", exact=True).count(), 0)
+
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        structure = self.open("structure", study_db(sections=sections))
+        expect(structure.get_by_text("Accurate", exact=True)).to_be_visible()
+        self.assertEqual(structure.get_by_text("Matches the song", exact=True).count(), 0)
+
+    def test_toolbar_to_title_gap_is_tight_and_consistent(self):
+        pages = [self.open("projects"), self.open("project"), self.open("structure")]
+        gaps = []
+        for page in pages:
+            toolbar = page.locator(".toolbar").bounding_box()
+            title = page.locator(".title-block").bounding_box()
+            gaps.append(round(title["y"] - (toolbar["y"] + toolbar["height"]), 1))
+        self.assertLessEqual(max(gaps), 8.0)
+        self.assertLessEqual(max(gaps) - min(gaps), 1.0)
+
+    def test_work_completion_actions_share_lower_page_action_region(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        setup = self.open("setup", study_db(setup=True))
+        structure = self.open("structure", study_db(sections=sections, verified=True))
+        tracks = self.open("tracks", study_db(tracks=[{"id": "t1", "name": "Vocal"}]))
+        for page, label in ((setup, "Continue"), (structure, "Continue"), (tracks, "Done")):
+            footer = page.locator(".page-action-footer")
+            expect(footer.get_by_role("button", name=label)).to_be_visible()
+            self.assertTrue(footer.evaluate("el => el.closest('.work-screen') !== null"))
+
+    def test_visible_back_retraces_actual_work_path(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        data = study_db(
+            setup=True,
+            sections=sections,
+            verified=True,
+            tracks=[{"id": "t1", "name": "Vocal"}],
+            tracks_verified=False,
+        )
+        page = self.open("project", data)
+        page.get_by_role("button", name="Setup").click()
+        expect(page.locator(".title-block h1")).to_have_text("Setup")
+        page.get_by_role("button", name="Continue").click()
+        expect(page.locator(".title-block h1")).to_have_text("Structure")
+        page.get_by_role("button", name="Continue").click()
+        expect(page.locator(".title-block h1")).to_have_text("Tracks")
+
+        page.locator(".icon-back").click()
+        expect(page.locator(".title-block h1")).to_have_text("Structure")
+        page.locator(".icon-back").click()
+        expect(page.locator(".title-block h1")).to_have_text("Setup")
+        page.locator(".icon-back").click()
+        expect(page.locator(".title-block h1")).to_have_text("Smithereens")
+
+    def test_direct_work_entry_backs_to_home_and_browser_back_agrees(self):
+        page = self.open("project")
+        page.get_by_role("button", name="Tracks").click()
+        expect(page.locator(".title-block h1")).to_have_text("Tracks")
+        page.locator(".icon-back").click()
+        expect(page.locator(".title-block h1")).to_have_text("Smithereens")
+
+        page.get_by_role("button", name="Structure").click()
+        expect(page.locator(".title-block h1")).to_have_text("Structure")
+        page.go_back()
+        expect(page.locator(".title-block h1")).to_have_text("Smithereens")
+
+    def test_done_returns_home_without_creating_back_loop(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        data = study_db(
+            setup=True,
+            sections=sections,
+            verified=True,
+            tracks=[{"id": "t1", "name": "Vocal"}],
+            tracks_verified=False,
+        )
+        page = self.open("project", data)
+        page.get_by_role("button", name="Tracks").click()
+        page.get_by_role("button", name="Done").click()
+        expect(page.locator(".title-block h1")).to_have_text("Smithereens")
+        page.locator(".icon-back").click()
+        expect(page.locator(".title-block h1")).to_have_text("Projects")
+
+    def test_context_redundant_sheet_titles_remain_removed(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
         structure = self.open("structure", study_db(sections=sections))
         structure.get_by_role("button", name="Add Section").click()
@@ -165,18 +264,6 @@ class V7VisualGrammar(unittest.TestCase):
         projects.get_by_role("button", name="Actions for Smithereens").click()
         projects.get_by_role("button", name="Delete", exact=True).click()
         expect(projects.locator(".sheet h2")).to_have_text("Delete project?")
-
-    def test_work_completion_actions_share_page_action_footer(self):
-        setup = self.open("setup", study_db(setup=True))
-        expect(setup.locator(".page-action-footer").get_by_role("button", name="Continue")).to_be_visible()
-
-        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
-        structure = self.open("structure", study_db(sections=sections, verified=True))
-        expect(structure.locator(".page-action-footer").get_by_role("button", name="Continue")).to_be_visible()
-
-        tracks_data = study_db(tracks=[{"id": "t1", "name": "Vocal"}])
-        tracks = self.open("tracks", tracks_data)
-        expect(tracks.locator(".page-action-footer").get_by_role("button", name="Done")).to_be_visible()
 
 
 if __name__ == "__main__":
