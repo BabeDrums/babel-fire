@@ -1,0 +1,239 @@
+/* G7 Shell Certification pass 1
+   Shared primitive refinements. This file is loaded by both real G7 and Shell Test. */
+
+:root {
+  --accessory-box: 28px;
+  --accessory-glyph: 18px;
+  --toolbar-control-radius: 13px;
+}
+
+/* Canonical toolbar action geometry. Keep the hit target stable; optically center the glyph inside it. */
+.toolbar-button {
+  position: relative;
+  border-radius: var(--toolbar-control-radius);
+}
+.add-button,
+.more-button {
+  display: inline-grid;
+  place-items: center;
+  text-align: center;
+  padding: 0;
+}
+.add-button {
+  font-size: 0;
+}
+.add-button::before {
+  content: "+";
+  display: block;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+.more-button {
+  font-size: 0;
+  letter-spacing: 0;
+}
+.more-button::before {
+  content: "•••";
+  display: block;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 1px;
+  transform: translateY(-2px);
+}
+
+/* Project-row management is an accessory, not a second divided column. */
+.project-card-actions {
+  justify-self: center;
+  border-left: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+/* Canonical trailing accessory slot. Semantic symbols differ; geometry does not. */
+.row,
+.form-row {
+  grid-template-columns: minmax(0, 1fr) var(--accessory-box);
+}
+.row > :last-child,
+.form-row > :last-child {
+  justify-self: center;
+}
+.journey-row {
+  grid-template-columns: minmax(0, 1fr) var(--accessory-box);
+}
+.journey-mark,
+.chevron,
+.checkmark,
+.completion-ring,
+.shell-accessory {
+  width: var(--accessory-box);
+  height: var(--accessory-box);
+  min-width: var(--accessory-box);
+  display: inline-grid;
+  place-items: center;
+  justify-self: center;
+  line-height: 1;
+}
+.journey-mark {
+  font-size: var(--accessory-glyph);
+  text-align: center;
+}
+.journey-mark.done {
+  font-size: 0;
+  font-weight: 800;
+}
+.journey-mark.done::before {
+  content: "✓";
+  font-size: 13px;
+}
+.journey-mark.done,
+.checkmark {
+  border-radius: 50%;
+  background: #e5e5ea;
+  color: #111114;
+}
+.journey-mark.current {
+  font-size: 0;
+  border-radius: 50%;
+  border: 1.5px solid #777881;
+}
+.journey-mark.current::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d9d9de;
+}
+.journey-mark.upcoming,
+.completion-ring {
+  border-radius: 50%;
+  border: 1.5px solid #55565f;
+  background: transparent;
+}
+.journey-mark.upcoming {
+  font-size: 0;
+}
+.checkmark,
+.completion-ring {
+  width: var(--accessory-box);
+  height: var(--accessory-box);
+}
+.checkmark {
+  font-size: 13px;
+}
+.chevron {
+  font-size: 22px;
+  color: var(--quiet);
+  transform: translateX(1px);
+}
+.reorder-handle {
+  width: var(--touch);
+  height: var(--touch);
+  font-size: 0;
+}
+.reorder-handle::before {
+  content: "≡";
+  font-size: 21px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+/* Modal/dialog composition: stronger conceptual grouping, quieter material, stable actions. */
+.sheet {
+  background: #19191d;
+  box-shadow: 0 -20px 64px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.025);
+}
+.sheet-content-group + .sheet-content-group {
+  margin-top: 24px;
+}
+.sheet-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+.sheet-actions.single-action {
+  margin-top: 16px;
+}
+.sheet-button {
+  min-height: 48px;
+}
+
+/* Shell Test infrastructure. It deliberately uses the same primitives above. */
+.shell-test-screen {
+  padding-bottom: 96px;
+}
+.shell-test-intro {
+  max-width: 42rem;
+  margin: -4px 0 28px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.shell-test-section {
+  margin-top: 30px;
+}
+.shell-test-section:first-of-type {
+  margin-top: 0;
+}
+.shell-test-heading {
+  margin: 0 0 10px;
+  color: #c9c9d0;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.shell-test-note {
+  margin: 10px 2px 0;
+  color: var(--quiet);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.shell-test-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.shell-test-actions .primary-action,
+.shell-test-actions .sheet-button {
+  min-width: 0;
+}
+.shell-test-row-long .row-title {
+  overflow: visible;
+  white-space: normal;
+  line-height: 1.25;
+}
+.shell-test-density {
+  display: grid;
+  gap: 12px;
+}
+.shell-test-density .placeholder-state {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+}
+.shell-test-disabled {
+  opacity: .42;
+}
+.shell-test-link {
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.shell-test-link:focus-visible {
+  outline: 2px solid #d9d9df;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (min-width: 700px) {
+  .sheet {
+    box-shadow: 0 24px 80px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.025);
+  }
+  .shell-test-screen {
+    padding-bottom: 120px;
+  }
+}
