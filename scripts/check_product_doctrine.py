@@ -1,7 +1,7 @@
 """Protect durable FIRE/Babel authority wiring and known stale definitions.
 
 This guard checks stable markers and explicit stale contradictions. It intentionally does
-not encode temporary PR/review prose beyond the current baseline handoff facts.
+not encode temporary merge SHAs, but it does require the current shell-routing/gate language.
 """
 from pathlib import Path
 
@@ -40,15 +40,15 @@ REQUIRED = {
     ],
     "START_HERE.md": [
         "BABEL_TRUTH.md",
-        "PR **#60",
-        "G7 live, NOT frozen",
-        "Latest real-device review after #60",
-        "Modal + row consistency consolidation",
+        "G7 shell-cohesion pass awaiting physical review",
+        "PR **#66",
+        "PR **#67",
+        "G7 is not physically approved/frozen",
         "Babel Truth Issue #1",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
-        "Tracks selection uses fill without redundant selection checks",
-        "Structure removes the visible ordinal column",
+        "coordinated shell iteration stays in G7",
+        "Lab is evidence, never authority",
     ],
     "BABEL_START_HERE.md": [
         "BABEL_TRUTH.md",
@@ -110,6 +110,7 @@ FORBIDDEN = {
         "Current rhythm/navigation refinement contract",
         "Tracks still shows redundant selection checkmarks in the current implementation",
         "visible Structure ordinal numbers push section names",
+        "Pause further exploratory shell styling in the product while Lab develops a candidate",
     ],
     "BABEL_START_HERE.md": [
         "`CONTINUITY_INBOX.md` is a low-authority capture buffer",

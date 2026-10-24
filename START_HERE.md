@@ -13,7 +13,7 @@ Use **Babel** as the project-facing name.
 7. Babel Truth Issue #1 body **plus newer comments** for unresolved FIRE items
 8. code/tests as implementation evidence
 
-## Current state — G7 live, NOT frozen
+## Current state — G7 shell-cohesion pass awaiting physical review
 
 Production remains V6.
 
@@ -21,9 +21,11 @@ G7 remains the isolated successor preview at `/v7-preview/` using `production-pr
 
 PR **#63 — Refine G7 shell clarity after physical review** is merged at `a39b306b02c66c3cd3ed9749005af9966780e617`.
 
-Physical review found the shell materially closer but **not ready to freeze**. The remaining work is coordinated shell visual-language refinement: modal/surface treatment, hierarchy, spacing/density, component cohesion, management affordances, focus/keyboard behavior, and responsive physical-device polish.
+PR **#66 — Return coordinated shell iteration to G7** is merged. The full-shell Lab replica is rejected evidence; coordinated FIRE shell work belongs in the real isolated G7 context.
 
-**G7 is not physically approved/frozen. FIRE Core breadboarding has not started.**
+PR **#67 — Refine G7 shell cohesion after physical review** is the current implementation pass. It tightens the shared toolbar/title relationship, integrates project-row management, normalizes typography/value-control treatment, and stabilizes sheet action composition. It does not change FIRE Core architecture or V6 data/runtime.
+
+**G7 is not physically approved/frozen. FIRE Core breadboarding has not started.** The next gate is real-device review of the deployed #67 result after merge.
 
 ## Current routing — coordinated shell iteration stays in G7
 
@@ -78,16 +80,18 @@ Existing interaction semantics remain useful evidence:
 
 ## Current physical-review targets
 
-Continue from the last real G7 review rather than from the Lab replica. Pay particular attention to:
+Review the #67 shell-cohesion result on real iPhone Safari first, then sanity-check iPad. Pay particular attention to:
 
-- whether the project-card `•••` management affordance feels integrated rather than stapled on
-- the Tempo input focus/keyboard appearance on physical iPhone
-- whether headers/text hierarchy feel like one coherent system
+- whether the lowered/integrated toolbar `+` now feels attached to the page rather than stranded at the top edge
+- whether project-card `•••` feels integrated into the row while remaining discoverable and tappable
+- whether New/Edit Project Return/Next behavior feels natural on the actual iPhone keyboard
+- whether Tempo focus/keyboard appearance now feels like part of the value-control system
+- whether headers, metadata, row labels, and work-page titles feel like one coherent typography hierarchy
+- whether Cancel now reads as a real secondary action beside Create/Save/Add
 - modal/surface language across iPhone bottom-sheet and iPad centered-dialog presentations
 - spacing/density on both sparse and content-heavy pages
 - consistent row/control geometry and selection language
 - sparse pages should not scroll unnecessarily; dense pages should scroll naturally
-- remove the internal Original placeholder phrase `FIRE Core spine` when the shell is next touched
 
 Repeated defects should be solved as component/system defects rather than patched independently on every page.
 
