@@ -174,8 +174,10 @@ h2 { margin: 0; font-size: 23px; line-height: 1.15; letter-spacing: -.025em; fon
   width: var(--touch);
   height: var(--touch);
   min-width: var(--touch);
-  justify-self: center;
+  justify-self: stretch;
   border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
   background: transparent;
   box-shadow: none;
   color: var(--quiet);
