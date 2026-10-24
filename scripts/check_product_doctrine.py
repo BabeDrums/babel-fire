@@ -47,6 +47,8 @@ REQUIRED = {
         "Babel Truth Issue #1",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
+        "Tracks selection uses fill without redundant selection checks",
+        "Structure removes the visible ordinal column",
     ],
     "BABEL_START_HERE.md": [
         "BABEL_TRUTH.md",
@@ -87,11 +89,13 @@ REQUIRED = {
         "## Physical rhythm and visual grammar primitives",
         "## State and accessory grammar",
         "## Navigation and Back behavior",
-        "Grouped surface",
+        "Shared row-content grid",
         "Selection surface",
         "Segmented control",
         "Page action footer",
         "Accurate",
+        "does **not** add redundant checkmarks",
+        "Visible ordinal numbers are removed",
     ],
 }
 
@@ -104,6 +108,8 @@ FORBIDDEN = {
         "PR **#59** is the last merged/deployed G7 baseline",
         "Latest physical-device review after #59",
         "Current rhythm/navigation refinement contract",
+        "Tracks still shows redundant selection checkmarks in the current implementation",
+        "visible Structure ordinal numbers push section names",
     ],
     "BABEL_START_HERE.md": [
         "`CONTINUITY_INBOX.md` is a low-authority capture buffer",
@@ -123,6 +129,8 @@ FORBIDDEN = {
         "current Cover shell work remains **Song Setup → Structure → Tracks**",
         "`Matches the song` is a separate grouped verification surface",
         "`Other` belongs to the same selection surface",
+        "Tracks is the multi-select variant and adds visible checks to selected choices",
+        "- index\n- section name",
     ],
 }
 
