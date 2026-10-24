@@ -30,6 +30,7 @@ The shell is the reusable interaction and layout grammar: headers, navigation, s
 12. **Different meaning may use different accessories.** Visual unity does not justify fake chevrons, menus, completion marks, or reorder affordances.
 13. **Physical rhythm is a system, not a page decision.** Repeated row/control geometry comes from shared tokens rather than one-off heights and gaps.
 14. **Back means where the musician actually came from.** Visible Back and browser/history Back must agree whenever G7 has a usable in-app route history.
+15. **State must not move the object.** Repeated labels keep the same typography and anchor across current/done/upcoming/selected state; state uses fill, color, or a semantic accessory instead.
 
 ## Interaction grammar
 
@@ -45,11 +46,13 @@ Consistency comes from semantic meaning, not from forcing every interaction into
 G7 should not accumulate one-off versions of the same control. Reuse these families and geometry rules:
 
 - **Grouped surface** — one material/radius/separator language for Projects, Project Home progression, Setup, Structure arrangement, verification, and other row-based collections. The canonical grouped page-row height is **64px**; accessories may differ by function.
-- **Selection surface** — one connected outer rounded container with internal hairline dividers for direct option sets. Section types and Tracks share this family. Canonical selection-cell height is **52px**. Section type is single-select; Tracks is multi-select and may add checks.
-- **Segmented control** — compact mutually exclusive choices such as **Original / Cover** and **4 / 8 / 12 / 16 / Custom** bars. The segments share one outer container instead of becoming five independent rounded buttons.
+- **Shared row-content grid** — primary row labels use one stable leading inset/typography role; trailing metadata and accessories occupy predictable slots rather than pushing the label around. Project Home state changes must not change label weight.
+- **Selection surface** — one connected outer rounded container with internal hairline dividers for direct option sets. The parent owns the outer border/radius. Child choices remain square to that parent and communicate selection through fill/contrast rather than nested outlines. Section types and Tracks share this family. Canonical selection-cell height is **52px**. Section type is single-select; Tracks is multi-select.
+- **Segmented control** — compact mutually exclusive choices such as **Original / Cover** and **4 / 8 / 12 / 16 / Custom** bars. The parent owns the outer geometry; segments do not draw competing rounded outlines.
 - **Page action footer** — the final non-sticky region of a work page for Continue/Done. Short pages use flexible document space so the action naturally occupies a stable lower region; long pages push it below the content and scroll normally.
-- **Sheet action hierarchy** — primary actions are filled; secondary/cancel actions remain quieter but retain a discernible button shape; destructive actions use the same geometry with danger treatment.
-- **Spacing scale** — prefer the shared 4 / 8 / 12 / 16 / 20 / 24 rhythm rather than arbitrary page-specific gaps.
+- **Sheet action hierarchy** — primary actions are filled; secondary/cancel actions remain quieter but retain a discernible button shape; destructive actions use the same geometry with danger treatment. Paired form actions use the shared two-action composition; a standalone action-sheet Cancel spans the same content width as the action group above it rather than becoming a small centered control.
+- **Sheet spacing grammar** — sheet inset and distinct conceptual-group separation use the stronger rhythm; tightly related controls use the smaller rhythm. Current G7 uses a **20px** major-group/inset rhythm and a **16px** content-to-action gap where that relationship applies.
+- **Spacing scale** — prefer the shared 4 / 8 / 12 / 16 / 20 / 24 rhythm rather than arbitrary page-specific gaps. Optical exceptions are allowed when deliberate.
 
 Do not visually clone unrelated controls just to make screenshots symmetrical.
 
@@ -59,14 +62,14 @@ Use visual marks only when their meaning is true:
 
 - `○` = incomplete/upcoming progression state
 - `→` = current/recommended progression state
-- `✓` = completed progression state or explicitly selected multi-select choice, according to context
+- `✓` = completed progression/state where completion is actually true
 - selected fill = chosen option
 - drag handle = reorderable object
 - chevron = navigation deeper
 - `•••` = management/actions
 - `+` = create/add the primary discrete object for the current view
 
-A Structure section row is an arrangement object, not a completed task, so merely existing does **not** earn a checkmark.
+A Structure section row is an arrangement object, not a completed task, so merely existing does **not** earn a checkmark. Tracks selection is already clear through selected fill and does **not** add redundant checkmarks.
 
 ## Header and title scaffold
 
@@ -132,6 +135,7 @@ New Project opens in one stable sheet. Do not reveal required fields only after 
 - Title/Artist remain the input placeholders and accessible semantic labels so clearing a field restores visible context and assistive technology still receives the field meaning
 - Title/Artist focus belongs to the **outer grouped field surface**; individual rectangular focus rings must not clip/cut the rounded group corners
 - the focused row may receive a subtle internal state, but the group keeps one clean rounded focus emphasis
+- **Original / Cover → Title/Artist** uses the stronger major-group gap; Title/Artist → actions uses the standard action gap rather than repeating the same spacing everywhere
 - text/name inputs request word capitalization from the mobile keyboard with `autocapitalize="words"`
 - do not programmatically force title casing; intentional stylization must remain possible
 - avoid aggressive autocorrection for song/artist/section/track names
@@ -148,7 +152,7 @@ Project Home answers: what project is this, and what deserves attention next?
 - current Cover shell work is **Setup → Structure → Tracks**
 - all current mapping steps live in **one coherent progression group** rather than splitting the recommended step into a separate card
 - progression rows use the same 64px grouped-row rhythm as the other page-level groups
-- completed steps use a quiet completed state, the current step is visually strongest, and upcoming work stays understandable without competing
+- completed/current/upcoming state changes color/fill/accessory emphasis without changing the row label's size/weight/anchor
 - the progression itself communicates completion; do not add a separate `Song map complete.` card when all three checked rows already say the same thing
 - no helper sentence under the current destination when the title/state already explains it
 - no visible `Continue` or `Journey` taxonomy
@@ -167,7 +171,9 @@ Current Cover shell workspaces:
 - Structure
 - Tracks
 
-All use the shared header/title scaffold. Default helper copy is removed when the controls are self-explanatory. When a work page exposes a final Continue/Done action, it uses the shared non-sticky page action footer and flexible document layout rather than inventing page-specific placement.
+All use the shared header/title scaffold. Their first primary content surface begins at the same vertical anchor so moving Setup → Structure → Tracks does not make the work area jump. Default helper copy is removed when the controls are self-explanatory. When a work page exposes a final Continue/Done action, it uses the shared non-sticky page action footer and flexible document layout rather than inventing page-specific placement.
+
+Projects → Project Home may retain an intentional hierarchy change because Project Home carries project identity metadata; do not delete useful context merely to force mathematical alignment with the root library.
 
 ### Setup
 
@@ -179,7 +185,7 @@ One grouped surface using the shared 64px row rhythm:
 - Grid
 - Listen
 
-Tempo remains an inline value field with 16px+ input behavior and an integrated focus treatment. Continue appears only when canonical setup requirements are satisfied and uses the shared page action footer.
+Setup labels use the shared primary row-label role/leading inset. Tempo remains an inline value field with 16px+ input behavior and an integrated focus treatment. Continue appears only when canonical setup requirements are satisfied and uses the shared page action footer.
 
 The data field may remain named `firstListen` internally for compatibility; the musician-facing row is simply **Listen**.
 
@@ -187,12 +193,13 @@ The data field may remain named `firstListen` internally for compatibility; the 
 
 Structure is an ordered arrangement, not a two-step create-then-fix workflow.
 
-Arrangement rows use the same 64px grouped-row physical rhythm as Projects while retaining Structure-specific accessories. They show:
+Arrangement rows use the same 64px grouped-row physical rhythm and primary label anchor as Setup while retaining Structure-specific semantics. Visible rows show:
 
-- index
 - section name
 - bar length
 - permanent reorder handle
+
+Visible ordinal numbers are removed because vertical order already communicates sequence and the number column pushed section labels off the shared text anchor. Accessible edit/reorder labels preserve the section ordinal so assistive interaction still has explicit ordering context.
 
 Do **not** add a project-style chevron, `•••`, or completion check merely for visual similarity. Row tap/edit and reorder remain distinct actions.
 
@@ -200,16 +207,19 @@ Do **not** add a project-style chevron, `•••`, or completion check merely 
 
 - choose Intro / Verse / Pre-Chorus / Chorus / Bridge / Instrumental / Outro / Custom
 - section types live in one connected two-column Selection Surface rather than eight independent rounded cards
+- the parent owns the rounded outline; selected type uses fill without a nested inner border
 - choose **4 / 8 / 12 / 16 / Custom** bars before insertion using one five-segment control
+- Section Type → Bars is a distinct conceptual-group transition and uses the stronger sheet gap
 - tapping a section type alone does not create anything
 - Add commits one valid section
 - the builder stays open after Add so repeated arrangement entry is fast
 - retain the chosen bar length, clear/re-arm section type, and show concise inline confirmation
+- empty confirmation space must not reserve a fake blank block before the actions; confirmation appears only when there is something to say
 - Done closes the builder
-- Custom type/length reveal only their required fields
+- Custom type/length reveal only their required fields with related-control spacing
 - the visible `Add Section` sheet heading is omitted because the toolbar action already supplies context; the dialog keeps an accessible name
 
-**Edit Section** edits name and bar length only, plus Duplicate/Delete utilities. It reuses the same bar segmented control. Reordering does not live in Edit. The visible `Edit Section` sheet heading may be omitted when the tapped section already supplies enough context; the dialog remains accessibly named.
+**Edit Section** edits name and bar length only, plus Duplicate/Delete utilities. It reuses the same bar segmented control and the same semantic sheet spacing. Reordering does not live in Edit. The visible `Edit Section` sheet heading may be omitted when the tapped section already supplies enough context; the dialog remains accessibly named.
 
 Reordering belongs to the visible row handle:
 
@@ -226,8 +236,8 @@ Tracks remains a fast musician-facing multi-select surface, not a generic settin
 
 - common tracks remain direct inline multi-select
 - phone choices use one connected two-column **Selection Surface** rather than a collection of individually rounded cards
-- selection cells use the same 52px geometry as Structure section-type choices
-- Tracks is the multi-select variant and adds visible checks to selected choices
+- selection cells use the same 52px geometry and parent-owned outer shape as Structure section-type choices
+- Tracks is the multi-select variant; selected fill is the complete visual selection signal and **does not add redundant checkmarks**
 - selected state should be clear without turning every choice into a heavy slab
 - **Add Track** moves to the trailing toolbar `+`; there is no special `Other` tile mixed into the selection surface
 - toolbar `+` opens the compact named-track sheet; its visible heading may remain omitted because the source action already supplies context
@@ -250,7 +260,7 @@ The project-actions sheet does not repeat the song title or add explanatory chro
 - Delete
 - Cancel
 
-The action group remains concise; Cancel uses the shared secondary button treatment so it reads as tappable without competing with the management actions.
+The action group remains concise. Standalone Cancel uses the shared secondary treatment and spans the same sheet content width as the management-action group rather than becoming a small centered control. Paired Cancel + Save/Create/confirm actions remain paired.
 
 Edit opens the compact grouped Title/Artist form above. Reset and Delete are uncommon destructive actions and require a short confirmation step because G7 does not provide a real undo path. The first action menu stays terse; confirmation is where consequence/context belongs.
 
@@ -260,9 +270,11 @@ Edit opens the compact grouped Title/Artist form above. Reset and Delete are unc
 - do not show a grabber/drag indicator on custom sheets that cannot actually drag, resize, or dismiss through that affordance
 - visible sheet headings are conditional: omit them when the source action already makes the temporary surface unambiguous; keep them when they add consequence or necessary context (for example `Reset progress?` and `Delete project?`)
 - primary/secondary/destructive actions reuse the shared sheet button geometry
+- sheet composition uses intentional major-group vs related-control vs action spacing; content count/flex wrapping must not accidentally decide layout
 - opening a selection/manage sheet does not automatically summon a keyboard
 - controls remain reachable above the iOS software keyboard
 - background scrolling locks only while the modal sheet is open
+- phone may use the bottom sheet while regular-width iPad uses the centered dialog presentation; semantics/action hierarchy stay identical
 - no VisualViewport root-scroll machinery
 - normal document height decides whether a page scrolls
 
@@ -276,33 +288,39 @@ Review for:
 - toolbar Back/`+`/`•••` feels visually related to the title rather than detached above it
 - Cover naming feels natural
 - New Project no longer changes shape when type changes
-- Original/Cover and grouped Title/Artist have one clear spacing rhythm
+- Original/Cover is clearly separated from grouped Title/Artist by the major-group rhythm, while Title/Artist → actions stays intentionally tighter
 - Title/Artist focus preserves one clean rounded group outline with no clipped corners
 - compact New/Edit project forms remain obvious without redundant visible headings/labels
 - Title/Artist fields keep stable semantics and mobile word capitalization
 - `•••` feels like one control everywhere and card actions do not mutate active-project state
-- project action wording is terse; Cancel reads as a real secondary button; destructive actions do not execute accidentally
+- project action wording is terse; standalone Cancel uses the full action-group width; destructive actions do not execute accidentally
 - recent-first Projects order feels useful without category clutter
 - Project Home reads as one calm progression rather than a current-task card plus a second system
+- Project Home label typography does not grow/shrink when state changes
 - **Setup / Structure / Tracks** feels concise and natural
 - grouped page rows across Projects, Project Home, Setup, Structure, and verification share the 64px rhythm without visually jumping between screens
+- Setup and Structure primary labels share one left anchor/typography role
+- Setup / Structure / Tracks first content starts at the same vertical position
 - Setup uses Reference / Tempo / Meter / Grid / Listen without helper-copy noise
 - work-page Continue/Done actions share one lower page-action region without becoming sticky browser-bar competitors
 - visible Back retraces Setup → Structure → Tracks when that is the real path, while direct entry safely returns to Project Home
 - browser/history Back agrees with visible Back
 - Done from Tracks returns Home without a Home → Back → Tracks loop
-- Structure rows keep honest Structure-specific controls and no fake completion marks
+- Structure rows keep honest Structure-specific controls, no visible ordinal column, and no fake completion marks
+- Structure order remains understandable and explicit in accessible control labels
 - Structure Add Section is discoverable from the toolbar `+`
-- Structure builder is fast, predictable, and uses a connected section-selection surface rather than button soup
+- Structure builder is fast, predictable, and uses semantic major/related/action spacing rather than a compressed stack
+- Add Section/Tracks/Original-Cover selections have parent-owned rounded geometry with no nested selected rectangle
 - 4 / 8 / 12 / 16 / Custom reads as one segmented bar-length control
 - **Accurate** reads naturally as Structure verification without a special tint
 - reorder feels direct on device; Edit remains compact
-- Add Section and Tracks visibly belong to the same connected Selection Surface family
 - Tracks toolbar `+` is a clean/discoverable Add Track affordance and no `Other` card is needed
+- Tracks selection remains clear using fill without redundant checks
 - Tracks completion reflects explicit confirmation rather than merely having one selected track
 - redundant sheet headings are gone while consequence-bearing confirmation titles remain
 - no mandatory learning-flavored route blocks a quick Cover
 - custom sheets do not advertise dead drag/resize behavior
+- centered iPad dialogs preserve the same modal semantics as phone sheets
 - natural scrolling/sheets remain reliable at 390 / 440 / 820
 - V6 production data remains untouched
 

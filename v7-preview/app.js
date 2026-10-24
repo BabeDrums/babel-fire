@@ -242,17 +242,20 @@ function renderStructure() {
   const item = project();
   if (!item || item.type !== "study") return navigate("project", "replace");
   const sections = item.map.sections;
-  const rows = sections.map((section, index) => `
+  const rows = sections.map((section, index) => {
+    const bars = Number(section.lengthBars) || 8;
+    const ordinal = index + 1;
+    return `
     <div class="arrangement-row" data-section-row="${esc(section.id)}">
-      <span class="arrangement-index">${index + 1}</span>
-      <button class="section-edit-target" data-action="edit-section" data-section-id="${esc(section.id)}" aria-label="Edit ${esc(section.name)}">
+      <button class="section-edit-target" data-action="edit-section" data-section-id="${esc(section.id)}" aria-label="Edit section ${ordinal}, ${esc(section.name)}, ${bars} bars">
         <span class="arrangement-name">${esc(section.name)}</span>
-        <span class="arrangement-bars">${Number(section.lengthBars) || 8} bars</span>
+        <span class="arrangement-bars">${bars} bars</span>
       </button>
-      <button class="reorder-handle" data-section-reorder="${esc(section.id)}" aria-label="Reorder ${esc(section.name)}" title="Drag to reorder">≡</button>
-    </div>`).join("");
+      <button class="reorder-handle" data-section-reorder="${esc(section.id)}" aria-label="Reorder section ${ordinal}, ${esc(section.name)}" title="Drag to reorder">≡</button>
+    </div>`;
+  }).join("");
 
-  const arrangement = sections.length ? `<div class="group arrangement work-content">${rows}</div>` : "";
+  const arrangement = sections.length ? `<div class="group arrangement">${rows}</div>` : "";
   const verification = sections.length
     ? `<div class="group structure-verification"><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Accurate</span>${completionAccessory(item.map.structureVerified)}</button></div>`
     : "";
@@ -261,18 +264,18 @@ function renderStructure() {
   app.innerHTML = `
     <main class="screen work-screen scroll-safe">
       ${screenHeader("Structure", { backRoute: "project", backLabel: item.title, right: addButton("open-add-section", "Add Section") })}
-      <div class="structure-stack">${arrangement}${verification}</div>
+      <div class="structure-stack work-content">${arrangement}${verification}</div>
       <div class="work-action-host">${continuation}</div>
     </main>`;
 }
 
-function choiceTile(name, { selected = false, action = "", dataName = "", classes = "", check = false } = {}) {
+function choiceTile(name, { selected = false, action = "", dataName = "", classes = "" } = {}) {
   const data = dataName ? ` data-name="${esc(dataName)}"` : "";
-  return `<button class="choice-tile selection-cell${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}"><span>${esc(name)}</span>${selected && check ? `<span class="choice-check track-check" aria-hidden="true">✓</span>` : ""}</button>`;
+  return `<button class="choice-tile selection-cell${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}"><span>${esc(name)}</span></button>`;
 }
 
 function trackTile(name, selected) {
-  return choiceTile(name, { selected, action: "toggle-track", dataName: name, classes: "track-tile", check: true });
+  return choiceTile(name, { selected, action: "toggle-track", dataName: name, classes: "track-tile" });
 }
 
 function renderTracks() {

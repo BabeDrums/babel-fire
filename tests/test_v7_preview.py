@@ -314,10 +314,10 @@ class V7Preview(unittest.TestCase):
         ]
         data = {"version": 5, "currentProjectId": "p1", "projects": [study_project(sections=sections)]}
         page = self.open("structure", data)
-        handle = page.get_by_role("button", name="Reorder Verse")
+        handle = page.get_by_role("button", name="Reorder section 2, Verse", exact=True)
         self.assertGreaterEqual(handle.bounding_box()["width"], 44)
         self.assertGreaterEqual(handle.bounding_box()["height"], 44)
-        page.get_by_role("button", name="Edit Intro").click()
+        page.get_by_role("button", name="Edit section 1, Intro, 8 bars", exact=True).click()
         self.assertEqual(page.get_by_role("button", name="Move Up").count(), 0)
         self.assertEqual(page.get_by_role("button", name="Move Down").count(), 0)
         expect(page.get_by_role("textbox", name="Name")).to_have_attribute("autocapitalize", "words")
@@ -329,7 +329,7 @@ class V7Preview(unittest.TestCase):
         ]
         data = {"version": 5, "currentProjectId": "p1", "projects": [study_project(sections=sections)]}
         page = self.open("structure", data)
-        page.get_by_role("button", name="Reorder Verse").focus()
+        page.get_by_role("button", name="Reorder section 2, Verse", exact=True).focus()
         page.keyboard.press("ArrowUp")
         self.assertEqual(page.locator(".arrangement-name").all_text_contents(), ["Verse", "Intro"])
         self.assertEqual(page.locator(".sheet").count(), 0)

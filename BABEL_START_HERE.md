@@ -13,7 +13,7 @@ This is the local ecosystem-concept handoff hosted in `babel-fire`. Cross-app pr
 5. `BABEL_PLATFORM.md` — cross-app architecture/progression hypotheses
 6. `FIRE_CORE.md` — canonical FIRE semantics when FIRE boundaries matter
 7. local `START_HERE.md` — current FIRE build state when relevant
-8. relevant ecosystem items in Babel Truth Issue #1 (`Babel Continuity Buffer`)
+8. Babel Truth Issue #1 (`Babel Continuity Buffer`) body **plus newer comments** for unresolved ecosystem/FIRE items
 9. `REFERENCES.md` — inspiration/research only
 
 Do not reconstruct current ecosystem truth from old prototypes or historical summaries.
@@ -65,6 +65,12 @@ Guardrails:
 - World is not currently the universal owner of every creative object
 
 A **World prototype may live in Babel Lab**. Babel Lab itself remains the prototype sandbox and does not become the World product. A real World product earns its own repo later.
+
+Current Lab ownership direction is more explicit:
+
+- **Fire Lab** is the FIRE-bound visualization/progression experiment; promotion destination is Babel FIRE.
+- **World Lab** is the World-bound experiment; Achievements live here.
+- both may remain in the single `babel-lab` repository without implying they ship in one final product.
 
 > **The collection earns its shape.**
 
@@ -138,14 +144,21 @@ Metaphor should clarify or delight, not force translation. Functional concepts s
 
 The old local `CONTINUITY_INBOX.md` is retired as an active buffer.
 
-New unresolved durable ecosystem findings go to **Babel Truth Issue #1** under Truth's persist-before-reply threshold.
+New unresolved durable ecosystem findings use **Babel Truth Issue #1** under Truth's persist-before-reply threshold.
+
+Under the current append-safe Truth process:
+
+- routine persist-before-reply capture is a **new Issue #1 comment**
+- the Issue #1 body is the consolidated unresolved snapshot
+- do not replace the full body during routine chat capture
+- body rewrites happen only during an explicit consolidation pass after reading the current body and all newer comments
 
 At consolidation:
 
 - mature sibling-app job/boundary → `BABEL_APPS.md`
 - mature shared architecture/progression semantics → `BABEL_PLATFORM.md` or Babel Truth when genuinely global
 - current ecosystem routing/state → this file
-- unresolved durable delta → Truth Issue #1
+- unresolved durable delta → Truth Issue #1 snapshot/comments until classified
 
 Do not commit every brainstorm sentence.
 
@@ -159,7 +172,9 @@ Before durable writes, each chat must re-read:
 - current local `main`
 - open PRs
 - relevant local authority
-- relevant Truth-buffer items
+- the Truth-buffer body and relevant newer comments
+
+If another chat already owns the same durable branch/file/PR, do not write from a stale snapshot; reconcile first or let the owning lane finish.
 
 Lab/ecosystem work must not casually edit FIRE runtime/spec/data.
 
