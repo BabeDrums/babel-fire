@@ -54,6 +54,10 @@ function moreButton(action = "project-actions", label = "Project actions") {
   return `<button class="toolbar-button more-button" data-action="${action}" aria-label="${esc(label)}">•••</button>`;
 }
 
+function addButton(action, label) {
+  return `<button class="toolbar-button add-button" data-action="${esc(action)}" aria-label="${esc(label)}">＋</button>`;
+}
+
 function screenHeader(title, { backRoute = "", backLabel = "Back", right = "", meta = "" } = {}) {
   const left = backRoute ? backButton(backRoute, backLabel) : `<span class="toolbar-spacer" aria-hidden="true"></span>`;
   const rightSlot = right || `<span class="toolbar-spacer" aria-hidden="true"></span>`;
@@ -62,6 +66,10 @@ function screenHeader(title, { backRoute = "", backLabel = "Back", right = "", m
       <div class="toolbar"><div>${left}</div><div>${rightSlot}</div></div>
       <div class="title-block"><h1>${esc(title)}</h1>${meta ? `<p class="screen-meta">${esc(meta)}</p>` : ""}</div>
     </header>`;
+}
+
+function pageAction(label, action, id = "") {
+  return `<div class="page-action-footer"><button${id ? ` id="${esc(id)}"` : ""} class="primary-action" data-action="${esc(action)}">${esc(label)}</button></div>`;
 }
 
 function setHistory(route, mode = "push") {
@@ -120,7 +128,7 @@ function renderProjects() {
 
   app.innerHTML = `
     <main class="screen root-screen scroll-safe">
-      ${screenHeader("Projects", { right: `<button class="toolbar-button new-project-button" data-action="new-project" aria-label="New Project">＋</button>` })}
+      ${screenHeader("Projects", { right: addButton("new-project", "New Project") })}
       <div class="project-list group">${rows || `<div class="empty-state projects-empty">No projects yet.</div>`}</div>
       <div class="build-info root-build-info" aria-label="Preview build">G7 · …</div>
     </main>`;
@@ -193,9 +201,7 @@ function setupToggleRow(label, field, value) {
 }
 
 function setupContinuationMarkup(item) {
-  return setupComplete(item)
-    ? `<div class="action-row"><button id="setupContinue" class="primary-action" data-action="continue-structure">Continue</button></div>`
-    : "";
+  return setupComplete(item) ? pageAction("Continue", "continue-structure", "setupContinue") : "";
 }
 
 function syncSetupContinuation(item) {
@@ -208,7 +214,7 @@ function renderSetup() {
   if (!item || item.type !== "study") return navigate("project", "replace");
   const setup = item.map.setup;
   app.innerHTML = `
-    <main class="screen scroll-safe">
+    <main class="screen work-screen scroll-safe">
       ${screenHeader("Song Setup", { backRoute: "project", backLabel: item.title })}
       <div class="form-group">
         ${setupToggleRow("Reference", "reference", setup.reference)}
@@ -235,23 +241,27 @@ function renderStructure() {
       <button class="reorder-handle" data-section-reorder="${esc(section.id)}" aria-label="Reorder ${esc(section.name)}" title="Drag to reorder">≡</button>
     </div>`).join("");
 
+  const arrangement = sections.length ? `<div class="group arrangement">${rows}</div>` : "";
   const verification = sections.length
-    ? `<button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Matches the song</span>${completionAccessory(item.map.structureVerified)}</button>`
+    ? `<div class="group structure-verification"><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Matches the song</span>${completionAccessory(item.map.structureVerified)}</button></div>`
     : "";
-  const continuation = structureComplete(item)
-    ? `<div class="action-row"><button class="primary-action" data-action="continue-tracks">Continue</button></div>`
-    : "";
+  const continuation = structureComplete(item) ? pageAction("Continue", "continue-tracks") : "";
 
   app.innerHTML = `
-    <main class="screen scroll-safe">
-      ${screenHeader("Structure", { backRoute: "project", backLabel: item.title })}
-      <div class="group arrangement">${rows}<button class="row add-section-row" data-action="open-add-section"><span class="row-title">Add Section</span><span class="plus" aria-hidden="true">＋</span></button>${verification}</div>
+    <main class="screen work-screen scroll-safe">
+      ${screenHeader("Structure", { backRoute: "project", backLabel: item.title, right: addButton("open-add-section", "Add Section") })}
+      <div class="structure-stack">${arrangement}${verification}</div>
       ${continuation}
     </main>`;
 }
 
+function choiceTile(name, { selected = false, action = "", dataName = "", classes = "", check = false } = {}) {
+  const data = dataName ? ` data-name="${esc(dataName)}"` : "";
+  return `<button class="choice-tile${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}"><span>${esc(name)}</span>${selected && check ? `<span class="choice-check track-check" aria-hidden="true">✓</span>` : ""}</button>`;
+}
+
 function trackTile(name, selected) {
-  return `<button class="track-tile${selected ? " selected" : ""}" data-action="toggle-track" data-name="${esc(name)}" aria-pressed="${selected}"><span>${esc(name)}</span>${selected ? `<span class="track-check" aria-hidden="true">✓</span>` : ""}</button>`;
+  return choiceTile(name, { selected, action: "toggle-track", dataName: name, classes: "track-tile", check: true });
 }
 
 function renderTracks() {
@@ -261,16 +271,14 @@ function renderTracks() {
   const extra = item.map.tracks.map((track) => track.name).filter((name) => !COMMON_TRACKS.includes(name));
   const names = [...COMMON_TRACKS, ...extra];
   const tiles = names.map((name) => trackTile(name, selectedNames.has(name))).join("");
-  const continuation = item.map.tracks.length
-    ? `<div class="action-row tracks-action-row"><button class="primary-action" data-action="finish-map">Done</button></div>`
-    : "";
+  const continuation = item.map.tracks.length ? pageAction("Done", "finish-map") : "";
 
   app.innerHTML = `
-    <main class="screen scroll-safe">
+    <main class="screen work-screen scroll-safe">
       ${screenHeader("Tracks", { backRoute: "project", backLabel: item.title })}
-      <div class="track-grid">
+      <div class="choice-grid track-grid">
         ${tiles}
-        <button class="track-tile track-other" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
+        <button class="choice-tile track-tile track-other" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
       </div>
       ${continuation}
     </main>`;
@@ -317,6 +325,14 @@ function textField(id, label, value = "", placeholder = "", { visibleLabel = tru
   return `<label class="${labelClass}" for="${id}">${esc(label)}</label><input id="${id}" class="field" value="${esc(value)}" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">`;
 }
 
+function projectFields(title = "", artist = "", prefix = "newProject") {
+  return `
+    <div class="project-field-group">
+      <div class="project-field-row">${textField(`${prefix}Title`, "Title", title, "Title", { visibleLabel: false })}</div>
+      <div class="project-field-row">${textField(`${prefix}Artist`, "Artist", artist, "Artist", { visibleLabel: false })}</div>
+    </div>`;
+}
+
 function projectTypeControl(selected = "original") {
   return `
     <div class="project-type-control" aria-label="Project type">
@@ -325,15 +341,20 @@ function projectTypeControl(selected = "original") {
     </div>`;
 }
 
+function sheetSecondary(label, action = "close-sheet", extraClass = "") {
+  return `<button class="sheet-button sheet-secondary${extraClass ? ` ${extraClass}` : ""}" data-action="${esc(action)}">${esc(label)}</button>`;
+}
+
+function sheetPrimary(label, action, { disabled = false, danger = false } = {}) {
+  return `<button class="sheet-button sheet-primary${danger ? " sheet-danger-button" : ""}" data-action="${esc(action)}"${disabled ? " disabled" : ""}>${esc(label)}</button>`;
+}
+
 function newProjectFields() {
   return `
-    <div class="stack-fields new-project-fields">
-      ${textField("newProjectTitle", "Title", "", "Title", { visibleLabel: false })}
-      ${textField("newProjectArtist", "Artist", "", "Artist", { visibleLabel: false })}
-    </div>
+    ${projectFields()}
     <div class="sheet-actions">
-      <button class="sheet-close" data-action="close-sheet">Cancel</button>
-      <button class="sheet-primary" data-action="create-project" disabled>Create</button>
+      ${sheetSecondary("Cancel")}
+      ${sheetPrimary("Create", "create-project", { disabled: true })}
     </div>`;
 }
 
@@ -376,19 +397,19 @@ function createProject() {
 function sectionBarsControls(selectedBars) {
   const standard = [4, 8, 12, 16];
   const isCustom = !standard.includes(Number(selectedBars));
-  return `<div class="bars-grid" aria-label="Bars">${standard.map((value) => `<button class="bar-choice${Number(selectedBars) === value ? " selected" : ""}" data-action="choose-section-bars" data-bars="${value}" aria-pressed="${Number(selectedBars) === value}">${value}</button>`).join("")}<button class="bar-choice${isCustom ? " selected" : ""}" data-action="choose-section-bars" data-bars="custom" aria-pressed="${isCustom}">Custom</button></div>`;
+  const choices = standard.map((value) => `<button class="choice-tile choice-compact bar-choice${Number(selectedBars) === value ? " selected" : ""}" data-action="choose-section-bars" data-bars="${value}" aria-pressed="${Number(selectedBars) === value}"><span>${value}</span></button>`).join("");
+  return `<div class="choice-grid bars-grid" aria-label="Bars">${choices}<button class="choice-tile choice-compact bar-choice${isCustom ? " selected" : ""}" data-action="choose-section-bars" data-bars="custom" aria-pressed="${isCustom}"><span>Custom</span></button></div>`;
 }
 
 function openAddSectionSheet() {
-  const choices = [...SECTION_TYPES, "Custom"].map((name) => `<button class="sheet-choice" data-action="choose-section-type" data-name="${esc(name)}" aria-pressed="false">${esc(name)}</button>`).join("");
+  const choices = [...SECTION_TYPES, "Custom"].map((name) => choiceTile(name, { action: "choose-section-type", dataName: name, classes: "sheet-choice section-choice" })).join("");
   openSheet(`
-    <h2>Add Section</h2>
-    <div class="sheet-grid section-types">${choices}</div>
-    <div id="customSectionArea" hidden>${textField("customSectionName", "Section name", "", "Section name")}</div>
+    <div class="choice-grid section-types">${choices}</div>
+    <div id="customSectionArea" hidden>${textField("customSectionName", "Section name", "", "Section name", { visibleLabel: false })}</div>
     ${sectionBarsControls(8)}
-    <div id="customBarsArea" hidden><label class="field-label" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" placeholder="Bars"></div>
+    <div id="customBarsArea" hidden><label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" placeholder="Bars"></div>
     <div id="sectionAddedNotice" class="inline-notice" aria-live="polite"></div>
-    <div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Done</button><button class="sheet-primary" data-action="add-section" disabled>Add</button></div>`,
+    <div class="sheet-actions">${sheetSecondary("Done")}${sheetPrimary("Add", "add-section", { disabled: true })}</div>`,
   { type: "add-section", sectionName: "", bars: 8, customBars: "" }, "Add Section");
 }
 
@@ -458,7 +479,7 @@ function addSectionFromSheet() {
 }
 
 function openCustomTrackSheet() {
-  openSheet(`<h2>Add Track</h2><div class="stack-fields">${textField("customTrackInput", "Track name", "", "Track name", { visibleLabel: false })}</div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="add-custom-track" disabled>Add</button></div>`, { type: "custom-track" }, "Add Track");
+  openSheet(`<div class="stack-fields">${textField("customTrackInput", "Track name", "", "Track name", { visibleLabel: false })}</div><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Add", "add-custom-track", { disabled: true })}</div>`, { type: "custom-track" }, "Add Track");
 }
 
 function syncCustomTrackAction() {
@@ -474,11 +495,10 @@ function openEditSectionSheet(sectionId) {
   const standard = [4, 8, 12, 16];
   const custom = !standard.includes(selectedBars);
   openSheet(`
-    <h2>Edit Section</h2>
-    <div class="stack-fields">${textField("editSectionName", "Name", section.name, "Section name")}</div>
+    <div class="stack-fields">${textField("editSectionName", "Name", section.name, "Section name", { visibleLabel: false })}</div>
     ${sectionBarsControls(selectedBars)}
-    <div id="customBarsArea" ${custom ? "" : "hidden"}><label class="field-label" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" value="${custom ? selectedBars : ""}"></div>
-    <div class="sheet-actions"><button class="sheet-primary" data-action="save-section">Save</button><button class="sheet-close" data-action="duplicate-section">Duplicate</button><button class="sheet-close sheet-danger" data-action="delete-section">Delete</button></div>`,
+    <div id="customBarsArea" ${custom ? "" : "hidden"}><label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" value="${custom ? selectedBars : ""}"></div>
+    <div class="sheet-actions three-actions">${sheetPrimary("Save", "save-section")}${sheetSecondary("Duplicate", "duplicate-section")}${sheetSecondary("Delete", "delete-section", "sheet-danger")}</div>`,
   { type: "edit-section", sectionId, bars: custom ? "custom" : selectedBars }, "Edit Section");
 }
 
@@ -486,23 +506,23 @@ function openProjectActions(projectId = db.currentProjectId) {
   const item = projectById(projectId);
   if (!item) return;
   const reset = item.type === "study" ? `<button class="row" data-action="reset-project-preview"><span class="row-title">Reset</span><span></span></button>` : "";
-  openSheet(`<div class="group action-menu"><button class="row" data-action="edit-project"><span class="row-title">Edit</span><span></span></button>${reset}<button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete</span><span></span></button></div><div class="sheet-actions single-action"><button class="sheet-close" data-action="close-sheet">Cancel</button></div>`, { type: "project-actions", projectId: item.id }, "Project actions");
+  openSheet(`<div class="group action-menu"><button class="row" data-action="edit-project"><span class="row-title">Edit</span><span></span></button>${reset}<button class="row sheet-danger" data-action="delete-project-preview"><span class="row-title">Delete</span><span></span></button></div><div class="sheet-actions single-action">${sheetSecondary("Cancel")}</div>`, { type: "project-actions", projectId: item.id }, "Project actions");
 }
 
 function openEditProjectSheet(projectId = sheetState?.projectId || db.currentProjectId) {
   const item = projectById(projectId);
   if (!item) return;
-  openSheet(`<div class="stack-fields">${textField("editProjectTitle", "Title", item.title, "Title", { visibleLabel: false })}${textField("editProjectArtist", "Artist", item.artist || "", "Artist", { visibleLabel: false })}</div><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary" data-action="save-project">Save</button></div>`, { type: "edit-project", projectId: item.id }, "Edit project");
+  openSheet(`${projectFields(item.title, item.artist || "", "editProject")}<div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Save", "save-project")}</div>`, { type: "edit-project", projectId: item.id }, "Edit project");
 }
 
 function openProjectConfirmation(kind, projectId) {
   const item = projectById(projectId);
   if (!item) return;
   if (kind === "reset") {
-    openSheet(`<h2>Reset progress?</h2><p class="sheet-message">This clears Song Setup, Structure, and Tracks.</p><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary sheet-danger-button" data-action="confirm-reset-project">Reset</button></div>`, { type: "confirm-reset-project", projectId: item.id }, "Reset progress");
+    openSheet(`<h2>Reset progress?</h2><p class="sheet-message">This clears Song Setup, Structure, and Tracks.</p><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Reset", "confirm-reset-project", { danger: true })}</div>`, { type: "confirm-reset-project", projectId: item.id }, "Reset progress");
     return;
   }
-  openSheet(`<h2>Delete project?</h2><p class="sheet-message">${esc(item.title)} will be permanently deleted.</p><div class="sheet-actions"><button class="sheet-close" data-action="close-sheet">Cancel</button><button class="sheet-primary sheet-danger-button" data-action="confirm-delete-project">Delete</button></div>`, { type: "confirm-delete-project", projectId: item.id }, "Delete project");
+  openSheet(`<h2>Delete project?</h2><p class="sheet-message">${esc(item.title)} will be permanently deleted.</p><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Delete", "confirm-delete-project", { danger: true })}</div>`, { type: "confirm-delete-project", projectId: item.id }, "Delete project");
 }
 
 function moveSection(sectionId, direction) {

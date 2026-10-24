@@ -55,7 +55,7 @@ If two chats could touch the same durable file at the same time, the later write
 
 ## Pending FIRE deltas
 
-None currently. The latest physical-device refinement feedback — compact placeholder-led New/Edit project forms, terse project actions, removal of dead sheet grabbers, confirmation for destructive project actions, project-card menu targeting without active-project mutation, one unified Cover Home progression, removal of redundant completion chrome, retention/refinement of the Tracks grid, and explicit Done-based Tracks confirmation — is promoted into `V7_DRAFT.md` / `START_HERE.md` and protected by G7 regression coverage. Physical approval remains a current-state gate in `START_HERE.md`, not an inbox item.
+None currently. The latest physical-device visual-grammar feedback — grouped Title/Artist project fields, discernible secondary/Cancel buttons, a shared non-sticky Continue/Done page-action footer, Structure toolbar `+`, Projects/Structure shared grouped-list rhythm without fake accessories, separate untinted Structure verification, one shared Choice Tile family across Add Section/Tracks/bars, and conditional sheet headings — is promoted into `V7_DRAFT.md` / `START_HERE.md` and protected by dedicated G7 regression coverage. Physical approval remains a current-state gate in `START_HERE.md`, not an inbox item.
 
 ## Pending repository/process deltas
 
