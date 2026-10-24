@@ -16,8 +16,9 @@ After Babel Truth:
 2. `FIRE_CORE.md` — cross-generation FIRE product doctrine
 3. `V6.md` — shipped production-generation behavior
 4. `V7_DRAFT.md` — current G7 successor-shell behavior where compatible with FIRE Core
-5. relevant FIRE items in Babel Truth Issue #1 (`Babel Continuity Buffer`)
-6. code/tests as implementation evidence
+5. `G7_SHELL_CERTIFICATION.md` — active G7 shell-completion checklist, Shell Test contract, and freeze gate
+6. relevant FIRE items in Babel Truth Issue #1 (`Babel Continuity Buffer`)
+7. code/tests as implementation evidence
 
 For wider ecosystem/sibling-app work instead, use `BABEL_START_HERE.md` → `BABEL_APPS.md` → `BABEL_PLATFORM.md` after Babel Truth.
 
@@ -28,9 +29,10 @@ For FIRE-specific product behavior, use:
 1. `FIRE_CORE.md`
 2. current production spec (`V6.md`) for shipped behavior
 3. `V7_DRAFT.md` for active successor behavior
-4. `START_HERE.md` for current verified build/review state
-5. `CONTEXT.md` for durable supporting history not superseded above
-6. code/tests as implementation evidence
+4. `G7_SHELL_CERTIFICATION.md` for G7 shell completion/certification status and freeze criteria
+5. `START_HERE.md` for current verified build/review state
+6. `CONTEXT.md` for durable supporting history not superseded above
+7. code/tests as implementation evidence
 
 Babel Truth owns cross-app rules. FIRE authorities own FIRE-specific behavior. If a conflict is ambiguous, classify whether it is global or FIRE-local before editing either side.
 
@@ -71,7 +73,9 @@ If two chats might edit the same durable file, the later writer reconciles the n
 - Delete before styling.
 - Learning is contextual/optional unless a distinct product job later earns separation.
 - Do not use theme/metaphor to obscure musician-facing meaning.
-- G7 shell approval is a real gate; do not begin FIRE Core breadboarding until `START_HERE.md` records explicit physical approval.
+- G7 shell approval is a real gate; do not begin FIRE Core breadboarding until `START_HERE.md` records explicit physical approval and `G7_SHELL_CERTIFICATION.md` records the certification freeze gate as satisfied.
+- Current Setup / Structure / Tracks are disposable shell fixtures. Do not confuse polishing them with approving FIRE Core architecture.
+- A developer Shell Test inside G7 may exercise actual G7 primitives/states. It is developer infrastructure, not a second FIRE implementation, not Babel Lab, and not a FIRE Core destination.
 
 ## FIRE interaction grammar
 
@@ -107,7 +111,8 @@ Use semantic consistency; do not force every interaction into one container.
 
 - `FIRE_CORE.md` — canonical FIRE doctrine
 - `V6.md` — live production-generation behavior
-- `V7_DRAFT.md` — active G7 behavior
+- `V7_DRAFT.md` — active G7 behavior and primitive grammar
+- `G7_SHELL_CERTIFICATION.md` — active shell-completion checklist, Shell Test contract, category status, and freeze gate
 - `START_HERE.md` — current FIRE state / next gate
 - `CONTEXT.md` — durable supporting history only
 - `CHANGELOG.md` — meaningful FIRE milestones
@@ -146,4 +151,4 @@ FIRE implementation is not complete until:
 - relevant Truth-buffer items are resolved or intentionally left open
 - PR is merged/deployed under the standing workflow when gates are satisfied
 
-For visual work, real-device Safari review remains a distinct gate.
+For visual work, real-device Safari review remains a distinct gate. For G7 shell freeze, the stricter `G7_SHELL_CERTIFICATION.md` gate applies.
