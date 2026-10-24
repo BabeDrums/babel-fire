@@ -180,7 +180,13 @@ h2 { margin: 0; font-size: 24px; line-height: 1.15; letter-spacing: -.025em; fon
 }
 
 .journey-group { margin-top: 0; }
-.journey-row { grid-template-columns: 21px minmax(0,1fr) auto; gap: var(--space-2); }
+.journey-row {
+  grid-template-columns: minmax(0,1fr) 20px auto;
+  gap: var(--space-2);
+}
+.journey-row .row-title { grid-column: 1; grid-row: 1; }
+.journey-row .journey-mark { grid-column: 2; grid-row: 1; }
+.journey-row .chevron { grid-column: 3; grid-row: 1; }
 .journey-row.done .row-title { color: #b8b8c0; }
 .journey-row.current { background: rgba(255,255,255,.026); }
 .journey-row.current .row-title { color: var(--text); }
@@ -266,7 +272,6 @@ h2 { margin: 0; font-size: 24px; line-height: 1.15; letter-spacing: -.025em; fon
 }
 .arrangement-row.dragging { opacity: .62; }
 .arrangement-row.drop-target { background: rgba(255,255,255,.055); }
-.arrangement-index { display: none; }
 .section-edit-target {
   min-width: 0;
   min-height: var(--row-height);
