@@ -17,19 +17,18 @@ const header = `
 host.innerHTML = `
   <main class="screen shell-test-screen scroll-safe">
     ${header}
-    <p class="shell-test-intro">This is intentionally not a FIRE workflow. It stress-tests the reusable shell grammar so new sections and temporary UI can inherit Babel fundamentals without redesigning them.</p>
 
     <section class="shell-test-section" aria-labelledby="rowsHeading">
       <h2 id="rowsHeading" class="shell-test-heading">Rows · accessories</h2>
       <div class="group">
         <button class="row"><span class="row-title">Complete</span><span class="checkmark" aria-label="Done">✓</span></button>
-        <button class="row"><span class="row-title">Current</span><span class="journey-mark current" aria-hidden="true">→</span></button>
-        <button class="row"><span class="row-title">Incomplete</span><span class="completion-ring" aria-hidden="true"></span></button>
+        <button class="row"><span class="row-title">Current</span><span class="journey-mark current" aria-label="Current"></span></button>
+        <button class="row"><span class="row-title">Incomplete</span><span class="completion-ring" aria-label="Incomplete"></span></button>
         <button class="row"><span><span class="row-title">Navigate</span><span class="row-sub">Secondary metadata</span></span><span class="chevron" aria-hidden="true">›</span></button>
-        <div class="arrangement-row"><button class="section-edit-target"><span class="arrangement-name">Reorderable item</span><span class="arrangement-bars">8 bars</span></button><button class="reorder-handle" aria-label="Reorder example">≡</button></div>
+        <div class="arrangement-row"><button class="section-edit-target"><span class="arrangement-name">Reorderable item</span><span class="arrangement-bars">8 bars</span></button><button class="reorder-handle" aria-label="Reorder example"></button></div>
         <div class="project-card"><button class="project-open"><span class="project-copy"><strong>Managed row</strong><span>Metadata · Fixture</span></span></button><button class="project-card-actions more-button" aria-label="Example row actions">•••</button></div>
       </div>
-      <p class="shell-test-note">Different meanings, one trailing geometry. Management has no divider.</p>
+      <p class="shell-test-note">State can carry stronger visual emphasis; navigation and management stay quiet.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="typeHeading">
@@ -48,10 +47,10 @@ host.innerHTML = `
         <button class="choice-tile selection-cell shell-test-disabled" disabled>Disabled</button>
         <button class="choice-tile selection-cell" aria-pressed="false">Longer choice</button>
       </div>
-      <div class="segmented-control bars-grid" style="margin-top:12px">
+      <div class="segmented-control bars-grid shell-test-gap">
         <button class="segment-option selected">4</button><button class="segment-option">8</button><button class="segment-option">12</button><button class="segment-option">16</button><button class="segment-option">Custom</button>
       </div>
-      <div class="project-field-group" style="margin-top:12px">
+      <div class="project-field-group shell-test-gap">
         <div class="project-field-row"><input class="field" placeholder="Name" aria-label="Example name"></div>
         <div class="project-field-row"><input class="field" value="Very long value that can be edited" aria-label="Example value"></div>
       </div>
