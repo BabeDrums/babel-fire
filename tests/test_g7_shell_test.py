@@ -7,24 +7,26 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def test_real_g7_and_shell_test_load_same_primitive_layer():
+def test_real_g7_and_shell_test_load_same_versioned_primitive_layer():
     preview = read("v7-preview/index.html")
     shell_test = read("v7-preview/shell-test.html")
     for html in (preview, shell_test):
-        assert './styles.css' in html
-        assert './shell-primitives.css' in html
+        assert './styles.css?v=g7-shell-4' in html
+        assert './shell-primitives.css?v=g7-shell-4' in html
+    assert './app.js?v=g7-shell-4' in preview
+    assert './shell-test.js?v=g7-shell-4' in shell_test
 
 
 def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     js = read("v7-preview/shell-test.js")
-    assert "intentionally not a FIRE workflow" in js
     assert "Rows · accessories" in js
     assert "Controls · states" in js
     assert "Temporary UI" in js
     assert "Composition · density" in js
+    assert "intentionally not a FIRE workflow" not in js
 
 
-def test_pass_one_removes_project_management_divider_and_canonicalizes_accessories():
+def test_project_management_has_no_divider_and_accessories_are_canonicalized():
     css = read("v7-preview/shell-primitives.css")
     assert ".project-card-actions" in css
     assert "border-left: 0" in css
