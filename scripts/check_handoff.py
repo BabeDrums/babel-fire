@@ -5,7 +5,7 @@ Usage:
 
 FIRE product/runtime/spec work refreshes START_HERE.md.
 Wider Babel ecosystem/app/platform doctrine refreshes BABEL_START_HERE.md.
-Files that govern both lanes (for example AGENTS/FIRE_CORE) refresh both.
+Shared routing/authority files refresh both.
 """
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ FIRE_WATCHED_PATHS = {
     "FIRE_CORE.md",
     "CONTEXT.md",
     "AGENTS.md",
+    "BABEL_TRUTH.md",
 }
 FIRE_WATCHED_PREFIXES = ("v7-preview/",)
 FIRE_HANDOFF_PATH = "START_HERE.md"
@@ -30,6 +31,7 @@ ECOSYSTEM_WATCHED_PATHS = {
     "BABEL_PLATFORM.md",
     "FIRE_CORE.md",
     "AGENTS.md",
+    "BABEL_TRUTH.md",
 }
 ECOSYSTEM_HANDOFF_PATH = "BABEL_START_HERE.md"
 
