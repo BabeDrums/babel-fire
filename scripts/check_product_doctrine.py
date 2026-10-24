@@ -42,7 +42,8 @@ REQUIRED = {
         "G7 shell is live but NOT frozen",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
-        "Latest physical-device review after #57",
+        "Latest physical-device review",
+        "Current visual-grammar refinement contract",
         "Parallel-chat ownership",
         "Cover",
     ],
@@ -110,11 +111,14 @@ REQUIRED = {
         "`FIRE_CORE.md` governs cross-generation product doctrine",
         "Delete before styling.",
         "## Interaction grammar",
+        "## Visual grammar primitives",
         "**Inline**",
         "**Sheet**",
         "Original",
         "Recreation",
         "Cover",
+        "Choice tile",
+        "Page action footer",
     ],
 }
 
@@ -131,7 +135,10 @@ FORBIDDEN = {
         "Project Home owns **Continue + Journey + Notes**",
         "The current design objective is **V7 Shell Freeze**",
     ],
-    "START_HERE.md": ["`V5.md` is historical"],
+    "START_HERE.md": [
+        "`V5.md` is historical",
+        "Latest physical-device review after #57",
+    ],
     "BABEL_START_HERE.md": [
         "FIRE = making the music.\nThe learning app = studying.",
         "WATER = learning",
