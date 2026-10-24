@@ -286,7 +286,7 @@ class V7Preview(unittest.TestCase):
         tempo = page.get_by_role("textbox", name="Tempo")
         expect(tempo).to_have_attribute("inputmode", "decimal")
         self.assertGreaterEqual(float(tempo.evaluate("el => parseFloat(getComputedStyle(el).fontSize)")), 16)
-        expect(tempo.locator("xpath=..")).to_have_class(lambda value: "value-control" in value)
+        self.assertIn("value-control", tempo.locator("xpath=..").get_attribute("class") or "")
         tempo.focus()
         self.assertEqual(tempo.evaluate("el => getComputedStyle(el).outlineStyle"), "none")
         tempo.fill("111")
