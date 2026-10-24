@@ -13,8 +13,6 @@ Use **Babel** as the project-facing name.
 7. Babel Truth Issue #1 body **plus newer comments** for unresolved FIRE items
 8. code/tests as implementation evidence
 
-For wider ecosystem/surrounding-app work instead, use `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md` after Babel Truth.
-
 ## Current state — G7 live, NOT frozen
 
 Production remains V6.
@@ -23,38 +21,25 @@ G7 remains the isolated successor preview at `/v7-preview/` using `production-pr
 
 PR **#63 — Refine G7 shell clarity after physical review** is merged at `a39b306b02c66c3cd3ed9749005af9966780e617`.
 
-Physical review found the shell materially closer but **not ready to freeze**. In particular, the modal/surface language still needs visual-system exploration rather than another sequence of local production patches.
+Physical review found the shell materially closer but **not ready to freeze**. The remaining work is coordinated shell visual-language refinement: modal/surface treatment, hierarchy, spacing/density, component cohesion, management affordances, focus/keyboard behavior, and responsive physical-device polish.
 
 **G7 is not physically approved/frozen. FIRE Core breadboarding has not started.**
 
-## Current routing — shell exploration moves to Lab
+## Current routing — coordinated shell iteration stays in G7
 
-Exploratory visual-shell work now happens in Babel Lab's dedicated **Visual Lab / FIRE Shell Lab** environment.
+G7 is already an isolated successor and contains the real FIRE navigation, state relationships, responsive behavior, and shell interactions. It is therefore the correct place to continue coordinated FIRE shell iteration.
 
-This does **not** move FIRE ownership or the FIRE project into Lab:
+Do not rebuild the complete FIRE shell in Babel Lab merely to create a visual test environment. The attempted full-shell Lab replica is rejected evidence: reconstruction bugs, missing interactions, and visual drift added variables that obscured the actual design question and created duplicate implementation work.
 
-- FIRE remains the product authority and owns product doctrine, runtime, data, specs, tests, and production/successor code
-- Visual Lab uses isolated fake/local state and must not read/write FIRE production or G7 storage
-- Visual Lab may reproduce the observable G7 shell behavior completely for experimentation
-- Lab may contain contradictory candidates and does not define a canonical Babel style
-- **Lab is evidence, never authority**
-- do not make G7 automatically match Lab; a chosen candidate must be deliberately implemented in FIRE
+Babel Lab remains useful as a bounded test bench. Use it for isolated questions that genuinely benefit from separation — for example a few modal treatments, a row language, selection control, navigation concept, motion idea, or surface/material study. If the complete shell context is needed to judge the idea, work directly in G7.
 
-### Parity-first baseline
+A Lab step is optional.
 
-The Visual Lab shell must not be a simplified component gallery whose missing behavior or harness chrome changes the thing Babel is judging.
+Default shell workflow:
 
-Before visual divergence, establish a faithful current-G7 baseline for the shell surfaces under review. Visible controls should work: project management, navigation/Back, Setup inputs/toggles, Structure creation/editing/reordering/verification, Tracks selection/custom creation/Done, menus, sheets/dialogs, focus/keyboard states, and responsive iPhone/iPad presentation as applicable.
+**observe G7 on physical device → diagnose repeated/systemic defects → optionally explore a bounded idea in Lab → implement the promising decision in G7 → physical-device review → iterate → explicit shell approval/freeze → promote genuinely transferable principles to Babel Truth.**
 
-Harness-only navigation pills, explanatory prototype footer copy, and similar developer affordances should stay outside the judged FIRE canvas. Lab developer utilities may exist outside that canvas or behind a clearly separate/collapsible control.
-
-The protection against creating a second FIRE app is **authority and data ownership**, not deliberately incomplete behavior.
-
-Default promotion path:
-
-**Current G7 → faithful functional Lab baseline → parity verification → visual experiments → physical-device testing → candidate → FIRE implementation → FIRE physical validation → transferable rules promoted to Babel Truth.**
-
-Pause further exploratory shell styling directly in G7 while this candidate work is active. Production fixes or safety fixes remain FIRE-local and should not be blocked by Lab.
+Do not make G7 automatically match a Lab specimen. Lab is evidence, never authority.
 
 ## Critical boundary — shell fixtures are not FIRE Core architecture
 
@@ -70,13 +55,9 @@ Do **not** interpret eventual shell approval as approval of:
 - exactly three checkpoints per phase
 - these exact fixture interactions being final FIRE Core workflow
 
-After shell approval, FIRE Core breadboarding revisits the journey from first principles. For each real workspace/checkpoint, define the musician's problem, decision, required evidence, DAW action, evaluation, done criteria, retained context, and the most natural interaction. Selection, drag/reorder, connect/group, mark/draw, compare, toggle, or other direct manipulation can all be valid when they match the musical mental model.
-
-Few visible destinations are desirable, but checkpoint count is earned by the work rather than fixed at three.
+After shell approval, FIRE Core breadboarding revisits the journey from first principles. For each real workspace/checkpoint, define the musician's problem, decision, required evidence, DAW action, evaluation, done criteria, retained context, and the most natural interaction.
 
 ## Stable G7 behavior / evidence to preserve while experimenting
-
-These are useful tested behaviors and constraints, not a command that every Lab candidate must visually copy them:
 
 - Projects → project Home → current shell-fixture workspaces
 - public project types Original / Cover
@@ -85,7 +66,7 @@ These are useful tested behaviors and constraints, not a command that every Lab 
 - toolbar `+` means add/create the primary discrete thing for the current view
 - toolbar `•••` means management/actions
 - Tracks Done confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop
-- iPhone/iPad share one product logic; sheet/dialog presentation may adapt
+- iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
 
 Existing interaction semantics remain useful evidence:
@@ -95,11 +76,24 @@ Existing interaction semantics remain useful evidence:
 - Navigation enters another meaningful workspace
 - Menu/secondary affordance holds utilities that should not compete with musical work
 
-Visual Lab is allowed to challenge presentation details and candidate component geometry without silently changing these semantics. If an experiment challenges a semantic rule itself, label that explicitly rather than smuggling it in as styling.
+## Current physical-review targets
+
+Continue from the last real G7 review rather than from the Lab replica. Pay particular attention to:
+
+- whether the project-card `•••` management affordance feels integrated rather than stapled on
+- the Tempo input focus/keyboard appearance on physical iPhone
+- whether headers/text hierarchy feel like one coherent system
+- modal/surface language across iPhone bottom-sheet and iPad centered-dialog presentations
+- spacing/density on both sparse and content-heavy pages
+- consistent row/control geometry and selection language
+- sparse pages should not scroll unnecessarily; dense pages should scroll naturally
+- remove the internal Original placeholder phrase `FIRE Core spine` when the shell is next touched
+
+Repeated defects should be solved as component/system defects rather than patched independently on every page.
 
 ## Approval gate
 
-Do not record shell approval automatically. Babel must explicitly approve/freeze the generic shell fundamentals **after** the chosen candidate has been implemented back into FIRE and physically validated in the real product.
+Do not record shell approval automatically. Babel must explicitly approve/freeze the generic shell fundamentals after physical validation in the real G7 product context.
 
 Physical validation should cover iPhone first and iPad adaptation, plus representative default/selected/custom/disabled/focus/keyboard/long-content states as applicable.
 
@@ -107,9 +101,9 @@ Physical validation should cover iPhone first and iPad adaptation, plus represen
 
 Sequence:
 
-**Lab candidate → FIRE implementation → physical FIRE shell approval → promote genuinely transferable shell primitives into Babel Truth → FIRE Core breadboard → thin FIRE Core spine → real-project validation.**
+**physical G7 shell approval → promote genuinely transferable shell primitives into Babel Truth → FIRE Core breadboard → thin FIRE Core spine → real-project validation.**
 
-Lab can continue holding future visual experiments after approval; their existence does not mutate Truth or FIRE automatically.
+Lab remains available for future bounded experiments; its existence does not mutate Truth or FIRE automatically.
 
 ## Data / generation safety
 
