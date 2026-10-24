@@ -24,6 +24,8 @@ PR **#66 — Return coordinated shell iteration to G7** established that complet
 
 PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review still exposed systemic shell inconsistencies: project-row management treatment, glyph/accessory geometry, modal composition, and fixture-specific UI being mistaken for shell work.
 
+PR **#73 — Repair G7 shell deployment verification and cache behavior** is the active reliability repair after a shell pass was merged despite red regressions and iOS/Safari could continue serving stale unversioned Shell Test assets. The repair versions G7/Shell Test asset URLs and realigns regression expectations with the current certification surface. Do not merge shell changes with red regressions; verify the exact deployed commit before physical review.
+
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
 The active phase is now **G7 Shell Certification**. `G7_SHELL_CERTIFICATION.md` defines the finite ten-category completion contract, `Unresolved → Candidate → Locked` states, the developer-only Shell Test, and the final freeze gate.
