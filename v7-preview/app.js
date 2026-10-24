@@ -20,6 +20,7 @@ import {
 const { clean, deepCopy, uid } = helpers;
 const app = document.getElementById("app");
 const sheetRoot = document.getElementById("sheetRoot");
+const VALID_ROUTES = new Set(["projects", "project", "setup", "structure", "tracks", "notes"]);
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
   "&": "&amp;",
   "<": "&lt;",
@@ -46,8 +47,8 @@ function projectById(projectId) {
   return db.projects.find((item) => item.id === projectId) || null;
 }
 
-function backButton(route, label = "Back") {
-  return `<button class="toolbar-button icon-back" data-route="${route}" data-nav="replace" aria-label="${esc(label)}"><span class="back-glyph" aria-hidden="true">‹</span></button>`;
+function backButton(fallbackRoute, label = "Back") {
+  return `<button class="toolbar-button icon-back" data-action="go-back" data-fallback-route="${esc(fallbackRoute)}" aria-label="${esc(label)}"><span class="back-glyph" aria-hidden="true">‹</span></button>`;
 }
 
 function moreButton(action = "project-actions", label = "Project actions") {
@@ -72,8 +73,8 @@ function pageAction(label, action, id = "") {
   return `<div class="page-action-footer"><button${id ? ` id="${esc(id)}"` : ""} class="primary-action" data-action="${esc(action)}">${esc(label)}</button></div>`;
 }
 
-function setHistory(route, mode = "push") {
-  const state = { v7Preview: true, route };
+function setHistory(route, mode = "push", fromRoute = null) {
+  const state = { v7Preview: true, route, from: mode === "push" ? fromRoute : null };
   const hash = `#${route}`;
   if (mode === "replace") history.replaceState(state, "", hash);
   else history.pushState(state, "", hash);
@@ -81,14 +82,24 @@ function setHistory(route, mode = "push") {
 
 function navigate(route, mode = "push") {
   closeSheet(false);
+  const fromRoute = currentRoute;
   currentRoute = route;
-  setHistory(route, mode);
+  setHistory(route, mode, fromRoute);
   render();
   window.scrollTo(0, 0);
 }
 
 function continueTo(route) {
-  navigate(route, "replace");
+  navigate(route, "push");
+}
+
+function goBack(fallbackRoute) {
+  const previousRoute = history.state?.v7Preview ? history.state.from : null;
+  if (previousRoute && VALID_ROUTES.has(previousRoute)) {
+    history.back();
+    return;
+  }
+  navigate(VALID_ROUTES.has(fallbackRoute) ? fallbackRoute : "project", "replace");
 }
 
 function showBuildInfo() {
@@ -215,15 +226,15 @@ function renderSetup() {
   const setup = item.map.setup;
   app.innerHTML = `
     <main class="screen work-screen scroll-safe">
-      ${screenHeader("Song Setup", { backRoute: "project", backLabel: item.title })}
-      <div class="form-group">
+      ${screenHeader("Setup", { backRoute: "project", backLabel: item.title })}
+      <div class="form-group work-content">
         ${setupToggleRow("Reference", "reference", setup.reference)}
         <div class="form-row"><span class="form-label">Tempo</span><span class="form-value"><input id="tempoInput" class="inline-input" inputmode="decimal" aria-label="Tempo" value="${esc(setup.tempo)}" placeholder="—"><span>BPM</span></span></div>
         <div class="form-row"><span class="form-label">Meter</span><select id="meterInput" class="inline-select" aria-label="Meter"><option ${setup.meter === "4/4" ? "selected" : ""}>4/4</option><option ${setup.meter === "3/4" ? "selected" : ""}>3/4</option><option ${setup.meter === "6/8" ? "selected" : ""}>6/8</option></select></div>
         ${setupToggleRow("Grid", "grid", setup.grid)}
-        ${setupToggleRow("First Listen", "firstListen", setup.firstListen)}
+        ${setupToggleRow("Listen", "firstListen", setup.firstListen)}
       </div>
-      <div id="setupContinuation">${setupContinuationMarkup(item)}</div>
+      <div id="setupContinuation" class="work-action-host">${setupContinuationMarkup(item)}</div>
     </main>`;
 }
 
@@ -241,9 +252,9 @@ function renderStructure() {
       <button class="reorder-handle" data-section-reorder="${esc(section.id)}" aria-label="Reorder ${esc(section.name)}" title="Drag to reorder">≡</button>
     </div>`).join("");
 
-  const arrangement = sections.length ? `<div class="group arrangement">${rows}</div>` : "";
+  const arrangement = sections.length ? `<div class="group arrangement work-content">${rows}</div>` : "";
   const verification = sections.length
-    ? `<div class="group structure-verification"><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Matches the song</span>${completionAccessory(item.map.structureVerified)}</button></div>`
+    ? `<div class="group structure-verification"><button class="row structure-confirm-row" data-action="toggle-structure-verified"><span class="row-title">Accurate</span>${completionAccessory(item.map.structureVerified)}</button></div>`
     : "";
   const continuation = structureComplete(item) ? pageAction("Continue", "continue-tracks") : "";
 
@@ -251,13 +262,13 @@ function renderStructure() {
     <main class="screen work-screen scroll-safe">
       ${screenHeader("Structure", { backRoute: "project", backLabel: item.title, right: addButton("open-add-section", "Add Section") })}
       <div class="structure-stack">${arrangement}${verification}</div>
-      ${continuation}
+      <div class="work-action-host">${continuation}</div>
     </main>`;
 }
 
 function choiceTile(name, { selected = false, action = "", dataName = "", classes = "", check = false } = {}) {
   const data = dataName ? ` data-name="${esc(dataName)}"` : "";
-  return `<button class="choice-tile${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}"><span>${esc(name)}</span>${selected && check ? `<span class="choice-check track-check" aria-hidden="true">✓</span>` : ""}</button>`;
+  return `<button class="choice-tile selection-cell${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}"><span>${esc(name)}</span>${selected && check ? `<span class="choice-check track-check" aria-hidden="true">✓</span>` : ""}</button>`;
 }
 
 function trackTile(name, selected) {
@@ -275,12 +286,9 @@ function renderTracks() {
 
   app.innerHTML = `
     <main class="screen work-screen scroll-safe">
-      ${screenHeader("Tracks", { backRoute: "project", backLabel: item.title })}
-      <div class="choice-grid track-grid">
-        ${tiles}
-        <button class="choice-tile track-tile track-other" data-action="open-custom-track"><span>Other</span><span class="plus" aria-hidden="true">＋</span></button>
-      </div>
-      ${continuation}
+      ${screenHeader("Tracks", { backRoute: "project", backLabel: item.title, right: addButton("open-custom-track", "Add Track") })}
+      <div class="selection-surface choice-grid track-grid work-content">${tiles}</div>
+      <div class="work-action-host">${continuation}</div>
     </main>`;
 }
 
@@ -333,11 +341,16 @@ function projectFields(title = "", artist = "", prefix = "newProject") {
     </div>`;
 }
 
+function segmentButton(label, { selected = false, action = "", value = "", valueKey = "value", classes = "" } = {}) {
+  const data = value !== "" ? ` data-${esc(valueKey)}="${esc(value)}"` : "";
+  return `<button class="segment-option${selected ? " selected" : ""}${classes ? ` ${classes}` : ""}"${action ? ` data-action="${esc(action)}"` : ""}${data} aria-pressed="${selected}">${esc(label)}</button>`;
+}
+
 function projectTypeControl(selected = "original") {
   return `
-    <div class="project-type-control" aria-label="Project type">
-      <button class="project-type-option${selected === "original" ? " selected" : ""}" data-action="choose-project-type" data-project-type="original" aria-pressed="${selected === "original"}">Original</button>
-      <button class="project-type-option${selected === "study" ? " selected" : ""}" data-action="choose-project-type" data-project-type="study" aria-pressed="${selected === "study"}">Cover</button>
+    <div class="segmented-control project-type-control" aria-label="Project type">
+      ${segmentButton("Original", { selected: selected === "original", action: "choose-project-type", value: "original", valueKey: "project-type", classes: "project-type-option" })}
+      ${segmentButton("Cover", { selected: selected === "study", action: "choose-project-type", value: "study", valueKey: "project-type", classes: "project-type-option" })}
     </div>`;
 }
 
@@ -397,14 +410,26 @@ function createProject() {
 function sectionBarsControls(selectedBars) {
   const standard = [4, 8, 12, 16];
   const isCustom = !standard.includes(Number(selectedBars));
-  const choices = standard.map((value) => `<button class="choice-tile choice-compact bar-choice${Number(selectedBars) === value ? " selected" : ""}" data-action="choose-section-bars" data-bars="${value}" aria-pressed="${Number(selectedBars) === value}"><span>${value}</span></button>`).join("");
-  return `<div class="choice-grid bars-grid" aria-label="Bars">${choices}<button class="choice-tile choice-compact bar-choice${isCustom ? " selected" : ""}" data-action="choose-section-bars" data-bars="custom" aria-pressed="${isCustom}"><span>Custom</span></button></div>`;
+  const choices = standard.map((value) => segmentButton(String(value), {
+    selected: Number(selectedBars) === value,
+    action: "choose-section-bars",
+    value,
+    valueKey: "bars",
+    classes: "bar-choice choice-compact choice-tile",
+  })).join("");
+  return `<div class="segmented-control bars-grid" aria-label="Bars">${choices}${segmentButton("Custom", {
+    selected: isCustom,
+    action: "choose-section-bars",
+    value: "custom",
+    valueKey: "bars",
+    classes: "bar-choice choice-compact choice-tile",
+  })}</div>`;
 }
 
 function openAddSectionSheet() {
   const choices = [...SECTION_TYPES, "Custom"].map((name) => choiceTile(name, { action: "choose-section-type", dataName: name, classes: "sheet-choice section-choice" })).join("");
   openSheet(`
-    <div class="choice-grid section-types">${choices}</div>
+    <div class="selection-surface choice-grid section-types">${choices}</div>
     <div id="customSectionArea" hidden>${textField("customSectionName", "Section name", "", "Section name", { visibleLabel: false })}</div>
     ${sectionBarsControls(8)}
     <div id="customBarsArea" hidden><label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" placeholder="Bars"></div>
@@ -519,7 +544,7 @@ function openProjectConfirmation(kind, projectId) {
   const item = projectById(projectId);
   if (!item) return;
   if (kind === "reset") {
-    openSheet(`<h2>Reset progress?</h2><p class="sheet-message">This clears Song Setup, Structure, and Tracks.</p><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Reset", "confirm-reset-project", { danger: true })}</div>`, { type: "confirm-reset-project", projectId: item.id }, "Reset progress");
+    openSheet(`<h2>Reset progress?</h2><p class="sheet-message">This clears Setup, Structure, and Tracks.</p><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Reset", "confirm-reset-project", { danger: true })}</div>`, { type: "confirm-reset-project", projectId: item.id }, "Reset progress");
     return;
   }
   openSheet(`<h2>Delete project?</h2><p class="sheet-message">${esc(item.title)} will be permanently deleted.</p><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Delete", "confirm-delete-project", { danger: true })}</div>`, { type: "confirm-delete-project", projectId: item.id }, "Delete project");
@@ -593,11 +618,12 @@ app.addEventListener("click", (event) => {
     save();
     return navigate("project");
   }
-  if (button.dataset.route) return navigate(button.dataset.route, button.dataset.nav === "replace" ? "replace" : "push");
+  if (button.dataset.route) return navigate(button.dataset.route);
 
   const action = button.dataset.action;
   if (!action) return;
   const item = project();
+  if (action === "go-back") return goBack(button.dataset.fallbackRoute || "project");
   if (action === "new-project") return openNewProjectSheet();
   if (action === "project-actions") return openProjectActions();
   if (action === "toggle-setup") {
@@ -746,15 +772,13 @@ document.addEventListener("keydown", (event) => {
 
 window.addEventListener("popstate", (event) => {
   const route = event.state?.v7Preview ? event.state.route : (location.hash || "#projects").slice(1);
-  const validRoutes = new Set(["projects", "project", "setup", "structure", "tracks", "notes"]);
-  currentRoute = validRoutes.has(route) ? route : "project";
+  currentRoute = VALID_ROUTES.has(route) ? route : "project";
   closeSheet(false);
   render();
   window.scrollTo(0, 0);
 });
 
 const hashRoute = (location.hash || "").slice(1);
-const validRoutes = new Set(["projects", "project", "setup", "structure", "tracks", "notes"]);
-currentRoute = validRoutes.has(hashRoute) ? hashRoute : (hashRoute ? "project" : "projects");
-history.replaceState({ v7Preview: true, route: currentRoute }, "", `#${currentRoute}`);
+currentRoute = VALID_ROUTES.has(hashRoute) ? hashRoute : (hashRoute ? "project" : "projects");
+history.replaceState({ v7Preview: true, route: currentRoute, from: null }, "", `#${currentRoute}`);
 render();

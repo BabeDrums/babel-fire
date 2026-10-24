@@ -18,43 +18,46 @@ For wider ecosystem/surrounding-app work instead, route through `BABEL_START_HER
 
 Production remains V6. G7 remains the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-PR **#58** is the current merged/deployed G7 baseline on `main`, merge commit `bbcfed804b76076a03b43b6c427a487dc9084592`. It refined compact project sheets, project actions/destructive confirmation, one coherent Cover Home progression, and truthful Tracks completion after explicit Done. At the start of the current visual-grammar refinement there were no open PRs. Always re-check current `main` and open PRs rather than assuming this SHA remains latest.
+PR **#59** is the last merged/deployed G7 baseline before the current rhythm/navigation refinement, merge commit `d357ec634fa62bc9f6473c3cc1aa5df40db396f6`. It consolidated grouped project fields, visible secondary buttons, shared work-page action placement, Structure toolbar add/verification, and the first visual-grammar primitive pass. At the start of the current refinement there were no open PRs. Always re-check current `main` and open PRs rather than assuming this SHA remains latest.
 
-The G7 shell is still **not approved/frozen**. Do not begin FIRE Core breadboarding until Babel physically approves the generic shell fundamentals.
+The current refinement is a physical-rhythm + navigation consolidation prompted by the next real iPhone review. Whether it is still on a branch/PR or has already merged when a new chat reads this file, the next product gate remains **physical iPhone review**. G7 is still **not approved/frozen** and FIRE Core breadboarding must not begin until Babel explicitly approves the generic shell fundamentals.
 
-### Latest physical-device review after #58
+### Latest physical-device review after #59
 
-The latest iPhone review says the shell is substantially cleaner but still exposes design-system drift rather than one coherent visual grammar:
+The latest iPhone review says the shell is close, but the remaining discomfort is now identifiable as **physical rhythm drift** and history behavior rather than broad page architecture:
 
-- Projects itself looks strong and should remain stable unless a real issue appears
-- project management actions are functionally right but the action sheet still feels visually under-resolved; Cancel reads too much like floating text instead of a button
-- New Project's Original/Cover selector and separate Title/Artist boxes do not share one clear spacing rhythm; Title + Artist should read as one grouped field surface beneath the segmented project-type decision
-- Edit Project already feels clean and should inherit the same grouped Title/Artist treatment without adding chrome
-- Cover Home now feels clean and should stay stable
-- Song Setup feels solid and should not be visually churned merely to prove a design system exists
-- Continue/Done actions should share one stable final-page action region rather than page-specific placement; this should remain a normal non-sticky footer in document flow, not a viewport-fixed control
-- Structure still needs consolidation: Add Section should move to a toolbar `+`; arrangement rows should share Projects' grouped-list material/rhythm without copying irrelevant chevrons/ellipsis; `Matches the song` should become a separate verification card using the same surface material instead of a special tint
-- Add Section and Tracks are semantically similar direct-choice grids but currently use slightly different borders/fills/gaps/radii; they should share one Choice Tile family, with Tracks as multi-select + checks and bar length as a compact variant
-- visible Add Section / Edit Section / Add Track sheet headings are redundant when the source action already supplies context; Reset/Delete confirmation headings are not redundant because they communicate consequence
-- secondary actions such as Cancel/Done/Duplicate should be quieter than primary actions but still visibly tappable
+- Projects and the overall dark visual direction feel solid
+- Title/Artist grouped fields have a focus highlight that visually cuts off at the rounded outer corners
+- Add Section's option controls still read as a pile of separate buttons rather than one coherent selection control
+- `Matches the song`, `Song Setup`, and `First Listen` are wordier than the surrounding shell needs
+- page-level grouped rows visibly change physical height from Projects → Project Home → Setup → Structure, making the interface feel like it resizes between screens
+- Structure arrangement objects should not receive checkmarks merely for existing; completion/selection marks must remain semantically honest
+- Tracks should use the same toolbar `+` creation grammar as Projects and Structure rather than a special `Other` tile
+- trailing toolbar `+` feels too detached/high relative to the title; tighten the shared toolbar-to-title relationship rather than nudging only one icon
+- current work-page Back behavior is wrong for the visible Back affordance: Setup → Structure → Tracks can dump straight back to Project Home because Continue replaced history and work-page Back was hard-coded to Home
+- visible Back and browser/history Back should retrace the actual route when one exists, with Project Home as a safe fallback for direct/deep-linked work pages
 
-### Current visual-grammar refinement contract
+### Current rhythm/navigation refinement contract
 
-The active refinement resolves those findings as one shell-level consolidation:
+The active refinement resolves those findings as one shell-level system pass:
 
-- keep Projects, Cover Home, Song Setup behavior, title/header scaffold, Cover naming, recent ordering, scrolling, and V6 isolation intact
-- introduce reusable visual grammar primitives in G7 rather than one-off near-duplicates: grouped surfaces, Choice Tiles, segmented choice, non-sticky page action footer, and primary/secondary/destructive sheet buttons
-- New Project keeps Original / Cover as a segmented decision and groups Title + Artist into one rounded field surface with one internal divider
-- Edit Project uses the same grouped Title/Artist surface
-- Cancel/secondary actions receive a discernible button shape while remaining visually subordinate to primary actions
-- Song Setup Continue, Structure Continue, and Tracks Done use one shared page-action-footer grammar at the end of page content; do not introduce a sticky footer
-- Structure moves Add Section to the trailing toolbar `+`
-- Structure arrangement rows reuse the same grouped-list material/rhythm as Projects while keeping Structure-specific index, bar metadata, and reorder handle; do not add fake `•••`/chevron accessories
-- `Matches the song` becomes a separate grouped verification surface below the arrangement and drops its one-off tint
-- Add Section section-type choices and Tracks choices share one Choice Tile family; 4/8/12/16/Custom bars use the compact variant
-- omit visible headings from Add Section, Edit Section, and Add Track when their source action already makes context obvious; keep accessible dialog names
-- retain visible confirmation headings for Reset/Delete because they communicate consequence
-- reconcile tests/spec/handoff/doctrine guard/changelog so #58 is baseline truth and no guard hardcodes the obsolete “after #57” checkpoint
+- keep Projects architecture, Cover Home progression, project actions, scrolling model, data isolation, and FIRE Core boundaries intact
+- rename musician-facing **Song Setup → Setup**, **First Listen → Listen**, and Structure verification **Matches the song → Accurate**; internal compatibility fields such as `firstListen` may remain unchanged
+- establish shared geometry tokens instead of page-specific near-duplicates: grouped page row **64px**, connected selection cell **52px**, standard control/button roughly **46px**, toolbar touch area at least **44px**, and shared 4 / 8 / 12 / 16 / 20 / 24 spacing rhythm
+- Projects, Project Home, Setup, Structure arrangement, and Structure verification share the same 64px grouped-row rhythm; accessories still follow semantics
+- Title/Artist focus moves to the outer grouped field surface so one clean rounded emphasis replaces clipped inner rectangular focus rings
+- section type becomes one connected two-column Selection Surface with internal dividers instead of eight individually rounded buttons
+- Tracks uses the same connected Selection Surface family as section type; selected Tracks keep checks because Tracks is multi-select
+- bar length becomes one segmented **4 / 8 / 12 / 16 / Custom** control; Original / Cover remains the other segmented-control use
+- Structure section rows do **not** gain checkmarks, chevrons, or `•••`; they keep index + name + bars + reorder handle
+- Tracks moves custom-track creation to the trailing toolbar `+` and removes the special `Other` tile
+- Projects / Structure / Tracks now share toolbar `+` semantics: create/add the primary object for that view
+- tighten the shared toolbar-to-title gap so Back/`+`/`•••` and the title read as one header system
+- Continue from Setup → Structure and Structure → Tracks pushes actual route history rather than replacing it
+- visible Back retraces that in-app history when available; browser/history Back agrees; direct/deep-linked work pages fall back safely to Project Home
+- Tracks Done remains a completion action: confirm Tracks and return to Project Home without creating a Home → Back → Tracks loop
+- keep Continue/Done non-sticky, but short work pages use flexible document space so the shared action footer naturally occupies a consistent lower region; long pages scroll normally
+- reconcile tests/spec/handoff/doctrine guard/changelog in the same pass so no stale #58/#59 or old wording remains as current authority
 
 This refinement still does **not** equal physical approval. The next meaningful product action after merge/deploy is another real iPhone review of the changed surfaces.
 
@@ -69,32 +72,55 @@ Protect these semantic rules:
 
 Delete before styling. Subtitle/helper text is optional, not default. Same meaning should reuse the same visual grammar; different meaning may use different accessories. Do not compensate for weak fundamentals with signature visual polish.
 
+## Current state/accessory grammar
+
+- `○` = incomplete/upcoming progression
+- `→` = current/recommended progression
+- `✓` = completed progression or explicitly selected multi-select choice, according to context
+- selected fill = chosen option
+- drag handle = reorderable object
+- chevron = navigation deeper
+- `•••` = management/actions
+- `+` = create/add the primary discrete object for the current view
+
+Do not add a visual state simply to make two rows look more alike.
+
 ## Physical approval checklist
 
 On real iPhone Safari, inspect:
 
 1. Does Projects → project → work keep title position/scale calm and predictable?
-2. Does **Cover** read naturally next to Original?
-3. Does New Project feel complete immediately and keep Original/Cover plus grouped Title/Artist visually coherent?
-4. Does Edit Project remain obvious with the same grouped Title/Artist pattern, including after clearing a field?
-5. Do Title/Artist keyboard capitalization suggestions behave naturally without forcing casing?
-6. Does `•••` feel like the same control in rows and the toolbar, and can a project-card menu open without changing the active project?
-7. Are Edit / Reset / Delete / Cancel terse and understandable, with Cancel visibly tappable and Reset/Delete confirmation preventing accidental loss?
-8. Does meaningful recent activity ordering still feel useful?
-9. Does Cover Home still read as one calm progression with no redundant completion card?
-10. Is Song Setup still clear, including Tempo focus/keyboard behavior, without unnecessary redesign?
-11. Do Continue/Done actions feel like one consistent final-page action region without becoming a sticky browser-bar competitor?
-12. Do Structure rows feel like the same grouped-list system as Projects while keeping honest Structure-specific controls?
-13. Is toolbar `+` a clean/discoverable Add Section affordance?
-14. Does Structure still allow quick repeated section entry, direct reorder, and compact Edit without regression?
-15. Does `Matches the song` read as a distinct verification step without a weird one-off tint?
-16. Do Add Section and Tracks visibly belong to the same Choice Tile family, with bar choices as the compact variant?
-17. Does Tracks still feel fast as a grid while selected state, Other, and Done feel integrated?
-18. Does Tracks remain incomplete until Done explicitly confirms the current non-empty selection, and does editing later invalidate that confirmation?
-19. Are redundant sheet headings gone while Reset/Delete confirmation headings remain useful?
-20. Do sheets feel honest without a dead grabber/drag affordance?
-21. Does the Cover flow stop cleanly after current mapped shell work without forcing learning chrome?
-22. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
+2. Do Back/`+`/`•••` feel visually connected to the title rather than floating too high?
+3. Does **Cover** read naturally next to Original?
+4. Does New Project keep Original/Cover plus grouped Title/Artist visually coherent?
+5. Does Title/Artist focus show one clean rounded group emphasis with no cut-off corners?
+6. Does Edit Project remain obvious with the same grouped Title/Artist pattern, including after clearing a field?
+7. Do Title/Artist keyboard capitalization suggestions behave naturally without forcing casing?
+8. Does `•••` feel like the same control in rows and the toolbar, and can a project-card menu open without changing the active project?
+9. Are Edit / Reset / Delete / Cancel terse and understandable, with destructive confirmation preventing accidental loss?
+10. Does meaningful recent activity ordering still feel useful?
+11. Does Cover Home still read as one calm progression with no redundant completion card?
+12. Does **Setup → Structure → Tracks** read naturally and concisely?
+13. Do page-level grouped rows keep one stable 64px rhythm instead of visibly resizing between screens?
+14. Does Setup feel clear as Reference / Tempo / Meter / Grid / Listen, including Tempo focus/keyboard behavior?
+15. Do Continue/Done actions feel like one consistent lower page-action region without becoming sticky?
+16. If Babel enters Setup → Continue → Structure → Continue → Tracks, does visible Back retrace Tracks → Structure → Setup → Home?
+17. If Babel enters Structure or Tracks directly from Home, does Back return directly to Home?
+18. Does browser/history Back agree with the visible Back button?
+19. After Tracks Done returns Home, does Home Back go to Projects instead of reopening Tracks?
+20. Do Structure rows feel like the same grouped-row system as Projects without fake checkmarks/chevrons/ellipsis?
+21. Is toolbar `+` a clean/discoverable Add Section affordance?
+22. Does Add Section read as one connected section-type selection surface instead of button soup?
+23. Does **4 / 8 / 12 / 16 / Custom** read as one coherent segmented bar-length control?
+24. Does Structure still allow quick repeated section entry, direct reorder, and compact Edit without regression?
+25. Does **Accurate** read naturally as the separate Structure verification step?
+26. Does Tracks visibly belong to the same connected Selection Surface family as Add Section while preserving multi-select checks?
+27. Is toolbar `+` a clean/discoverable Add Track affordance, with no need for an `Other` tile?
+28. Does Tracks remain incomplete until Done explicitly confirms the current non-empty selection, and does editing later invalidate that confirmation?
+29. Are redundant sheet headings still gone while Reset/Delete confirmation headings remain useful?
+30. Do sheets feel honest without a dead grabber/drag affordance?
+31. Does the Cover flow stop cleanly after current mapped shell work without forcing learning chrome?
+32. Overall: **can Babel move through the shell without wondering what kind of UI is going to happen next?**
 
 If yes, explicitly record approval and stop broad shell polishing. Small later animation/personality/microinteraction improvements remain allowed after the product logic proves itself.
 

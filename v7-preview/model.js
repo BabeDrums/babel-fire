@@ -25,7 +25,7 @@ export const SECTION_TYPES = [
 ];
 
 export const WORK = {
-  setup: { title: "Song Setup" },
+  setup: { title: "Setup" },
   structure: { title: "Structure" },
   tracks: { title: "Tracks" },
 };

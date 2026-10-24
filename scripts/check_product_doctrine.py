@@ -43,7 +43,8 @@ REQUIRED = {
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
         "Latest physical-device review",
-        "Current visual-grammar refinement contract",
+        "Current rhythm/navigation refinement contract",
+        "Current state/accessory grammar",
         "Parallel-chat ownership",
         "Cover",
     ],
@@ -94,6 +95,7 @@ REQUIRED = {
         "Promotion rule",
         "Parallel-chat rule",
         "read-mostly by default",
+        "post-#59 physical-device rhythm/navigation feedback",
     ],
     "REFERENCES.md": [
         "# Babel FIRE — Reference Registry",
@@ -111,14 +113,19 @@ REQUIRED = {
         "`FIRE_CORE.md` governs cross-generation product doctrine",
         "Delete before styling.",
         "## Interaction grammar",
-        "## Visual grammar primitives",
+        "## Physical rhythm and visual grammar primitives",
+        "## State and accessory grammar",
+        "## Navigation and Back behavior",
         "**Inline**",
         "**Sheet**",
         "Original",
         "Recreation",
         "Cover",
-        "Choice tile",
+        "Grouped surface",
+        "Selection surface",
+        "Segmented control",
         "Page action footer",
+        "Accurate",
     ],
 }
 
@@ -138,6 +145,13 @@ FORBIDDEN = {
     "START_HERE.md": [
         "`V5.md` is historical",
         "Latest physical-device review after #57",
+        "Current visual-grammar refinement contract",
+        "PR **#58** is the current merged/deployed G7 baseline",
+    ],
+    "V7_DRAFT.md": [
+        "current Cover shell work remains **Song Setup → Structure → Tracks**",
+        "`Matches the song` is a separate grouped verification surface",
+        "`Other` belongs to the same selection surface",
     ],
     "BABEL_START_HERE.md": [
         "FIRE = making the music.\nThe learning app = studying.",
