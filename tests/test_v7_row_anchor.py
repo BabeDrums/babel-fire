@@ -72,19 +72,27 @@ class V7SharedRowAnchor(unittest.TestCase):
             "localStorage.setItem(%s,%s);"
             % (json.dumps(PREVIEW_KEY), json.dumps(json.dumps(study_db())))
         )
-        page = context.new_page()
-        page.set_default_timeout(5000)
 
-        page.goto(URL + "#project")
-        home_x = page.locator(".journey-row .row-title").first.bounding_box()["x"]
-        mark_x = page.locator(".journey-row .journey-mark").first.bounding_box()["x"]
+        def fresh_page(route):
+            page = context.new_page()
+            page.set_default_timeout(5000)
+            response = page.goto(URL + f"#{route}")
+            self.assertEqual(response.status, 200)
+            return page
+
+        home = fresh_page("project")
+        home_x = home.locator(".journey-row .row-title").first.bounding_box()["x"]
+        mark_x = home.locator(".journey-row .journey-mark").first.bounding_box()["x"]
         self.assertGreater(mark_x, home_x)
+        home.close()
 
-        page.goto(URL + "#setup")
-        setup_x = page.locator(".form-label").first.bounding_box()["x"]
+        setup = fresh_page("setup")
+        setup_x = setup.locator(".form-label").first.bounding_box()["x"]
+        setup.close()
 
-        page.goto(URL + "#structure")
-        structure_x = page.locator(".arrangement-name").first.bounding_box()["x"]
+        structure = fresh_page("structure")
+        structure_x = structure.locator(".arrangement-name").first.bounding_box()["x"]
+        structure.close()
 
         self.assertAlmostEqual(home_x, setup_x, delta=1.0)
         self.assertAlmostEqual(home_x, structure_x, delta=1.0)
