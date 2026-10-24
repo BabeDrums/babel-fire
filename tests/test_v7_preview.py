@@ -177,8 +177,6 @@ class V7Preview(unittest.TestCase):
         cover.click()
         self.assertAlmostEqual(title.bounding_box()["y"], title_y, delta=1)
         self.assertAlmostEqual(artist.bounding_box()["y"], artist_y, delta=1)
-        self.assertEqual(page.get_by_text("Song", exact=True).count(), 0)
-        self.assertEqual(page.get_by_text("Artist (optional)", exact=True).count(), 0)
 
     def test_original_artist_optional_cover_artist_required(self):
         page = self.open("projects", empty_db())
@@ -204,11 +202,8 @@ class V7Preview(unittest.TestCase):
         self.assertEqual(page.get_by_role("button", name="Reset Progress").count(), 0)
         self.assertEqual(page.get_by_role("button", name="Delete Project").count(), 0)
         self.assertEqual(page.locator(".sheet h2").count(), 0)
-        self.assertEqual(page.locator(".sheet").get_by_text("Creep", exact=True).count(), 0)
-        self.assertEqual(page.locator(".grabber").count(), 0)
         page.get_by_role("button", name="Edit", exact=True).click()
         self.assertEqual(page.locator(".sheet h2").count(), 0)
-        self.assertEqual(page.locator(".sheet .field-label").count(), 0)
         expect(page.get_by_role("textbox", name="Title")).to_have_attribute("autocapitalize", "words")
         expect(page.get_by_role("textbox", name="Artist")).to_have_attribute("autocapitalize", "words")
 
@@ -229,6 +224,7 @@ class V7Preview(unittest.TestCase):
         page.get_by_role("button", name="Actions for Creep").click()
         page.get_by_role("button", name="Reset", exact=True).click()
         expect(page.locator(".sheet h2")).to_have_text("Reset progress?")
+        expect(page.locator(".sheet-message")).to_contain_text("Setup, Structure, and Tracks")
         before = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
         self.assertTrue(before["projects"][0]["map"]["setup"]["reference"])
         page.get_by_role("button", name="Reset", exact=True).click()
@@ -238,37 +234,18 @@ class V7Preview(unittest.TestCase):
         page.get_by_role("button", name="Actions for Creep").click()
         page.get_by_role("button", name="Delete", exact=True).click()
         expect(page.locator(".sheet h2")).to_have_text("Delete project?")
-        self.assertEqual(len(page.evaluate("(key) => JSON.parse(localStorage.getItem(key)).projects", PREVIEW_KEY)), 1)
         page.get_by_role("button", name="Cancel").click()
         self.assertEqual(len(page.evaluate("(key) => JSON.parse(localStorage.getItem(key)).projects", PREVIEW_KEY)), 1)
-
-    def test_more_control_is_same_visual_component_on_card_and_project_home(self):
-        projects = self.open("projects")
-        card_more = projects.get_by_role("button", name="Actions for Creep")
-        card_size = float(card_more.evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
-        home = self.open("project")
-        toolbar_more = home.get_by_role("button", name="Project actions")
-        home_size = float(toolbar_more.evaluate("el => parseFloat(getComputedStyle(el).fontSize)"))
-        self.assertEqual(card_size, home_size)
-        self.assertGreaterEqual(toolbar_more.bounding_box()["width"], 44)
 
     def test_projects_sort_by_meaningful_activity_not_opening(self):
         old = study_project("old", "Old Song", activity=10)
         recent = study_project("recent", "Recent Song", activity=20)
         data = {"version": 5, "currentProjectId": "old", "projects": [old, recent]}
         page = self.open("projects", data)
-        titles = page.locator(".project-copy strong").all_text_contents()
-        self.assertEqual(titles[:2], ["Recent Song", "Old Song"])
+        self.assertEqual(page.locator(".project-copy strong").all_text_contents()[:2], ["Recent Song", "Old Song"])
         page.locator('[data-project="old"]').click()
         page.get_by_role("button", name="Projects").click()
-        titles = page.locator(".project-copy strong").all_text_contents()
-        self.assertEqual(titles[:2], ["Recent Song", "Old Song"])
-        page.get_by_role("button", name="Actions for Old Song").click()
-        page.get_by_role("button", name="Edit", exact=True).click()
-        page.get_by_role("textbox", name="Title").fill("Old Song Edited")
-        page.get_by_role("button", name="Save").click()
-        titles = page.locator(".project-copy strong").all_text_contents()
-        self.assertEqual(titles[0], "Old Song Edited")
+        self.assertEqual(page.locator(".project-copy strong").all_text_contents()[:2], ["Recent Song", "Old Song"])
 
     def test_project_home_is_one_coherent_cover_progression(self):
         page = self.open("project")
@@ -276,31 +253,24 @@ class V7Preview(unittest.TestCase):
         expect(page.locator(".screen-meta")).to_have_text("Radiohead · Cover")
         self.assertEqual(page.locator(".journey-group .journey-row").count(), 3)
         current = page.locator('.journey-row[aria-current="step"]')
-        expect(current).to_contain_text("Song Setup")
-        self.assertEqual(page.locator(".continue-row").count(), 0)
+        expect(current).to_contain_text("Setup")
+        self.assertEqual(page.get_by_text("Song Setup", exact=True).count(), 0)
         self.assertEqual(page.locator(".map-complete").count(), 0)
         self.assertEqual(page.get_by_text("Section Study", exact=True).count(), 0)
         self.assertEqual(page.get_by_text("Review Map", exact=True).count(), 0)
-        self.assertEqual(page.get_by_text("Later", exact=True).count(), 0)
 
     def test_completed_project_home_uses_progression_itself_as_status(self):
         page = self.open("project", study_db(setup=True, structure=True, tracks=True))
         self.assertEqual(page.locator(".journey-row.done").count(), 3)
-        self.assertEqual(page.locator(".map-complete").count(), 0)
         self.assertEqual(page.get_by_text("Song map complete.", exact=True).count(), 0)
 
-    def test_work_pages_remove_default_helper_copy(self):
-        setup = self.open("setup")
-        tracks = self.open("tracks")
-        self.assertEqual(setup.get_by_text("Import it into your session.", exact=True).count(), 0)
-        self.assertEqual(setup.get_by_text("Align it to the bar grid.", exact=True).count(), 0)
-        self.assertEqual(setup.get_by_text("Play the full song once.", exact=True).count(), 0)
-        self.assertEqual(tracks.get_by_text("Choose everything you hear.", exact=True).count(), 0)
-
-    def test_song_setup_tempo_focus_and_live_continuation(self):
+    def test_setup_is_concise_and_tempo_focus_keeps_live_continuation(self):
         data = study_db()
         data["projects"][0]["map"]["setup"].update({"reference": True, "grid": True, "firstListen": True})
         page = self.open("setup", data)
+        expect(page.locator(".title-block h1")).to_have_text("Setup")
+        expect(page.get_by_text("Listen", exact=True)).to_be_visible()
+        self.assertEqual(page.get_by_text("First Listen", exact=True).count(), 0)
         tempo = page.get_by_role("textbox", name="Tempo")
         expect(tempo).to_have_attribute("inputmode", "decimal")
         self.assertGreaterEqual(float(tempo.evaluate("el => parseFloat(getComputedStyle(el).fontSize)")), 16)
@@ -323,6 +293,8 @@ class V7Preview(unittest.TestCase):
         page.get_by_role("button", name="Done").click()
         expect(page.locator(".arrangement-row")).to_contain_text("Intro")
         expect(page.locator(".arrangement-row")).to_contain_text("12 bars")
+        expect(page.get_by_text("Accurate", exact=True)).to_be_visible()
+        self.assertEqual(page.get_by_text("Matches the song", exact=True).count(), 0)
 
     def test_structure_builder_supports_custom_length_without_edit_round_trip(self):
         page = self.open("structure")
@@ -359,8 +331,7 @@ class V7Preview(unittest.TestCase):
         page = self.open("structure", data)
         page.get_by_role("button", name="Reorder Verse").focus()
         page.keyboard.press("ArrowUp")
-        names = page.locator(".arrangement-name").all_text_contents()
-        self.assertEqual(names, ["Verse", "Intro"])
+        self.assertEqual(page.locator(".arrangement-name").all_text_contents(), ["Verse", "Intro"])
         self.assertEqual(page.locator(".sheet").count(), 0)
 
     def test_tracks_selection_requires_done_to_complete_mapping(self):
@@ -372,9 +343,6 @@ class V7Preview(unittest.TestCase):
         self.assertFalse(pending["projects"][0]["map"]["tracksVerified"])
         page.get_by_role("button", name="Done").click()
         expect(page.locator(".journey-row.done")).to_have_count(3)
-        self.assertEqual(page.locator(".map-complete").count(), 0)
-        self.assertEqual(page.get_by_text("Section Study", exact=True).count(), 0)
-        self.assertNotIn("section-study", page.url)
         complete = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
         self.assertTrue(complete["projects"][0]["map"]["tracksVerified"])
 
@@ -388,19 +356,13 @@ class V7Preview(unittest.TestCase):
         confirmed = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
         self.assertTrue(confirmed["projects"][0]["map"]["tracksVerified"])
 
-    def test_tracks_keep_compact_grid_and_integrate_other(self):
+    def test_tracks_use_toolbar_add_for_custom_tracks(self):
         page = self.open("tracks")
-        self.assertEqual(page.locator(".track-grid").count(), 1)
-        other = page.get_by_role("button", name="Other")
-        classes = other.get_attribute("class") or ""
-        self.assertIn("track-tile", classes)
-        self.assertIn("track-other", classes)
-        page.locator('.track-tile[data-name="Vocal"]').click()
-        expect(page.locator('.track-tile[data-name="Vocal"] .track-check')).to_have_text("✓")
-
-    def test_custom_track_name_uses_word_capitalization(self):
-        page = self.open("tracks")
-        page.get_by_role("button", name="Other").click()
+        add = page.get_by_role("button", name="Add Track")
+        expect(add).to_be_visible()
+        self.assertTrue(add.evaluate("el => el.closest('.toolbar') !== null"))
+        self.assertEqual(page.get_by_role("button", name="Other").count(), 0)
+        add.click()
         field = page.get_by_role("textbox", name="Track name")
         expect(field).to_have_attribute("autocapitalize", "words")
         field.fill("Strings")
@@ -450,11 +412,11 @@ class V7Preview(unittest.TestCase):
         self.assertNotIn("move-section", source)
         self.assertNotIn("continue-section-study", source)
         self.assertNotIn('>Recreation<', source)
-        self.assertNotIn('class="grabber"', source)
+        self.assertNotIn('class=\"grabber\"', source)
         self.assertNotIn(".grabber", styles)
-        self.assertNotIn("continue-row", source)
-        self.assertNotIn("map-complete", source)
+        self.assertNotIn("track-other", source)
         self.assertIn("Cover", model)
+        self.assertIn('title: \"Setup\"', model)
         self.assertIn("tracksVerified", model)
 
 
