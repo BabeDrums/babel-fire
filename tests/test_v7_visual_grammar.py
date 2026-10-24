@@ -127,9 +127,22 @@ class V7VisualGrammar(unittest.TestCase):
         page = self.open("projects")
         page.get_by_role("button", name="Actions for Smithereens").click()
         group = page.locator(".action-menu").bounding_box()
-        cancel = page.get_by_role("button", name="Cancel").bounding_box()
-        self.assertAlmostEqual(cancel["x"], group["x"], delta=1.0)
-        self.assertAlmostEqual(cancel["width"], group["width"], delta=1.0)
+        cancel = page.get_by_role("button", name="Cancel")
+        cancel_box = cancel.bounding_box()
+        self.assertAlmostEqual(cancel_box["x"], group["x"], delta=1.0)
+        self.assertAlmostEqual(cancel_box["width"], group["width"], delta=1.0)
+        self.assertNotEqual(cancel.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+
+    def test_toolbar_actions_are_anchored_controls_without_changing_back_semantics(self):
+        projects = self.open("projects")
+        add = projects.get_by_role("button", name="New Project")
+        self.assertNotEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        project = self.open("project")
+        more = project.get_by_role("button", name="Project actions")
+        back = project.get_by_role("button", name="Projects")
+        self.assertNotEqual(more.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertAlmostEqual(add.bounding_box()["width"], more.bounding_box()["width"], delta=1.0)
 
     def test_grouped_page_rows_share_one_64px_rhythm(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
@@ -185,7 +198,7 @@ class V7VisualGrammar(unittest.TestCase):
         actions = page.locator(".sheet-actions").bounding_box()
         self.assertAlmostEqual(bars["y"] - (types["y"] + types["height"]), 20.0, delta=1.0)
         self.assertAlmostEqual(actions["y"] - (bars["y"] + bars["height"]), 16.0, delta=1.0)
-        self.assertFalse(page.locator("#sectionAddedNotice").is_visible())
+        self.assertEqual(page.locator("#sectionAddedNotice").count(), 0)
 
     def test_tracks_and_structure_use_toolbar_plus_without_fake_other_row(self):
         structure = self.open("structure")
@@ -196,6 +209,21 @@ class V7VisualGrammar(unittest.TestCase):
         track_add = tracks.get_by_role("button", name="Add Track")
         self.assertTrue(track_add.evaluate("el => el.closest('.toolbar') !== null"))
         self.assertEqual(tracks.get_by_role("button", name="Other").count(), 0)
+
+    def test_track_grid_balances_the_final_row_for_the_current_viewport(self):
+        page = self.open("tracks")
+        surface = page.locator(".track-grid").bounding_box()
+        tiles = page.locator(".track-tile")
+        first = tiles.first.bounding_box()
+        last = tiles.last.bounding_box()
+        width = page.viewport_size["width"]
+        if width >= 700:
+            self.assertAlmostEqual(last["width"], surface["width"] - 2, delta=3.0)
+        else:
+            penultimate = tiles.nth(tiles.count() - 2).bounding_box()
+            combined = penultimate["width"] + last["width"] + 1
+            self.assertAlmostEqual(combined, surface["width"] - 2, delta=3.0)
+            self.assertAlmostEqual(first["width"], last["width"], delta=2.0)
 
     def test_structure_rows_do_not_fake_completion_or_project_accessories(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
@@ -229,6 +257,16 @@ class V7VisualGrammar(unittest.TestCase):
         setup_x = setup.locator(".form-label").first.bounding_box()["x"]
         structure_x = structure.locator(".arrangement-name").first.bounding_box()["x"]
         self.assertAlmostEqual(setup_x, structure_x, delta=1.0)
+
+    def test_setup_editable_values_share_one_trailing_control_grammar(self):
+        page = self.open("setup")
+        values = page.locator(".value-control")
+        self.assertEqual(values.count(), 2)
+        heights = values.evaluate_all("els => els.map(el => getComputedStyle(el).minHeight)")
+        backgrounds = values.evaluate_all("els => els.map(el => getComputedStyle(el).backgroundColor)")
+        self.assertEqual(len(set(heights)), 1)
+        self.assertEqual(len(set(backgrounds)), 1)
+        self.assertNotEqual(backgrounds[0], "rgba(0, 0, 0, 0)")
 
     def test_work_screens_share_first_content_anchor(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
