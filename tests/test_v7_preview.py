@@ -366,7 +366,7 @@ class V7Preview(unittest.TestCase):
         field = page.get_by_role("textbox", name="Track name")
         expect(field).to_have_attribute("autocapitalize", "words")
         field.fill("Strings")
-        page.get_by_role("button", name="Add").click()
+        page.get_by_role("button", name="Add", exact=True).click()
         expect(page.locator('.track-tile[data-name="Strings"]')).to_be_visible()
         state = page.evaluate("(key) => JSON.parse(localStorage.getItem(key))", PREVIEW_KEY)
         self.assertFalse(state["projects"][0]["map"]["tracksVerified"])
