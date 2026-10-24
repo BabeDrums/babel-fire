@@ -1,5 +1,6 @@
 const host = document.getElementById("shellTest");
 const sheetRoot = document.getElementById("sheetRoot");
+let buildCommitPromise = null;
 
 const toolbarButton = (kind, label) => kind === "add"
   ? `<button class="toolbar-button add-button" aria-label="${label}">+</button>`
@@ -11,7 +12,7 @@ const header = `
       <div class="toolbar-slot toolbar-leading"><a class="shell-test-link" href="./">← G7</a></div>
       <div class="toolbar-slot toolbar-trailing">${toolbarButton("add", "Example add action")}</div>
     </div>
-    <div class="title-block"><h1>Shell Test</h1><p class="screen-meta">Developer certification surface · actual G7 primitives</p></div>
+    <div class="title-block"><h1>Shell Test</h1><p class="screen-meta build-info" aria-label="Preview build">G7 · …</p></div>
   </header>`;
 
 host.innerHTML = `
@@ -92,6 +93,25 @@ host.innerHTML = `
       </div>
     </section>
   </main>`;
+
+function showBuildInfo() {
+  const targets = document.querySelectorAll(".build-info");
+  if (!targets.length) return;
+  buildCommitPromise ||= fetch("../build-info.json", { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) throw new Error("Build metadata unavailable");
+      return response.json();
+    })
+    .then((info) => /^[0-9a-f]{40}$/i.test(info.commit) ? info.commit.slice(0, 7) : "unavailable")
+    .catch(() => "unavailable");
+  buildCommitPromise.then((commit) => {
+    targets.forEach((target) => {
+      if (target.isConnected) target.textContent = `G7 · ${commit}`;
+    });
+  });
+}
+
+showBuildInfo();
 
 function closeSheet() {
   sheetRoot.hidden = true;
