@@ -15,15 +15,17 @@ Use **Babel** as the project-facing name.
 
 For wider ecosystem/surrounding-app work instead, use `BABEL_START_HERE.md`, `BABEL_APPS.md`, and `BABEL_PLATFORM.md` after Babel Truth.
 
-## Current state — G7 shell clarity refinement, NOT frozen
+## Current state — G7 live, NOT frozen
 
 Production remains V6.
 
 G7 remains the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-The last deployed baseline before this pass is PR **#62 — Consolidate G7 modal and row consistency**, merge `cdbcd23fca4fad338f62ce024dc6e89558b602d4`.
+The physically reviewed predecessor baseline was PR **#60**. The last deployed baseline before this pass is PR **#62 — Consolidate G7 modal and row consistency**, merge `cdbcd23fca4fad338f62ce024dc6e89558b602d4`.
 
-Physical review of that deployment found the shell materially closer, but not ready to freeze. The next coherent implementation is the **shell clarity refinement**:
+### Latest real-device review after #60
+
+That review sequence eventually produced the **Modal + row consistency consolidation** in PR #62. Physical review of #62 then found the shell materially closer, but not ready to freeze. The next coherent implementation is the **shell clarity refinement**:
 
 - keep the shared Back / trailing-action toolbar-slot structure; make trailing `+` / `•••` feel like intentional controls rather than isolated glyphs
 - remove redundant chevrons from project rows and Project Home progression rows
@@ -75,6 +77,15 @@ Few visible destinations are desirable, but checkpoint count is earned by the wo
 - iPhone/iPad share one product logic; sheet/dialog presentation may adapt
 - V6 production schema/data remain untouched
 
+## Interaction grammar retained from the approved shell direction
+
+- **Inline = choose/toggle/classify/confirm/evaluate** something already in the current task.
+- **Sheet = create/edit/manage a discrete thing** while staying in context.
+- Navigation enters another meaningful workspace.
+- Menu/secondary affordance holds utilities that should not compete with musical work.
+
+The current pass refines how those interaction families read physically; it does not change their meanings.
+
 ## Current shell/accessory grammar
 
 - `○` = incomplete/upcoming progression state
@@ -85,6 +96,8 @@ Few visible destinations are desirable, but checkpoint count is earned by the wo
 - chevron = deeper navigation only when another cue does not already make navigation clear
 - `•••` = management/actions
 - `+` = create/add the primary discrete object for the current view
+
+Tracks selection uses fill without redundant selection checks. Structure removes the visible ordinal column while preserving order in accessible edit/reorder labels.
 
 Do not add state/accessories merely for visual symmetry. Project rows and progression rows no longer need redundant chevrons; Notes may retain one as a utility-navigation cue.
 
