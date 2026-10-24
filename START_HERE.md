@@ -29,21 +29,30 @@ Physical review found the shell materially closer but **not ready to freeze**. I
 
 ## Current routing — shell exploration moves to Lab
 
-Exploratory visual-shell work now happens in Babel Lab's dedicated **Visual Lab / FIRE Shell Lab** harness.
+Exploratory visual-shell work now happens in Babel Lab's dedicated **Visual Lab / FIRE Shell Lab** environment.
 
 This does **not** move FIRE ownership or the FIRE project into Lab:
 
 - FIRE remains the product authority and owns product doctrine, runtime, data, specs, tests, and production/successor code
-- Visual Lab is a disposable visual-interaction harness using fake/prototype state
+- Visual Lab uses isolated fake/local state and must not read/write FIRE production or G7 storage
+- Visual Lab may reproduce the observable G7 shell behavior completely for experimentation
 - Lab may contain contradictory candidates and does not define a canonical Babel style
 - **Lab is evidence, never authority**
 - do not make G7 automatically match Lab; a chosen candidate must be deliberately implemented in FIRE
 
-The current Structure modal study is the first specimen in Visual Lab. It is not sufficient by itself to prove the shell. The harness should expand across representative pages, rows, controls, forms, sheets/dialogs, menus, states, focus/keyboard behavior, and iPhone/iPad adaptation before a shell candidate is considered mature.
+### Parity-first baseline
+
+The Visual Lab shell must not be a simplified component gallery whose missing behavior or harness chrome changes the thing Babel is judging.
+
+Before visual divergence, establish a faithful current-G7 baseline for the shell surfaces under review. Visible controls should work: project management, navigation/Back, Setup inputs/toggles, Structure creation/editing/reordering/verification, Tracks selection/custom creation/Done, menus, sheets/dialogs, focus/keyboard states, and responsive iPhone/iPad presentation as applicable.
+
+Harness-only navigation pills, explanatory prototype footer copy, and similar developer affordances should stay outside the judged FIRE canvas. Lab developer utilities may exist outside that canvas or behind a clearly separate/collapsible control.
+
+The protection against creating a second FIRE app is **authority and data ownership**, not deliberately incomplete behavior.
 
 Default promotion path:
 
-**Lab experiment → physical-device testing → candidate → FIRE implementation → FIRE physical validation → transferable rules promoted to Babel Truth.**
+**Current G7 → faithful functional Lab baseline → parity verification → visual experiments → physical-device testing → candidate → FIRE implementation → FIRE physical validation → transferable rules promoted to Babel Truth.**
 
 Pause further exploratory shell styling directly in G7 while this candidate work is active. Production fixes or safety fixes remain FIRE-local and should not be blocked by Lab.
 
