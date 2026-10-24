@@ -3,7 +3,7 @@
 This repository follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `531ad751be11573b224a91694d5eb870f0cea607`
+- Last reconciled Truth commit: `ae1e30b971571e7620578a48c637f0e18862375a`
 - Active unresolved continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
 
 ## Read before FIRE work
@@ -20,6 +20,8 @@ This repository follows shared cross-app Babel authority from:
 Babel Truth owns cross-app principles, design foundations, process, shared semantic contracts, repo roles, and major architecture decisions.
 
 `babel-fire` owns FIRE-specific product doctrine, runtime, data, generation specs, tests, current build state, and local implementation decisions.
+
+Babel Lab may contain FIRE-bound experiments, including the current shell/visual harness, but **Lab is evidence, never authority**. FIRE does not inherit a design merely because it exists in Lab. A chosen Lab candidate must be deliberately implemented and physically validated in FIRE before any transferable rule is eligible for Truth.
 
 Do not silently overwrite a FIRE-specific rule merely because a Truth rule looks similar. Classify conflicts first:
 

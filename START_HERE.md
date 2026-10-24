@@ -9,7 +9,7 @@ Use **Babel** as the project-facing name.
 3. this file — current FIRE build/review/next-step state
 4. `FIRE_CORE.md`
 5. `V6.md` for live production behavior
-6. `V7_DRAFT.md` for active G7 successor behavior
+6. `V7_DRAFT.md` for G7 successor behavior
 7. Babel Truth Issue #1 body **plus newer comments** for unresolved FIRE items
 8. code/tests as implementation evidence
 
@@ -21,27 +21,31 @@ Production remains V6.
 
 G7 remains the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-The physically reviewed predecessor baseline was PR **#60**. The last deployed baseline before this pass is PR **#62 — Consolidate G7 modal and row consistency**, merge `cdbcd23fca4fad338f62ce024dc6e89558b602d4`.
+PR **#63 — Refine G7 shell clarity after physical review** is merged at `a39b306b02c66c3cd3ed9749005af9966780e617`.
 
-### Latest real-device review after #60
-
-That review sequence eventually produced the **Modal + row consistency consolidation** in PR #62. Physical review of #62 then found the shell materially closer, but not ready to freeze. The next coherent implementation is the **shell clarity refinement**:
-
-- keep the shared Back / trailing-action toolbar-slot structure; make trailing `+` / `•••` feel like intentional controls rather than isolated glyphs
-- remove redundant chevrons from project rows and Project Home progression rows
-- keep project entries named **project rows** in product/design vocabulary
-- give Setup editable values a shared trailing-value control grammar
-- make Title Return/Next advance to Artist
-- make custom Bars numeric-only in behavior as well as keyboard intent
-- strengthen modal hierarchy through conceptual grouping, not additional decorative boxes
-- remove redundant Add Section success/helper copy
-- rebalance Tracks selection layout to item count + viewport rather than rendering filler-looking gaps
-- simplify `Section name` → `Section` and `Track name` → `Track`
-- make secondary sheet actions visibly pressable without competing with primary actions
-
-This pass must preserve the pieces that already physically tested well: Original/Cover selection, connected selection geometry, stable row rhythm/anchors, history-aware Back, non-sticky page actions, and one product logic across iPhone/iPad.
+Physical review found the shell materially closer but **not ready to freeze**. In particular, the modal/surface language still needs visual-system exploration rather than another sequence of local production patches.
 
 **G7 is not physically approved/frozen. FIRE Core breadboarding has not started.**
+
+## Current routing — shell exploration moves to Lab
+
+Exploratory visual-shell work now happens in Babel Lab's dedicated **Visual Lab / FIRE Shell Lab** harness.
+
+This does **not** move FIRE ownership or the FIRE project into Lab:
+
+- FIRE remains the product authority and owns product doctrine, runtime, data, specs, tests, and production/successor code
+- Visual Lab is a disposable visual-interaction harness using fake/prototype state
+- Lab may contain contradictory candidates and does not define a canonical Babel style
+- **Lab is evidence, never authority**
+- do not make G7 automatically match Lab; a chosen candidate must be deliberately implemented in FIRE
+
+The current Structure modal study is the first specimen in Visual Lab. It is not sufficient by itself to prove the shell. The harness should expand across representative pages, rows, controls, forms, sheets/dialogs, menus, states, focus/keyboard behavior, and iPhone/iPad adaptation before a shell candidate is considered mature.
+
+Default promotion path:
+
+**Lab experiment → physical-device testing → candidate → FIRE implementation → FIRE physical validation → transferable rules promoted to Babel Truth.**
+
+Pause further exploratory shell styling directly in G7 while this candidate work is active. Production fixes or safety fixes remain FIRE-local and should not be blocked by Lab.
 
 ## Critical boundary — shell fixtures are not FIRE Core architecture
 
@@ -51,7 +55,7 @@ Current G7 `Setup → Structure → Tracks` is **shell/workspace fixture content
 - Structure → sheets, single selection, segmented values, creation, editing, reordering
 - Tracks → multi-selection, adaptive collections, custom creation, explicit confirmation
 
-Do **not** interpret shell approval as approval of:
+Do **not** interpret eventual shell approval as approval of:
 
 - The Map being exactly Setup → Structure → Tracks
 - exactly three checkpoints per phase
@@ -61,77 +65,42 @@ After shell approval, FIRE Core breadboarding revisits the journey from first pr
 
 Few visible destinations are desirable, but checkpoint count is earned by the work rather than fixed at three.
 
-## Stable G7 shell behavior to preserve
+## Stable G7 behavior / evidence to preserve while experimenting
+
+These are useful tested behaviors and constraints, not a command that every Lab candidate must visually copy them:
 
 - Projects → project Home → current shell-fixture workspaces
 - public project types Original / Cover
-- shared 64px grouped-row rhythm across major work surfaces
-- connected section-type / Tracks selection-surface family
-- segmented `4 / 8 / 12 / 16 / Custom` family
-- grouped Title/Artist field focus at the group level
-- toolbar `+` means add/create the primary discrete thing on Projects / Structure / Tracks
-- toolbar `•••` means management/actions
+- stable grouped-row rhythm/anchors
 - history-aware Back retraces actual route history; direct work entry falls back safely to Project Home
+- toolbar `+` means add/create the primary discrete thing for the current view
+- toolbar `•••` means management/actions
 - Tracks Done confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop
-- shared non-sticky lower page-action region for Continue/Done
 - iPhone/iPad share one product logic; sheet/dialog presentation may adapt
 - V6 production schema/data remain untouched
 
-## Interaction grammar retained from the approved shell direction
+Existing interaction semantics remain useful evidence:
 
-- **Inline = choose/toggle/classify/confirm/evaluate** something already in the current task.
-- **Sheet = create/edit/manage a discrete thing** while staying in context.
-- Navigation enters another meaningful workspace.
-- Menu/secondary affordance holds utilities that should not compete with musical work.
+- **Inline = choose/toggle/classify/confirm/evaluate** something already in the current task
+- **Sheet = create/edit/manage a discrete thing** while staying in context
+- Navigation enters another meaningful workspace
+- Menu/secondary affordance holds utilities that should not compete with musical work
 
-The current pass refines how those interaction families read physically; it does not change their meanings.
+Visual Lab is allowed to challenge presentation details and candidate component geometry without silently changing these semantics. If an experiment challenges a semantic rule itself, label that explicitly rather than smuggling it in as styling.
 
-## Current shell/accessory grammar
+## Approval gate
 
-- `○` = incomplete/upcoming progression state
-- `→` = current/recommended progression state
-- `✓` = actual completion where that meaning is needed
-- selected fill = chosen option
-- drag handle = reorderable object
-- chevron = deeper navigation only when another cue does not already make navigation clear
-- `•••` = management/actions
-- `+` = create/add the primary discrete object for the current view
+Do not record shell approval automatically. Babel must explicitly approve/freeze the generic shell fundamentals **after** the chosen candidate has been implemented back into FIRE and physically validated in the real product.
 
-Tracks selection uses fill without redundant selection checks. Structure removes the visible ordinal column while preserving order in accessible edit/reorder labels.
-
-Do not add state/accessories merely for visual symmetry. Project rows and progression rows no longer need redundant chevrons; Notes may retain one as a utility-navigation cue.
-
-## Physical approval gate for this pass
-
-After the shell clarity refinement is merged and deployed, review on real iPhone Safari first, then sanity-check iPad adaptation.
-
-Focus on:
-
-1. toolbar system as a whole: Back, trailing `+` / `•••`, title relationship, touch targets, and whether the trailing action still feels stranded
-2. project rows without chevrons: opening remains obvious while `•••` still clearly means management
-3. Project Home progression without chevrons: state mark remains sufficient and rows remain obviously tappable
-4. New/Edit Project keyboard progression: Title Return/Next → Artist
-5. Cancel/secondary action treatment: clearly a button, still quieter than primary
-6. Setup Tempo/Meter: one clean, intentional trailing-value grammar
-7. Add/Edit Section modal hierarchy: related custom fields read as part of their parent group; major groups remain distinct
-8. custom Bars: numeric keyboard + nonnumeric rejection
-9. Add Section repeated-entry flow without redundant `Added …` helper copy
-10. Tracks adaptive layout: no filler-looking empty cells or awkward orphan treatment at phone/iPad widths
-11. microcopy (`Section`, `Track`) feels concise without losing meaning
-12. connected selection corners/outlines and stable 64px/52px geometry remain clean
-13. Setup / Structure / Tracks first-content position and Back/history behavior remain stable
-14. centered iPad dialogs preserve the same semantics/action hierarchy
-15. overall: **does the generic shell now feel predictable enough to stop redesigning it?**
-
-Do not record shell approval automatically. Babel must explicitly approve/freeze the generic shell fundamentals.
+Physical validation should cover iPhone first and iPad adaptation, plus representative default/selected/custom/disabled/focus/keyboard/long-content states as applicable.
 
 ## After shell approval
 
 Sequence:
 
-**physical G7 shell approval → promote proven generic shell primitives into Babel Truth → FIRE Core breadboard + Lab shell reconciliation may then proceed in their appropriate lanes → thin FIRE Core spine → real-project validation**
+**Lab candidate → FIRE implementation → physical FIRE shell approval → promote genuinely transferable shell primitives into Babel Truth → FIRE Core breadboard → thin FIRE Core spine → real-project validation.**
 
-FIRE Core does not need to wait for Lab visual reconciliation once the shared shell contract has been promoted; both can proceed without conflating product-specific behavior.
+Lab can continue holding future visual experiments after approval; their existence does not mutate Truth or FIRE automatically.
 
 ## Data / generation safety
 
@@ -146,7 +115,5 @@ FIRE Core does not need to wait for Lab visual reconciliation once the shared sh
 `CONTINUITY_INBOX.md` is retired as an active local buffer.
 
 All new unresolved durable Babel/FIRE deltas use Babel Truth Issue #1 under the persist-before-reply threshold. Routine capture is append-only through new comments; do not replace the Issue #1 body during ordinary work.
-
-At consolidation of this pass, the old post-#62 physical-review findings become implementation-resolved; the remaining unresolved item should be the new physical approval gate until Babel explicitly approves or reports another system-level defect.
 
 Git history is the archive for superseded implementation/history. Active docs should describe current truth, not every prior pass.
