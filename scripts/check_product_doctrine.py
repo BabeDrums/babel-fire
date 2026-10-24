@@ -1,11 +1,19 @@
-"""Protect FIRE/Babel authority wiring and known stale definitions.
+"""Protect durable FIRE/Babel authority wiring and known stale definitions.
 
-This guard intentionally checks only durable markers/known contradictions. It does not
-prove natural-language semantic consistency; human/product review remains required.
+This guard checks stable markers and explicit stale contradictions. It intentionally does
+not encode temporary PR/review prose beyond the current baseline handoff facts.
 """
 from pathlib import Path
 
 REQUIRED = {
+    "BABEL_TRUTH.md": [
+        "BabeDrums/babel-truth",
+        "Last reconciled Truth commit",
+        "Babel Continuity Buffer",
+        "stale divergence",
+        "potential upstream improvement",
+        "app-local exception",
+    ],
     "FIRE_CORE.md": [
         "# Babel FIRE — Core Product Doctrine",
         "production companion",
@@ -18,51 +26,44 @@ REQUIRED = {
         "Experiment",
         "Evaluate",
         "Documentation authority and conflict policy",
-        "Git history is the canonical archive for retired implementation generations",
     ],
     "AGENTS.md": [
-        "FIRE_CORE.md",
-        "BABEL_START_HERE.md",
-        "BABEL_APPS.md",
-        "CONTINUITY_INBOX.md",
-        "Git history is the archive",
+        "BABEL_TRUTH.md",
+        "Babel Continuity Buffer",
+        "CONTINUITY_INBOX.md` is retired",
+        "production-projects-v1",
+        "production-projects-v1-v7-preview",
+        "No Codex for FIRE",
         "Inline",
         "Sheet",
         "Navigation",
-        "Parallel-chat ownership",
-        "Continuity capture buffer",
-        "Do **not** update it for every message",
     ],
     "START_HERE.md": [
-        "FIRE_CORE.md",
-        "BABEL_START_HERE.md",
-        "BABEL_APPS.md",
-        "CONTINUITY_INBOX.md",
-        "Generation-spec retention",
-        "G7 shell is live but NOT frozen",
+        "BABEL_TRUTH.md",
+        "PR **#60",
+        "G7 live, NOT frozen",
+        "Latest real-device review after #60",
+        "Modal + row consistency consolidation",
+        "Babel Truth Issue #1",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
-        "Latest physical-device review",
-        "Current rhythm/navigation refinement contract",
-        "Current state/accessory grammar",
-        "Parallel-chat ownership",
-        "Cover",
     ],
     "BABEL_START_HERE.md": [
-        "# Babel Ecosystem — Start Here",
+        "BABEL_TRUTH.md",
         "Product need earns an app",
-        "BABEL_APPS.md",
-        "CONTINUITY_INBOX.md",
-        "Recreation is **not** merely a learning mode",
         "Dedicated learning product — not currently earned",
         "Visual Identity product — promising candidate, deliberately underdefined",
-        "Babel World — optional hub hypothesis",
-        "WATER is **not** currently the learning app",
+        "Babel World — optional future hub hypothesis",
+        "Babel Lab boundary",
         "Shared evidence, local identity",
-        "The collection earns its shape",
-        "Continuity capture for ecosystem brainstorms",
-        "Parallel-chat rule",
-        "Anti-drift rules for new chats",
+        "Babel Truth Issue #1",
+        "WATER is not currently the learning app",
+    ],
+    "CONTINUITY_INBOX.md": [
+        "Retired Local Continuity Inbox",
+        "Do not add new continuity items here",
+        "BabeDrums/babel-truth",
+        "Babel Continuity Buffer",
     ],
     "BABEL_APPS.md": [
         "# Babel — App Concept Ledger",
@@ -70,11 +71,7 @@ REQUIRED = {
         "Dedicated learning product — not currently earned",
         "Visual Identity product — promising candidate, deliberately underdefined",
         "Babel World — optional future hub hypothesis",
-        "WATER has been floated historically",
         "Shared evidence, local identity",
-        "Cross-app object sharing is intentionally open",
-        "Source marks, achievements, and pixel badge language",
-        "The collection earns its shape",
     ],
     "BABEL_PLATFORM.md": [
         "# Babel Platform — Future Hypotheses",
@@ -82,32 +79,6 @@ REQUIRED = {
         "Shared evidence, local identity",
         "Evidence first, interpretation second",
         "Babel Learning Contract",
-        "Source/origin marks",
-        "achievement badges",
-        "Pixel-art Fire hypothesis",
-        "Desire, not deprivation",
-    ],
-    "CONTINUITY_INBOX.md": [
-        "# Babel — Continuity Inbox",
-        "not product authority",
-        "Do **not** update this file for every message",
-        "Consolidation cadence",
-        "Promotion rule",
-        "Parallel-chat rule",
-        "read-mostly by default",
-        "post-#59 physical-device rhythm/navigation feedback",
-    ],
-    "REFERENCES.md": [
-        "# Babel FIRE — Reference Registry",
-        "GitHub / Primer",
-        "ChatGPT",
-        "Open Badges 3.0",
-        "Pixel-art Fire + badge language hypothesis",
-    ],
-    "CONTEXT.md": [
-        "# Babel FIRE — Durable Supporting Context",
-        "standalone cover/reconstruction workflow",
-        "Do not infer sibling apps from this file",
     ],
     "V7_DRAFT.md": [
         "`FIRE_CORE.md` governs cross-generation product doctrine",
@@ -116,11 +87,6 @@ REQUIRED = {
         "## Physical rhythm and visual grammar primitives",
         "## State and accessory grammar",
         "## Navigation and Back behavior",
-        "**Inline**",
-        "**Sheet**",
-        "Original",
-        "Recreation",
-        "Cover",
         "Grouped surface",
         "Selection surface",
         "Segmented control",
@@ -130,46 +96,34 @@ REQUIRED = {
 }
 
 FORBIDDEN = {
-    "CONTEXT.md": [
-        "### Recreation — SECONDARY / LEARNING MODE",
-        "**Recreation:** sequential forward, flexible backward",
-        "Current redesign progression and navigation direction — LOCKED FOR V7 SHELL",
-        "Project Home owns **Continue + Journey + Notes**",
-    ],
     "AGENTS.md": [
-        "The current approved next step is a global FIRE Design System foundation pass",
-        "Historical/versioned specifications are a library of generation-specific truth",
-        "Project Home owns **Continue + Journey + Notes**",
-        "The current design objective is **V7 Shell Freeze**",
+        "Continuity capture buffer",
+        "Do **not** update it for every message",
     ],
     "START_HERE.md": [
-        "`V5.md` is historical",
-        "Latest physical-device review after #57",
-        "Current visual-grammar refinement contract",
-        "PR **#58** is the current merged/deployed G7 baseline",
+        "PR **#59** is the last merged/deployed G7 baseline",
+        "Latest physical-device review after #59",
+        "Current rhythm/navigation refinement contract",
+    ],
+    "BABEL_START_HERE.md": [
+        "`CONTINUITY_INBOX.md` is a low-authority capture buffer",
+        "FIRE = making the music.\nThe learning app = studying.",
+        "WATER = learning",
+        "World = universal source of truth",
+    ],
+    "CONTINUITY_INBOX.md": [
+        "## Pending FIRE deltas",
+        "## Pending ecosystem deltas",
+    ],
+    "CONTEXT.md": [
+        "### Recreation — SECONDARY / LEARNING MODE",
+        "Project Home owns **Continue + Journey + Notes**",
     ],
     "V7_DRAFT.md": [
         "current Cover shell work remains **Song Setup → Structure → Tracks**",
         "`Matches the song` is a separate grouped verification surface",
         "`Other` belongs to the same selection surface",
     ],
-    "BABEL_START_HERE.md": [
-        "FIRE = making the music.\nThe learning app = studying.",
-        "WATER = learning",
-        "WATER = the learning app",
-        "AIR = app",
-        "EARTH = app",
-        "World = universal source of truth",
-    ],
-    "BABEL_APPS.md": [
-        "FIRE = making the music.\nThe learning app = studying.",
-        "WATER = learning",
-        "WATER = the learning app",
-        "AIR = app",
-        "EARTH = app",
-        "Babel World = universal database",
-    ],
-    "BABEL_PLATFORM.md": ["Current FIRE work remains: **G7 Shell Freeze"],
 }
 
 
