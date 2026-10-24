@@ -56,7 +56,7 @@ function moreButton(action = "project-actions", label = "Project actions") {
 }
 
 function addButton(action, label) {
-  return `<button class="toolbar-button add-button" data-action="${esc(action)}" aria-label="${esc(label)}">＋</button>`;
+  return `<button class="toolbar-button add-button" data-action="${esc(action)}" aria-label="${esc(label)}">+</button>`;
 }
 
 function screenHeader(title, { backRoute = "", backLabel = "Back", right = "", meta = "" } = {}) {
@@ -64,7 +64,7 @@ function screenHeader(title, { backRoute = "", backLabel = "Back", right = "", m
   const rightSlot = right || `<span class="toolbar-spacer" aria-hidden="true"></span>`;
   return `
     <header class="screen-header">
-      <div class="toolbar"><div>${left}</div><div>${rightSlot}</div></div>
+      <div class="toolbar"><div class="toolbar-slot toolbar-leading">${left}</div><div class="toolbar-slot toolbar-trailing">${rightSlot}</div></div>
       <div class="title-block"><h1>${esc(title)}</h1>${meta ? `<p class="screen-meta">${esc(meta)}</p>` : ""}</div>
     </header>`;
 }
@@ -132,7 +132,6 @@ function renderProjects() {
     <div class="project-card" data-project-card="${esc(item.id)}">
       <button class="project-open" data-project="${esc(item.id)}">
         <span class="project-copy"><strong>${esc(item.title)}</strong><span>${esc(projectMeta(item))}</span></span>
-        <span class="chevron" aria-hidden="true">›</span>
       </button>
       <button class="project-card-actions more-button" data-project-actions="${esc(item.id)}" aria-label="Actions for ${esc(item.title)}">•••</button>
     </div>`).join("");
@@ -153,9 +152,8 @@ function journeyRow(item, route, current) {
   const mark = done ? "✓" : active ? "→" : "○";
   return `
     <button class="row journey-row ${state}" data-route="${route}"${active ? ' aria-current="step"' : ""}>
-      <span class="journey-mark ${state}" aria-hidden="true">${mark}</span>
       <span class="row-title">${esc(WORK[route].title)}</span>
-      <span class="chevron" aria-hidden="true">›</span>
+      <span class="journey-mark ${state}" aria-hidden="true">${mark}</span>
     </button>`;
 }
 
@@ -229,8 +227,8 @@ function renderSetup() {
       ${screenHeader("Setup", { backRoute: "project", backLabel: item.title })}
       <div class="form-group work-content">
         ${setupToggleRow("Reference", "reference", setup.reference)}
-        <div class="form-row"><span class="form-label">Tempo</span><span class="form-value"><input id="tempoInput" class="inline-input" inputmode="decimal" aria-label="Tempo" value="${esc(setup.tempo)}" placeholder="—"><span>BPM</span></span></div>
-        <div class="form-row"><span class="form-label">Meter</span><select id="meterInput" class="inline-select" aria-label="Meter"><option ${setup.meter === "4/4" ? "selected" : ""}>4/4</option><option ${setup.meter === "3/4" ? "selected" : ""}>3/4</option><option ${setup.meter === "6/8" ? "selected" : ""}>6/8</option></select></div>
+        <div class="form-row"><span class="form-label">Tempo</span><span class="form-value value-control"><input id="tempoInput" class="inline-input" inputmode="decimal" aria-label="Tempo" value="${esc(setup.tempo)}" placeholder="—"><span class="value-unit">BPM</span></span></div>
+        <div class="form-row"><span class="form-label">Meter</span><span class="form-value value-control select-value"><select id="meterInput" class="inline-select" aria-label="Meter"><option ${setup.meter === "4/4" ? "selected" : ""}>4/4</option><option ${setup.meter === "3/4" ? "selected" : ""}>3/4</option><option ${setup.meter === "6/8" ? "selected" : ""}>6/8</option></select></span></div>
         ${setupToggleRow("Grid", "grid", setup.grid)}
         ${setupToggleRow("Listen", "firstListen", setup.firstListen)}
       </div>
@@ -331,16 +329,17 @@ function closeSheet(clear = true) {
   if (clear) sheetState = null;
 }
 
-function textField(id, label, value = "", placeholder = "", { visibleLabel = true } = {}) {
+function textField(id, label, value = "", placeholder = "", { visibleLabel = true, enterKeyHint = "" } = {}) {
   const labelClass = visibleLabel ? "field-label" : "visually-hidden";
-  return `<label class="${labelClass}" for="${id}">${esc(label)}</label><input id="${id}" class="field" value="${esc(value)}" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">`;
+  const enter = enterKeyHint ? ` enterkeyhint="${esc(enterKeyHint)}"` : "";
+  return `<label class="${labelClass}" for="${id}">${esc(label)}</label><input id="${id}" class="field" value="${esc(value)}" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false"${enter}>`;
 }
 
 function projectFields(title = "", artist = "", prefix = "newProject") {
   return `
     <div class="project-field-group">
-      <div class="project-field-row">${textField(`${prefix}Title`, "Title", title, "Title", { visibleLabel: false })}</div>
-      <div class="project-field-row">${textField(`${prefix}Artist`, "Artist", artist, "Artist", { visibleLabel: false })}</div>
+      <div class="project-field-row">${textField(`${prefix}Title`, "Title", title, "Title", { visibleLabel: false, enterKeyHint: "next" })}</div>
+      <div class="project-field-row">${textField(`${prefix}Artist`, "Artist", artist, "Artist", { visibleLabel: false, enterKeyHint: "done" })}</div>
     </div>`;
 }
 
@@ -429,14 +428,21 @@ function sectionBarsControls(selectedBars) {
   })}</div>`;
 }
 
+function customBarsField(value = "") {
+  return `<label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" aria-label="Custom bars" placeholder="Bars" value="${esc(value)}">`;
+}
+
 function openAddSectionSheet() {
   const choices = [...SECTION_TYPES, "Custom"].map((name) => choiceTile(name, { action: "choose-section-type", dataName: name, classes: "sheet-choice section-choice" })).join("");
   openSheet(`
-    <div class="selection-surface choice-grid section-types">${choices}</div>
-    <div id="customSectionArea" hidden>${textField("customSectionName", "Section name", "", "Section name", { visibleLabel: false })}</div>
-    ${sectionBarsControls(8)}
-    <div id="customBarsArea" hidden><label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" placeholder="Bars"></div>
-    <div id="sectionAddedNotice" class="inline-notice" aria-live="polite"></div>
+    <div class="sheet-content-group">
+      <div class="selection-surface choice-grid section-types">${choices}</div>
+      <div id="customSectionArea" hidden>${textField("customSectionName", "Section", "", "Section", { visibleLabel: false, enterKeyHint: "done" })}</div>
+    </div>
+    <div class="sheet-content-group">
+      ${sectionBarsControls(8)}
+      <div id="customBarsArea" hidden>${customBarsField()}</div>
+    </div>
     <div class="sheet-actions">${sheetSecondary("Done")}${sheetPrimary("Add", "add-section", { disabled: true })}</div>`,
   { type: "add-section", sectionName: "", bars: 8, customBars: "" }, "Add Section");
 }
@@ -479,6 +485,7 @@ function chooseSectionBars(button) {
   const customBarsArea = document.getElementById("customBarsArea");
   if (customBarsArea) customBarsArea.hidden = sheetState.bars !== "custom";
   if (sheetState.type === "add-section") syncAddSectionSheet();
+  if (sheetState.bars === "custom") requestAnimationFrame(() => document.getElementById("customBarsInput")?.focus());
 }
 
 function addSectionFromSheet() {
@@ -494,8 +501,6 @@ function addSectionFromSheet() {
   noteActivity(item);
   save();
   renderStructure();
-  const notice = document.getElementById("sectionAddedNotice");
-  if (notice) notice.textContent = `Added ${name} · ${bars} bars`;
   sheetState.sectionName = "";
   sheetRoot.querySelectorAll('[data-action="choose-section-type"]').forEach((entry) => {
     entry.classList.remove("selected");
@@ -507,7 +512,7 @@ function addSectionFromSheet() {
 }
 
 function openCustomTrackSheet() {
-  openSheet(`<div class="stack-fields">${textField("customTrackInput", "Track name", "", "Track name", { visibleLabel: false })}</div><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Add", "add-custom-track", { disabled: true })}</div>`, { type: "custom-track" }, "Add Track");
+  openSheet(`<div class="stack-fields">${textField("customTrackInput", "Track", "", "Track", { visibleLabel: false, enterKeyHint: "done" })}</div><div class="sheet-actions">${sheetSecondary("Cancel")}${sheetPrimary("Add", "add-custom-track", { disabled: true })}</div>`, { type: "custom-track" }, "Add Track");
 }
 
 function syncCustomTrackAction() {
@@ -523,9 +528,11 @@ function openEditSectionSheet(sectionId) {
   const standard = [4, 8, 12, 16];
   const custom = !standard.includes(selectedBars);
   openSheet(`
-    <div class="stack-fields">${textField("editSectionName", "Name", section.name, "Section name", { visibleLabel: false })}</div>
-    ${sectionBarsControls(selectedBars)}
-    <div id="customBarsArea" ${custom ? "" : "hidden"}><label class="visually-hidden" for="customBarsInput">Bars</label><input id="customBarsInput" class="field numeric-field" inputmode="numeric" aria-label="Custom bars" value="${custom ? selectedBars : ""}"></div>
+    <div class="sheet-content-group"><div class="stack-fields">${textField("editSectionName", "Name", section.name, "Section", { visibleLabel: false, enterKeyHint: "done" })}</div></div>
+    <div class="sheet-content-group">
+      ${sectionBarsControls(selectedBars)}
+      <div id="customBarsArea" ${custom ? "" : "hidden"}>${customBarsField(custom ? selectedBars : "")}</div>
+    </div>
     <div class="sheet-actions three-actions">${sheetPrimary("Save", "save-section")}${sheetSecondary("Duplicate", "duplicate-section")}${sheetSecondary("Delete", "delete-section", "sheet-danger")}</div>`,
   { type: "edit-section", sectionId, bars: custom ? "custom" : selectedBars }, "Edit Section");
 }
@@ -612,6 +619,24 @@ function finishReorder(event, cancelled = false) {
   renderStructure();
 }
 
+function sanitizeCustomBarsInput(input) {
+  const digits = input.value.replace(/\D+/g, "");
+  if (input.value !== digits) input.value = digits;
+}
+
+function advanceProjectField(event) {
+  if (event.key !== "Enter") return false;
+  const nextById = {
+    newProjectTitle: "newProjectArtist",
+    editProjectTitle: "editProjectArtist",
+  };
+  const nextId = nextById[event.target.id];
+  if (!nextId) return false;
+  event.preventDefault();
+  document.getElementById(nextId)?.focus();
+  return true;
+}
+
 app.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
@@ -693,10 +718,15 @@ app.addEventListener("keydown", (event) => {
   }
 });
 
-sheetRoot.addEventListener("input", () => {
+sheetRoot.addEventListener("input", (event) => {
+  if (event.target.id === "customBarsInput") sanitizeCustomBarsInput(event.target);
   if (sheetState?.type === "new-project") syncNewProjectAction();
   if (sheetState?.type === "custom-track") syncCustomTrackAction();
   if (sheetState?.type === "add-section") syncAddSectionSheet();
+});
+
+sheetRoot.addEventListener("keydown", (event) => {
+  advanceProjectField(event);
 });
 
 sheetRoot.addEventListener("click", (event) => {
