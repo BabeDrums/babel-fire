@@ -2,6 +2,8 @@
 
 **Status:** active shell-completion contract. G7 remains unfrozen until every category below is locked and Babel explicitly approves the final physical-device sweep.
 
+Current mutable category state lives in `G7_SHELL_CERTIFICATION_STATUS.md`. This file defines the contract; the status board records progress/evidence without rewriting the contract on every review.
+
 ## Purpose
 
 G7 is not a collection of final FIRE screens. It is the reusable Babel/FIRE visual and interaction grammar that should let a future screen, section, modal, menu, form, or workspace begin from solved fundamentals and already feel like Babel.
@@ -122,7 +124,7 @@ G7 Shell Frozen requires all of the following:
 3. real G7 still composes those primitives coherently in context
 4. final physical-device sweep covers iPhone first and iPad/regular-width adaptation, including representative sparse/dense/long-content/focus/keyboard states as applicable
 5. no unresolved systemic contradiction remains in active authority
-6. Babel explicitly approves/freeze the shell
+6. Babel explicitly approves/freezes the shell
 
 Then:
 
