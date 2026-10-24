@@ -114,6 +114,23 @@ class V7VisualGrammar(unittest.TestCase):
         )
         self.assertNotEqual(group.evaluate("el => getComputedStyle(el).boxShadow"), "none")
 
+    def test_new_project_uses_major_then_action_spacing(self):
+        page = self.open("projects", empty_db())
+        page.get_by_role("button", name="New Project").click()
+        project_type = page.locator(".project-type-control").bounding_box()
+        fields = page.locator(".project-field-group").bounding_box()
+        actions = page.locator(".sheet-actions").bounding_box()
+        self.assertAlmostEqual(fields["y"] - (project_type["y"] + project_type["height"]), 20.0, delta=1.0)
+        self.assertAlmostEqual(actions["y"] - (fields["y"] + fields["height"]), 16.0, delta=1.0)
+
+    def test_project_action_cancel_matches_action_group_width(self):
+        page = self.open("projects")
+        page.get_by_role("button", name="Actions for Smithereens").click()
+        group = page.locator(".action-menu").bounding_box()
+        cancel = page.get_by_role("button", name="Cancel").bounding_box()
+        self.assertAlmostEqual(cancel["x"], group["x"], delta=1.0)
+        self.assertAlmostEqual(cancel["width"], group["width"], delta=1.0)
+
     def test_grouped_page_rows_share_one_64px_rhythm(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
         data = study_db(setup=True, sections=sections, verified=True)
@@ -145,6 +162,31 @@ class V7VisualGrammar(unittest.TestCase):
         expect(structure.locator(".bars-grid.segmented-control")).to_be_visible()
         self.assertEqual(structure.locator(".bars-grid .segment-option").count(), 5)
 
+    def test_selected_cells_use_parent_owned_geometry_without_inner_outline(self):
+        page = self.open("tracks", study_db(tracks=[{"id": "t1", "name": "Vocal"}]))
+        selected = page.locator('.track-tile[data-name="Vocal"]')
+        surface = page.locator(".track-grid")
+        self.assertEqual(selected.evaluate("el => getComputedStyle(el).boxShadow"), "none")
+        self.assertEqual(selected.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
+        self.assertGreater(float(surface.evaluate("el => parseFloat(getComputedStyle(el).borderTopLeftRadius)")), 0)
+        self.assertEqual(page.locator(".track-check").count(), 0)
+
+        projects = self.open("projects", empty_db())
+        projects.get_by_role("button", name="New Project").click()
+        chosen = projects.get_by_role("button", name="Original")
+        self.assertEqual(chosen.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
+        self.assertEqual(projects.locator(".project-type-control").evaluate("el => getComputedStyle(el).paddingTop"), "0px")
+
+    def test_add_section_uses_major_group_spacing(self):
+        page = self.open("structure")
+        page.get_by_role("button", name="Add Section").click()
+        types = page.locator(".section-types").bounding_box()
+        bars = page.locator(".bars-grid").bounding_box()
+        actions = page.locator(".sheet-actions").bounding_box()
+        self.assertAlmostEqual(bars["y"] - (types["y"] + types["height"]), 20.0, delta=1.0)
+        self.assertAlmostEqual(actions["y"] - (bars["y"] + bars["height"]), 16.0, delta=1.0)
+        self.assertFalse(page.locator("#sectionAddedNotice").is_visible())
+
     def test_tracks_and_structure_use_toolbar_plus_without_fake_other_row(self):
         structure = self.open("structure")
         structure_add = structure.get_by_role("button", name="Add Section")
@@ -162,7 +204,41 @@ class V7VisualGrammar(unittest.TestCase):
         self.assertEqual(row.locator(".checkmark").count(), 0)
         self.assertEqual(row.locator(".chevron").count(), 0)
         self.assertEqual(row.locator(".more-button").count(), 0)
-        expect(page.get_by_role("button", name="Reorder Intro")).to_be_visible()
+        self.assertEqual(row.locator(".arrangement-index").count(), 0)
+        expect(page.get_by_role("button", name="Reorder section 1, Intro")).to_be_visible()
+        expect(page.get_by_role("button", name="Edit section 1, Intro, 8 bars")).to_be_visible()
+
+    def test_row_label_typography_does_not_change_with_progress_state(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        page = self.open("project", study_db(setup=True, sections=sections, verified=False))
+        weights = page.locator(".journey-row .row-title").evaluate_all(
+            "els => els.map(el => getComputedStyle(el).fontWeight)"
+        )
+        self.assertEqual(len(set(weights)), 1)
+
+        setup = self.open("setup", study_db(setup=True))
+        structure = self.open("structure", study_db(sections=sections))
+        setup_weight = setup.locator(".form-label").first.evaluate("el => getComputedStyle(el).fontWeight")
+        structure_weight = structure.locator(".arrangement-name").first.evaluate("el => getComputedStyle(el).fontWeight")
+        self.assertEqual(setup_weight, structure_weight)
+
+    def test_structure_and_setup_share_primary_label_anchor(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        setup = self.open("setup")
+        structure = self.open("structure", study_db(sections=sections))
+        setup_x = setup.locator(".form-label").first.bounding_box()["x"]
+        structure_x = structure.locator(".arrangement-name").first.bounding_box()["x"]
+        self.assertAlmostEqual(setup_x, structure_x, delta=1.0)
+
+    def test_work_screens_share_first_content_anchor(self):
+        sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
+        pages = [
+            self.open("setup", study_db(setup=True)),
+            self.open("structure", study_db(sections=sections, verified=True)),
+            self.open("tracks", study_db(tracks=[{"id": "t1", "name": "Vocal"}])),
+        ]
+        starts = [page.locator(".work-content").first.bounding_box()["y"] for page in pages]
+        self.assertLessEqual(max(starts) - min(starts), 1.0)
 
     def test_concise_work_labels_are_current(self):
         home = self.open("project")
@@ -257,7 +333,7 @@ class V7VisualGrammar(unittest.TestCase):
         structure.get_by_role("button", name="Add Section").click()
         self.assertEqual(structure.locator(".sheet h2").count(), 0)
         structure.get_by_role("button", name="Done").click()
-        structure.get_by_role("button", name="Edit Intro").click()
+        structure.get_by_role("button", name="Edit section 1, Intro, 8 bars").click()
         self.assertEqual(structure.locator(".sheet h2").count(), 0)
 
         projects = self.open("projects")
