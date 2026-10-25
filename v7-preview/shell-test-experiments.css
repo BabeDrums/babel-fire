@@ -1,38 +1,13 @@
 /* Shell Test-only experiments.
    This file must never redefine real G7 production primitives. The comparison below isolates
-   symbol normalization from container treatment so physical review can choose deliberately. */
+   symbol normalization from container shape so physical review can choose deliberately. */
 
 .symbol-comparison-stage {
-  position: relative;
-  overflow: hidden;
   padding: 16px;
+  overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 24px;
-  background: #101013;
-  isolation: isolate;
-}
-
-/* A restrained shared substrate lets translucent glass reveal itself without giving only the
-   glass row a different background. All three rows sit above the same field. */
-.symbol-comparison-stage::before {
-  content: "";
-  position: absolute;
-  inset: -24%;
-  z-index: -2;
-  background:
-    radial-gradient(circle at 18% 28%, rgba(105, 118, 162, .28), transparent 30%),
-    radial-gradient(circle at 82% 72%, rgba(156, 104, 126, .19), transparent 32%),
-    linear-gradient(135deg, rgba(255,255,255,.035), rgba(255,255,255,0) 48%, rgba(255,255,255,.025));
-  filter: blur(8px);
-}
-
-.symbol-comparison-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,.018), rgba(0,0,0,.12));
+  border-radius: var(--group-radius);
+  background: var(--surface);
 }
 
 .symbol-variant + .symbol-variant {
@@ -68,7 +43,7 @@
   place-items: center;
   color: #d3d3da;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
 
 .normalized-symbol {
@@ -93,88 +68,30 @@
   stroke: none;
 }
 
-/* A — existing Shell Test surface language, now driven by normalized inline SVG artwork. */
+/* A — existing Shell Test surface language, driven by normalized inline SVG artwork. */
 .symbol-button-current {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: #17171a;
-  box-shadow: none;
 }
 
 .symbol-button-current:active {
   background: #202024;
 }
 
-/* B — shape-only experiment. Same material as A; only the container becomes a circle. */
+/* B — shape-only experiment. Same simple material as A; only the container becomes a circle. */
 .symbol-button-circle {
   border: 1px solid var(--line);
   border-radius: 50%;
   background: #17171a;
-  box-shadow: none;
 }
 
 .symbol-button-circle:active {
   background: #202024;
 }
 
-/* C — circular web approximation of Apple's Liquid Glass control layer.
-   The static web cannot invoke Apple's native glass material, so this combines backdrop adaptation,
-   translucency, edge/specular highlights, depth, and a compact press response without changing layout. */
-.symbol-button-glass {
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 50%;
-  background:
-    linear-gradient(145deg, rgba(255,255,255,.19) 0%, rgba(255,255,255,.085) 38%, rgba(255,255,255,.035) 64%, rgba(255,255,255,.10) 100%);
-  -webkit-backdrop-filter: blur(18px) saturate(1.45) brightness(1.07);
-  backdrop-filter: blur(18px) saturate(1.45) brightness(1.07);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -1px 0 rgba(255,255,255,.08),
-    inset 1px 0 0 rgba(255,255,255,.08),
-    0 7px 22px rgba(0,0,0,.24);
-}
-
-.symbol-button-glass::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 31% 20%, rgba(255,255,255,.27), transparent 34%),
-    linear-gradient(155deg, rgba(255,255,255,.09), transparent 42%);
-  opacity: .8;
-}
-
-.symbol-button-glass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow: inset 0 0 12px rgba(255,255,255,.035);
-}
-
-.symbol-button-glass .normalized-symbol {
-  position: relative;
-  z-index: 1;
-  color: #f0f0f4;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,.24));
-}
-
 .symbol-button:active {
   transform: scale(.94);
-}
-
-.symbol-button-glass:active {
-  transform: scale(.92);
-  background:
-    linear-gradient(145deg, rgba(255,255,255,.23), rgba(255,255,255,.075) 54%, rgba(255,255,255,.12));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.34),
-    inset 0 -1px 0 rgba(255,255,255,.10),
-    0 4px 14px rgba(0,0,0,.22);
 }
 
 .symbol-button:focus-visible {
