@@ -138,11 +138,15 @@ class V7VisualGrammar(unittest.TestCase):
     def test_toolbar_actions_use_simple_circle_without_changing_back_semantics(self):
         projects = self.open("projects")
         add = projects.get_by_role("button", name="New Project")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(add.bounding_box()["width"], 44)
         self.assertEqual(add.bounding_box()["height"], 44)
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "50%")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').backgroundColor"), "rgb(23, 23, 26)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').borderTopWidth"), "1px")
         self.assertIn(
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -152,9 +156,12 @@ class V7VisualGrammar(unittest.TestCase):
         more = project.get_by_role("button", name="Project actions")
         back = project.get_by_role("button", name="Projects")
         for control in (more, back):
-            self.assertEqual(control.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
-            self.assertEqual(control.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
-            self.assertEqual(control.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "50%")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el, '::after').backgroundColor"), "rgb(23, 23, 26)")
         self.assertIn(
             "data:image/svg+xml",
             more.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -283,8 +290,10 @@ class V7VisualGrammar(unittest.TestCase):
         values = page.locator(".value-control")
         self.assertEqual(values.count(), 2)
         heights = values.evaluate_all("els => els.map(el => getComputedStyle(el).minHeight)")
+        widths = values.evaluate_all("els => els.map(el => getComputedStyle(el).width)")
         backgrounds = values.evaluate_all("els => els.map(el => getComputedStyle(el).backgroundColor)")
         self.assertEqual(len(set(heights)), 1)
+        self.assertEqual(len(set(widths)), 1)
         self.assertEqual(len(set(backgrounds)), 1)
         self.assertNotEqual(backgrounds[0], "rgba(0, 0, 0, 0)")
 
@@ -390,9 +399,11 @@ class V7VisualGrammar(unittest.TestCase):
         structure = self.open("structure", study_db(sections=sections))
         structure.get_by_role("button", name="Add Section").click()
         self.assertEqual(structure.locator(".sheet h2").count(), 0)
+        self.assertEqual(structure.locator(".sheet").evaluate("el => getComputedStyle(el, '::before').content"), '"Add Section"')
         structure.get_by_role("button", name="Done").click()
         structure.get_by_role("button", name="Edit section 1, Intro, 8 bars").click()
         self.assertEqual(structure.locator(".sheet h2").count(), 0)
+        self.assertEqual(structure.locator(".sheet").evaluate("el => getComputedStyle(el, '::before').content"), '"Edit Section"')
 
         projects = self.open("projects")
         projects.get_by_role("button", name="Actions for Smithereens").click()
