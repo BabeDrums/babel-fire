@@ -56,16 +56,17 @@ class G7RealShellBrowser(unittest.TestCase):
         expect(current).to_be_visible()
         expect(upcoming).to_be_visible()
 
-        # Current/upcoming are status bars rather than radio rings, and Current does not tint the row.
+        # Current/upcoming containers are visually empty; the visible state language lives in ::before.
         for marker in (current, upcoming):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
-            self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "4px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
         self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
         self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
         # Current and upcoming occupy the same trailing lane center in the actual project.
