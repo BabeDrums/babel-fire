@@ -84,7 +84,8 @@ Do not make G7 automatically match a Lab specimen.
 - toolbar `•••` means management/actions
 - project-row management has no decorative divider from the row
 - recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
-- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter inset circle; color alone does not carry the state
+- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter faded inner ring; color alone does not carry the state
+- the accessory family uses one rounded construction vocabulary for drawn strokes/caps while preserving semantic hierarchy between state, navigation, reorder, add, and management affordances
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
@@ -102,9 +103,10 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 
 - project-row `•••` divider removed and management aligned through the shared accessory lane
 - `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
-- management `•••`, chevron, and reorder marks use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics
+- management `•••`, chevron, reorder, and completion check use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics where practical
 - canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
-- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inset circle, not the old yellow accent
+- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inner ring, not the old yellow accent and not a center dot
+- rounded terminals/caps unify the accessory family's visual handwriting without forcing different semantic meanings into identical containers
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine

@@ -37,28 +37,47 @@ def test_project_management_has_no_divider_and_accessories_are_canonicalized():
     assert "border-left: 0" in css
     assert "--accessory-box" in css
     assert "--accessory-stroke" in css
+    assert "--accessory-cap" in css
     assert ".journey-mark" in css
     assert ".completion-ring" in css
     assert ".chevron::before" in css
+    assert ".chevron::after" in css
     assert ".reorder-handle::before" in css
 
 
-def test_current_state_is_neutral_nested_ring_and_actions_are_not_font_dependent():
+def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring():
     css = read("v7-preview/shell-primitives.css")
+
+    # Toolbar actions remain geometry-driven, not font-metric driven.
     assert ".add-button { font-size: 0; }" in css
     assert ".add-button::before" in css
     assert ".add-button::after" in css
     assert ".more-button::before" in css
-    assert "width: 3px" in css
     assert "box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor" in css
+
+    # Complete is drawn from rounded strokes instead of inheriting a font checkmark shape.
+    assert ".checkmark::before" in css
+    assert ".checkmark::after" in css
+    assert ".journey-mark.done::before" in css
+    assert ".journey-mark.done::after" in css
+    assert 'content: "✓"' not in css
+    assert "border-radius: var(--accessory-cap)" in css
+
+    # Current is outer ring + faded inner ring, never a dot or accent-color fill.
     assert ".journey-mark.current" in css
     assert "border: 2px solid var(--state-current-ring)" in css
     assert "--state-current-ring: #d9d9df" in css
-    assert "--state-current-inner: rgba(232,232,237,.22)" in css
+    assert "--state-current-inner-ring: rgba(232,232,237,.30)" in css
     assert ".journey-mark.current::after" in css
-    assert "width: 10px" in css
-    assert "background: var(--state-current-inner)" in css
+    assert "border: 1.5px solid var(--state-current-inner-ring)" in css
+    assert "background: transparent" in css
     assert "#d8d84f" not in css
+
+    # Navigation and reorder use the same rounded stroke vocabulary.
+    assert ".chevron::before," in css
+    assert ".chevron::after" in css
+    assert "transform-origin: right center" in css
+    assert "height: var(--accessory-stroke)" in css
 
 
 def test_shared_modal_spacing_uses_named_tokens():

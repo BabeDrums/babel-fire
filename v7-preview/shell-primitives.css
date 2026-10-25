@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 4
+/* G7 Shell Certification pass 5
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
@@ -6,11 +6,12 @@
   --accessory-box: 28px;
   --accessory-glyph: 18px;
   --accessory-stroke: 2px;
+  --accessory-cap: 999px;
   --toolbar-control-radius: 13px;
   --state-ring: #666872;
   --state-fill: #e8e8ed;
   --state-current-ring: #d9d9df;
-  --state-current-inner: rgba(232,232,237,.22);
+  --state-current-inner-ring: rgba(232,232,237,.30);
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
 }
@@ -35,13 +36,13 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  border-radius: 999px;
+  border-radius: var(--accessory-cap);
   background: currentColor;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
-.add-button::before { width: 18px; height: 2px; }
-.add-button::after { width: 2px; height: 18px; }
+.add-button::before { width: 18px; height: var(--accessory-stroke); }
+.add-button::after { width: var(--accessory-stroke); height: 18px; }
 
 /* Draw overflow from three fixed circles on the same optical center as the button.
    Do not depend on bullet-glyph baseline/side-bearing metrics, which vary in Safari. */
@@ -94,29 +95,48 @@
 }
 
 /* State language: shape/contrast carry meaning without requiring accent color.
-   Complete = filled/check. Current = brighter double-level ring. Incomplete = quiet outline. */
+   Complete = filled/check. Current = outer ring + quieter inner ring. Incomplete = quiet outline. */
 .journey-mark { font-size: var(--accessory-glyph); text-align: center; }
 .journey-mark.done,
 .checkmark {
+  position: relative;
   border-radius: 50%;
   background: var(--state-fill);
   color: #101013;
   border: 1px solid var(--state-fill);
-  font-weight: 780;
+  font-size: 0;
 }
-.journey-mark.done { font-size: 0; }
-.journey-mark.done::before {
-  content: "✓";
-  font-size: 13px;
-  line-height: 1;
-  transform: translate(.2px, -.5px);
+
+/* Complete uses the same drawn, round-capped stroke language as the rest of the accessory family.
+   The visible check no longer depends on the font's checkmark construction. */
+.journey-mark.done::before,
+.journey-mark.done::after,
+.checkmark::before,
+.checkmark::after {
+  content: "";
+  position: absolute;
+  height: var(--accessory-stroke);
+  border-radius: var(--accessory-cap);
+  background: currentColor;
+  transform-origin: left center;
 }
-.checkmark {
-  font-size: 13px;
-  transform: translateY(0);
+.journey-mark.done::before,
+.checkmark::before {
+  width: 6px;
+  left: 8px;
+  top: 13px;
+  transform: rotate(45deg);
 }
-/* Current borrows only the older roadmap's nested-state structure, not its yellow accent.
-   The subtle inset circle adds a second visual cue while keeping the Babel shell neutral. */
+.journey-mark.done::after,
+.checkmark::after {
+  width: 11px;
+  left: 12px;
+  top: 16px;
+  transform: rotate(-48deg);
+}
+
+/* Current borrows only the older roadmap's nested-ring structure, not its yellow accent.
+   The inset is a faded ring—not a dot—so Current stays related to Incomplete without reading like a radio control. */
 .journey-mark.current {
   position: relative;
   font-size: 0;
@@ -130,7 +150,9 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--state-current-inner);
+  border: 1.5px solid var(--state-current-inner-ring);
+  background: transparent;
+  box-sizing: border-box;
 }
 .journey-mark.upcoming,
 .completion-ring {
@@ -140,22 +162,28 @@
 }
 .journey-mark.upcoming { font-size: 0; }
 
-/* Commodity affordances use the same artboard/stroke family but remain visually quiet. */
+/* Commodity affordances use the same rounded stroke family and artboard but remain visually quiet. */
 .chevron {
   position: relative;
   font-size: 0;
-  font-weight: 400;
   color: var(--quiet);
   transform: none;
 }
-.chevron::before {
+.chevron::before,
+.chevron::after {
   content: "";
-  width: 7px;
-  height: 7px;
-  border-top: var(--accessory-stroke) solid currentColor;
-  border-right: var(--accessory-stroke) solid currentColor;
-  transform: translateX(-1px) rotate(45deg);
+  position: absolute;
+  left: calc(50% - 4px);
+  top: calc(50% - 1px);
+  width: 8px;
+  height: var(--accessory-stroke);
+  border-radius: var(--accessory-cap);
+  background: currentColor;
+  transform-origin: right center;
 }
+.chevron::before { transform: rotate(45deg); }
+.chevron::after { transform: rotate(-45deg); }
+
 .reorder-handle {
   position: relative;
   width: var(--touch);
@@ -168,8 +196,8 @@
   left: 50%;
   top: 50%;
   width: 14px;
-  height: 2px;
-  border-radius: 999px;
+  height: var(--accessory-stroke);
+  border-radius: var(--accessory-cap);
   background: var(--quiet);
   box-shadow: 0 -5px 0 var(--quiet), 0 5px 0 var(--quiet);
   transform: translate(-50%, -50%);
