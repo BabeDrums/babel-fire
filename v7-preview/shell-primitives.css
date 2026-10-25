@@ -1,24 +1,31 @@
-/* G7 Shell Certification pass 7
+/* G7 Shell Certification pass 8
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
+   Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
 :root {
   --accessory-box: 28px;
   --accessory-glyph: 18px;
-  --accessory-stroke: 2px;
-  --accessory-cap: 999px;
+  --toolbar-icon-size: 22px;
+  --accessory-edge-inset: 4px;
   --toolbar-control-radius: 13px;
   --header-action-offset: 44px;
   --state-ring: #666872;
   --state-fill: #e8e8ed;
   --state-current-ring: #d9d9df;
-  --state-current-inner-ring: rgba(232,232,237,.38);
+  --state-current-fill: rgba(232,232,237,.035);
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
-  --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M6.5 3.5 12 9l-5.5 5.5' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* Canonical Lucide 24x24 paths. Keep commodity glyph construction here rather than redrawing per component. */
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 6 9 17l-5-5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9 18 6-6-6-6' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14M12 5v14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-ellipsis: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='19' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E");
+  --icon-menu: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16M4 12h16M4 19h16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
-/* Stable hit targets with explicit optical correction per glyph. */
+/* Stable 44px hit targets. Resting toolbar actions are glyph-first, not permanently boxed controls. */
 .toolbar-button {
   position: relative;
   border-radius: var(--toolbar-control-radius);
@@ -30,50 +37,47 @@
 
 .add-button,
 .more-button {
+  position: relative;
   display: inline-grid;
   place-items: center;
   text-align: center;
   padding: 0;
-}
-.add-button { font-size: 0; }
-/* Draw the plus rather than relying on a font glyph. This keeps its visual center exact across Safari/iOS font metrics. */
-.add-button::before,
-.add-button::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: var(--accessory-cap);
-  background: currentColor;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-.add-button::before { width: 18px; height: var(--accessory-stroke); }
-.add-button::after { width: var(--accessory-stroke); height: 18px; }
-
-/* Draw overflow from three fixed circles on the same optical center as the button.
-   Do not depend on bullet-glyph baseline/side-bearing metrics, which vary in Safari. */
-.more-button {
-  position: relative;
   font-size: 0;
   letter-spacing: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
+.add-button { color: var(--text); }
+.more-button { color: #c0c0c8; }
+.add-button::before,
 .more-button::before {
   content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
+  width: var(--toolbar-icon-size);
+  height: var(--toolbar-icon-size);
   background: currentColor;
-  box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor;
-  transform: translate(-50%, -50%);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
   pointer-events: none;
 }
+.add-button::before {
+  -webkit-mask-image: var(--icon-plus);
+  mask-image: var(--icon-plus);
+}
+.more-button::before {
+  width: 20px;
+  height: 20px;
+  -webkit-mask-image: var(--icon-ellipsis);
+  mask-image: var(--icon-ellipsis);
+}
+.add-button::after,
+.more-button::after { content: none; }
 
-/* Back and forward are one canonical chevron drawing, mirrored only by direction.
-   A single SVG mask avoids the visible seam created by two separately rotated CSS bars. */
+/* Back and forward are one canonical Lucide chevron, mirrored only by direction. */
 .chevron,
 .back-glyph {
   position: relative;
@@ -107,12 +111,15 @@
   width: var(--accessory-glyph);
   height: var(--accessory-glyph);
   background: currentColor;
-  -webkit-mask: var(--chevron-mask) center / contain no-repeat;
-  mask: var(--chevron-mask) center / contain no-repeat;
+  -webkit-mask: var(--icon-chevron-right) center / contain no-repeat;
+  mask: var(--icon-chevron-right) center / contain no-repeat;
   pointer-events: none;
 }
 .back-glyph::before,
 .shell-test-link::before { transform: scaleX(-1); }
+.chevron::after,
+.back-glyph::after,
+.shell-test-link::after { content: none; }
 
 /* Management is an accessory, never a divided second column. */
 .project-card-actions {
@@ -122,11 +129,14 @@
   background: transparent;
 }
 
-/* One accessory lane, different semantic symbols. Do not circle commodity affordances merely for symmetry.
-   Form rows deliberately keep their own label/control grid so inputs never collapse into the accessory lane. */
-.row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }
+/* One physical trailing lane across grouped rows, project cards and arrangement rows.
+   Rows use a 44px slot plus 4px right inset, matching the 52px centered slots used by project/arrangement rows. */
+.row {
+  grid-template-columns: minmax(0, 1fr) var(--touch);
+  padding-right: var(--accessory-edge-inset);
+}
 .row > :last-child { justify-self: center; }
-.journey-row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }
+.journey-row { grid-template-columns: minmax(0, 1fr) var(--touch); }
 .journey-mark,
 .chevron,
 .checkmark,
@@ -142,9 +152,9 @@
   box-sizing: border-box;
 }
 
-/* State language: shape/contrast carry meaning without requiring accent color.
-   Complete = filled/check. Current = outer ring + quieter inner ring. Incomplete = quiet outline. */
-.journey-mark { font-size: var(--accessory-glyph); text-align: center; }
+/* State language is separate from commodity glyphs.
+   Complete = filled state + canonical check. Current = one emphasized ring. Incomplete = quiet ring. */
+.journey-mark { font-size: 0; text-align: center; }
 .journey-mark.done,
 .checkmark {
   position: relative;
@@ -154,57 +164,30 @@
   border: 1px solid var(--state-fill);
   font-size: 0;
 }
-
-/* Complete uses the same drawn, round-capped stroke language as the rest of the accessory family.
-   The visible check no longer depends on the font's checkmark construction. */
-.journey-mark.done::before,
-.journey-mark.done::after,
-.checkmark::before,
-.checkmark::after {
-  content: "";
-  position: absolute;
-  height: var(--accessory-stroke);
-  border-radius: var(--accessory-cap);
-  background: currentColor;
-  transform-origin: left center;
-}
 .journey-mark.done::before,
 .checkmark::before {
-  width: 6px;
-  left: 8px;
-  top: 13px;
-  transform: rotate(45deg);
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
+  pointer-events: none;
 }
 .journey-mark.done::after,
-.checkmark::after {
-  width: 11px;
-  left: 12px;
-  top: 16px;
-  transform: rotate(-48deg);
-}
+.checkmark::after { content: none; }
 
-/* Current borrows only the older roadmap's nested-ring structure, not its yellow accent.
-   Absolute positioning keeps generated content out of grid flow. inset: 0 pins the inner ring to the
-   padding edge, exactly the inside edge of the 2px outer border. The inner ring is deliberately thicker
-   than the previous candidate so it remains visibly secondary rather than disappearing on a real device. */
+/* Current is deliberately not a bullseye/radio control: emphasis comes from ring weight and contrast only. */
 .journey-mark.current {
   position: relative;
   font-size: 0;
   border-radius: 50%;
-  border: 2px solid var(--state-current-ring);
-  background: transparent;
+  border: 2.5px solid var(--state-current-ring);
+  background: var(--state-current-fill);
   box-shadow: none;
 }
-.journey-mark.current::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 3px solid var(--state-current-inner-ring);
-  background: transparent;
-  box-sizing: border-box;
-  pointer-events: none;
-}
+.journey-mark.current::before,
+.journey-mark.current::after { content: none; }
 .journey-mark.upcoming,
 .completion-ring {
   border-radius: 50%;
@@ -213,7 +196,7 @@
 }
 .journey-mark.upcoming { font-size: 0; }
 
-/* Reorder uses the same rounded terminal vocabulary while preserving its distinct meaning. */
+/* Reorder uses Lucide's canonical three-line menu geometry on the same 24x24 optical grid. */
 .reorder-handle {
   position: relative;
   width: var(--touch);
@@ -222,16 +205,18 @@
 }
 .reorder-handle::before {
   content: "";
+  width: 20px;
+  height: 20px;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 14px;
-  height: var(--accessory-stroke);
-  border-radius: var(--accessory-cap);
   background: var(--quiet);
-  box-shadow: 0 -5px 0 var(--quiet), 0 5px 0 var(--quiet);
+  -webkit-mask: var(--icon-menu) center / contain no-repeat;
+  mask: var(--icon-menu) center / contain no-repeat;
   transform: translate(-50%, -50%);
+  pointer-events: none;
 }
+.reorder-handle::after { content: none; }
 
 /* Modal/dialog composition: calm material, strong conceptual grouping, stable actions.
    No decorative hairline is introduced by the shared primitive layer. */

@@ -44,9 +44,15 @@ class G7ShellTestBrowser(unittest.TestCase):
 
         add = page.get_by_role("button", name="Example add action")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').height"), "18px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).boxShadow"), "none")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "22px")
+        self.assertIn(
+            "data:image/svg+xml",
+            add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
         # The contextual action belongs to the same visual title line instead of floating above it.
         title_box = page.locator("h1").bounding_box()
@@ -57,39 +63,37 @@ class G7ShellTestBrowser(unittest.TestCase):
         add_center = add_box["y"] + add_box["height"] / 2
         self.assertLessEqual(abs(title_center - add_center), 2.0)
 
+        # Complete uses the canonical masked check rather than a hand-built two-stroke drawing.
         complete = page.locator(".checkmark").first
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "6px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::after').width"), "11px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "999px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "16px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "16px")
+        self.assertIn(
+            "data:image/svg+xml",
+            complete.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
+        # Current is one emphasized ring, not a bullseye/radio-control treatment.
         current = page.locator(".journey-mark.current")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopWidth"), "2px")
+        incomplete = page.locator(".completion-ring").first
+        current_width = current.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
+        incomplete_width = incomplete.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
+        self.assertGreater(current_width, incomplete_width)
         self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), '""')
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').position"), "absolute")
-        for side in ("top", "right", "bottom", "left"):
-            self.assertEqual(current.evaluate(f"el => getComputedStyle(el, '::after').{side}"), "0px")
-        inner_ring_width = current.evaluate(
-            "el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"
-        )
-        self.assertGreaterEqual(inner_ring_width, 2.5)
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').borderTopStyle"), "solid")
-        self.assertEqual(
-            current.evaluate("el => getComputedStyle(el, '::after').borderTopColor"),
-            "rgba(232, 232, 237, 0.38)",
-        )
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').content"), "none")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
         management = page.get_by_role("button", name="Example row actions")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "3px")
-        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
+        self.assertIn(
+            "data:image/svg+xml",
+            management.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
 
-        # Back and forward are the exact same continuous rounded chevron mask, mirrored by direction.
+        # Back and forward share the same canonical icon mask; direction is the only difference.
         chevron = page.locator(".chevron").first
         back = page.locator(".shell-test-link")
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el).fontSize"), "0px")
@@ -104,9 +108,28 @@ class G7ShellTestBrowser(unittest.TestCase):
 
         reorder = page.get_by_role("button", name="Reorder example")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
-        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
-        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').height"), "20px")
+        self.assertIn(
+            "data:image/svg+xml",
+            reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
+
+        # Every trailing accessory shares one physical lane center, regardless of semantic glyph.
+        accessory_locators = [
+            page.locator(".checkmark").first,
+            current,
+            incomplete,
+            chevron,
+            reorder,
+            management,
+        ]
+        centers = []
+        for locator in accessory_locators:
+            box = locator.bounding_box()
+            self.assertIsNotNone(box)
+            centers.append(box["x"] + box["width"] / 2)
+        self.assertLessEqual(max(centers) - min(centers), 1.5)
 
     def test_shell_test_temporary_ui_uses_same_adaptive_dialog_primitive(self):
         page = self.open()

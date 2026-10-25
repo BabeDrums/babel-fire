@@ -25,7 +25,7 @@ PR **#66 — Return coordinated shell iteration to G7** established that complet
 
 PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review continued to expose systemic shell inconsistencies rather than final FIRE-workflow questions.
 
-The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, reliable deployed-build identification, real-screen regressions caused by over-broad shared selectors, and header/navigation consistency.
+The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, accessory alignment, current-state language, modal/group rhythm, reliable deployed-build identification, real-screen regressions caused by over-broad shared selectors, header/navigation consistency, and the limits of a homemade per-glyph CSS icon system.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -85,11 +85,12 @@ Do not make G7 automatically match a Lab specimen.
 - toolbar `+` means add/create the primary discrete thing for the current view
 - toolbar `•••` means management/actions
 - trailing header actions align to the visual center of the large title line rather than floating in a separate vertical rhythm
+- toolbar add/management actions keep ~44px interaction targets but are glyph-first at rest rather than permanently boxed surfaces
 - project-row management has no decorative divider from the row
-- Back and forward/navigation use one canonical continuous rounded chevron drawing, mirrored only by direction; Shell Test Back uses the same primitive
-- recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
-- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter faded inner ring touching the inside edge of the outer ring; color alone does not carry the state
-- the accessory family uses one rounded construction vocabulary for drawn strokes/caps while preserving semantic hierarchy between state, navigation, reorder, add, and management affordances
+- standard interface glyphs use one canonical Lucide 24×24 construction source instead of being redrawn independently in CSS
+- Back and forward/navigation use the same canonical chevron family, with direction as the only change; Shell Test Back uses the same primitive
+- recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container
+- progress-state language remains under physical review but is intentionally simple: Complete = filled state circle + canonical check; Current = one brighter/thicker ring; Incomplete = quieter/thinner ring
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
@@ -105,23 +106,23 @@ Existing interaction semantics remain useful evidence:
 
 The following are **implemented Candidate evidence, not Locked conclusions**:
 
-- project-row `•••` divider removed and management aligned through the shared accessory lane
-- `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
-- trailing header actions now align to the large-title centerline rather than floating above the title
-- Back and forward navigation are built from the same continuous rounded chevron path, mirrored only by direction, removing the visible apex break from the prior two-piece CSS construction
+- project-row `•••` divider remains removed and management stays in the shared accessory lane
+- the prior homemade per-glyph CSS system has been retired for commodity interface symbols after physical review showed mismatched visual centers, joins, proportions, and stroke personalities
+- check, chevron, plus, ellipsis, and reorder now use canonical Lucide SVG-mask geometry from one 24×24 source system in `shell-primitives.css`
+- trailing row accessories now share one actual x-center across Complete / Current / Incomplete / Navigate / Reorder / More rather than merely sharing similar box sizes
+- toolbar `+` / `•••` keep 44px hit targets but no longer render permanent dark rounded-square backgrounds at rest; active/focus behavior can reveal the control target
+- trailing header actions remain aligned to the large-title centerline
+- Back and forward navigation use the same canonical chevron family, mirrored only by direction
 - Shell Test Back uses the same canonical back primitive as the real project rather than a separate text-arrow treatment
-- management `•••`, chevron, reorder, and completion check use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics where practical
-- canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
-- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a thicker but still lower-emphasis faded inner ring touching the outer ring's inside edge, not the old yellow accent and not a center dot
-- Current's generated inner ring is absolutely positioned so hidden legacy text in the real fixture cannot move it onto another grid row
-- shared accessory layout no longer overrides `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
-- shared sheet styling no longer adds an action-divider hairline or inset top hairline that was not part of the approved shell language
-- rounded terminals/caps unify the accessory family's visual handwriting without forcing different semantic meanings into identical containers
+- the progress-state candidate is simplified to avoid radio/bullseye ambiguity: Current has no inner ring/dot; it is distinguished from Incomplete by stronger ring weight and contrast, while Complete uses the filled state circle plus canonical check
+- shared accessory layout does not override `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
+- shared sheet styling does not add an action-divider hairline or inset top hairline that was not part of the approved shell language
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
+- browser coverage checks real accessory center alignment and the actual G7 Project → Setup → Structure path at 390/440/820 widths
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the exact deployed header/navigation candidate, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed icon/accessory reset candidate, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 

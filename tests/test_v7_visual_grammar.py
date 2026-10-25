@@ -138,13 +138,25 @@ class V7VisualGrammar(unittest.TestCase):
     def test_toolbar_actions_are_anchored_controls_without_changing_back_semantics(self):
         projects = self.open("projects")
         add = projects.get_by_role("button", name="New Project")
-        self.assertNotEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.bounding_box()["width"], 44)
+        self.assertEqual(add.bounding_box()["height"], 44)
+        self.assertIn(
+            "data:image/svg+xml",
+            add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
+
         project = self.open("project")
         more = project.get_by_role("button", name="Project actions")
         back = project.get_by_role("button", name="Projects")
-        self.assertNotEqual(more.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(more.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertIn(
+            "data:image/svg+xml",
+            more.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
         self.assertEqual(back.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         self.assertAlmostEqual(add.bounding_box()["width"], more.bounding_box()["width"], delta=1.0)
+        self.assertAlmostEqual(add.bounding_box()["height"], more.bounding_box()["height"], delta=1.0)
 
     def test_grouped_page_rows_share_one_64px_rhythm(self):
         sections = [{"id": "s1", "name": "Intro", "lengthBars": 8}]
