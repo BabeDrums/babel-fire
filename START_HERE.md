@@ -48,7 +48,7 @@ PR #89 passed Static + Chromium **390 / 440 / 820**, including the real G7 Proje
 
 PR #91 later simplified authority/documentation only and made no G7/V6 runtime change. Exact Pages deployment and post-merge Static + Chromium 390/440/820 passed on `f512b90065c58a2426e79e4a99941a22b22fe35e`.
 
-## Active physical-review finding — host centering
+## Active physical review finding — host centering
 
 Physical iPad review of deployed `G7 · f512b90` found that the normalized glyphs look correct in the Shell Test container comparison, while the same generated artwork can sit visibly high in toolbar/action/row/state hosts.
 
