@@ -3,8 +3,8 @@ const sheetRoot = document.getElementById("sheetRoot");
 let buildCommitPromise = null;
 
 const SYMBOLS = {
-  back: '<path d="M15 18 9 12l6-6"/>',
-  forward: '<path d="m9 18 6-6-6-6"/>',
+  back: '<polyline points="15 18 9 12 15 6"/>',
+  forward: '<polyline points="9 18 15 12 9 6"/>',
   plus: '<path d="M5 12h14M12 5v14"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
   reorder: '<path d="M4 5h16M4 12h16M4 19h16"/>',
@@ -19,11 +19,6 @@ const SYMBOL_LABELS = {
   reorder: "Reorder",
   more: "More"
 };
-
-// Physical review found the chevron family visually pulled toward each directional tip even after
-// visible-bounds centering. Keep one mirrored family rule: both chevrons move the same small amount
-// inward toward the center of the control. Other symbols remain purely geometry-centered.
-const CHEVRON_OPTICAL_INSET = 1.2;
 
 const normalizedSymbol = (name) => `
   <svg class="normalized-symbol" data-symbol="${name}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -43,24 +38,50 @@ const symbolRow = (variant, label) => `
     </div>
   </div>`;
 
+// Optical alignment is an intrinsic symbol metric, not a container-specific nudge.
+// The commodity symbols that already passed physical review stay centered on their geometry bounds.
+// A chevron's two strokes form a triangular convex hull whose centroid captures the asymmetric
+// visual envelope: Back resolves to x=13 and Forward to x=11, so centering that anchor moves
+// the pair outward by equal-and-opposite amounts derived directly from the glyph geometry.
+function chevronHullCentroid(art) {
+  const polyline = art.querySelector("polyline");
+  if (!polyline || polyline.points.numberOfItems !== 3) return null;
+  const points = Array.from({ length: 3 }, (_, index) => polyline.points.getItem(index));
+  return {
+    x: points.reduce((sum, point) => sum + point.x, 0) / 3,
+    y: points.reduce((sum, point) => sum + point.y, 0) / 3
+  };
+}
+
 function normalizeSymbols(root = document) {
   root.querySelectorAll(".normalized-symbol").forEach((svg) => {
     const art = svg.querySelector(".symbol-art");
     if (!art) return;
     art.removeAttribute("transform");
     const bounds = art.getBBox();
-    const geometryDx = 12 - (bounds.x + bounds.width / 2);
-    const dy = 12 - (bounds.y + bounds.height / 2);
-    const opticalDx = svg.dataset.symbol === "back"
-      ? CHEVRON_OPTICAL_INSET
-      : svg.dataset.symbol === "forward"
-        ? -CHEVRON_OPTICAL_INSET
-        : 0;
-    const dx = geometryDx + opticalDx;
+    const geometryCenter = {
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y + bounds.height / 2
+    };
+    const isChevron = svg.dataset.symbol === "back" || svg.dataset.symbol === "forward";
+    const hullCenter = isChevron ? chevronHullCentroid(art) : null;
+    const anchor = hullCenter || geometryCenter;
+    const alignmentModel = hullCenter ? "convex-hull-centroid" : "geometry-bounds";
+    const geometryDx = 12 - geometryCenter.x;
+    const geometryDy = 12 - geometryCenter.y;
+    const dx = 12 - anchor.x;
+    const dy = 12 - anchor.y;
+    const opticalDx = dx - geometryDx;
+    const opticalDy = dy - geometryDy;
     art.setAttribute("transform", `translate(${dx} ${dy})`);
     svg.dataset.normalized = "true";
+    svg.dataset.alignmentModel = alignmentModel;
+    svg.dataset.anchorX = anchor.x.toFixed(3);
+    svg.dataset.anchorY = anchor.y.toFixed(3);
     svg.dataset.geometryShiftX = geometryDx.toFixed(3);
+    svg.dataset.geometryShiftY = geometryDy.toFixed(3);
     svg.dataset.opticalShiftX = opticalDx.toFixed(3);
+    svg.dataset.opticalShiftY = opticalDy.toFixed(3);
     svg.dataset.shiftX = dx.toFixed(3);
     svg.dataset.shiftY = dy.toFixed(3);
   });
@@ -89,7 +110,6 @@ host.innerHTML = `
         ${symbolRow("symbol-button-current", "Current")}
         ${symbolRow("symbol-button-circle", "Circle")}
       </div>
-      <p class="shell-test-note">Both rows use the same 24×24 vector source and automatic visible-bounds centering. Only the button shape changes; Back and Forward share one mirrored inward optical correction from physical review.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="rowsHeading">
@@ -102,7 +122,6 @@ host.innerHTML = `
         <div class="arrangement-row"><button class="section-edit-target"><span class="arrangement-name">Reorderable item</span><span class="arrangement-bars">8 bars</span></button><button class="reorder-handle" aria-label="Reorder example"></button></div>
         <div class="project-card"><button class="project-open"><span class="project-copy"><strong>Managed row</strong><span>Metadata · Fixture</span></span></button><button class="project-card-actions more-button" aria-label="Example row actions">•••</button></div>
       </div>
-      <p class="shell-test-note">State can carry stronger visual emphasis; navigation and management stay quiet.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="typeHeading">
