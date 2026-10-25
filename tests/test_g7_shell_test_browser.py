@@ -106,13 +106,35 @@ class G7ShellTestBrowser(unittest.TestCase):
         forward_symbol = comparison.locator('.normalized-symbol[data-symbol="forward"]').first
         back_optical = float(back_symbol.get_attribute("data-optical-shift-x"))
         forward_optical = float(forward_symbol.get_attribute("data-optical-shift-x"))
-        self.assertGreater(back_optical, 0)
-        self.assertLess(forward_optical, 0)
+        self.assertEqual(back_symbol.get_attribute("data-alignment-model"), "convex-hull-centroid")
+        self.assertEqual(forward_symbol.get_attribute("data-alignment-model"), "convex-hull-centroid")
+        self.assertLess(back_optical, 0)
+        self.assertGreater(forward_optical, 0)
         self.assertAlmostEqual(back_optical, -forward_optical, delta=0.001)
-        self.assertAlmostEqual(abs(back_optical), 1.2, delta=0.001)
+        self.assertAlmostEqual(abs(back_optical), 1.0, delta=0.001)
+
+        for symbol in (back_symbol, forward_symbol):
+            optical_anchor = symbol.evaluate(
+                """el => {
+                    const art = el.querySelector('.symbol-art');
+                    const polyline = art.querySelector('polyline');
+                    const points = Array.from(
+                        {length: polyline.points.numberOfItems},
+                        (_, i) => polyline.points.getItem(i)
+                    );
+                    const m = art.transform.baseVal.consolidate()?.matrix;
+                    return {
+                        x: points.reduce((sum, point) => sum + point.x, 0) / points.length + (m?.e || 0),
+                        y: points.reduce((sum, point) => sum + point.y, 0) / points.length + (m?.f || 0)
+                    };
+                }"""
+            )
+            self.assertAlmostEqual(optical_anchor["x"], 12.0, delta=0.01)
+            self.assertAlmostEqual(optical_anchor["y"], 12.0, delta=0.01)
 
         for name in ("plus", "check", "reorder", "more"):
             symbol = comparison.locator(f'.normalized-symbol[data-symbol="{name}"]').first
+            self.assertEqual(symbol.get_attribute("data-alignment-model"), "geometry-bounds")
             self.assertEqual(float(symbol.get_attribute("data-optical-shift-x")), 0.0)
 
         current = comparison.locator('[data-symbol-variant="symbol-button-current"] .symbol-button').first
