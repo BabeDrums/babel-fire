@@ -10,6 +10,8 @@ REQUIRED = {
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
         "Babel Continuity Buffer",
+        "Coordinated FIRE shell implementation/certification lives in the isolated G7 context",
+        "Lab is evidence, never authority",
         "stale divergence",
         "potential upstream improvement",
         "app-local exception",
@@ -27,6 +29,7 @@ REQUIRED = {
         "Evaluate",
         "Documentation authority and conflict policy",
         "G7 shell vs FIRE Core",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
     ],
     "AGENTS.md": [
         "BABEL_TRUTH.md",
@@ -35,6 +38,7 @@ REQUIRED = {
         "production-projects-v1",
         "production-projects-v1-v7-preview",
         "No Codex for FIRE",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "Inline",
         "Sheet",
         "Navigation",
@@ -42,6 +46,7 @@ REQUIRED = {
     "START_HERE.md": [
         "BABEL_TRUTH.md",
         "G7 Shell Certification active",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "PR **#66",
         "PR **#67",
         "G7 is not approved/frozen",
@@ -54,6 +59,7 @@ REQUIRED = {
     ],
     "G7_SHELL_CERTIFICATION.md": [
         "# Babel FIRE — G7 Shell Certification",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "Developer Shell Test",
         "all 10 categories are **Locked**",
         "Babel explicitly approves/freezes the shell",
@@ -62,6 +68,10 @@ REQUIRED = {
         "# G7 Shell Certification — Status Board",
         "0 / 10 Locked",
         "G7 NOT FROZEN",
+    ],
+    "CONTEXT.md": [
+        "G7_SHELL_CERTIFICATION_STATUS.md",
+        "current category status/evidence",
     ],
     "BABEL_START_HERE.md": [
         "BABEL_TRUTH.md",
@@ -97,6 +107,7 @@ REQUIRED = {
     ],
     "V7_DRAFT.md": [
         "`FIRE_CORE.md` governs cross-generation product doctrine",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "Delete before styling.",
         "## Interaction grammar",
         "## Physical rhythm and visual grammar primitives",
@@ -113,9 +124,13 @@ REQUIRED = {
 }
 
 FORBIDDEN = {
+    "BABEL_TRUTH.md": [
+        "including the current shell/visual harness",
+    ],
     "AGENTS.md": [
         "Continuity capture buffer",
         "Do **not** update it for every message",
+        "G7_SHELL_CERTIFICATION.md` — active shell-completion checklist, Shell Test contract, category status, and freeze gate",
     ],
     "START_HERE.md": [
         "PR **#59** is the last merged/deployed G7 baseline",
@@ -138,6 +153,7 @@ FORBIDDEN = {
     "CONTEXT.md": [
         "### Recreation — SECONDARY / LEARNING MODE",
         "Project Home owns **Continue + Journey + Notes**",
+        "Detailed category status and freeze requirements live only in `G7_SHELL_CERTIFICATION.md`",
     ],
     "V7_DRAFT.md": [
         "current Cover shell work remains **Song Setup → Structure → Tracks**",
@@ -146,6 +162,7 @@ FORBIDDEN = {
         "Tracks is the multi-select variant and adds visible checks to selected choices",
         "- index\n- section name",
         "## State and accessory grammar",
+        "`G7_SHELL_CERTIFICATION.md` must show all ten categories Locked",
     ],
 }
 
