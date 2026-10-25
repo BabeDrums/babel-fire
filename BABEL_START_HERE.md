@@ -2,7 +2,7 @@
 
 Use **Babel** as the project-facing name.
 
-This is the local ecosystem-concept handoff hosted in `babel-fire`. Cross-app principles/process/design foundations now live in Babel Truth and should not be recopied here.
+This is the local ecosystem-concept handoff hosted in `babel-fire`. Cross-app principles/process/design foundations live in Babel Truth and should not be recopied here.
 
 ## Read order
 
@@ -38,12 +38,13 @@ FIRE supports first-class Original and Recreation/Cover paths. Recreation is not
 
 ### FIRE shell boundary relevant to the ecosystem
 
-Coordinated FIRE shell implementation and certification currently live in FIRE's isolated **G7** context, not in Babel Lab.
+Coordinated FIRE shell implementation and certification live in FIRE's isolated **G7** context, not in Babel Lab.
 
 - G7 remains unfrozen and FIRE Core remains blocked until the FIRE-local shell-certification gate is explicitly passed.
 - `G7_SHELL_CERTIFICATION.md` defines the certification/freeze contract; `G7_SHELL_CERTIFICATION_STATUS.md` owns mutable category status/evidence.
 - Current Setup / Structure / Tracks content is disposable shell-fixture evidence, not final FIRE Core architecture.
-- Babel Lab may still host bounded experiments, but **Lab is evidence, never authority** and should not carry a parallel full FIRE shell merely to certify G7.
+- Babel Lab may host bounded experiments, but **Lab is evidence, never authority** and must not carry a parallel full FIRE shell merely to certify G7.
+- FIRE shell progress does **not** depend on a Lab candidate. G7 may use Lab evidence deliberately, but coordinated implementation, validation, and certification stay in FIRE.
 - Only after FIRE physically proves/freezes transferable shell fundamentals should genuinely cross-app principles be promoted into Babel Truth. Lab can then reconcile to that promoted Truth without blocking FIRE Core work.
 
 This is an ownership/sequence boundary, not approval of a universal shared UI package today.
@@ -80,8 +81,8 @@ A **World prototype may live in Babel Lab**. Babel Lab itself remains the protot
 
 Current Lab ownership direction is more explicit:
 
-- **Fire Lab** is the FIRE-bound visualization/progression experiment; promotion destination is Babel FIRE.
-- **World Lab** is the World-bound experiment; Achievements live here.
+- **Fire Lab** is a FIRE-bound visualization/progression experiment; promotion destination is Babel FIRE if FIRE deliberately adopts it.
+- **World Lab** is a World-bound experiment; Achievements live here.
 - both may remain in the single `babel-lab` repository without implying they ship in one final product.
 
 > **The collection earns its shape.**
@@ -158,7 +159,7 @@ The old local `CONTINUITY_INBOX.md` is retired as an active buffer.
 
 New unresolved durable ecosystem findings use **Babel Truth Issue #1** under Truth's persist-before-reply threshold.
 
-Under the current append-safe Truth process:
+Under the append-safe Truth process:
 
 - routine persist-before-reply capture is a **new Issue #1 comment**
 - the Issue #1 body is the consolidated unresolved snapshot
