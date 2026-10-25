@@ -8,7 +8,7 @@ This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The
 | --- | --- | --- |
 | 1. Page frame | Candidate | Shell Test exposes sparse/normal/dense and long-content composition using the real page shell. Needs final compact/regular physical review before locking. |
 | 2. Typography | Candidate | Representative title/meta/row/supporting roles and long wrapping are visible together in Shell Test. Needs final hierarchy review in real G7 context. |
-| 3. Spacing and alignment | Candidate | Shared primitive layer owns canonical accessory geometry, optical `+` / `•••` centering, and named modal spacing tokens. Needs physical confirmation after the reliability repair deploys. |
+| 3. Spacing and alignment | Candidate | Shared primitive layer owns canonical accessory geometry, optical `+` / `•••` centering, and named modal spacing tokens. Needs physical confirmation on the exact deployed revision. |
 | 4. Surfaces | Candidate | Existing grouped/selection/field/modal surfaces are exercised together in Shell Test; material relationships remain subject to physical review. |
 | 5. Actions | Candidate | Primary/secondary/destructive/add/management actions are compared on one real-primitives surface; project-row management has no decorative divider. Needs physical review. |
 | 6. Icons and accessories | Candidate | Completion/current/incomplete/chevron/ellipsis/add/drag share canonical geometry; the current state now uses the stronger outlined ring language rather than an inner dot. Needs physical review. |
