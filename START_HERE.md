@@ -29,7 +29,9 @@ The developer Shell Test is now the shared-primitives certification surface insi
 
 The first canonical-icon reset reached deployed build `0cc4cba`, but physical review of that exact revision found that mathematical shared-center alignment still did not read as optically aligned. The main cause was unequal visible mass: 28px state circles beside 18–20px commodity glyphs. Build `02e1e10` improved commodity-glyph balance and added the six-glyph comparison palette, but physical review then isolated the remaining problem more clearly: the circular Complete / Current / Incomplete state vocabulary still read like a radio-control system, and the inherited Current-row background tint looked like a selected button.
 
-The active state-language candidate therefore retires the circular state treatment instead of continuing to tune it: Complete = canonical check only; Current = short stronger status bar; Incomplete/upcoming = shorter quieter status bar; Current row = no persistent background tint. These state overrides live in a deployment-revisioned `state-primitives.css` layer shared by real G7 and Shell Test while commodity glyph construction remains in `shell-primitives.css`.
+Deployed build `c02ac89` retired that circular treatment: Complete = canonical check only; Current = stronger short status bar; Incomplete/upcoming = quieter short status bar; Current row = no persistent background tint. Physical review of that exact build was a clear improvement and kept the direction, but exposed one final refinement layer: the three state marks still felt independently drawn rather than generated from one optical system, and trailing `8 bars` metadata competed visually with the reorder affordance.
+
+The active accessory-polish candidate therefore keeps the accepted non-circular language but normalizes Complete / Current / Incomplete onto one 18px optical frame. Current and Incomplete share the same width and cap geometry; hierarchy comes only from weight and contrast. Arrangement metadata such as `8 bars` moves into a supporting-text line beneath the section name so the far-right lane contains only the reorder affordance. These changes are shared between Shell Test and real G7 through the existing primitive layers.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -96,8 +98,9 @@ Do not make G7 automatically match a Lab specimen.
 - standard interface glyphs use one canonical Lucide 24×24 construction source instead of being redrawn independently in CSS
 - Back and forward/navigation use the same canonical chevron family, with direction as the only semantic difference; tiny optical offsets are allowed when needed so mirrored geometry reads centered on-device
 - recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container or equal visible mass
-- progress-state language remains under physical review; the active candidate is deliberately non-circular: Complete = canonical check only; Current = stronger short status bar; Incomplete/upcoming = quieter short status bar
+- progress-state language remains under physical review; the active candidate is deliberately non-circular and optically normalized: Complete = canonical check only; Current = stronger 18px status bar; Incomplete/upcoming = quieter 18px status bar
 - Current state must not create a persistent selected-row background; state and row selection are different semantics
+- arrangement supporting metadata belongs to the content hierarchy; the far-right accessory lane is reserved for the row's affordance
 - state marks and commodity glyphs may differ deliberately in visible mass while sharing the same interaction lane
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
@@ -124,7 +127,9 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - trailing header actions remain aligned to the large-title centerline
 - Back and forward navigation use the same canonical chevron family
 - Shell Test Back uses the same canonical back primitive as the real project rather than a separate text-arrow treatment
-- the circular Complete / Current / Incomplete candidate is retired after physical review; the active state candidate uses check / strong short bar / quiet short bar and explicitly removes the inherited Current-row tint
+- the circular Complete / Current / Incomplete candidate is retired; the active state candidate uses check / strong bar / quiet bar with one shared 18px optical width and explicitly removes the inherited Current-row tint
+- Current and Incomplete share the same cap geometry, with state hierarchy expressed through stroke weight and contrast rather than independent dimensions
+- arrangement metadata such as `8 bars` is supporting text under the item name; reorder is the sole far-right affordance
 - state overrides are loaded after the base and commodity primitive layers in both real G7 and Shell Test, using the same deployed build revision
 - shared accessory layout does not override `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
 - shared sheet styling does not add an action-divider hairline or inset top hairline that was not part of the approved shell language
@@ -133,7 +138,7 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - browser coverage checks real state geometry, transparent Current-row background, accessory center alignment, the glyph comparison palette, and the actual G7 Project → Setup → Structure path at 390/440/820 widths
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the exact deployed non-circular state-language candidate, especially Complete / Current / Incomplete in Rows · accessories and the real project Home. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed accessory-polish candidate: compare Complete / Current / Incomplete as one family, verify `8 bars` now reads as supporting information rather than a competing accessory, and confirm the same treatment in real Structure. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 

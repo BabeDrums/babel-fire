@@ -61,12 +61,12 @@ class G7RealShellBrowser(unittest.TestCase):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "4px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
-        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
-        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
-        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
         # Current and upcoming occupy the same trailing lane center in the actual project.

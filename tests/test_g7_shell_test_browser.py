@@ -82,7 +82,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        # Complete is the canonical check without a surrounding circle.
+        # Complete is the canonical check without a surrounding circle, drawn in the shared 18px optical frame.
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "18px")
@@ -91,13 +91,14 @@ class G7ShellTestBrowser(unittest.TestCase):
             complete.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Current is a stronger short status bar; incomplete is the same language at lower emphasis.
+        # Current and incomplete share width/caps; only weight and contrast step down.
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "4px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
-        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
-        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
+        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
 
         current_row = page.get_by_role("button", name="Current")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
@@ -132,6 +133,19 @@ class G7ShellTestBrowser(unittest.TestCase):
             "data:image/svg+xml",
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
+
+        # Supporting arrangement metadata belongs under the name; reorder alone owns the far-right lane.
+        arrangement_name = page.locator(".arrangement-name").first
+        arrangement_bars = page.locator(".arrangement-bars").first
+        name_box = arrangement_name.bounding_box()
+        bars_box = arrangement_bars.bounding_box()
+        reorder_box = reorder.bounding_box()
+        self.assertIsNotNone(name_box)
+        self.assertIsNotNone(bars_box)
+        self.assertIsNotNone(reorder_box)
+        self.assertGreaterEqual(bars_box["y"], name_box["y"] + name_box["height"] - 1)
+        self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
+        self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
         # State and commodity marks keep the same physical trailing-lane center.
         accessory_locators = [complete, current, incomplete, chevron, reorder, management]
