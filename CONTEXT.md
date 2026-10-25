@@ -2,7 +2,7 @@
 
 **Purpose:** preserve supporting context that materially helps FIRE product/design work without becoming a second live specification.
 
-Start every FIRE continuation with `START_HERE.md`, then follow `AGENTS.md` authority. `FIRE_CORE.md` owns current cross-generation doctrine. `V6.md` owns live V6 production behavior. `V7_DRAFT.md` owns current G7 shell behavior/primitive grammar. `G7_SHELL_CERTIFICATION.md` owns G7 shell completion status and the freeze gate.
+Start every FIRE continuation with `START_HERE.md`, then follow `AGENTS.md` authority. `FIRE_CORE.md` owns current cross-generation doctrine. `V6.md` owns live V6 production behavior. `V7_DRAFT.md` owns current G7 shell behavior/primitive grammar. `G7_SHELL_CERTIFICATION.md` owns the G7 shell completion contract/freeze gate; `G7_SHELL_CERTIFICATION_STATUS.md` owns mutable category status and review evidence.
 
 This file must **not** contain route-by-route G7 rules, current PR/SHA status, certification-category status, or “LOCKED” implementation language that can become stale. Git history preserves the larger historical context and retired implementation details.
 
@@ -54,7 +54,7 @@ A developer-only Shell Test inside G7 uses actual G7 primitives to expose system
 
 Shell freeze means the foundation is stable enough to build confidently, not that the design system can never gain a genuinely new primitive. FIRE Core may later extend the smallest necessary part deliberately.
 
-Detailed category status and freeze requirements live only in `G7_SHELL_CERTIFICATION.md`.
+Detailed category definitions/freeze requirements live in `G7_SHELL_CERTIFICATION.md`; current category status/evidence lives in `G7_SHELL_CERTIFICATION_STATUS.md`.
 
 ## Core production problem FIRE should solve
 
