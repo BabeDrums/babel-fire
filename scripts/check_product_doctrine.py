@@ -1,7 +1,7 @@
 """Protect durable FIRE/Babel authority wiring and known stale definitions.
 
-This guard checks stable markers and explicit stale contradictions. It intentionally does
-not encode temporary merge SHAs, but it does require the current shell-routing/gate language.
+This guard checks stable semantic markers and explicit stale contradictions. It intentionally
+avoids brittle wording from superseded drafts and does not encode temporary merge SHAs.
 """
 from pathlib import Path
 
@@ -26,6 +26,7 @@ REQUIRED = {
         "Experiment",
         "Evaluate",
         "Documentation authority and conflict policy",
+        "G7 shell vs FIRE Core",
     ],
     "AGENTS.md": [
         "BABEL_TRUTH.md",
@@ -50,6 +51,17 @@ REQUIRED = {
         "G7** owns coordinated FIRE shell implementation",
         "Lab is evidence, never authority",
         "10/10 categories Locked",
+    ],
+    "G7_SHELL_CERTIFICATION.md": [
+        "# Babel FIRE — G7 Shell Certification",
+        "Developer Shell Test",
+        "all 10 categories are **Locked**",
+        "Babel explicitly approves/freezes the shell",
+    ],
+    "G7_SHELL_CERTIFICATION_STATUS.md": [
+        "# G7 Shell Certification — Status Board",
+        "0 / 10 Locked",
+        "G7 NOT FROZEN",
     ],
     "BABEL_START_HERE.md": [
         "BABEL_TRUTH.md",
@@ -88,15 +100,15 @@ REQUIRED = {
         "Delete before styling.",
         "## Interaction grammar",
         "## Physical rhythm and visual grammar primitives",
-        "## State and accessory grammar",
+        "## Canonical icon/accessory grammar",
         "## Navigation and Back behavior",
         "Shared row-content grid",
         "Selection surface",
         "Segmented control",
         "Page action footer",
         "Accurate",
-        "does **not** add redundant checkmarks",
-        "Visible ordinal numbers are removed",
+        "Structure arrangement objects do not earn completion checks merely by existing.",
+        "Track selections do not need redundant completion checks when selected fill already communicates selection.",
     ],
 }
 
@@ -133,6 +145,7 @@ FORBIDDEN = {
         "`Other` belongs to the same selection surface",
         "Tracks is the multi-select variant and adds visible checks to selected choices",
         "- index\n- section name",
+        "## State and accessory grammar",
     ],
 }
 
