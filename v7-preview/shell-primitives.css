@@ -12,7 +12,6 @@
   --toolbar-control-radius: 50%;
   --toolbar-control-bg: #17171a;
   --toolbar-control-active: #202024;
-  --header-action-offset: 44px;
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
 
@@ -41,10 +40,6 @@
 .toolbar-button:active,
 .shell-test-link:active { background: var(--toolbar-control-active); }
 
-/* Header actions align to the visual center of the large title line rather than floating above it.
-   The leading Back control remains in the toolbar lane; the trailing contextual action belongs to the title lane. */
-.toolbar-trailing { transform: translateY(var(--header-action-offset)); }
-
 .add-button,
 .more-button {
   position: relative;
@@ -58,11 +53,22 @@
 }
 .add-button { color: var(--text); }
 .more-button { color: #c0c0c8; }
+
+/* GENERATED ARTWORK HOST CONTRACT
+   Every generated symbol is seated explicitly at the physical center of its host frame.
+   The host decides where the frame lives; the symbol asset decides any intrinsic optical metric.
+   Do not let pseudo-elements fall back to inline/grid flow where line boxes or later host CSS can
+   move identical artwork differently between toolbar, action-row, and accessory contexts. */
 .add-button::before,
-.more-button::before {
+.more-button::before,
+.chevron::before,
+.back-glyph::before,
+.shell-test-link::before {
   content: "";
-  width: var(--toolbar-icon-size);
-  height: var(--toolbar-icon-size);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   background: currentColor;
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
@@ -71,6 +77,11 @@
   mask-repeat: no-repeat;
   mask-size: contain;
   pointer-events: none;
+}
+.add-button::before,
+.more-button::before {
+  width: var(--toolbar-icon-size);
+  height: var(--toolbar-icon-size);
 }
 .add-button::before {
   -webkit-mask-image: var(--icon-plus);
@@ -84,7 +95,7 @@
 .more-button::after { content: none; }
 
 /* Back and Forward are one mirrored semantic family, but each asset owns its optical side bearing.
-   Their hit targets and accessory lanes stay fixed; the artwork needs no container-specific transform. */
+   Their hit targets and accessory lanes stay fixed; the artwork needs no container-specific nudge. */
 .chevron,
 .back-glyph {
   position: relative;
@@ -112,17 +123,8 @@
 .chevron::before,
 .back-glyph::before,
 .shell-test-link::before {
-  content: "";
   width: var(--accessory-glyph);
   height: var(--accessory-glyph);
-  background: currentColor;
-  -webkit-mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: contain;
-  pointer-events: none;
 }
 .chevron::before {
   -webkit-mask-image: var(--icon-chevron-forward);
@@ -238,12 +240,6 @@
   letter-spacing: .055em;
   text-transform: uppercase;
 }
-.shell-test-note {
-  margin: 10px 2px 0;
-  color: var(--quiet);
-  font-size: 12px;
-  line-height: 1.45;
-}
 .shell-test-gap { margin-top: 12px; }
 .shell-test-actions {
   display: flex;
@@ -263,6 +259,12 @@
   min-height: 88px;
   display: flex;
   align-items: center;
+  padding: var(--space-4) var(--row-inline);
+}
+.shell-test-density .placeholder-state p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
 }
 .shell-test-disabled { opacity: .42; }
 
