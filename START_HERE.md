@@ -29,56 +29,62 @@ Coordinated FIRE shell implementation/certification belongs in the real isolated
 
 ## Current symbol/alignment finding
 
-The deployed real-G7 candidate still contains PR #83's shared `--symbol-optical-y: 1px` correction. That candidate preserved the accepted horizontal row/accessory lanes, text anchors, hit targets, and header geometry while moving visible symbol/state artwork down 1px.
+The old production-wide `--symbol-optical-y: 1px` candidate is superseded by the physically reviewed Shell Test work from PRs #85–#87.
 
-Physical iPhone review of `G7 · d00d146` did not approve that global 1px candidate, so PR #85 introduced a Shell Test-only inline-SVG normalization experiment. Plus / Check / Reorder / More now read correctly enough in the bounded experiment and should remain undisturbed.
+Physical review established the following direction:
 
-PR #86 deployed `G7 · 4e84bd5` with Liquid Glass removed, a standard FIRE comparison card, Current vs Circle only, and a mirrored **inward** chevron correction. Physical iPad review rejected that chevron direction: Back / Forward now read too far inward. The helper paragraphs beneath the symbol comparison and Rows · accessories also add unnecessary developer narration and should be removed from the visual review surface.
+- Plus / More / Reorder do not need extra optical offsets beyond their normal centered symbol frame.
+- Check benefits from a tiny intrinsic vertical optical correction.
+- Back / Forward need mirrored **outward** optical side bearings; the successful candidate derived those from the chevron family's own geometry rather than a page-specific nudge.
+- Plain Circle is preferred over the rounded-square comparison for standalone glyph buttons.
+- Liquid Glass is rejected for the current FIRE shell direction.
 
-The research/implementation conclusion is that **bounding-box centering and optical centering are different problems**. Runtime `getBBox()` can mechanically center geometry, but a directional asymmetric glyph can still read off. The next Shell Test candidate therefore treats alignment as an intrinsic symbol metric instead of another container-specific pixel nudge:
+PR #87 deployed `G7 · b35b783` with the refined outward chevron candidate and the Current-vs-Circle comparison. Babel physically reported that result looked really good and approved moving beyond the Shell Test experiment.
 
-- Plus / Check / Reorder / More keep their accepted geometry-bounds centering.
-- Back / Forward use the centroid of the triangular convex hull formed by their three chevron vertices as the optical anchor.
-- For the current 24×24 source geometry, Back's hull center is `x=13` and Forward's is `x=11`; centering those anchors at `x=12` deterministically yields `-1` for Back and `+1` for Forward — equal-and-opposite **outward** movement derived from the glyph geometry rather than a hand-entered correction.
-- The optical rule remains Shell Test-only. Real G7 production controls are unchanged until physical approval.
+The implementation rule going forward is:
 
-**Liquid Glass remains rejected.** Plain Circle remains the current physical preference, but it is not yet promoted into real G7.
+**geometry baseline → optional intrinsic symbol optical metric → container placement**
 
-### Active Shell Test experiment
+The container must not decide per-glyph nudges. Optical alignment belongs to the symbol asset/primitive. Different symbols may therefore use different intrinsic metrics while still participating in one shared system.
 
-Shell Test contains a bounded two-row symbol/container comparison that does **not** alter real G7 production controls:
+### Current real-G7 promotion candidate
 
-- the same six commodity symbols render as inline 24×24 SVG artwork
-- Plus / Check / Reorder / More use geometry-bounds centering
-- Back / Forward derive their optical anchor from their own triangular convex-hull centroid, producing mirrored outward seating without a magic offset constant
-- the comparison card uses the standard FIRE grouped surface tokens; it is not a special ambient/glass field
-- the same symbol implementation is shown in two rows:
-  1. **Current** — existing rounded-square Shell Test container treatment
-  2. **Circle** — the same simple material in a circular container
-- no Liquid Glass treatment remains in the experiment
-- the two now-redundant explanatory helper paragraphs beneath the symbol comparison and Rows · accessories are removed
+The active pass promotes that approved architecture into the actual G7 shared primitives:
 
-The comparison intentionally changes only container shape. Symbol source geometry, alignment model, target size, simple material, and 44px interaction boxes stay consistent across the two rows.
+- the global `--symbol-optical-y` correction is removed
+- Plus / More / Reorder remain centered without extra transforms
+- Check owns its half-viewBox-unit vertical correction inside the canonical SVG asset
+- Back / Forward own separate mirrored optical side bearings in their canonical SVG assets
+- Current / Incomplete remain symmetric bars centered directly in their existing state boxes
+- standalone toolbar controls use the preferred simple Circle treatment with the existing 44px hit target
+- row management, row navigation, progress marks, and reorder remain unboxed according to their semantics
+- accepted horizontal accessory lanes, x-centers, hit targets, row geometry, text anchors, and header geometry remain unchanged
+
+Shell Test remains useful evidence, but this pass is no longer a Shell Test-only experiment: it is a real-G7 shared-primitive candidate and therefore must survive the actual product fixture path.
 
 ## Immediate next gate
 
-Deploy the refined Shell Test and physically review it on iPhone first, then iPad/regular width.
+Run the full reliability gate on the promotion candidate:
 
-Judge two questions separately:
+**Authority/Handoff + Static + Chromium 390 / 440 / 820**, including the actual G7 Project → Setup → Structure path.
 
-1. **Chevron seating:** does the intrinsic convex-hull optical anchor make Back / Forward feel naturally centered relative to each other and to Plus / Check / Reorder / More without requiring another arbitrary nudge?
-2. **Container direction:** with symbol geometry/alignment held constant, does plain Circle still clearly beat Current rounded-square?
+If green, merge/deploy automatically and physically review the **actual G7** on iPhone first, then iPad/regular width.
 
-Do **not** promote Circle or the chevron optical-anchor model into real G7 until Babel physically approves the refined comparison. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
+Judge these together:
 
-After a direction is approved, implement the smallest shared real-G7 primitive change, reconcile tests/authority/handoff, run all gates, merge/deploy, then repeat physical iPhone/iPad validation before locking any category.
+1. standalone Back / Add / More circular controls feel correctly sized, seated, and calm
+2. Back / Forward chevrons retain the approved outward optical balance
+3. Check / Current / Incomplete / Reorder remain naturally centered without the old global vertical nudge
+4. accepted row/accessory horizontal alignment has not moved
+
+Do **not** lock Icons & Accessories or any other category until this promoted real-G7 implementation receives explicit physical approval. FIRE Core remains blocked.
 
 ## Reliability baseline
 
 Shell work must leave implementation, active authority, regression expectations, handoff state, and deployed assets describing the same candidate.
 
 - Do not merge a shell change with known red regressions.
-- If a deliberate decision supersedes an old regression, update that regression in the same change rather than restoring obsolete behavior.
+- If a deliberate decision supersedes an old regression expectation, update that regression in the same change rather than restoring obsolete behavior.
 - **Shell Test passing is not sufficient** for any shared primitive used by real G7. Real-G7 browser coverage must still pass at 390 / 440 / 820 widths.
 - Shell Test-only experiments may remain isolated from production primitives until a direction is physically chosen.
 - G7 and Shell Test assets use the exact GitHub Pages build revision for cache busting.
@@ -117,7 +123,8 @@ Preserve unless certification proves a better transferable primitive:
 - `+` = add/create the primary discrete object for the current view
 - `•••` = management/actions
 - project-row management has no decorative divider
-- ~44px interaction targets remain even when resting toolbar actions are visually glyph-first
+- ~44px interaction targets remain even when resting toolbar actions are visually compact
+- standalone glyph-button containers may be circular; semantic row/accessory marks remain unboxed unless their role independently earns a control surface
 - arrangement supporting metadata belongs to content hierarchy; the far-right lane belongs to the affordance
 - Complete = canonical check; Current = stronger short bar; Incomplete/upcoming = quieter short bar
 - Current does not tint the whole row
