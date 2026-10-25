@@ -2,7 +2,7 @@
 
 This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The certification contract defines what each category means and how it can be locked.
 
-**Current phase:** fundamentals physical review + repo reliability reconciliation. Shell Test is useful evidence, but no category is Locked yet and FIRE Core remains blocked.
+**Current phase:** fundamentals physical review under the repo reliability gate. Shell Test is useful evidence, but no category is Locked yet and FIRE Core remains blocked.
 
 | Category | State | Current note |
 | --- | --- | --- |
