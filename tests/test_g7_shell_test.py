@@ -74,13 +74,14 @@ def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring
     assert "background: transparent" in css
     assert "#d8d84f" not in css
 
-    # Back and forward navigation are one rounded, seam-free mask mirrored only by direction.
+    # Back, Shell Test Back, and forward navigation are one rounded, seam-free mask mirrored by direction.
     assert "--chevron-mask:" in css
     assert "stroke-linecap='round'" in css
     assert "stroke-linejoin='round'" in css
     assert ".chevron::before," in css
-    assert ".back-glyph::before" in css
-    assert ".back-glyph::before { transform: scaleX(-1); }" in css
+    assert ".back-glyph::before," in css
+    assert ".shell-test-link::before" in css
+    assert ".back-glyph::before,\n.shell-test-link::before { transform: scaleX(-1); }" in css
     assert ".chevron::after" not in css
 
 
