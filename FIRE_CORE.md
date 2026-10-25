@@ -184,7 +184,7 @@ Particularly useful FIRE lenses:
 
 - **G7 shell** = current successor implementation/design generation and the reusable FIRE/Babel visual-interaction grammar being certified before product breadboarding.
 - **FIRE Core** = complete functional product + shared reasoning/learning system.
-- G7 shell completion is governed by `G7_SHELL_CERTIFICATION.md`: ten categories move **Unresolved → Candidate → Locked**, with representative developer Shell Test coverage, real-G7 composition, physical-device validation, and explicit final approval.
+- `G7_SHELL_CERTIFICATION.md` defines the G7 shell completion contract: ten categories move **Unresolved → Candidate → Locked**, with representative developer Shell Test coverage, real-G7 composition, physical-device validation, and explicit final approval. `G7_SHELL_CERTIFICATION_STATUS.md` records current category state/evidence.
 - The developer Shell Test is G7 infrastructure using actual G7 primitives; it is not product architecture, a second FIRE implementation, or a substitute for physical validation.
 - Current Setup → Structure → Tracks is disposable shell fixture content. Its polish does not approve the FIRE Core journey or its exact interactions.
 - Do not begin FIRE Core breadboarding until all ten certification categories are Locked, the final physical-device sweep reveals no unresolved systemic contradiction, and Babel explicitly freezes the G7 shell.
@@ -193,7 +193,7 @@ Particularly useful FIRE lenses:
 - Understand the whole journey; deeply design only the next area being built.
 - Real songs drive depth.
 
-Current G7 route/primitive behavior lives in `V7_DRAFT.md`; shell completion/status lives in `G7_SHELL_CERTIFICATION.md`; current review/build state lives in `START_HERE.md`. Do not duplicate moving details here.
+Current G7 route/primitive behavior lives in `V7_DRAFT.md`; certification definitions/freeze criteria live in `G7_SHELL_CERTIFICATION.md`; current category status/evidence lives in `G7_SHELL_CERTIFICATION_STATUS.md`; current review/build state lives in `START_HERE.md`. Do not duplicate moving details here.
 
 ## Wider Babel ecosystem boundary
 
@@ -224,9 +224,10 @@ Keep the **current production generation specification + active successor/previe
 3. active production spec (`V6.md` today) — behavior shipped in that generation.
 4. `V7_DRAFT.md` — G7 shell behavior where Core-compatible.
 5. `G7_SHELL_CERTIFICATION.md` — active G7 shell completion/certification contract.
-6. `START_HERE.md` — current verified state/next step.
-7. `CONTEXT.md` — durable supporting context not superseded above.
-8. code/tests — implementation evidence, not product authority.
+6. `G7_SHELL_CERTIFICATION_STATUS.md` — mutable category state/evidence.
+7. `START_HERE.md` — current verified state/next step.
+8. `CONTEXT.md` — durable supporting context not superseded above.
+9. code/tests — implementation evidence, not product authority.
 
 ### Wider ecosystem authority
 
@@ -238,7 +239,7 @@ Keep the **current production generation specification + active successor/previe
 6. `REFERENCES.md`
 7. older prototypes/history
 
-When durable FIRE doctrine changes, the same work must scan/reconcile affected `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, relevant generation specs, shell-certification authority, and ecosystem docs when cross-app semantics are affected.
+When durable FIRE doctrine changes, the same work must scan/reconcile affected `CONTEXT.md`, `START_HERE.md`, `AGENTS.md`, relevant generation specs, shell-certification authority/status, and ecosystem docs when cross-app semantics are affected.
 
 Automated guards can catch known stale phrases/authority wiring, but no script can prove natural-language semantic consistency. Human/product consistency review remains required.
 

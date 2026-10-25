@@ -17,6 +17,20 @@ def test_shell_certification_is_routed_from_active_authority():
         assert "G7_SHELL_CERTIFICATION.md" in text
 
 
+def test_mutable_certification_status_has_one_documented_owner():
+    status = "G7_SHELL_CERTIFICATION_STATUS.md"
+    agents = read("AGENTS.md")
+    start = read("START_HERE.md")
+    context = read("CONTEXT.md")
+    cert = read("G7_SHELL_CERTIFICATION.md")
+
+    for text in (agents, start, context, cert):
+        assert status in text
+    assert "current category state/evidence" in agents
+    assert "current category status/evidence" in context
+    assert "Current mutable category state lives" in cert
+
+
 def test_shell_certification_keeps_fire_core_blocked_until_explicit_freeze():
     cert = read("G7_SHELL_CERTIFICATION.md")
     start = read("START_HERE.md")

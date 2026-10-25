@@ -1,7 +1,7 @@
 """Protect durable FIRE/Babel authority wiring and known stale definitions.
 
-This guard checks stable markers and explicit stale contradictions. It intentionally does
-not encode temporary merge SHAs, but it does require the current shell-routing/gate language.
+This guard checks stable semantic markers and explicit stale contradictions. It intentionally
+avoids brittle wording from superseded drafts and does not encode temporary merge SHAs.
 """
 from pathlib import Path
 
@@ -10,6 +10,8 @@ REQUIRED = {
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
         "Babel Continuity Buffer",
+        "Coordinated FIRE shell implementation/certification lives in the isolated G7 context",
+        "Lab is evidence, never authority",
         "stale divergence",
         "potential upstream improvement",
         "app-local exception",
@@ -26,6 +28,8 @@ REQUIRED = {
         "Experiment",
         "Evaluate",
         "Documentation authority and conflict policy",
+        "G7 shell vs FIRE Core",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
     ],
     "AGENTS.md": [
         "BABEL_TRUTH.md",
@@ -34,21 +38,40 @@ REQUIRED = {
         "production-projects-v1",
         "production-projects-v1-v7-preview",
         "No Codex for FIRE",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "Inline",
         "Sheet",
         "Navigation",
     ],
     "START_HERE.md": [
         "BABEL_TRUTH.md",
-        "G7 shell-cohesion pass awaiting physical review",
+        "G7 Shell Certification active",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "PR **#66",
         "PR **#67",
-        "G7 is not physically approved/frozen",
+        "G7 is not approved/frozen",
         "Babel Truth Issue #1",
         "Inline = choose/toggle/classify/confirm/evaluate",
         "Sheet = create/edit/manage a discrete thing",
-        "coordinated shell iteration stays in G7",
+        "G7** owns coordinated FIRE shell implementation",
         "Lab is evidence, never authority",
+        "10/10 categories Locked",
+    ],
+    "G7_SHELL_CERTIFICATION.md": [
+        "# Babel FIRE — G7 Shell Certification",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
+        "Developer Shell Test",
+        "all 10 categories are **Locked**",
+        "Babel explicitly approves/freezes the shell",
+    ],
+    "G7_SHELL_CERTIFICATION_STATUS.md": [
+        "# G7 Shell Certification — Status Board",
+        "0 / 10 Locked",
+        "G7 NOT FROZEN",
+    ],
+    "CONTEXT.md": [
+        "G7_SHELL_CERTIFICATION_STATUS.md",
+        "current category status/evidence",
     ],
     "BABEL_START_HERE.md": [
         "BABEL_TRUTH.md",
@@ -84,25 +107,30 @@ REQUIRED = {
     ],
     "V7_DRAFT.md": [
         "`FIRE_CORE.md` governs cross-generation product doctrine",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
         "Delete before styling.",
         "## Interaction grammar",
         "## Physical rhythm and visual grammar primitives",
-        "## State and accessory grammar",
+        "## Canonical icon/accessory grammar",
         "## Navigation and Back behavior",
         "Shared row-content grid",
         "Selection surface",
         "Segmented control",
         "Page action footer",
         "Accurate",
-        "does **not** add redundant checkmarks",
-        "Visible ordinal numbers are removed",
+        "Structure arrangement objects do not earn completion checks merely by existing.",
+        "Track selections do not need redundant completion checks when selected fill already communicates selection.",
     ],
 }
 
 FORBIDDEN = {
+    "BABEL_TRUTH.md": [
+        "including the current shell/visual harness",
+    ],
     "AGENTS.md": [
         "Continuity capture buffer",
         "Do **not** update it for every message",
+        "G7_SHELL_CERTIFICATION.md` — active shell-completion checklist, Shell Test contract, category status, and freeze gate",
     ],
     "START_HERE.md": [
         "PR **#59** is the last merged/deployed G7 baseline",
@@ -125,6 +153,7 @@ FORBIDDEN = {
     "CONTEXT.md": [
         "### Recreation — SECONDARY / LEARNING MODE",
         "Project Home owns **Continue + Journey + Notes**",
+        "Detailed category status and freeze requirements live only in `G7_SHELL_CERTIFICATION.md`",
     ],
     "V7_DRAFT.md": [
         "current Cover shell work remains **Song Setup → Structure → Tracks**",
@@ -132,6 +161,8 @@ FORBIDDEN = {
         "`Other` belongs to the same selection surface",
         "Tracks is the multi-select variant and adds visible checks to selected choices",
         "- index\n- section name",
+        "## State and accessory grammar",
+        "`G7_SHELL_CERTIFICATION.md` must show all ten categories Locked",
     ],
 }
 

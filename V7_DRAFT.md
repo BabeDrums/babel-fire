@@ -1,6 +1,6 @@
 # Babel FIRE — G7 Shell Specification (Draft)
 
-**Status:** G7 is the isolated successor preview under `/v7-preview/`; V6 remains production. `FIRE_CORE.md` governs cross-generation product doctrine. This file governs current G7 shell behavior/primitive grammar. `G7_SHELL_CERTIFICATION.md` governs whether that grammar is complete enough to freeze.
+**Status:** G7 is the isolated successor preview under `/v7-preview/`; V6 remains production. `FIRE_CORE.md` governs cross-generation product doctrine. This file governs current G7 shell behavior/primitive grammar. `G7_SHELL_CERTIFICATION.md` defines the freeze contract; `G7_SHELL_CERTIFICATION_STATUS.md` records current category state/evidence.
 
 G7 uses **Cover** as the musician-facing label for the canonical FIRE Core **Recreation** workflow. Internal compatibility may continue using the legacy `study` project type; public naming does not require a storage migration.
 
@@ -16,7 +16,7 @@ The current **Setup → Structure → Tracks** flow is disposable **shell/worksp
 
 ## Certification boundary
 
-`G7_SHELL_CERTIFICATION.md` is the completion authority.
+`G7_SHELL_CERTIFICATION.md` is the completion contract. `G7_SHELL_CERTIFICATION_STATUS.md` is the mutable status/evidence board.
 
 - ten categories move **Unresolved → Candidate → Locked**
 - no category is Locked from screenshot polish alone
@@ -210,7 +210,7 @@ Babel character comes through hierarchy, rhythm, material, tactile grouping, res
 
 ## Freeze boundary
 
-Do not declare the shell frozen from this specification alone. `G7_SHELL_CERTIFICATION.md` must show all ten categories Locked and the final real-device sweep must receive explicit Babel approval.
+Do not declare the shell frozen from this specification alone. The `G7_SHELL_CERTIFICATION.md` criteria must be satisfied, `G7_SHELL_CERTIFICATION_STATUS.md` must show all ten categories Locked, and the final real-device sweep must receive explicit Babel approval.
 
 After freeze:
 

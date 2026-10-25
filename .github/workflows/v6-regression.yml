@@ -1,4 +1,4 @@
-name: FIRE V6 regression
+name: FIRE regression
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ jobs:
     name: Static checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check JavaScript syntax
@@ -23,6 +23,9 @@ jobs:
           if [ -f v7-preview/app.js ]; then
             node --check v7-preview/app.js
             node --check v7-preview/model.js
+          fi
+          if [ -f v7-preview/shell-test.js ]; then
+            node --check v7-preview/shell-test.js
           fi
           if [ -f v7-preview/new-project.js ]; then
             node --check v7-preview/new-project.js
@@ -36,14 +39,14 @@ jobs:
           fi
 
   handoff:
-    name: Handoff freshness
+    name: Authority + handoff
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Require a current START_HERE handoff
+      - name: Require current authority and zero-context handoff
         run: >-
           python3 scripts/check_handoff.py
           "${{ github.event.pull_request.base.sha }}"
@@ -58,29 +61,31 @@ jobs:
       matrix:
         width: [390, 440, 820]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: tests/test_v6.py
+          cache-dependency-path: requirements-test.txt
       - name: Prepare local Pages metadata
         run: |
           python - <<'PY'
           import json, os
           from pathlib import Path
+
           revision = os.environ['GITHUB_SHA']
           Path('build-info.json').write_text(json.dumps({'commit': revision}), encoding='utf-8')
-          index = Path('index.html')
-          index.write_text(
-              index.read_text(encoding='utf-8').replace('{{ site.github.build_revision }}', revision),
-              encoding='utf-8',
-          )
+          for html_path in ('index.html', 'v7-preview/index.html', 'v7-preview/shell-test.html'):
+              path = Path(html_path)
+              text = path.read_text(encoding='utf-8').replace('{{ site.github.build_revision }}', revision)
+              if text.startswith('---\n---\n'):
+                  text = text[8:]
+              path.write_text(text, encoding='utf-8')
           PY
       - name: Install Playwright
         run: |
           python -m pip install --upgrade pip
-          python -m pip install playwright
+          python -m pip install -r requirements-test.txt
           python -m playwright install --with-deps chromium
       - name: Resolve Chromium path
         run: |
@@ -103,7 +108,7 @@ jobs:
           done
           cat /tmp/fire-http.log
           exit 1
-      - name: Run V6 browser regressions
+      - name: Run browser regressions
         env:
           FIRE_URL: http://127.0.0.1:8000
           FIRE_TEST_WIDTH: ${{ matrix.width }}

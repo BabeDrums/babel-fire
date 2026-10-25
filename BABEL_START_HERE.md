@@ -36,6 +36,18 @@ Core promise:
 
 FIRE supports first-class Original and Recreation/Cover paths. Recreation is not merely a learning mode. FIRE already includes contextual diagnosis, experimentation, teaching, and likely optional deliberate practice without requiring a separate learning app.
 
+### FIRE shell boundary relevant to the ecosystem
+
+Coordinated FIRE shell implementation and certification currently live in FIRE's isolated **G7** context, not in Babel Lab.
+
+- G7 remains unfrozen and FIRE Core remains blocked until the FIRE-local shell-certification gate is explicitly passed.
+- `G7_SHELL_CERTIFICATION.md` defines the certification/freeze contract; `G7_SHELL_CERTIFICATION_STATUS.md` owns mutable category status/evidence.
+- Current Setup / Structure / Tracks content is disposable shell-fixture evidence, not final FIRE Core architecture.
+- Babel Lab may still host bounded experiments, but **Lab is evidence, never authority** and should not carry a parallel full FIRE shell merely to certify G7.
+- Only after FIRE physically proves/freezes transferable shell fundamentals should genuinely cross-app principles be promoted into Babel Truth. Lab can then reconcile to that promoted Truth without blocking FIRE Core work.
+
+This is an ownership/sequence boundary, not approval of a universal shared UI package today.
+
 ## Current surrounding-product status
 
 ### Dedicated learning product — not currently earned
@@ -190,6 +202,7 @@ Do not automatically revive:
 - one shared Babel-wide XP/skill score
 - every app sharing one UI/database
 - a complete badge/app set invented before the real jobs exist
+- Babel Lab as the authority for coordinated FIRE shell implementation
 
 ## Open questions remain intentionally open
 
