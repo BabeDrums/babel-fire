@@ -135,7 +135,7 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
         self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
 
-        current_row = page.get_by_role("button", name="Current")
+        current_row = current_state.locator("xpath=..")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
         management = page.get_by_role("button", name="Example row actions")
