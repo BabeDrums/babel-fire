@@ -43,26 +43,31 @@ class G7ShellTestBrowser(unittest.TestCase):
         expect(build).to_have_text(re.compile(r"G7 · [0-9a-f]{7}"))
 
         add = page.get_by_role("button", name="Example add action")
+        back_control = page.locator(".shell-test-link")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).boxShadow"), "none")
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "50%")
 
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
+        back_box = back_control.bounding_box()
         self.assertIsNotNone(title_box)
         self.assertIsNotNone(add_box)
-        title_center = title_box["y"] + title_box["height"] / 2
+        self.assertIsNotNone(back_box)
         add_center = add_box["y"] + add_box["height"] / 2
-        self.assertLessEqual(abs(title_center - add_center), 2.0)
+        back_center = back_box["y"] + back_box["height"] / 2
+        self.assertLessEqual(abs(add_center - back_center), 1.0)
+        self.assertGreaterEqual(title_box["y"], add_box["y"] + add_box["height"])
 
         comparison = page.locator(".symbol-comparison-stage")
         expect(comparison).to_be_visible()
@@ -147,11 +152,11 @@ class G7ShellTestBrowser(unittest.TestCase):
         for marker in (complete, current_state, incomplete):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).width"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).fontSize"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
 
-        # Complete is the canonical check without a surrounding circle, drawn in the shared 18px optical frame.
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "18px")
@@ -160,7 +165,6 @@ class G7ShellTestBrowser(unittest.TestCase):
             complete.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Current and incomplete share width/caps; only weight and contrast step down.
         self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
         self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
@@ -172,14 +176,12 @@ class G7ShellTestBrowser(unittest.TestCase):
         current_row = current_state.locator("xpath=..")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        # Row management stays unboxed even though standalone More controls are circular.
         management = page.get_by_role("button", name="Example row actions")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
-        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             management.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -195,11 +197,12 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertIn("data:image/svg+xml", forward_mask)
         self.assertIn("data:image/svg+xml", back_mask)
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::after').content"), "none")
-        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
-        self.assertEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).width"), "44px")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).height"), "44px")
-        self.assertEqual(back.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "50%")
 
         reorder = page.get_by_role("button", name="Reorder example")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
@@ -211,7 +214,6 @@ class G7ShellTestBrowser(unittest.TestCase):
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Supporting arrangement metadata belongs under the name; reorder alone owns the far-right lane.
         arrangement_name = page.locator(".arrangement-name").first
         arrangement_bars = page.locator(".arrangement-bars").first
         name_box = arrangement_name.bounding_box()
@@ -224,7 +226,6 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
         self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
-        # The accepted horizontal accessory lane stays fixed.
         accessory_locators = [complete, current_state, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:
@@ -242,7 +243,14 @@ class G7ShellTestBrowser(unittest.TestCase):
         actions = dialog.locator(".sheet-actions")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
+        self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
+        self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
         self.assertNotIn("inset", dialog.evaluate("el => getComputedStyle(el).boxShadow"))
+        self.assertEqual(dialog.evaluate("el => getComputedStyle(el, '::before').content"), '"Shell Test dialog"')
+        dialog_box = dialog.bounding_box()
+        self.assertIsNotNone(dialog_box)
+        self.assertGreater(dialog_box["y"], 0)
+        self.assertLess(dialog_box["y"] + dialog_box["height"], page.viewport_size["height"])
         page.keyboard.press("Escape")
         expect(dialog).to_be_hidden()
         self.assertEqual(page.evaluate("document.body.style.overflow"), "")

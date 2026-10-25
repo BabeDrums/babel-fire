@@ -19,74 +19,91 @@ Use **Babel** as the project-facing name.
 
 Production remains **V6**. G7 is the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-PR **#66 — Return coordinated shell iteration to G7** established that coordinated FIRE shell implementation/certification belongs in the real isolated G7 context rather than a parallel Lab shell.
+PR **#66 — Return coordinated shell iteration to G7** established the current ownership boundary: coordinated FIRE shell implementation/certification belongs in the real isolated G7 context rather than a parallel Lab shell.
 
-PR **#67 — Refine G7 shell cohesion after physical review** remains the important historical baseline for the current certification sequence; later certification passes supersede its visual details where explicitly documented.
-
-**G7 is not approved/frozen. FIRE Core breadboarding has not started.** All ten certification categories remain Candidate; **0 / 10 are Locked**.
+PR **#67 — Refine G7 shell cohesion after physical review** is the historical baseline that the finite certification sequence superseded; later certification passes may replace its visual details, but its role in the handoff chain remains explicit.
 
 Coordinated FIRE shell implementation/certification belongs in the real isolated G7 context. Babel Lab remains optional bounded evidence only and must not become a parallel FIRE shell.
 
-## Current symbol/alignment finding
+**G7 is not approved/frozen. FIRE Core breadboarding has not started. All ten certification categories remain Candidate; 0 / 10 are Locked.**
 
-The old production-wide `--symbol-optical-y: 1px` candidate is superseded by the physically reviewed Shell Test work from PRs #85–#87.
+## Current physically validated symbol direction
 
-Physical review established the following direction:
+The production-wide `--symbol-optical-y` nudge is retired.
 
-- Plus / More / Reorder do not need extra optical offsets beyond their normal centered symbol frame.
-- Check benefits from a tiny intrinsic vertical optical correction.
-- Back / Forward need mirrored **outward** optical side bearings; the successful candidate derived those from the chevron family's own geometry rather than a page-specific nudge.
-- Plain Circle is preferred over the rounded-square comparison for standalone glyph buttons.
-- Liquid Glass is rejected for the current FIRE shell direction.
-
-PR #87 deployed `G7 · b35b783` with the refined outward chevron candidate and the Current-vs-Circle comparison. Babel physically reported that result looked really good and approved moving beyond the Shell Test experiment.
-
-The implementation rule going forward is:
+The current symbol rule is:
 
 **geometry baseline → optional intrinsic symbol optical metric → container placement**
 
-The container must not decide per-glyph nudges. Optical alignment belongs to the symbol asset/primitive. Different symbols may therefore use different intrinsic metrics while still participating in one shared system.
+- Plus / More / Reorder use normal centered placement.
+- Check owns its small intrinsic vertical correction.
+- Back / Forward own mirrored outward side bearings.
+- Current / Incomplete are symmetric status bars.
+- Liquid Glass is rejected.
+- Symbol alignment belongs to the symbol primitive, never page-specific CSS.
 
-### Current real-G7 promotion candidate
+PR #87 proved the refined symbol family in Shell Test. PR #88 promoted that architecture into real G7 at `109590e66038845849c832d3f4e3ea93ba5193c1`.
 
-The active pass promotes that approved architecture into the actual G7 shared primitives:
+## Current physical finding — frame repair required after PR #88
 
-- the global `--symbol-optical-y` correction is removed
-- Plus / More / Reorder remain centered without extra transforms
-- Check owns its half-viewBox-unit vertical correction inside the canonical SVG asset
-- Back / Forward own separate mirrored optical side bearings in their canonical SVG assets
-- Current / Incomplete remain symmetric bars centered directly in their existing state boxes
-- standalone toolbar controls use the preferred simple Circle treatment with the existing 44px hit target
-- row management, row navigation, progress marks, and reorder remain unboxed according to their semantics
-- accepted horizontal accessory lanes, x-centers, hit targets, row geometry, text anchors, and header geometry remain unchanged
+Real-device iPhone review of `G7 · 109590e` showed that the remaining defects are **not primarily symbol-offset defects**. The shared shell frame is contradicting the symbol work.
 
-Shell Test remains useful evidence, but this pass is no longer a Shell Test-only experiment: it is a real-G7 shared-primitive candidate and therefore must survive the actual product fixture path.
+Durable findings:
+
+1. **Header frame:** Back remained in the toolbar row while trailing Add/More was translated down into the large-title line. This produced visibly split controls. The fix must be structural: one navigation/action row, then the large title/meta row beneath it. No independent side-specific toolbar translation.
+2. **Control frame:** keep the 44px interaction target, but do not make the full hit region visually heavy. Interaction geometry and visible material geometry are separate concerns.
+3. **State rendering:** `state-primitives.css` must remain the only visible state owner. Legacy text glyphs may exist as fixture residue only if they cannot render; they must never leak beneath Current/Incomplete/Complete artwork.
+4. **Editable-value frame:** Tempo and Meter must share one stable trailing lane rather than size themselves from content.
+5. **Modal frame:** compact sheets must not depend on bottom-edge anchoring under dynamic mobile browser chrome. The active candidate centers a bounded sheet using small-viewport-safe geometry and keeps task identity visible.
+6. **Edit-sheet action hierarchy:** Save / Duplicate / Delete must not collapse into three equivalent oversized slabs on narrow phones. The primary task remains visually primary; management actions remain secondary.
+
+These findings are captured in Babel Truth Issue #1 under the persist-before-reply rule.
+
+## Active implementation candidate
+
+Branch: `g7-shell-frame-repair`
+
+The active pass introduces `v7-preview/frame-primitives.css` as the shared owner for structural frame relationships while preserving existing ownership boundaries:
+
+- `shell-primitives.css` — symbol/accessory artwork and shared symbol metrics
+- `state-primitives.css` — progress/completion state artwork
+- `frame-primitives.css` — header frame, toolbar hit-vs-material geometry, editable-value lane, compact modal frame
+
+Current candidate rules:
+
+- one 44px toolbar interaction row for Back + trailing contextual action
+- large title/meta in a separate row beneath toolbar actions
+- 44px tap target with a quieter 36px visible circular material
+- no horizontal accessory-lane rewrite
+- one fixed Tempo/Meter value lane
+- state glyph leakage explicitly suppressed at the shared frame level
+- compact sheets centered and bounded with `svh` rather than pinned to Safari's dynamic bottom edge
+- sheet task title sourced from the existing dialog label
+- three-action edit sheets avoid narrow-phone three-slab stacking
+
+This is a shared-primitive pass, not a page-specific visual patch.
 
 ## Immediate next gate
 
-Run the full reliability gate on the promotion candidate:
+Run the full reliability gate on the frame candidate:
 
-**Authority/Handoff + Static + Chromium 390 / 440 / 820**, including the actual G7 Project → Setup → Structure path.
+**Authority/Handoff + Static + Chromium 390 / 440 / 820**, including the actual G7 Project → Setup → Structure path and Shell Test.
 
-If green, merge/deploy automatically and physically review the **actual G7** on iPhone first, then iPad/regular width.
+If green:
 
-Judge these together:
+1. re-check current `main` and open PRs
+2. merge automatically
+3. verify the exact merge commit deploys to GitHub Pages
+4. verify post-merge 390 / 440 / 820
+5. physically review the exact deployed build on iPhone first, then iPad/regular width
 
-1. standalone Back / Add / More circular controls feel correctly sized, seated, and calm
-2. Back / Forward chevrons retain the approved outward optical balance
-3. Check / Current / Incomplete / Reorder remain naturally centered without the old global vertical nudge
-4. accepted row/accessory horizontal alignment has not moved
-
-Do **not** lock Icons & Accessories or any other category until this promoted real-G7 implementation receives explicit physical approval. FIRE Core remains blocked.
+Do **not** lock any certification category from browser evidence alone. FIRE Core remains blocked.
 
 ## Reliability baseline
 
-Shell work must leave implementation, active authority, regression expectations, handoff state, and deployed assets describing the same candidate.
-
 - Do not merge a shell change with known red regressions.
 - If a deliberate decision supersedes an old regression expectation, update that regression in the same change rather than restoring obsolete behavior.
-- **Shell Test passing is not sufficient** for any shared primitive used by real G7. Real-G7 browser coverage must still pass at 390 / 440 / 820 widths.
-- Shell Test-only experiments may remain isolated from production primitives until a direction is physically chosen.
+- **Shell Test passing is not sufficient** for any shared primitive used by real G7.
 - G7 and Shell Test assets use the exact GitHub Pages build revision for cache busting.
 - Physical review targets the exact deployed revision shown by the G7/Shell Test build indicator.
 - The authority/handoff gate must pass before merge.
@@ -98,7 +115,7 @@ Current `Setup → Structure → Tracks` content is disposable shell/workspace f
 
 The developer-only Shell Test lives **inside G7** and is a certification showroom/torture chamber, not a second FIRE implementation and not Babel Lab.
 
-Routing is explicit:
+Routing:
 
 - **G7** owns coordinated FIRE shell implementation, Shell Test, in-context validation, and certification.
 - **Babel Lab** is optional bounded evidence only. **Lab is evidence, never authority.**
@@ -108,10 +125,6 @@ Routing is explicit:
 Default process:
 
 **Observe → Diagnose → Shape → Contract → Build → Verify → Consolidate.**
-
-For active FIRE shell work:
-
-**physical finding → shared/system diagnosis → bounded Shell Test evidence when useful → branch → implementation/tests/docs → 390/440/820 gates → merge/deploy → exact-build physical iPhone/iPad review.**
 
 ## Stable semantic evidence
 
