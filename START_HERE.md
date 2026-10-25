@@ -111,7 +111,7 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 
 Next product-facing work is physical confirmation of the repaired exact deployed revision, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
 
-## certification and approval gate
+## Certification and approval gate
 
 `G7_SHELL_CERTIFICATION.md` is the active checklist. Categories are **Unresolved**, **Candidate**, or **Locked**.
 
