@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 10
+/* G7 Shell Certification pass 11
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
@@ -6,9 +6,9 @@
 :root {
   --accessory-box: 28px;
   --accessory-glyph: 20px;
+  --accessory-lane: var(--touch);
   --state-marker-size: 24px;
   --toolbar-icon-size: 22px;
-  --accessory-edge-inset: 4px;
   --toolbar-control-radius: 13px;
   --header-action-offset: 44px;
   --state-ring: #666872;
@@ -131,14 +131,18 @@
   background: transparent;
 }
 
-/* One physical trailing lane across grouped rows, project cards and arrangement rows.
-   The lane is shared, but the visible marks are optically balanced inside it rather than forced to equal mass. */
-.row {
-  grid-template-columns: minmax(0, 1fr) var(--touch);
-  padding-right: var(--accessory-edge-inset);
+/* One canonical 44px trailing lane across grouped rows, project cards and arrangement rows.
+   The lane itself owns alignment: no component recreates the centerline with extra inset math. */
+.row,
+.journey-row,
+.project-card,
+.arrangement-row {
+  grid-template-columns: minmax(0, 1fr) var(--accessory-lane);
 }
-.row > :last-child { justify-self: center; }
-.journey-row { grid-template-columns: minmax(0, 1fr) var(--touch); }
+.row { padding-right: 0; }
+.row > :last-child,
+.project-card-actions,
+.reorder-handle { justify-self: center; }
 .journey-mark,
 .chevron,
 .checkmark,
