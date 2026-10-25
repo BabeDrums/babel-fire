@@ -27,6 +27,8 @@ PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its dep
 
 The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, accessory alignment, current-state language, modal/group rhythm, reliable deployed-build identification, real-screen regressions caused by over-broad shared selectors, header/navigation consistency, and the limits of a homemade per-glyph CSS icon system.
 
+The first canonical-icon reset reached deployed build `0cc4cba`, but physical review of that exact revision found that mathematical shared-center alignment still did not read as optically aligned. The main cause was unequal visible mass: 28px state circles beside 18–20px commodity glyphs. The active candidate therefore keeps the same 44px trailing lane while reducing state-marker mass, strengthening commodity glyph scale, adding small directional optical correction to chevrons, and adding a compact Shell Test glyph palette so the whole icon family can be judged side-by-side.
+
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
 The active phase is **G7 Shell Certification**. `G7_SHELL_CERTIFICATION.md` defines the finite ten-category completion contract, `Unresolved → Candidate → Locked` states, the developer-only Shell Test, and the final freeze gate. `G7_SHELL_CERTIFICATION_STATUS.md` records mutable review evidence.
@@ -62,6 +64,8 @@ The developer-only Shell Test lives **inside G7** and uses the actual G7 primiti
 
 It deliberately exercises the ten certification categories and representative sparse/normal/dense, short/long, default/selected/custom/disabled/focus/error states where applicable. A primitive fixed in Shell Test must be the same primitive used by real G7.
 
+Shell Test now also includes a compact comparison-only glyph palette containing Back, Forward, Add, Check, Reorder, and More. Those temporary boxes exist only to make the icon family easy to compare during certification; they are not a proposal to put every production glyph in a visible button.
+
 Shell Test does not replace real-product or physical-device validation. Shared primitive changes must survive both the Shell Test and the real G7 fixture browser path before merge.
 
 ## Routing — G7, Lab, Truth, FIRE Core
@@ -88,9 +92,10 @@ Do not make G7 automatically match a Lab specimen.
 - toolbar add/management actions keep ~44px interaction targets but are glyph-first at rest rather than permanently boxed surfaces
 - project-row management has no decorative divider from the row
 - standard interface glyphs use one canonical Lucide 24×24 construction source instead of being redrawn independently in CSS
-- Back and forward/navigation use the same canonical chevron family, with direction as the only change; Shell Test Back uses the same primitive
-- recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container
+- Back and forward/navigation use the same canonical chevron family, with direction as the only semantic difference; tiny optical offsets are allowed when needed so mirrored geometry reads centered on-device
+- recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container or equal visible mass
 - progress-state language remains under physical review but is intentionally simple: Complete = filled state circle + canonical check; Current = one brighter/thicker ring; Incomplete = quieter/thinner ring
+- state-marker visual size and commodity-glyph visual size may differ deliberately while sharing the same interaction lane; current candidate uses 24px state markers and 20px navigation/management glyphs
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
@@ -108,21 +113,24 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 
 - project-row `•••` divider remains removed and management stays in the shared accessory lane
 - the prior homemade per-glyph CSS system has been retired for commodity interface symbols after physical review showed mismatched visual centers, joins, proportions, and stroke personalities
-- check, chevron, plus, ellipsis, and reorder now use canonical Lucide SVG-mask geometry from one 24×24 source system in `shell-primitives.css`
-- trailing row accessories now share one actual x-center across Complete / Current / Incomplete / Navigate / Reorder / More rather than merely sharing similar box sizes
+- check, chevron, plus, ellipsis, and reorder use canonical Lucide SVG-mask geometry from one 24×24 source system in `shell-primitives.css`
+- trailing row accessories keep one actual x-center across Complete / Current / Incomplete / Navigate / Reorder / More, but the active physical-review candidate no longer assumes equal visible size equals equal optical balance
+- current candidate reduces Complete / Current / Incomplete markers from 28px to 24px and raises navigation glyphs to 20px so state and action marks carry more comparable perceived mass
+- forward/back chevrons use tiny direction-specific x offsets while retaining the same source geometry, because physical review showed mathematically mirrored masks can still look visually off-center
+- Shell Test exposes Back / Forward / Add / Check / Reorder / More in one temporary comparison row so remaining family-level inconsistencies are easy to spot
 - toolbar `+` / `•••` keep 44px hit targets but no longer render permanent dark rounded-square backgrounds at rest; active/focus behavior can reveal the control target
 - trailing header actions remain aligned to the large-title centerline
-- Back and forward navigation use the same canonical chevron family, mirrored only by direction
+- Back and forward navigation use the same canonical chevron family
 - Shell Test Back uses the same canonical back primitive as the real project rather than a separate text-arrow treatment
-- the progress-state candidate is simplified to avoid radio/bullseye ambiguity: Current has no inner ring/dot; it is distinguished from Incomplete by stronger ring weight and contrast, while Complete uses the filled state circle plus canonical check
+- the progress-state candidate remains simplified to avoid radio/bullseye ambiguity: Current has no inner ring/dot; it is distinguished from Incomplete by stronger ring weight and contrast, while Complete uses the filled state circle plus canonical check
 - shared accessory layout does not override `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
 - shared sheet styling does not add an action-divider hairline or inset top hairline that was not part of the approved shell language
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
-- browser coverage checks real accessory center alignment and the actual G7 Project → Setup → Structure path at 390/440/820 widths
+- browser coverage checks real accessory center alignment, marker/glyph scale, the comparison palette, and the actual G7 Project → Setup → Structure path at 390/440/820 widths
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the exact deployed icon/accessory reset candidate, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed optical-balance candidate, especially the six-glyph palette and Rows · accessories section. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 
