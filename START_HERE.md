@@ -25,7 +25,7 @@ PR **#66 — Return coordinated shell iteration to G7** established that complet
 
 PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review continued to expose systemic shell inconsistencies rather than final FIRE-workflow questions.
 
-The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, reliable deployed-build identification, and real-screen regressions caused by over-broad shared selectors.
+The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, reliable deployed-build identification, real-screen regressions caused by over-broad shared selectors, and header/navigation consistency.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -40,7 +40,7 @@ Shell work must leave implementation, active authority, regression expectations,
 - Do not merge a shell change with known red regressions.
 - If a deliberate product/shell decision makes an old regression obsolete, update that regression in the same change rather than restoring superseded behavior just to get green.
 - **Shell Test passing is not sufficient for a shared-primitive merge.** Shared primitives used by real G7 must also pass browser coverage in the actual G7 fixture path at 390/440/820 widths. The current minimum real-screen path is Project → Setup → Structure temporary UI.
-- Real-screen regression coverage must guard current-state geometry, form-control containment, and sheet chrome so a certification specimen cannot be green while the project fixture is visibly broken.
+- Real-screen regression coverage must guard current-state geometry, form-control containment, header action alignment, navigation glyph construction, and sheet chrome so a certification specimen cannot be green while the project fixture is visibly broken.
 - G7 and Shell Test CSS/JS asset URLs are tied to the deployed GitHub Pages build revision rather than a manually bumped cache string.
 - G7's module dependency mapping revisions `model.js` with the same deployed build revision.
 - Shell Test and real G7 display the deployed short commit from `build-info.json`; physical review should target that exact revision.
@@ -84,7 +84,9 @@ Do not make G7 automatically match a Lab specimen.
 - history-aware Back retraces actual route history; direct work entry falls back safely to Project Home
 - toolbar `+` means add/create the primary discrete thing for the current view
 - toolbar `•••` means management/actions
+- trailing header actions align to the visual center of the large title line rather than floating in a separate vertical rhythm
 - project-row management has no decorative divider from the row
+- Back and forward/navigation use one canonical continuous rounded chevron drawing, mirrored only by direction; Shell Test Back uses the same primitive
 - recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
 - current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter faded inner ring touching the inside edge of the outer ring; color alone does not carry the state
 - the accessory family uses one rounded construction vocabulary for drawn strokes/caps while preserving semantic hierarchy between state, navigation, reorder, add, and management affordances
@@ -105,9 +107,12 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 
 - project-row `•••` divider removed and management aligned through the shared accessory lane
 - `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
+- trailing header actions now align to the large-title centerline rather than floating above the title
+- Back and forward navigation are built from the same continuous rounded chevron path, mirrored only by direction, removing the visible apex break from the prior two-piece CSS construction
+- Shell Test Back uses the same canonical back primitive as the real project rather than a separate text-arrow treatment
 - management `•••`, chevron, reorder, and completion check use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics where practical
 - canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
-- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inner ring touching the outer ring's inside edge, not the old yellow accent and not a center dot
+- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a thicker but still lower-emphasis faded inner ring touching the outer ring's inside edge, not the old yellow accent and not a center dot
 - Current's generated inner ring is absolutely positioned so hidden legacy text in the real fixture cannot move it onto another grid row
 - shared accessory layout no longer overrides `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
 - shared sheet styling no longer adds an action-divider hairline or inset top hairline that was not part of the approved shell language
@@ -116,7 +121,7 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - Shell Test subtitle is the live G7 deployed-version indicator
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the repaired exact deployed revision, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed header/navigation candidate, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 
