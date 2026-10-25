@@ -135,10 +135,12 @@ class V7VisualGrammar(unittest.TestCase):
         self.assertAlmostEqual(cancel_box["width"], group["width"], delta=1.0)
         self.assertNotEqual(cancel.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-    def test_toolbar_actions_are_anchored_controls_without_changing_back_semantics(self):
+    def test_toolbar_actions_use_simple_circle_without_changing_back_semantics(self):
         projects = self.open("projects")
         add = projects.get_by_role("button", name="New Project")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
         self.assertEqual(add.bounding_box()["width"], 44)
         self.assertEqual(add.bounding_box()["height"], 44)
         self.assertIn(
@@ -149,12 +151,14 @@ class V7VisualGrammar(unittest.TestCase):
         project = self.open("project")
         more = project.get_by_role("button", name="Project actions")
         back = project.get_by_role("button", name="Projects")
-        self.assertEqual(more.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        for control in (more, back):
+            self.assertEqual(control.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+            self.assertEqual(control.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
         self.assertIn(
             "data:image/svg+xml",
             more.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertEqual(back.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         self.assertAlmostEqual(add.bounding_box()["width"], more.bounding_box()["width"], delta=1.0)
         self.assertAlmostEqual(add.bounding_box()["height"], more.bounding_box()["height"], delta=1.0)
 

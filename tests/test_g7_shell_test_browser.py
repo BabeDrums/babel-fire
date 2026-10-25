@@ -42,22 +42,19 @@ class G7ShellTestBrowser(unittest.TestCase):
         build = page.locator(".build-info")
         expect(build).to_have_text(re.compile(r"G7 · [0-9a-f]{7}"))
 
-        optical_y = lambda locator: locator.evaluate(
-            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
-        )
-
         add = page.get_by_role("button", name="Example add action")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).boxShadow"), "none")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "22px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').content"), "none")
-        self.assertAlmostEqual(optical_y(add), 1.0, delta=0.05)
 
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
@@ -152,7 +149,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
-            self.assertAlmostEqual(optical_y(marker), 1.0, delta=0.05)
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
 
         # Complete is the canonical check without a surrounding circle, drawn in the shared 18px optical frame.
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
@@ -175,15 +172,18 @@ class G7ShellTestBrowser(unittest.TestCase):
         current_row = current_state.locator("xpath=..")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
+        # Row management stays unboxed even though standalone More controls are circular.
         management = page.get_by_role("button", name="Example row actions")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             management.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertAlmostEqual(optical_y(management), 1.0, delta=0.05)
 
         chevron = page.locator(".chevron").first
         back = page.locator(".shell-test-link")
@@ -191,20 +191,21 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
         forward_mask = chevron.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
         back_mask = back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
-        self.assertEqual(forward_mask, back_mask)
+        self.assertNotEqual(forward_mask, back_mask)
         self.assertIn("data:image/svg+xml", forward_mask)
+        self.assertIn("data:image/svg+xml", back_mask)
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::after').content"), "none")
-        self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
-        self.assertAlmostEqual(optical_y(chevron), 1.0, delta=0.05)
-        self.assertAlmostEqual(optical_y(back), 1.0, delta=0.05)
+        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).width"), "44px")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).height"), "44px")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
 
         reorder = page.get_by_role("button", name="Reorder example")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').height"), "20px")
-        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').top"), "23px")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').top"), "22px")
         self.assertIn(
             "data:image/svg+xml",
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -223,7 +224,7 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
         self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
-        # The existing horizontal accessory lane stays fixed; this experiment does not alter real G7 geometry.
+        # The accepted horizontal accessory lane stays fixed.
         accessory_locators = [complete, current_state, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:

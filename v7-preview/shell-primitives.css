@@ -1,33 +1,45 @@
 /* G7 Shell Certification shared primitives
    Loaded by both real G7 and Shell Test.
-   Standard interface glyphs use canonical Lucide geometry.
+   Standard interface glyphs use canonical Lucide geometry with symbol-owned optical metrics.
    Progress-state visuals have one owner: state-primitives.css.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
 :root {
   --accessory-box: 28px;
   --accessory-glyph: 20px;
-  --toolbar-icon-size: 22px;
+  --toolbar-icon-size: 20px;
   --accessory-edge-inset: 4px;
-  --symbol-optical-y: 1px;
-  --toolbar-control-radius: 13px;
+  --toolbar-control-radius: 50%;
+  --toolbar-control-bg: #17171a;
+  --toolbar-control-active: #202024;
   --header-action-offset: 44px;
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
 
-  /* Canonical Lucide 24x24 paths. Keep commodity glyph construction here rather than redrawing per component. */
-  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 6 9 17l-5-5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --icon-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9 18 6-6-6-6' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* Canonical Lucide 24x24 artwork. Optical alignment belongs to the symbol asset itself:
+     - Plus / More / Reorder remain geometric-center assets.
+     - Check carries its half-unit vertical correction in the asset.
+     - Back / Forward carry mirrored side bearings derived from the approved chevron optical anchor. */
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='translate(0 .5)'%3E%3Cpath d='M20 6 9 17l-5-5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+  --icon-chevron-forward: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m10 18 6-6-6-6' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-chevron-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 18 8 12l6-6' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --icon-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14M12 5v14' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --icon-ellipsis: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='19' cy='12' r='1' fill='none' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E");
+  --icon-ellipsis: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='1.25' fill='%23000'/%3E%3Ccircle cx='12' cy='12' r='1.25' fill='%23000'/%3E%3Ccircle cx='19' cy='12' r='1.25' fill='%23000'/%3E%3C/svg%3E");
   --icon-menu: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16M4 12h16M4 19h16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
-/* Stable 44px hit targets. Resting toolbar actions are glyph-first, not permanently boxed controls. */
-.toolbar-button {
+/* Stable 44px hit targets. Standalone toolbar controls use the approved simple circular container.
+   Row/accessory symbols remain unboxed and keep their existing lane ownership. */
+.toolbar-button,
+.shell-test-link {
   position: relative;
+  border: 1px solid var(--line);
   border-radius: var(--toolbar-control-radius);
+  background: var(--toolbar-control-bg);
+  box-shadow: none;
 }
+.toolbar-button:active,
+.shell-test-link:active { background: var(--toolbar-control-active); }
 
 /* Header actions align to the visual center of the large title line rather than floating above it.
    The leading Back control remains in the toolbar lane; the trailing contextual action belongs to the title lane. */
@@ -42,8 +54,6 @@
   padding: 0;
   font-size: 0;
   letter-spacing: 0;
-  border: 0;
-  background: transparent;
   box-shadow: none;
 }
 .add-button { color: var(--text); }
@@ -60,7 +70,6 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
-  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .add-button::before {
@@ -68,16 +77,14 @@
   mask-image: var(--icon-plus);
 }
 .more-button::before {
-  width: 20px;
-  height: 20px;
   -webkit-mask-image: var(--icon-ellipsis);
   mask-image: var(--icon-ellipsis);
 }
 .add-button::after,
 .more-button::after { content: none; }
 
-/* Back and forward are one canonical Lucide chevron, mirrored only by direction.
-   Their hit targets stay mathematically centered; only the visible ink uses the shared optical baseline. */
+/* Back and Forward are one mirrored semantic family, but each asset owns its optical side bearing.
+   Their hit targets and accessory lanes stay fixed; the artwork needs no container-specific transform. */
 .chevron,
 .back-glyph {
   position: relative;
@@ -97,13 +104,11 @@
   min-width: var(--touch);
   display: inline-grid;
   place-items: center;
-  border-radius: 12px;
   color: var(--muted);
   font-size: 0;
   line-height: 1;
   text-decoration: none;
 }
-.shell-test-link:active { background: rgba(255,255,255,.065); }
 .chevron::before,
 .back-glyph::before,
 .shell-test-link::before {
@@ -111,27 +116,38 @@
   width: var(--accessory-glyph);
   height: var(--accessory-glyph);
   background: currentColor;
-  -webkit-mask: var(--icon-chevron-right) center / contain no-repeat;
-  mask: var(--icon-chevron-right) center / contain no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
   pointer-events: none;
 }
-.chevron::before { transform: translate(1px, var(--symbol-optical-y)); }
-.back-glyph::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
-.shell-test-link::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
+.chevron::before {
+  -webkit-mask-image: var(--icon-chevron-forward);
+  mask-image: var(--icon-chevron-forward);
+}
+.back-glyph::before,
+.shell-test-link::before {
+  -webkit-mask-image: var(--icon-chevron-back);
+  mask-image: var(--icon-chevron-back);
+}
 .chevron::after,
 .back-glyph::after,
 .shell-test-link::after { content: none; }
 
-/* Management is an accessory, never a divided second column. */
+/* Management is an accessory, never a divided second column or a boxed toolbar control. */
 .project-card-actions {
   justify-self: center;
+  border: 0;
   border-left: 0;
   border-radius: 10px;
   background: transparent;
 }
+.project-card-actions:active { background: rgba(255,255,255,.075); }
 
-/* Keep the already-validated horizontal lane math. Physical review isolated the remaining defect to
-   vertical optical placement of the visible artwork, so hit targets, row geometry and x-centers stay put. */
+/* Keep the already-validated horizontal lane math. Hit targets, row geometry and x-centers stay put. */
 .row {
   grid-template-columns: minmax(0, 1fr) var(--touch);
   padding-right: var(--accessory-edge-inset);
@@ -172,7 +188,7 @@
   line-height: 1.3;
 }
 
-/* Reorder uses Lucide's canonical three-line menu geometry on the same 24x24 optical grid. */
+/* Reorder uses Lucide's canonical three-line menu geometry on the same 24x24 symbol frame. */
 .reorder-handle {
   position: relative;
   width: var(--touch);
@@ -185,7 +201,7 @@
   height: 20px;
   position: absolute;
   left: 50%;
-  top: calc(50% + var(--symbol-optical-y));
+  top: 50%;
   background: var(--quiet);
   -webkit-mask: var(--icon-menu) center / contain no-repeat;
   mask: var(--icon-menu) center / contain no-repeat;
@@ -282,19 +298,17 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
-  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
-.glyph-swatch[data-glyph="back"]::before,
-.glyph-swatch[data-glyph="forward"]::before {
-  -webkit-mask-image: var(--icon-chevron-right);
-  mask-image: var(--icon-chevron-right);
+.glyph-swatch[data-glyph="back"]::before {
+  -webkit-mask-image: var(--icon-chevron-back);
+  mask-image: var(--icon-chevron-back);
 }
-.glyph-swatch[data-glyph="back"]::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
-.glyph-swatch[data-glyph="forward"]::before { transform: translate(1px, var(--symbol-optical-y)); }
+.glyph-swatch[data-glyph="forward"]::before {
+  -webkit-mask-image: var(--icon-chevron-forward);
+  mask-image: var(--icon-chevron-forward);
+}
 .glyph-swatch[data-glyph="plus"]::before {
-  width: 22px;
-  height: 22px;
   -webkit-mask-image: var(--icon-plus);
   mask-image: var(--icon-plus);
 }

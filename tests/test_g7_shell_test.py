@@ -47,14 +47,21 @@ def test_project_management_has_no_divider_and_accessories_use_canonical_icon_va
     assert "border-left: 0" in css
     assert "--accessory-box: 28px" in css
     assert "--accessory-glyph: 20px" in css
-    for token in ("--icon-check", "--icon-chevron-right", "--icon-plus", "--icon-ellipsis", "--icon-menu"):
+    for token in (
+        "--icon-check",
+        "--icon-chevron-forward",
+        "--icon-chevron-back",
+        "--icon-plus",
+        "--icon-ellipsis",
+        "--icon-menu",
+    ):
         assert token in css
     assert ".journey-mark" in css
     assert ".completion-ring" in css
     assert ".reorder-handle::before" in css
 
 
-def test_accessory_family_uses_canonical_masks():
+def test_accessory_family_uses_symbol_owned_canonical_assets():
     css = read("v7-preview/shell-primitives.css")
 
     assert ".add-button::before" in css
@@ -62,18 +69,18 @@ def test_accessory_family_uses_canonical_masks():
     assert "mask-image: var(--icon-plus)" in css
     assert "mask-image: var(--icon-ellipsis)" in css
 
-    assert ".checkmark::before" in css
-    assert ".journey-mark.done::before" in css
-    assert "mask: var(--icon-check) center / contain no-repeat" in css
+    assert ".checkmark::before" in read("v7-preview/state-primitives.css")
+    assert "mask: var(--icon-check) center / contain no-repeat" in read("v7-preview/state-primitives.css")
     assert 'content: "✓"' not in css
 
-    assert "--icon-chevron-right" in css
+    assert "--icon-chevron-forward" in css
+    assert "--icon-chevron-back" in css
     assert "stroke-linecap='round'" in css
     assert "stroke-linejoin='round'" in css
     assert ".chevron::before," in css
     assert ".back-glyph::before," in css
     assert ".shell-test-link::before" in css
-    assert "scaleX(-1)" in css
+    assert "scaleX(-1)" not in css
     assert ".chevron::after," in css
 
 
@@ -94,18 +101,31 @@ def test_state_language_is_non_circular_and_current_is_not_a_selected_row():
     assert ".completion-ring::before" in css
 
 
-def test_visible_glyph_artwork_uses_one_downward_optical_baseline_without_moving_layout():
+def test_real_g7_symbol_alignment_is_intrinsic_without_global_nudge():
     css = read("v7-preview/shell-primitives.css")
     state_css = read("v7-preview/state-primitives.css")
-    assert "--symbol-optical-y: 1px" in css
+
+    assert "--symbol-optical-y" not in css
+    assert "--symbol-optical-y" not in state_css
+    assert "--toolbar-icon-size: 20px" in css
+    assert "--toolbar-control-radius: 50%" in css
+    assert "border-radius: var(--toolbar-control-radius)" in css
+    assert "background: var(--toolbar-control-bg)" in css
+
+    # The approved chevron side bearings live in the SVG assets rather than CSS transforms.
+    assert "d='m10 18 6-6-6-6'" in css
+    assert "d='M14 18 8 12l6-6'" in css
+    assert "translate(-1px" not in css
+    assert "translate(1px" not in css
+
+    # Check owns its tiny vertical optical correction; symmetric symbols/state bars need none.
+    assert "transform='translate(0 .5)'" in css
+    assert "transform: translateY" not in state_css
+    assert "top: 50%" in css
+
+    # Accepted row/accessory geometry remains fixed.
     assert "padding-right: var(--accessory-edge-inset)" in css
     assert "grid-template-columns: minmax(0, 1fr) var(--touch)" in css
-    assert "transform: translateY(var(--symbol-optical-y))" in css
-    assert "translate(1px, var(--symbol-optical-y))" in css
-    assert "translate(-1px, var(--symbol-optical-y)) scaleX(-1)" in css
-    assert "top: calc(50% + var(--symbol-optical-y))" in css
-    assert state_css.count("transform: translateY(var(--symbol-optical-y))") == 3
-    assert "translateY(-.25px)" not in state_css
 
 
 def test_shell_test_comparison_uses_geometry_centering_and_intrinsic_chevron_optical_anchor():
