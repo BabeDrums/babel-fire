@@ -41,7 +41,8 @@
 /* STATE ARTWORK HOST CONTRACT
    Generated state art always sits at the physical center of the 24px state box. Intrinsic optical
    metrics (such as Check's tiny internal correction) stay inside the symbol asset rather than being
-   reinterpreted by each row/container. */
+   reinterpreted by each row/container. Absolute inset + auto margins avoids host-specific line-box
+   behavior while leaving the transform channel free for intrinsic symbol metrics. */
 .journey-mark.done::before,
 .checkmark::before,
 .journey-mark.current::before,
@@ -49,9 +50,8 @@
 .completion-ring::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
   pointer-events: none;
 }
 
