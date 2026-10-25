@@ -56,8 +56,9 @@ class G7RealShellBrowser(unittest.TestCase):
         expect(current).to_be_visible()
         expect(upcoming).to_be_visible()
 
-        # Current/upcoming containers are visually empty; symmetric bars center without a shared nudge.
+        # State primitives have one visible owner: the pseudo-element artwork.
         for marker in (current, upcoming):
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).fontSize"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
@@ -70,7 +71,6 @@ class G7RealShellBrowser(unittest.TestCase):
         self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        # Current and upcoming still occupy the same trailing lane center.
         current_box = current.bounding_box()
         upcoming_box = upcoming.bounding_box()
         self.assertIsNotNone(current_box)
@@ -79,7 +79,7 @@ class G7RealShellBrowser(unittest.TestCase):
         upcoming_center = upcoming_box["x"] + upcoming_box["width"] / 2
         self.assertLessEqual(abs(current_center - upcoming_center), 1.0)
 
-        # Real project Back now uses the promoted symbol-owned asset inside the simple circle control.
+        # The interaction target stays 44px while the visible circular material is quieter inside it.
         back_glyph = page.locator(".back-glyph")
         back_button = page.locator(".toolbar-button.icon-back")
         self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el).fontSize"), "0px")
@@ -87,12 +87,13 @@ class G7RealShellBrowser(unittest.TestCase):
             "data:image/svg+xml",
             back_glyph.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertEqual(back_button.evaluate("el => getComputedStyle(el).width"), "44px")
         self.assertEqual(back_button.evaluate("el => getComputedStyle(el).height"), "44px")
-        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
-        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
-        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el, '::after').borderRadius"), "50%")
 
         page.locator('.journey-row[data-route="setup"]').click()
         expect(page.locator("h1")).to_have_text("Setup")
@@ -102,29 +103,22 @@ class G7RealShellBrowser(unittest.TestCase):
         group_left = group_box["x"]
         group_right = group_box["x"] + group_box["width"]
 
-        expected_min_width = {
-            "#tempoInput": 85,
-            "#meterInput": 71,
-        }
-        for selector, min_width in expected_min_width.items():
-            control = page.locator(selector)
-            control_box = control.evaluate(
+        value_widths = []
+        for selector in ("#tempoInput", "#meterInput"):
+            control_box = page.locator(selector).evaluate(
                 """el => {
                     const r = el.parentElement.getBoundingClientRect();
                     return { left: r.left, right: r.right, width: r.width };
                 }"""
             )
-            self.assertGreaterEqual(control_box["width"], min_width)
+            value_widths.append(control_box["width"])
             self.assertGreaterEqual(control_box["left"], group_left - 1)
             self.assertLessEqual(control_box["right"], group_right + 1)
+        self.assertLessEqual(abs(value_widths[0] - value_widths[1]), 1.0)
+        self.assertGreaterEqual(value_widths[0], 103)
 
         meter_value = page.locator("#meterInput").locator("xpath=..")
         self.assertTrue(meter_value.evaluate("el => el.classList.contains('select-value')"))
-
-        for selector in ("#tempoInput", "#meterInput"):
-            form_row = page.locator(selector).locator("xpath=../..")
-            columns = form_row.evaluate("el => getComputedStyle(el).gridTemplateColumns").split()
-            self.assertNotEqual(columns[-1], "28px")
 
     def test_real_structure_header_alignment_and_sheet_chrome(self):
         page = self.open()
@@ -132,19 +126,26 @@ class G7RealShellBrowser(unittest.TestCase):
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
 
+        back = page.get_by_role("button", name="Creep")
         add = page.get_by_role("button", name="Add Section")
         title_box = page.locator("h1").bounding_box()
+        back_box = back.bounding_box()
         add_box = add.bounding_box()
         self.assertIsNotNone(title_box)
+        self.assertIsNotNone(back_box)
         self.assertIsNotNone(add_box)
-        title_center = title_box["y"] + title_box["height"] / 2
+
+        # Header actions share one navigation row; title is a separate row beneath them.
+        back_center = back_box["y"] + back_box["height"] / 2
         add_center = add_box["y"] + add_box["height"] / 2
-        self.assertLessEqual(abs(title_center - add_center), 2.0)
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertLessEqual(abs(back_center - add_center), 1.0)
+        self.assertGreaterEqual(title_box["y"], max(back_box["y"] + back_box["height"], add_box["y"] + add_box["height"]))
+
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').width"), "36px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').height"), "36px")
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -157,7 +158,17 @@ class G7RealShellBrowser(unittest.TestCase):
         expect(actions).to_be_visible()
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
+        self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
+        self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
         self.assertNotIn("inset", sheet.evaluate("el => getComputedStyle(el).boxShadow"))
+
+        # The modal is centered away from the dynamic browser bottom edge and carries a visible task title.
+        sheet_box = sheet.bounding_box()
+        self.assertIsNotNone(sheet_box)
+        viewport_height = page.viewport_size["height"]
+        self.assertGreater(sheet_box["y"], 0)
+        self.assertLess(sheet_box["y"] + sheet_box["height"], viewport_height)
+        self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').content"), '"Add Section"')
 
 
 if __name__ == "__main__":
