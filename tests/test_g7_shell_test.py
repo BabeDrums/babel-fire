@@ -66,7 +66,7 @@ def test_accessory_family_uses_canonical_masks():
     assert ".chevron::before," in css
     assert ".back-glyph::before," in css
     assert ".shell-test-link::before" in css
-    assert "translateX(-1px) scaleX(-1)" in css
+    assert "scaleX(-1)" in css
     assert ".chevron::after," in css
 
 
@@ -74,17 +74,31 @@ def test_state_language_is_non_circular_and_current_is_not_a_selected_row():
     css = read("v7-preview/state-primitives.css")
     assert ".journey-row.current { background: transparent; }" in css
     assert "--state-mark-box: 24px" in css
-    assert "--state-current-width: 18px" in css
-    assert "--state-current-height: 4px" in css
-    assert "--state-upcoming-width: 14px" in css
-    assert "--state-upcoming-height: 3px" in css
+    assert "--state-mark-visual: 18px" in css
+    assert "--state-current-width: var(--state-mark-visual)" in css
+    assert "--state-current-height: 3px" in css
+    assert "--state-upcoming-width: var(--state-mark-visual)" in css
+    assert "--state-upcoming-height: 2px" in css
     assert ".journey-mark.done," in css
     assert ".checkmark" in css
     assert "border-radius: 50%" not in css
     assert ".journey-mark.current::before" in css
     assert ".journey-mark.upcoming::before," in css
     assert ".completion-ring::before" in css
-    assert "radio ring" in css
+
+
+def test_visible_glyph_artwork_uses_one_downward_optical_baseline_without_moving_layout():
+    css = read("v7-preview/shell-primitives.css")
+    state_css = read("v7-preview/state-primitives.css")
+    assert "--symbol-optical-y: 1px" in css
+    assert "padding-right: var(--accessory-edge-inset)" in css
+    assert "grid-template-columns: minmax(0, 1fr) var(--touch)" in css
+    assert "transform: translateY(var(--symbol-optical-y))" in css
+    assert "translate(1px, var(--symbol-optical-y))" in css
+    assert "translate(-1px, var(--symbol-optical-y)) scaleX(-1)" in css
+    assert "top: calc(50% + var(--symbol-optical-y))" in css
+    assert state_css.count("transform: translateY(var(--symbol-optical-y))") == 3
+    assert "translateY(-.25px)" not in state_css
 
 
 def test_header_action_alignment_is_owned_by_shared_primitive_layer():
