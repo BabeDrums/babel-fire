@@ -31,7 +31,9 @@ The first canonical-icon reset reached deployed build `0cc4cba`, but physical re
 
 Deployed build `c02ac89` retired that circular treatment: Complete = canonical check only; Current = stronger short status bar; Incomplete/upcoming = quieter short status bar; Current row = no persistent background tint. Physical review of that exact build was a clear improvement and kept the direction, but exposed one final refinement layer: the three state marks still felt independently drawn rather than generated from one optical system, and trailing `8 bars` metadata competed visually with the reorder affordance.
 
-The active accessory-polish candidate therefore keeps the accepted non-circular language but normalizes Complete / Current / Incomplete onto one 18px optical frame. Current and Incomplete share the same width and cap geometry; hierarchy comes only from weight and contrast. Arrangement metadata such as `8 bars` moves into a supporting-text line beneath the section name so the far-right lane contains only the reorder affordance. These changes are shared between Shell Test and real G7 through the existing primitive layers.
+Deployed build `66c43bf` normalized Complete / Current / Incomplete onto one 18px optical frame and moved arrangement metadata such as `8 bars` beneath the section name so the reorder affordance owns the far-right lane. Physical review liked that result substantially more, but the accessory family still read as slightly pushed because different row families reached nearly the same x-center through different layout math: ordinary rows used a 44px lane plus a 4px edge inset while project/arrangement rows used a 52px lane containing a centered 44px control.
+
+The active alignment candidate replaces those parallel calculations with one canonical 44px trailing lane shared by ordinary rows, journey rows, project cards, and arrangement rows. The lane itself owns the centerline; component-specific edge inset math is removed. Existing tiny glyph-specific optical compensation is retained only where mirrored geometry genuinely needs it. This is a shell-system alignment correction, not a new glyph language or FIRE workflow redesign.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -97,7 +99,7 @@ Do not make G7 automatically match a Lab specimen.
 - project-row management has no decorative divider from the row
 - standard interface glyphs use one canonical Lucide 24×24 construction source instead of being redrawn independently in CSS
 - Back and forward/navigation use the same canonical chevron family, with direction as the only semantic difference; tiny optical offsets are allowed when needed so mirrored geometry reads centered on-device
-- recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container or equal visible mass
+- recurring state/accessory meanings share one canonical 44px physical trailing lane and therefore one derived x-center; different meanings are not forced into the same visible container or equal visible mass
 - progress-state language remains under physical review; the active candidate is deliberately non-circular and optically normalized: Complete = canonical check only; Current = stronger 18px status bar; Incomplete/upcoming = quieter 18px status bar
 - Current state must not create a persistent selected-row background; state and row selection are different semantics
 - arrangement supporting metadata belongs to the content hierarchy; the far-right accessory lane is reserved for the row's affordance
@@ -120,6 +122,7 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - project-row `•••` divider remains removed and management stays in the shared accessory lane
 - the prior homemade per-glyph CSS system has been retired for commodity interface symbols after physical review showed mismatched visual centers, joins, proportions, and stroke personalities
 - check, chevron, plus, ellipsis, and reorder use canonical Lucide SVG-mask geometry from one 24×24 source system in `shell-primitives.css`
+- ordinary rows, journey rows, project cards, and arrangement rows now derive their far-right accessory center from one 44px lane; the prior mix of 44px-plus-inset and 52px-container math is retired
 - trailing row accessories keep one actual x-center across state / Navigate / Reorder / More without forcing different meanings into identical visible containers
 - forward/back chevrons use tiny direction-specific x offsets while retaining the same source geometry, because physical review showed mathematically mirrored masks can still look visually off-center
 - Shell Test exposes Back / Forward / Add / Check / Reorder / More in one temporary comparison row so remaining family-level inconsistencies are easy to spot
@@ -138,7 +141,7 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - browser coverage checks real state geometry, transparent Current-row background, accessory center alignment, the glyph comparison palette, and the actual G7 Project → Setup → Structure path at 390/440/820 widths
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the exact deployed accessory-polish candidate: compare Complete / Current / Incomplete as one family, verify `8 bars` now reads as supporting information rather than a competing accessory, and confirm the same treatment in real Structure. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed accessory-lane candidate: verify that Complete / Current / Incomplete / Navigate / Reorder / More now read as sitting on one calm right-edge centerline, confirm `8 bars` remains clearly supporting information, and check the same lane treatment in real Structure. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 
