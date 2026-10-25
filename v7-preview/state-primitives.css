@@ -5,13 +5,14 @@
 
 :root {
   --state-mark-box: 24px;
+  --state-mark-visual: 18px;
   --state-complete: #d9d9df;
   --state-current: #d9d9df;
   --state-upcoming: #666872;
-  --state-current-width: 18px;
-  --state-current-height: 4px;
-  --state-upcoming-width: 14px;
-  --state-upcoming-height: 3px;
+  --state-current-width: var(--state-mark-visual);
+  --state-current-height: 3px;
+  --state-upcoming-width: var(--state-mark-visual);
+  --state-upcoming-height: 2px;
 }
 
 /* Current is state, not a selected button. */
@@ -37,7 +38,7 @@
   line-height: 1;
 }
 
-/* Complete is simply the canonical check. No enclosing circle. */
+/* Complete, Current, and Incomplete all draw inside the same 18px optical frame. */
 .journey-mark.done,
 .checkmark {
   color: var(--state-complete);
@@ -47,8 +48,8 @@
 .journey-mark.done::before,
 .checkmark::before {
   content: "";
-  width: 18px;
-  height: 18px;
+  width: var(--state-mark-visual);
+  height: var(--state-mark-visual);
   background: currentColor;
   -webkit-mask: var(--icon-check) center / contain no-repeat;
   mask: var(--icon-check) center / contain no-repeat;
@@ -58,7 +59,7 @@
 .journey-mark.done::after,
 .checkmark::after { content: none; }
 
-/* Current is a compact emphasized status bar, not a radio ring or filled control. */
+/* Current uses the same optical width as the check, with one step more weight than Incomplete. */
 .journey-mark.current {
   color: var(--state-current);
   border: 0;
@@ -68,13 +69,13 @@
   content: "";
   width: var(--state-current-width);
   height: var(--state-current-height);
-  border-radius: 999px;
+  border-radius: 2px;
   background: currentColor;
   pointer-events: none;
 }
 .journey-mark.current::after { content: none; }
 
-/* Incomplete/upcoming uses the same status-bar language at lower emphasis. */
+/* Incomplete/upcoming shares the exact width/caps; only weight and contrast step down. */
 .journey-mark.upcoming,
 .completion-ring {
   color: var(--state-upcoming);
@@ -86,7 +87,7 @@
   content: "";
   width: var(--state-upcoming-width);
   height: var(--state-upcoming-height);
-  border-radius: 999px;
+  border-radius: 2px;
   background: currentColor;
   pointer-events: none;
 }
