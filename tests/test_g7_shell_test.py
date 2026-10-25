@@ -98,17 +98,18 @@ def test_generated_symbol_and_state_artwork_share_one_explicit_host_center_contr
     assert ".back-glyph::before," in css
     assert ".shell-test-link::before" in css
     assert "position: absolute" in css
-    assert "left: 50%" in css
-    assert "top: 50%" in css
-    assert "transform: translate(-50%, -50%)" in css
+    assert "inset: 0" in css
+    assert "margin: auto" in css
 
     assert "STATE ARTWORK HOST CONTRACT" in state_css
     assert ".journey-mark.current::before" in state_css
     assert ".completion-ring::before" in state_css
     assert "position: absolute" in state_css
-    assert "left: 50%" in state_css
-    assert "top: 50%" in state_css
-    assert "transform: translate(-50%, -50%)" in state_css
+    assert "inset: 0" in state_css
+    assert "margin: auto" in state_css
+
+    # Host centering must not consume the transform channel used by intrinsic symbol metrics.
+    assert "transform: translate(-50%, -50%)" not in state_css
 
     # The frame layer can stack symbol artwork, but must not replace its positioning model.
     assert ".toolbar-button::before,\n.toolbar-button > *,\n.shell-test-link::before { z-index: 1; }" in frame_css
@@ -148,10 +149,10 @@ def test_real_g7_symbol_alignment_is_intrinsic_without_global_nudge():
     assert "translate(-1px" not in css
     assert "translate(1px" not in css
 
-    # Check owns its tiny intrinsic optical correction; the host applies only generic centering.
+    # Check owns its tiny intrinsic optical correction; symmetric state hosts add no transform.
     assert "transform='translate(0 .5)'" in css
     assert "transform: translateY" not in state_css
-    assert "transform: translate(-50%, -50%)" in state_css
+    assert "transform: translate(-50%, -50%)" not in state_css
 
     # Accepted row/accessory geometry remains fixed.
     assert "padding-right: var(--accessory-edge-inset)" in css
