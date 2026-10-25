@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,12 +8,13 @@
   <meta name="theme-color" content="#09090b">
   <meta name="color-scheme" content="dark">
   <title>G7 Shell Test</title>
-  <link rel="stylesheet" href="./styles.css?v=g7-shell-4">
-  <link rel="stylesheet" href="./shell-primitives.css?v=g7-shell-4">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css?v={{ site.github.build_revision }}">
+  <link rel="stylesheet" href="./shell-primitives.css?v={{ site.github.build_revision }}">
 </head>
 <body>
   <div id="shellTest" class="app-shell"></div>
   <div id="sheetRoot" class="sheet-backdrop" hidden></div>
-  <script type="module" src="./shell-test.js?v=g7-shell-4"></script>
+  <script type="module" src="./shell-test.js?v={{ site.github.build_revision }}"></script>
 </body>
 </html>
