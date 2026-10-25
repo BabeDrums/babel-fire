@@ -55,6 +55,23 @@ class G7RealShellBrowser(unittest.TestCase):
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').position"), "absolute")
         for side in ("top", "right", "bottom", "left"):
             self.assertEqual(current.evaluate(f"el => getComputedStyle(el, '::after').{side}"), "0px")
+        self.assertGreaterEqual(
+            current.evaluate("el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"),
+            2.5,
+        )
+        self.assertEqual(
+            current.evaluate("el => getComputedStyle(el, '::after').borderTopColor"),
+            "rgba(232, 232, 237, 0.38)",
+        )
+
+        # Real project Back uses the canonical continuous chevron mask rather than a font glyph.
+        back = page.locator(".back-glyph")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertIn(
+            "data:image/svg+xml",
+            back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
+        self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
 
         page.locator('.journey-row[data-route="setup"]').click()
         expect(page.locator("h1")).to_have_text("Setup")
@@ -92,13 +109,23 @@ class G7RealShellBrowser(unittest.TestCase):
             columns = form_row.evaluate("el => getComputedStyle(el).gridTemplateColumns").split()
             self.assertNotEqual(columns[-1], "28px")
 
-    def test_real_structure_sheet_has_no_unapproved_hairline(self):
+    def test_real_structure_header_alignment_and_sheet_chrome(self):
         page = self.open()
         self.open_fixture_project(page)
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
-        page.get_by_role("button", name="Add Section").click()
 
+        # The plus action shares the title line rather than floating above the header.
+        add = page.get_by_role("button", name="Add Section")
+        title_box = page.locator("h1").bounding_box()
+        add_box = add.bounding_box()
+        self.assertIsNotNone(title_box)
+        self.assertIsNotNone(add_box)
+        title_center = title_box["y"] + title_box["height"] / 2
+        add_center = add_box["y"] + add_box["height"] / 2
+        self.assertLessEqual(abs(title_center - add_center), 2.0)
+
+        page.get_by_role("button", name="Add Section").click()
         sheet = page.locator(".sheet")
         expect(sheet).to_be_visible()
         actions = sheet.locator(".sheet-actions")

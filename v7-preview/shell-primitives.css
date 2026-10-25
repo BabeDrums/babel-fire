@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 6
+/* G7 Shell Certification pass 7
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
@@ -8,12 +8,14 @@
   --accessory-stroke: 2px;
   --accessory-cap: 999px;
   --toolbar-control-radius: 13px;
+  --header-action-offset: 44px;
   --state-ring: #666872;
   --state-fill: #e8e8ed;
   --state-current-ring: #d9d9df;
-  --state-current-inner-ring: rgba(232,232,237,.30);
+  --state-current-inner-ring: rgba(232,232,237,.38);
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
+  --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M6.5 3.5 12 9l-5.5 5.5' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* Stable hit targets with explicit optical correction per glyph. */
@@ -21,6 +23,11 @@
   position: relative;
   border-radius: var(--toolbar-control-radius);
 }
+
+/* Header actions align to the visual center of the large title line rather than floating above it.
+   The leading Back control remains in the toolbar lane; the trailing contextual action belongs to the title lane. */
+.toolbar-trailing { transform: translateY(var(--header-action-offset)); }
+
 .add-button,
 .more-button {
   display: inline-grid;
@@ -64,6 +71,48 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
+
+/* Back and forward are one canonical chevron drawing, mirrored only by direction.
+   A single SVG mask avoids the visible seam created by two separately rotated CSS bars. */
+.chevron,
+.back-glyph {
+  position: relative;
+  width: var(--accessory-box);
+  height: var(--accessory-box);
+  min-width: var(--accessory-box);
+  display: inline-grid;
+  place-items: center;
+  font-size: 0;
+  line-height: 1;
+}
+.chevron { color: var(--quiet); }
+.back-glyph { color: var(--muted); }
+.shell-test-link {
+  width: var(--touch);
+  height: var(--touch);
+  min-width: var(--touch);
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+.shell-test-link:active { background: rgba(255,255,255,.065); }
+.chevron::before,
+.back-glyph::before,
+.shell-test-link::before {
+  content: "";
+  width: var(--accessory-glyph);
+  height: var(--accessory-glyph);
+  background: currentColor;
+  -webkit-mask: var(--chevron-mask) center / contain no-repeat;
+  mask: var(--chevron-mask) center / contain no-repeat;
+  pointer-events: none;
+}
+.back-glyph::before,
+.shell-test-link::before { transform: scaleX(-1); }
 
 /* Management is an accessory, never a divided second column. */
 .project-card-actions {
@@ -136,7 +185,8 @@
 
 /* Current borrows only the older roadmap's nested-ring structure, not its yellow accent.
    Absolute positioning keeps generated content out of grid flow. inset: 0 pins the inner ring to the
-   padding edge, which is exactly the inside edge of the 2px outer border: no gap, no floating center ring. */
+   padding edge, exactly the inside edge of the 2px outer border. The inner ring is deliberately thicker
+   than the previous candidate so it remains visibly secondary rather than disappearing on a real device. */
 .journey-mark.current {
   position: relative;
   font-size: 0;
@@ -150,7 +200,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1.5px solid var(--state-current-inner-ring);
+  border: 3px solid var(--state-current-inner-ring);
   background: transparent;
   box-sizing: border-box;
   pointer-events: none;
@@ -163,28 +213,7 @@
 }
 .journey-mark.upcoming { font-size: 0; }
 
-/* Commodity affordances use the same rounded stroke family and artboard but remain visually quiet. */
-.chevron {
-  position: relative;
-  font-size: 0;
-  color: var(--quiet);
-  transform: none;
-}
-.chevron::before,
-.chevron::after {
-  content: "";
-  position: absolute;
-  left: calc(50% - 4px);
-  top: calc(50% - 1px);
-  width: 8px;
-  height: var(--accessory-stroke);
-  border-radius: var(--accessory-cap);
-  background: currentColor;
-  transform-origin: right center;
-}
-.chevron::before { transform: rotate(45deg); }
-.chevron::after { transform: rotate(-45deg); }
-
+/* Reorder uses the same rounded terminal vocabulary while preserving its distinct meaning. */
 .reorder-handle {
   position: relative;
   width: var(--touch);
@@ -259,16 +288,6 @@
   align-items: center;
 }
 .shell-test-disabled { opacity: .42; }
-.shell-test-link {
-  color: var(--muted);
-  font-size: 13px;
-  text-decoration: none;
-}
-.shell-test-link:focus-visible {
-  outline: 2px solid #d9d9df;
-  outline-offset: 4px;
-  border-radius: 4px;
-}
 
 @media (min-width: 700px) {
   .sheet {

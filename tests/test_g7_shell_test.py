@@ -40,8 +40,7 @@ def test_project_management_has_no_divider_and_accessories_are_canonicalized():
     assert "--accessory-cap" in css
     assert ".journey-mark" in css
     assert ".completion-ring" in css
-    assert ".chevron::before" in css
-    assert ".chevron::after" in css
+    assert "--chevron-mask" in css
     assert ".reorder-handle::before" in css
 
 
@@ -63,23 +62,33 @@ def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring
     assert 'content: "✓"' not in css
     assert "border-radius: var(--accessory-cap)" in css
 
-    # Current is outer ring + faded inner ring, pinned to the outer ring's inside edge.
+    # Current is outer ring + a visibly thicker faded inner ring pinned to the outer ring's inside edge.
     assert ".journey-mark.current" in css
     assert "border: 2px solid var(--state-current-ring)" in css
     assert "--state-current-ring: #d9d9df" in css
-    assert "--state-current-inner-ring: rgba(232,232,237,.30)" in css
+    assert "--state-current-inner-ring: rgba(232,232,237,.38)" in css
     assert ".journey-mark.current::after" in css
     assert "position: absolute" in css
     assert "inset: 0" in css
-    assert "border: 1.5px solid var(--state-current-inner-ring)" in css
+    assert "border: 3px solid var(--state-current-inner-ring)" in css
     assert "background: transparent" in css
     assert "#d8d84f" not in css
 
-    # Navigation and reorder use the same rounded stroke vocabulary.
+    # Back, Shell Test Back, and forward navigation are one rounded, seam-free mask mirrored by direction.
+    assert "--chevron-mask:" in css
+    assert "stroke-linecap='round'" in css
+    assert "stroke-linejoin='round'" in css
     assert ".chevron::before," in css
-    assert ".chevron::after" in css
-    assert "transform-origin: right center" in css
-    assert "height: var(--accessory-stroke)" in css
+    assert ".back-glyph::before," in css
+    assert ".shell-test-link::before" in css
+    assert ".back-glyph::before,\n.shell-test-link::before { transform: scaleX(-1); }" in css
+    assert ".chevron::after" not in css
+
+
+def test_header_action_alignment_is_owned_by_shared_primitive_layer():
+    css = read("v7-preview/shell-primitives.css")
+    assert "--header-action-offset: 44px" in css
+    assert ".toolbar-trailing { transform: translateY(var(--header-action-offset)); }" in css
 
 
 def test_shared_accessory_layer_does_not_override_form_control_grid():
