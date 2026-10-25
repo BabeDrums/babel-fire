@@ -2,20 +2,20 @@
 
 This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The certification contract defines what each category means and how it can be locked.
 
-**Current phase:** exact-build physical review after the shared frame repair merged and deployed in PR #89. Shell Test and browser regressions are green evidence, but no category is Locked yet and FIRE Core remains blocked.
+**Current phase:** host-centering candidate after iPad physical review of deployed `G7 · f512b90`. The symbol artwork itself remains the preferred direction, but generated symbol/state artwork is not yet physically consistent across every host. No category is Locked and FIRE Core remains blocked.
 
 | Category | State | Current note |
 | --- | --- | --- |
-| 1. Page frame | Candidate | PR #89 restored one shared navigation/action row with the large title/meta in a separate row beneath it. Browser evidence is green; exact-build iPhone/iPad physical review is still required before lock. |
-| 2. Typography | Candidate | Representative title/meta/row/supporting roles remain intact; the frame repair changed their structural relationship rather than introducing new type roles. Needs final hierarchy review in real G7 context. |
-| 3. Spacing and alignment | Candidate | Symbol-owned optical metrics remain in place. PR #89 removed header-side vertical drift, keeps 44px interaction frames, uses a quieter 36px visible toolbar material, and preserves accepted row/accessory horizontal lanes. Physical review remains the deciding evidence. |
-| 4. Surfaces | Candidate | Existing grouped/selection/field/modal surfaces remain exercised. Toolbar material is separated from its interaction frame, and compact sheets use one centered bounded surface rather than bottom-edge anchoring. |
-| 5. Actions | Candidate | Standalone glyph actions retain circular semantics without making the full 44px hit region visually heavy. Edit/manage sheet actions now preserve primary-task hierarchy rather than reading as equal stacked slabs. |
-| 6. Icons and accessories | Candidate | The promoted symbol architecture remains the current direction: Plus / More / Reorder use geometric placement, Check owns its intrinsic vertical metric, and Back / Forward own mirrored outward side bearings. PR #89 intentionally repaired the surrounding frame rather than reopening symbol nudging. |
-| 7. Controls and states | Candidate | Current/Incomplete/Complete remain owned by `state-primitives.css`. The frame layer suppresses legacy text glyph leakage so pseudo-element state artwork is the only visible owner. Tempo and Meter share one stable trailing-value lane instead of content-sized mini-buttons. |
-| 8. Temporary UI | Candidate | Compact sheets center within a small-viewport-safe frame using `svh`, full rounded geometry, and a visible task title sourced from the existing dialog label. This avoids tying modal usability to Safari's dynamic bottom toolbar. |
-| 9. Responsive behavior | Candidate | Shell Test and the real Project → Setup → Structure path passed the 390/440/820 matrix before merge and again after merge on the exact deployed commit. Physical iPhone/iPad review is still required. |
-| 10. Accessibility and motion | Candidate | 44px toolbar hit targets are preserved even though visible material is smaller. Existing focus-visible/reduced-motion behavior remains; final physical/device accessibility review is still required. |
+| 1. Page frame | Candidate | PR #89 restored one shared navigation/action row with large title/meta below it. The current candidate preserves that frame and removes a dead shell-level header offset rule so structural placement has one owner. Exact candidate physical review still required. |
+| 2. Typography | Candidate | Representative title/meta/row/supporting roles remain intact. No new type role is introduced; sparse Shell Test copy now receives intentional internal inset instead of touching its group edge. |
+| 3. Spacing and alignment | Candidate | iPad review exposed a remaining host-centering inconsistency: identical generated artwork can sit high in toolbar/action/row/state contexts even while the comparison specimen looks correct. Candidate makes host centering explicit while preserving accepted x-lanes and row/text geometry. |
+| 4. Surfaces | Candidate | Existing grouped/selection/field/modal surfaces remain exercised. Toolbar material remains separated from its 44px interaction frame; no surface redesign is part of this candidate. |
+| 5. Actions | Candidate | Add/More semantics and circle treatment remain. Candidate changes only how generated artwork is seated inside the existing host; 44px targets and 36px visible material remain fixed. |
+| 6. Icons and accessories | Candidate | Intrinsic symbol architecture remains: Plus/More/Reorder geometric, Check with intrinsic vertical metric, Back/Forward with mirrored outward side bearings. New candidate adds one host-centering contract so container context cannot vertically move identical artwork. |
+| 7. Controls and states | Candidate | `state-primitives.css` remains sole state-art owner. Complete/Current/Incomplete now use the same explicit host-centering rule inside the 24px state box; Current's bar and checks require exact-device revalidation. Tempo/Meter lane remains unchanged. |
+| 8. Temporary UI | Candidate | Compact sheets still use the bounded small-viewport-safe frame and visible task title. Shell Test removes redundant helper narration; modal behavior is otherwise unchanged. |
+| 9. Responsive behavior | Candidate | Previous exact builds passed 390/440/820. This candidate must pass the same matrix in Shell Test and real G7, then receive iPhone-first and iPad physical review. |
+| 10. Accessibility and motion | Candidate | 44px toolbar hit targets remain unchanged and host centering does not alter hit geometry. Existing focus-visible/reduced-motion behavior remains; final physical/device accessibility review is still required. |
 
 ## Current evidence
 
@@ -26,29 +26,37 @@ This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The
 - Shell Test-only comparison styling remains isolated in `v7-preview/shell-test-experiments.css`.
 - PR #87 deployed `G7 · b35b783` with the refined outward chevron optical-anchor candidate; physical review reported the symbol family looked strong enough to promote.
 - PR #88 merged the symbol architecture into real G7 at `109590e66038845849c832d3f4e3ea93ba5193c1`.
-- Physical iPhone review of that real-G7 build found the symbol artwork largely convincing but exposed broader frame contradictions: Back and trailing actions occupied different vertical lanes, the full 44px circle carried too much resting visual mass, Current could reveal a legacy arrow beneath its status bar, Tempo/Meter used inconsistent content-sized value boxes, and compact edit sheets collided visually with mobile browser chrome / over-emphasized peer actions.
-- PR #89 repaired those contradictions at the shared-primitive level and merged to `main` as `d93729ff7a734035f25a6835323d19706f15186d`.
-- PR #89 passed Authority/Handoff + Static + Chromium 390/440/820 before merge, including Shell Test and the real G7 Project → Setup → Structure path.
-- GitHub Pages successfully deployed the exact `d93729ff…` merge commit.
-- Post-merge Static + Chromium 390/440/820 passed again on that exact merge SHA.
-- Current frame rule: **one navigation row → separate large-title/meta row**. No side-specific header translation is allowed.
-- Current control rule: **44px interaction frame → smaller visible material → symbol-owned optical placement**. Hit geometry and visible material geometry are intentionally separate.
-- Current state rule: state artwork has one visible owner; legacy text content must not be able to reappear through specificity drift.
-- Current editable-value rule: Tempo and Meter share one fixed trailing lane; content length does not determine control width.
-- Current modal rule: compact sheets center within a small-viewport-safe frame rather than anchoring a large surface to Safari's dynamic bottom edge.
+- Physical iPhone review of that build exposed broader frame contradictions rather than a reason to reopen the symbol metrics.
+- PR #89 repaired header/action rows, 44px target vs 36px material, state visual ownership, Tempo/Meter lane, and modal framing at `d93729ff7a734035f25a6835323d19706f15186d`; pre/post Static + Chromium 390/440/820 and exact Pages deploy passed.
+- PR #91 later simplified authority/documentation only at `f512b90065c58a2426e79e4a99941a22b22fe35e`; it made no G7/V6 runtime change. Exact Pages deploy and post-merge Static + Chromium 390/440/820 passed.
+- Physical iPad review of `G7 · f512b90` found:
+  - normalized comparison glyphs look well seated
+  - toolbar/action `+` and `•••` read high
+  - managed-row `•••` reads high
+  - Current's status bar reads clearly high and checks may also be slightly inconsistent
+  - Back/Forward look good and should be preserved
+  - the prior legacy Current-arrow fallthrough remains resolved
+- Code diagnosis: comparison symbols are block inline SVGs centered by Grid, while real G7 generated pseudo-elements were allowed to participate in host layout differently; the frame layer also changed toolbar pseudo-element positioning after the symbol layer loaded.
+- Candidate fix: **stable host box → absolute inset/auto-margin centering → intrinsic symbol metric inside the asset**. No page-specific or glyph-specific vertical nudges are introduced.
+- Candidate cleanup also removes the dead `--header-action-offset`/shell-level toolbar translation rule, removes the Shell Test adaptive-dialog helper sentence, and adds intentional inset to the sparse composition fixture.
 - Liquid Glass remains rejected for the current FIRE shell direction.
 - Accepted horizontal accessory lanes and far-right ownership remain unchanged. Arrangement metadata such as `8 bars` stays supporting text beneath the item name; Reorder remains the sole far-right affordance.
 - Setup / Structure / Tracks remain disposable product fixtures. Their current behavior does not approve FIRE Core architecture.
 
 ## Reliability gate
 
-The PR #89 engineering gate is complete and green. Do not repeat that repair unless new physical evidence proves a remaining systemic contradiction.
+Do not merge the host-centering candidate unless the exact PR head passes:
+- Authority/Handoff
+- Static
+- Chromium 390 / 440 / 820
+- Shell Test coverage
+- real G7 Project → Setup → Structure coverage
 
-A red regression is not merge-ready evidence. When a deliberate shell change invalidates an old regression expectation, reconcile the implementation, active authority, test contract, zero-context handoff, and deployed asset revisioning in the same change before merge.
+A red regression is not merge-ready evidence. When a deliberate shell change invalidates an old regression expectation, reconcile implementation, active authority, test contract, zero-context handoff, and deployed asset revisioning in the same change.
 
-**Shell Test passing is not sufficient for a shared-primitive merge.** Any shared primitive used by real G7 must also pass browser coverage in the actual G7 fixture path at the compact and regular-width regression matrix.
+**Shell Test passing is not sufficient for a shared-primitive merge.** Any shared primitive used by real G7 must also pass browser coverage in the actual G7 fixture path at compact and regular-width sizes.
 
-The current next gate is physical review of the exact deployed `G7 · d93729f` build on **iPhone first, then iPad/regular width**. Any discovered issue must be classified before changing code: shared-frame, symbol/state, page-local, or disposable product-fixture content.
+After exact deployment, physical review is **iPhone first, then iPad/regular width**. Do not infer iPhone success from the iPad evidence that motivated this candidate.
 
 Physical review must target the exact deployed revision shown by the G7/Shell Test build indicator.
 
