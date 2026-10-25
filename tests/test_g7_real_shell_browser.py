@@ -29,8 +29,8 @@ class G7RealShellBrowser(unittest.TestCase):
 
     def open(self):
         width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
-        context = cls_context = self.browser.new_context(viewport={"width": width, "height": 844}, has_touch=True)
-        self.addCleanup(cls_context.close)
+        context = self.browser.new_context(viewport={"width": width, "height": 844}, has_touch=True)
+        self.addCleanup(context.close)
         page = context.new_page()
         page.set_default_timeout(5000)
         errors = []
