@@ -20,6 +20,11 @@ const SYMBOL_LABELS = {
   more: "More"
 };
 
+// Physical review found the chevron family visually pulled toward each directional tip even after
+// visible-bounds centering. Keep one mirrored family rule: both chevrons move the same small amount
+// inward toward the center of the control. Other symbols remain purely geometry-centered.
+const CHEVRON_OPTICAL_INSET = 1.2;
+
 const normalizedSymbol = (name) => `
   <svg class="normalized-symbol" data-symbol="${name}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <g class="symbol-art">${SYMBOLS[name]}</g>
@@ -44,10 +49,18 @@ function normalizeSymbols(root = document) {
     if (!art) return;
     art.removeAttribute("transform");
     const bounds = art.getBBox();
-    const dx = 12 - (bounds.x + bounds.width / 2);
+    const geometryDx = 12 - (bounds.x + bounds.width / 2);
     const dy = 12 - (bounds.y + bounds.height / 2);
+    const opticalDx = svg.dataset.symbol === "back"
+      ? CHEVRON_OPTICAL_INSET
+      : svg.dataset.symbol === "forward"
+        ? -CHEVRON_OPTICAL_INSET
+        : 0;
+    const dx = geometryDx + opticalDx;
     art.setAttribute("transform", `translate(${dx} ${dy})`);
     svg.dataset.normalized = "true";
+    svg.dataset.geometryShiftX = geometryDx.toFixed(3);
+    svg.dataset.opticalShiftX = opticalDx.toFixed(3);
     svg.dataset.shiftX = dx.toFixed(3);
     svg.dataset.shiftY = dy.toFixed(3);
   });
@@ -75,9 +88,8 @@ host.innerHTML = `
       <div class="symbol-comparison-stage" aria-label="Normalized symbol button comparison">
         ${symbolRow("symbol-button-current", "Current")}
         ${symbolRow("symbol-button-circle", "Circle")}
-        ${symbolRow("symbol-button-glass", "Liquid Glass")}
       </div>
-      <p class="shell-test-note">All three rows use the same 24×24 vector source and automatic visible-bounds centering. Only the button container treatment changes.</p>
+      <p class="shell-test-note">Both rows use the same 24×24 vector source and automatic visible-bounds centering. Only the button shape changes; Back and Forward share one mirrored inward optical correction from physical review.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="rowsHeading">
