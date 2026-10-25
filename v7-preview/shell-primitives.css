@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 9
+/* G7 Shell Certification pass 10
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
@@ -206,6 +206,28 @@
   background: transparent;
 }
 .journey-mark.upcoming { font-size: 0; }
+
+/* Reorder rows use one content lane plus one accessory lane.
+   Supporting values belong to the content hierarchy, never beside the reorder affordance. */
+.section-edit-target {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  gap: 2px;
+}
+.arrangement-name {
+  grid-column: 1;
+  grid-row: 1;
+}
+.arrangement-bars {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
 
 /* Reorder uses Lucide's canonical three-line menu geometry on the same 24x24 optical grid. */
 .reorder-handle {
