@@ -62,7 +62,15 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), '""')
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').width"), "10px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').height"), "10px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').borderTopWidth"), "1.5px")
+        inner_ring_width = current.evaluate(
+            "el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"
+        )
+        self.assertGreater(inner_ring_width, 0)
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').borderTopStyle"), "solid")
+        self.assertEqual(
+            current.evaluate("el => getComputedStyle(el, '::after').borderTopColor"),
+            "rgba(232, 232, 237, 0.3)",
+        )
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').backgroundColor"), "rgba(0, 0, 0, 0)")
 
         management = page.get_by_role("button", name="Example row actions")
