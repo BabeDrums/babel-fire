@@ -73,29 +73,34 @@ class G7ShellTestBrowser(unittest.TestCase):
                 swatch.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
             )
 
-        # State markers share one smaller visual mass while remaining centered in the same row lane.
         complete = page.locator(".checkmark").first
         current = page.locator(".journey-mark.current")
         incomplete = page.locator(".completion-ring").first
         for marker in (complete, current, incomplete):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).width"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "14px")
+        # Complete is the canonical check without a surrounding circle.
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "18px")
         self.assertIn(
             "data:image/svg+xml",
             complete.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
-        current_width = current.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
-        incomplete_width = incomplete.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
-        self.assertGreater(current_width, incomplete_width)
-        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').content"), "none")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+        # Current is a stronger short status bar; incomplete is the same language at lower emphasis.
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "4px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
+        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
+        self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+
+        current_row = page.get_by_role("button", name="Current")
+        self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
         management = page.get_by_role("button", name="Example row actions")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
@@ -128,7 +133,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Bounding-box centers stay shared even though the visible optical mass is no longer equal-sized.
+        # State and commodity marks keep the same physical trailing-lane center.
         accessory_locators = [complete, current, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:

@@ -46,21 +46,28 @@ class G7RealShellBrowser(unittest.TestCase):
         page.locator('[data-project="preview-creep"]').click()
         expect(page.locator("h1")).to_have_text("Creep")
 
-    def test_real_project_current_marker_and_setup_controls_preserve_geometry(self):
+    def test_real_project_state_marks_and_setup_controls_preserve_geometry(self):
         page = self.open()
         self.open_fixture_project(page)
 
+        current_row = page.locator(".journey-row.current")
         current = page.locator(".journey-row.current .journey-mark.current")
         upcoming = page.locator(".journey-row.upcoming .journey-mark.upcoming").first
         expect(current).to_be_visible()
         expect(upcoming).to_be_visible()
-        self.assertGreater(
-            current.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)"),
-            upcoming.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)"),
-        )
-        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').content"), "none")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+
+        # Current/upcoming containers are visually empty; the visible state language lives in ::before.
+        for marker in (current, upcoming):
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "4px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
+        self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
         # Current and upcoming occupy the same trailing lane center in the actual project.
         current_box = current.bounding_box()
@@ -88,10 +95,6 @@ class G7RealShellBrowser(unittest.TestCase):
         group_left = group_box["x"]
         group_right = group_box["x"] + group_box["width"]
 
-        # Tempo and Meter intentionally have different control widths in the base grammar:
-        # Tempo uses the regular 86px value control; Meter's select-value override is 72px.
-        # The regression we are guarding is either one collapsing into the accessory lane
-        # or escaping the form-group bounds on compact widths.
         expected_min_width = {
             "#tempoInput": 85,
             "#meterInput": 71,
@@ -122,7 +125,6 @@ class G7RealShellBrowser(unittest.TestCase):
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
 
-        # The plus action shares the title line, is glyph-first at rest, and uses one canonical mask.
         add = page.get_by_role("button", name="Add Section")
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
