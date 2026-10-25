@@ -21,13 +21,14 @@ def test_mutable_certification_status_has_one_documented_owner():
     status = "G7_SHELL_CERTIFICATION_STATUS.md"
     agents = read("AGENTS.md")
     start = read("START_HERE.md")
-    context = read("CONTEXT.md")
+    core = read("FIRE_CORE.md")
     cert = read("G7_SHELL_CERTIFICATION.md")
 
-    for text in (agents, start, context, cert):
+    for text in (agents, start, core, cert):
         assert status in text
-    assert "current category state/evidence" in agents
-    assert "current category status/evidence" in context
+    assert "mutable certification evidence/status" in agents
+    assert "mutable evidence" in start
+    assert "mutable certification evidence/status" in core
     assert "Current mutable category state lives" in cert
 
 
