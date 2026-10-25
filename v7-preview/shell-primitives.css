@@ -57,8 +57,8 @@
 /* GENERATED ARTWORK HOST CONTRACT
    Every generated symbol is seated explicitly at the physical center of its host frame.
    The host decides where the frame lives; the symbol asset decides any intrinsic optical metric.
-   Do not let pseudo-elements fall back to inline/grid flow where line boxes or later host CSS can
-   move identical artwork differently between toolbar, action-row, and accessory contexts. */
+   Absolute inset + auto margins keeps host centering independent of line boxes and keeps the CSS
+   transform channel free for symbol-intrinsic metrics rather than container compensation. */
 .add-button::before,
 .more-button::before,
 .chevron::before,
@@ -66,9 +66,8 @@
 .shell-test-link::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
   background: currentColor;
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
@@ -202,12 +201,11 @@
   width: 20px;
   height: 20px;
   position: absolute;
-  left: 50%;
-  top: 50%;
+  inset: 0;
+  margin: auto;
   background: var(--quiet);
   -webkit-mask: var(--icon-menu) center / contain no-repeat;
   mask: var(--icon-menu) center / contain no-repeat;
-  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 .reorder-handle::after { content: none; }
