@@ -50,21 +50,17 @@ class G7RealShellBrowser(unittest.TestCase):
         page = self.open()
         self.open_fixture_project(page)
 
-        optical_y = lambda locator: locator.evaluate(
-            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
-        )
-
         current_row = page.locator(".journey-row.current")
         current = page.locator(".journey-row.current .journey-mark.current")
         upcoming = page.locator(".journey-row.upcoming .journey-mark.upcoming").first
         expect(current).to_be_visible()
         expect(upcoming).to_be_visible()
 
-        # Current/upcoming containers are visually empty; the visible state language lives in ::before.
+        # Current/upcoming containers are visually empty; symmetric bars center without a shared nudge.
         for marker in (current, upcoming):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
-            self.assertAlmostEqual(optical_y(marker), 1.0, delta=0.05)
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
@@ -74,7 +70,7 @@ class G7RealShellBrowser(unittest.TestCase):
         self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        # Current and upcoming still occupy the same trailing lane center; this pass is vertical-only.
+        # Current and upcoming still occupy the same trailing lane center.
         current_box = current.bounding_box()
         upcoming_box = upcoming.bounding_box()
         self.assertIsNotNone(current_box)
@@ -83,15 +79,20 @@ class G7RealShellBrowser(unittest.TestCase):
         upcoming_center = upcoming_box["x"] + upcoming_box["width"] / 2
         self.assertLessEqual(abs(current_center - upcoming_center), 1.0)
 
-        # Real project Back uses the same canonical masked chevron family and shared y baseline.
-        back = page.locator(".back-glyph")
-        self.assertEqual(back.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        # Real project Back now uses the promoted symbol-owned asset inside the simple circle control.
+        back_glyph = page.locator(".back-glyph")
+        back_button = page.locator(".toolbar-button.icon-back")
+        self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertIn(
             "data:image/svg+xml",
-            back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+            back_glyph.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
-        self.assertAlmostEqual(optical_y(back), 1.0, delta=0.05)
+        self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).width"), "44px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).height"), "44px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+        self.assertEqual(back_button.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
 
         page.locator('.journey-row[data-route="setup"]').click()
         expect(page.locator("h1")).to_have_text("Setup")
@@ -139,16 +140,15 @@ class G7RealShellBrowser(unittest.TestCase):
         title_center = title_box["y"] + title_box["height"] / 2
         add_center = add_box["y"] + add_box["height"] / 2
         self.assertLessEqual(abs(title_center - add_center), 2.0)
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
-        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(23, 23, 26)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "1px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
-        add_optical_y = add.evaluate(
-            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
-        )
-        self.assertAlmostEqual(add_optical_y, 1.0, delta=0.05)
 
         page.get_by_role("button", name="Add Section").click()
         sheet = page.locator(".sheet")
