@@ -31,38 +31,43 @@ Coordinated FIRE shell implementation/certification belongs in the real isolated
 
 The deployed real-G7 candidate still contains PR #83's shared `--symbol-optical-y: 1px` correction. That candidate preserved the accepted horizontal row/accessory lanes, text anchors, hit targets, and header geometry while moving visible symbol/state artwork down 1px.
 
-Physical iPhone review of `G7 · d00d146` found that the family is close but still does not feel consistently optically seated. The 1px candidate is therefore **not physically approved**.
+Physical iPhone review of `G7 · d00d146` did not approve that global 1px candidate, so PR #85 introduced a Shell Test-only inline-SVG normalization experiment. Each symbol's visible vector bounds are measured with `getBBox()` and translated to the 12×12 center of a 24×24 frame without changing real G7 production primitives.
 
-The next diagnosis is systemic: mathematically centering a 24×24 icon canvas does not guarantee that the visible vector artwork is optically centered. Do not continue by stacking page-specific or universal pixel nudges.
+Physical iPad review of deployed `G7 · cf344e6` materially narrowed the remaining problem:
+
+- **Plus, Check, Reorder, and More now read correctly enough that they should not be disturbed in the experiment.**
+- **Back / Forward chevrons are the remaining symbol culprits.** Their mathematically centered geometry still reads slightly pulled toward each directional tip.
+- The next experimental chevron correction is one mirrored family rule: Back moves slightly inward/right and Forward moves by the same amount inward/left. This is not a page-specific nudge and does not alter production G7 yet.
+- **Liquid Glass is rejected for this shell direction.** Remove the glass row and its ambient/glass substrate rather than retaining dormant styling.
+- **Plain Circle is the preferred container direction from this physical comparison**, but it is not yet promoted into real G7. Keep Current vs Circle side-by-side until the refined chevrons are physically reviewed.
 
 ### Active Shell Test experiment
 
-Shell Test now contains a bounded symbol-system comparison that does **not** alter real G7 production controls:
+Shell Test now contains a bounded two-row symbol/container comparison that does **not** alter real G7 production controls:
 
-- the same six commodity symbols are rendered as inline 24×24 SVG artwork
-- each symbol's visible vector bounds are measured with `getBBox()` and automatically translated so the artwork bounds center at 12×12
-- no `--symbol-optical-y` token participates in this experimental palette
-- the same normalized symbol implementation is shown in three rows:
-  1. **Current** — the existing rounded-square Shell Test container treatment
-  2. **Circle** — circular container, no glass treatment
-  3. **Liquid Glass** — circular web approximation using translucency, backdrop adaptation, highlights/depth, and compact press response
+- the same six commodity symbols render as inline 24×24 SVG artwork
+- each symbol first receives automatic visible-bounds centering
+- Back and Forward then receive one equal-and-opposite inward optical correction because physical review isolated those two symbols as the remaining offenders
+- the comparison card uses the standard FIRE grouped surface tokens; it is not a special ambient/glass field
+- the same normalized symbol implementation is shown in two rows:
+  1. **Current** — existing rounded-square Shell Test container treatment
+  2. **Circle** — the same simple material in a circular container
+- no Liquid Glass treatment remains in the experiment
 
-Because G7 is static web, the Liquid Glass comparison cannot invoke Apple's native iOS `glass` material APIs. It is an evidence surface that approximates the material behavior closely enough for visual direction testing; it is not a claim of native-system rendering.
-
-The comparison intentionally changes only container treatment. Symbol source geometry, normalization, target size, and 44px interaction boxes stay the same across all three rows.
+The comparison intentionally changes only container shape. Symbol source geometry, normalized placement, target size, simple material, and 44px interaction boxes stay consistent across the two rows.
 
 ## Immediate next gate
 
-Deploy the Shell Test experiment and physically review it on iPhone first, then iPad/regular width.
+Deploy the refined Shell Test and physically review it on iPhone first, then iPad/regular width.
 
 Judge two questions separately:
 
-1. **Symbol system:** does geometry-derived normalization make Back / Forward / Plus / Check / Reorder / More feel naturally seated without manual nudging?
-2. **Container direction:** with symbol geometry held constant, which treatment feels best — Current, plain Circle, or circular Liquid Glass?
+1. **Chevron seating:** does the symmetric inward correction make Back / Forward feel naturally centered relative to each other and to Plus / Check / Reorder / More?
+2. **Container direction:** with the glass option removed and symbol geometry held constant, does plain Circle still clearly beat Current rounded-square?
 
-Do **not** promote the experiment into real G7 until Babel physically chooses a direction. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
+Do **not** promote Circle or the chevron correction into real G7 until Babel physically approves the refined comparison. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
 
-After a direction is chosen, implement the smallest shared real-G7 primitive change, reconcile tests/authority/handoff, run all gates, merge/deploy, then repeat physical iPhone/iPad validation before locking any category.
+After a direction is approved, implement the smallest shared real-G7 primitive change, reconcile tests/authority/handoff, run all gates, merge/deploy, then repeat physical iPhone/iPad validation before locking any category.
 
 ## Reliability baseline
 
