@@ -19,9 +19,9 @@ This repository follows shared cross-app Babel authority from:
 
 Babel Truth owns cross-app principles, design foundations, process, shared semantic contracts, repo roles, and major architecture decisions.
 
-`babel-fire` owns FIRE-specific product doctrine, runtime, data, generation specs, tests, current build state, and local implementation decisions.
+`babel-fire` owns FIRE-specific product doctrine, runtime, data, generation specs, tests, current build state, and local implementation decisions. Coordinated FIRE shell implementation/certification lives in the isolated G7 context under this repo.
 
-Babel Lab may contain FIRE-bound experiments, including the current shell/visual harness, but **Lab is evidence, never authority**. FIRE does not inherit a design merely because it exists in Lab. A chosen Lab candidate must be deliberately implemented and physically validated in FIRE before any transferable rule is eligible for Truth.
+Babel Lab may contain bounded FIRE-bound experiments, but **Lab is evidence, never authority**. FIRE does not inherit a design merely because it exists in Lab. A chosen Lab experiment must be deliberately implemented and physically validated in FIRE before any transferable rule is eligible for Truth. Do not rebuild a parallel full FIRE shell in Lab merely to certify G7.
 
 Do not silently overwrite a FIRE-specific rule merely because a Truth rule looks similar. Classify conflicts first:
 
