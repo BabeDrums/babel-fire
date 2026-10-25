@@ -141,3 +141,5 @@
     max-height: min(78svh, 650px);
   }
 }
+
+/* Exact-head browser certification remains authoritative; runner setup retries do not alter these primitives. */
