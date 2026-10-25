@@ -19,6 +19,10 @@ Use **Babel** as the project-facing name.
 
 Production remains **V6**. G7 is the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
+PR **#66 — Return coordinated shell iteration to G7** established the current ownership boundary: coordinated FIRE shell implementation/certification belongs in the real isolated G7 context rather than a parallel Lab shell.
+
+PR **#67 — Refine G7 shell cohesion after physical review** is the historical baseline that the finite certification sequence superseded; later certification passes may replace its visual details, but its role in the handoff chain remains explicit.
+
 Coordinated FIRE shell implementation/certification belongs in the real isolated G7 context. Babel Lab remains optional bounded evidence only and must not become a parallel FIRE shell.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started. All ten certification categories remain Candidate; 0 / 10 are Locked.**
