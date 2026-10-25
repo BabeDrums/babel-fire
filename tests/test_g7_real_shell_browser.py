@@ -64,22 +64,32 @@ class G7RealShellBrowser(unittest.TestCase):
         group_left = group_box["x"]
         group_right = group_box["x"] + group_box["width"]
 
-        for selector in ("#tempoInput", "#meterInput"):
-            control_box = page.locator(selector).evaluate(
+        # Tempo and Meter intentionally have different control widths in the base grammar:
+        # Tempo uses the regular 86px value control; Meter uses the 72px tight variant.
+        # The regression we are guarding is either one collapsing into the 28px accessory lane
+        # or escaping the form-group bounds on compact widths.
+        expected_min_width = {
+            "#tempoInput": 85,
+            "#meterInput": 71,
+        }
+        for selector, min_width in expected_min_width.items():
+            control = page.locator(selector)
+            control_box = control.evaluate(
                 """el => {
                     const r = el.parentElement.getBoundingClientRect();
                     return { left: r.left, right: r.right, width: r.width };
                 }"""
             )
-            self.assertGreaterEqual(control_box["width"], 85)
+            self.assertGreaterEqual(control_box["width"], min_width)
             self.assertGreaterEqual(control_box["left"], group_left - 1)
             self.assertLessEqual(control_box["right"], group_right + 1)
 
-        tempo_row = page.locator("#tempoInput").locator("xpath=../..")
-        self.assertNotEqual(
-            tempo_row.evaluate("el => getComputedStyle(el).gridTemplateColumns").split()[-1],
-            "28px",
-        )
+        self.assertTrue(page.locator("#meterInput").locator("xpath=..").evaluate("el => el.classList.contains('tight')"))
+
+        for selector in ("#tempoInput", "#meterInput"):
+            form_row = page.locator(selector).locator("xpath=../..")
+            columns = form_row.evaluate("el => getComputedStyle(el).gridTemplateColumns").split()
+            self.assertNotEqual(columns[-1], "28px")
 
     def test_real_structure_sheet_has_no_unapproved_hairline(self):
         page = self.open()
