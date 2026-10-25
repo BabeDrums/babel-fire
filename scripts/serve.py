@@ -15,13 +15,13 @@ REVISION_TOKEN = "{{ site.github.build_revision }}"
 FRONT_MATTER = "---\n---\n"
 
 
-def current_commit() -> str:
+def current_commit():
     return subprocess.check_output(
         ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True
     ).strip()
 
 
-def html_path_for_request(request_path: str) -> Path | None:
+def html_path_for_request(request_path):
     relative = request_path.lstrip("/")
     if not relative:
         relative = "index.html"
@@ -37,7 +37,7 @@ def html_path_for_request(request_path: str) -> Path | None:
     return path
 
 
-def render_html(path: Path, commit: str) -> bytes:
+def render_html(path, commit):
     source = path.read_text(encoding="utf-8")
     if source.startswith(FRONT_MATTER):
         source = source[len(FRONT_MATTER):]
@@ -50,7 +50,6 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         request_path = urlsplit(self.path).path
-        commit = None
 
         if request_path == "/build-info.json":
             commit = current_commit()
