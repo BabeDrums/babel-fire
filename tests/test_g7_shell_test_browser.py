@@ -48,6 +48,15 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').height"), "18px")
 
+        # The contextual action belongs to the same visual title line instead of floating above it.
+        title_box = page.locator("h1").bounding_box()
+        add_box = add.bounding_box()
+        self.assertIsNotNone(title_box)
+        self.assertIsNotNone(add_box)
+        title_center = title_box["y"] + title_box["height"] / 2
+        add_center = add_box["y"] + add_box["height"] / 2
+        self.assertLessEqual(abs(title_center - add_center), 2.0)
+
         complete = page.locator(".checkmark").first
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "6px")
@@ -66,11 +75,11 @@ class G7ShellTestBrowser(unittest.TestCase):
         inner_ring_width = current.evaluate(
             "el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"
         )
-        self.assertGreater(inner_ring_width, 0)
+        self.assertGreaterEqual(inner_ring_width, 2.5)
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').borderTopStyle"), "solid")
         self.assertEqual(
             current.evaluate("el => getComputedStyle(el, '::after').borderTopColor"),
-            "rgba(232, 232, 237, 0.3)",
+            "rgba(232, 232, 237, 0.38)",
         )
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').backgroundColor"), "rgba(0, 0, 0, 0)")
 
@@ -80,12 +89,18 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "3px")
         self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
 
+        # Back and forward are the exact same continuous rounded chevron mask, mirrored by direction.
         chevron = page.locator(".chevron").first
+        back = page.locator(".shell-test-link")
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').width"), "8px")
-        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
-        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "999px")
-        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::after').width"), "8px")
+        forward_mask = chevron.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
+        back_mask = back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
+        self.assertEqual(forward_mask, back_mask)
+        self.assertIn("data:image/svg+xml", forward_mask)
+        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+        self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).width"), "44px")
+        self.assertEqual(back.evaluate("el => getComputedStyle(el).height"), "44px")
 
         reorder = page.get_by_role("button", name="Reorder example")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
