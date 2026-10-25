@@ -42,6 +42,10 @@ class G7ShellTestBrowser(unittest.TestCase):
         build = page.locator(".build-info")
         expect(build).to_have_text(re.compile(r"G7 · [0-9a-f]{7}"))
 
+        optical_y = lambda locator: locator.evaluate(
+            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
+        )
+
         add = page.get_by_role("button", name="Example add action")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
@@ -53,6 +57,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+        self.assertAlmostEqual(optical_y(add), 1.0, delta=0.05)
 
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
@@ -72,6 +77,7 @@ class G7ShellTestBrowser(unittest.TestCase):
                 "data:image/svg+xml",
                 swatch.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
             )
+            self.assertAlmostEqual(optical_y(swatch), 1.0, delta=0.05)
 
         complete = page.locator(".checkmark").first
         current = page.locator(".journey-mark.current")
@@ -81,6 +87,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+            self.assertAlmostEqual(optical_y(marker), 1.0, delta=0.05)
 
         # Complete is the canonical check without a surrounding circle, drawn in the shared 18px optical frame.
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).borderRadius"), "0px")
@@ -111,6 +118,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             "data:image/svg+xml",
             management.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
+        self.assertAlmostEqual(optical_y(management), 1.0, delta=0.05)
 
         chevron = page.locator(".chevron").first
         back = page.locator(".shell-test-link")
@@ -122,6 +130,8 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertIn("data:image/svg+xml", forward_mask)
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::after').content"), "none")
         self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
+        self.assertAlmostEqual(optical_y(chevron), 1.0, delta=0.05)
+        self.assertAlmostEqual(optical_y(back), 1.0, delta=0.05)
         self.assertEqual(back.evaluate("el => getComputedStyle(el).width"), "44px")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).height"), "44px")
 
@@ -129,6 +139,7 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
         self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').height"), "20px")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').top"), "23px")
         self.assertIn(
             "data:image/svg+xml",
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
@@ -147,7 +158,7 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
         self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
-        # State and commodity marks keep the same physical trailing-lane center.
+        # The existing horizontal accessory lane stays fixed; this pass changes visible y placement only.
         accessory_locators = [complete, current, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:

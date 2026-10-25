@@ -31,7 +31,9 @@ The first canonical-icon reset reached deployed build `0cc4cba`, but physical re
 
 Deployed build `c02ac89` retired that circular treatment: Complete = canonical check only; Current = stronger short status bar; Incomplete/upcoming = quieter short status bar; Current row = no persistent background tint. Physical review of that exact build was a clear improvement and kept the direction, but exposed one final refinement layer: the three state marks still felt independently drawn rather than generated from one optical system, and trailing `8 bars` metadata competed visually with the reorder affordance.
 
-The active accessory-polish candidate therefore keeps the accepted non-circular language but normalizes Complete / Current / Incomplete onto one 18px optical frame. Current and Incomplete share the same width and cap geometry; hierarchy comes only from weight and contrast. Arrangement metadata such as `8 bars` moves into a supporting-text line beneath the section name so the far-right lane contains only the reorder affordance. These changes are shared between Shell Test and real G7 through the existing primitive layers.
+Deployed build `66c43bf` kept the accepted non-circular state language, normalized Complete / Current / Incomplete onto one 18px optical frame, and moved arrangement metadata such as `8 bars` beneath the section name so Reorder alone owns the far-right affordance. Physical iPhone review found this substantially better. That same review then clarified the remaining alignment issue: the horizontal lanes and hit-target centers are already correct, while the visible glyph/state artwork reads slightly high inside those centered boxes.
+
+An interrupted follow-up that tried to rewrite the horizontal accessory lane was rejected and closed without merge. The active candidate deliberately preserves the `66c43bf` horizontal layout and instead gives visible symbol artwork one shared 1px downward optical baseline. Add, More, Back/Forward, Check, Current/Incomplete state bars, Reorder, and the Shell Test glyph palette inherit that token while row columns, x-centers, text, hit targets, and header geometry remain unchanged.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -98,6 +100,7 @@ Do not make G7 automatically match a Lab specimen.
 - standard interface glyphs use one canonical Lucide 24×24 construction source instead of being redrawn independently in CSS
 - Back and forward/navigation use the same canonical chevron family, with direction as the only semantic difference; tiny optical offsets are allowed when needed so mirrored geometry reads centered on-device
 - recurring state/accessory meanings share one physical trailing-lane center while different meanings are not forced into the same visible container or equal visible mass
+- visual artwork may use a small shared optical correction inside an otherwise-centered interaction box; that correction must not move hit targets, row geometry, text, or the established horizontal accessory lane
 - progress-state language remains under physical review; the active candidate is deliberately non-circular and optically normalized: Complete = canonical check only; Current = stronger 18px status bar; Incomplete/upcoming = quieter 18px status bar
 - Current state must not create a persistent selected-row background; state and row selection are different semantics
 - arrangement supporting metadata belongs to the content hierarchy; the far-right accessory lane is reserved for the row's affordance
@@ -121,24 +124,26 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - the prior homemade per-glyph CSS system has been retired for commodity interface symbols after physical review showed mismatched visual centers, joins, proportions, and stroke personalities
 - check, chevron, plus, ellipsis, and reorder use canonical Lucide SVG-mask geometry from one 24×24 source system in `shell-primitives.css`
 - trailing row accessories keep one actual x-center across state / Navigate / Reorder / More without forcing different meanings into identical visible containers
-- forward/back chevrons use tiny direction-specific x offsets while retaining the same source geometry, because physical review showed mathematically mirrored masks can still look visually off-center
+- the physical review after `66c43bf` specifically rejected further horizontal-lane movement; the active alignment candidate preserves those x-centers and moves only visible artwork down through the shared `--symbol-optical-y` token
+- forward/back chevrons retain tiny direction-specific x offsets while sharing the same 1px downward optical baseline as the rest of the symbol family
 - Shell Test exposes Back / Forward / Add / Check / Reorder / More in one temporary comparison row so remaining family-level inconsistencies are easy to spot
 - toolbar `+` / `•••` keep 44px hit targets but no longer render permanent dark rounded-square backgrounds at rest; active/focus behavior can reveal the control target
-- trailing header actions remain aligned to the large-title centerline
+- trailing header action containers remain aligned to the large-title centerline; only their visible glyph artwork receives the optical-y correction
 - Back and forward navigation use the same canonical chevron family
 - Shell Test Back uses the same canonical back primitive as the real project rather than a separate text-arrow treatment
 - the circular Complete / Current / Incomplete candidate is retired; the active state candidate uses check / strong bar / quiet bar with one shared 18px optical width and explicitly removes the inherited Current-row tint
 - Current and Incomplete share the same cap geometry, with state hierarchy expressed through stroke weight and contrast rather than independent dimensions
+- Complete / Current / Incomplete visible artwork participates in the same shared 1px downward optical baseline as commodity glyphs
 - arrangement metadata such as `8 bars` is supporting text under the item name; reorder is the sole far-right affordance
 - state overrides are loaded after the base and commodity primitive layers in both real G7 and Shell Test, using the same deployed build revision
 - shared accessory layout does not override `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
 - shared sheet styling does not add an action-divider hairline or inset top hairline that was not part of the approved shell language
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
-- browser coverage checks real state geometry, transparent Current-row background, accessory center alignment, the glyph comparison palette, and the actual G7 Project → Setup → Structure path at 390/440/820 widths
+- browser coverage keeps the established accessory x-center contract while checking the optical-y baseline, current-state geometry, transparent Current-row background, the glyph comparison palette, and the actual G7 Project → Setup → Structure path at 390/440/820 widths
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-Next product-facing work is physical confirmation of the exact deployed accessory-polish candidate: compare Complete / Current / Incomplete as one family, verify `8 bars` now reads as supporting information rather than a competing accessory, and confirm the same treatment in real Structure. Do not infer additional FIRE Core architecture from the fixture content.
+Next product-facing work is physical confirmation of the exact deployed vertical-optical-alignment candidate: inspect the plus, ellipsis, Back/Forward, state marks, reorder glyph, and Shell Test palette as one family and confirm that the 1px downward artwork baseline resolves the “slightly pushed up” feeling without disturbing the accepted horizontal layout. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 

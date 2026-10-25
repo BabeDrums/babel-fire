@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 10
+/* G7 Shell Certification pass 11
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
@@ -9,6 +9,7 @@
   --state-marker-size: 24px;
   --toolbar-icon-size: 22px;
   --accessory-edge-inset: 4px;
+  --symbol-optical-y: 1px;
   --toolbar-control-radius: 13px;
   --header-action-offset: 44px;
   --state-ring: #666872;
@@ -63,6 +64,7 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .add-button::before {
@@ -78,7 +80,8 @@
 .add-button::after,
 .more-button::after { content: none; }
 
-/* Back and forward are one canonical Lucide chevron, mirrored only by direction. */
+/* Back and forward are one canonical Lucide chevron, mirrored only by direction.
+   Their hit targets stay mathematically centered; only the visible ink uses the shared optical baseline. */
 .chevron,
 .back-glyph {
   position: relative;
@@ -116,9 +119,9 @@
   mask: var(--icon-chevron-right) center / contain no-repeat;
   pointer-events: none;
 }
-.chevron::before { transform: translateX(1px); }
-.back-glyph::before { transform: translateX(-1px) scaleX(-1); }
-.shell-test-link::before { transform: translateX(-1px) scaleX(-1); }
+.chevron::before { transform: translate(1px, var(--symbol-optical-y)); }
+.back-glyph::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
+.shell-test-link::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
 .chevron::after,
 .back-glyph::after,
 .shell-test-link::after { content: none; }
@@ -131,8 +134,8 @@
   background: transparent;
 }
 
-/* One physical trailing lane across grouped rows, project cards and arrangement rows.
-   The lane is shared, but the visible marks are optically balanced inside it rather than forced to equal mass. */
+/* Keep the already-validated horizontal lane math. Physical review isolated the remaining defect to
+   vertical optical placement of the visible artwork, so hit targets, row geometry and x-centers stay put. */
 .row {
   grid-template-columns: minmax(0, 1fr) var(--touch);
   padding-right: var(--accessory-edge-inset);
@@ -182,7 +185,7 @@
   background: currentColor;
   -webkit-mask: var(--icon-check) center / contain no-repeat;
   mask: var(--icon-check) center / contain no-repeat;
-  transform: translateY(-.25px);
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .journey-mark.done::after,
@@ -242,7 +245,7 @@
   height: 20px;
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: calc(50% + var(--symbol-optical-y));
   background: var(--quiet);
   -webkit-mask: var(--icon-menu) center / contain no-repeat;
   mask: var(--icon-menu) center / contain no-repeat;
@@ -339,6 +342,7 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .glyph-swatch[data-glyph="back"]::before,
@@ -346,8 +350,8 @@
   -webkit-mask-image: var(--icon-chevron-right);
   mask-image: var(--icon-chevron-right);
 }
-.glyph-swatch[data-glyph="back"]::before { transform: translateX(-1px) scaleX(-1); }
-.glyph-swatch[data-glyph="forward"]::before { transform: translateX(1px); }
+.glyph-swatch[data-glyph="back"]::before { transform: translate(-1px, var(--symbol-optical-y)) scaleX(-1); }
+.glyph-swatch[data-glyph="forward"]::before { transform: translate(1px, var(--symbol-optical-y)); }
 .glyph-swatch[data-glyph="plus"]::before {
   width: 22px;
   height: 22px;

@@ -50,6 +50,10 @@ class G7RealShellBrowser(unittest.TestCase):
         page = self.open()
         self.open_fixture_project(page)
 
+        optical_y = lambda locator: locator.evaluate(
+            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
+        )
+
         current_row = page.locator(".journey-row.current")
         current = page.locator(".journey-row.current .journey-mark.current")
         upcoming = page.locator(".journey-row.upcoming .journey-mark.upcoming").first
@@ -60,6 +64,7 @@ class G7RealShellBrowser(unittest.TestCase):
         for marker in (current, upcoming):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+            self.assertAlmostEqual(optical_y(marker), 1.0, delta=0.05)
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
@@ -69,7 +74,7 @@ class G7RealShellBrowser(unittest.TestCase):
         self.assertEqual(upcoming.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
         self.assertEqual(current_row.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
 
-        # Current and upcoming occupy the same trailing lane center in the actual project.
+        # Current and upcoming still occupy the same trailing lane center; this pass is vertical-only.
         current_box = current.bounding_box()
         upcoming_box = upcoming.bounding_box()
         self.assertIsNotNone(current_box)
@@ -78,7 +83,7 @@ class G7RealShellBrowser(unittest.TestCase):
         upcoming_center = upcoming_box["x"] + upcoming_box["width"] / 2
         self.assertLessEqual(abs(current_center - upcoming_center), 1.0)
 
-        # Real project Back uses the same canonical masked chevron family as forward navigation.
+        # Real project Back uses the same canonical masked chevron family and shared y baseline.
         back = page.locator(".back-glyph")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertIn(
@@ -86,6 +91,7 @@ class G7RealShellBrowser(unittest.TestCase):
             back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
         self.assertNotEqual(back.evaluate("el => getComputedStyle(el, '::before').transform"), "none")
+        self.assertAlmostEqual(optical_y(back), 1.0, delta=0.05)
 
         page.locator('.journey-row[data-route="setup"]').click()
         expect(page.locator("h1")).to_have_text("Setup")
@@ -139,6 +145,10 @@ class G7RealShellBrowser(unittest.TestCase):
             "data:image/svg+xml",
             add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
+        add_optical_y = add.evaluate(
+            "el => new DOMMatrixReadOnly(getComputedStyle(el, '::before').transform).m42"
+        )
+        self.assertAlmostEqual(add_optical_y, 1.0, delta=0.05)
 
         page.get_by_role("button", name="Add Section").click()
         sheet = page.locator(".sheet")
