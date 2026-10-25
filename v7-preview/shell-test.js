@@ -19,6 +19,18 @@ host.innerHTML = `
   <main class="screen shell-test-screen scroll-safe">
     ${header}
 
+    <section class="shell-test-section" aria-labelledby="glyphsHeading">
+      <h2 id="glyphsHeading" class="shell-test-heading">Glyph palette</h2>
+      <div class="shell-test-glyph-palette" aria-label="Current G7 glyph family">
+        <button class="glyph-swatch" data-glyph="back" aria-label="Back glyph"></button>
+        <button class="glyph-swatch" data-glyph="forward" aria-label="Forward glyph"></button>
+        <button class="glyph-swatch" data-glyph="plus" aria-label="Add glyph"></button>
+        <button class="glyph-swatch" data-glyph="check" aria-label="Check glyph"></button>
+        <button class="glyph-swatch" data-glyph="reorder" aria-label="Reorder glyph"></button>
+        <button class="glyph-swatch" data-glyph="more" aria-label="More glyph"></button>
+      </div>
+    </section>
+
     <section class="shell-test-section" aria-labelledby="rowsHeading">
       <h2 id="rowsHeading" class="shell-test-heading">Rows · accessories</h2>
       <div class="group">
