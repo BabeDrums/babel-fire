@@ -54,7 +54,6 @@ class G7ShellTestBrowser(unittest.TestCase):
         )
         self.assertEqual(add.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
-        # The contextual action belongs to the same visual title line instead of floating above it.
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
         self.assertIsNotNone(title_box)
@@ -63,20 +62,34 @@ class G7ShellTestBrowser(unittest.TestCase):
         add_center = add_box["y"] + add_box["height"] / 2
         self.assertLessEqual(abs(title_center - add_center), 2.0)
 
-        # Complete uses the canonical masked check rather than a hand-built two-stroke drawing.
+        palette = page.locator(".shell-test-glyph-palette")
+        expect(palette).to_be_visible()
+        swatches = palette.locator(".glyph-swatch")
+        self.assertEqual(swatches.count(), 6)
+        for swatch in swatches.all():
+            self.assertEqual(swatch.evaluate("el => getComputedStyle(el).height"), "44px")
+            self.assertIn(
+                "data:image/svg+xml",
+                swatch.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+            )
+
+        # State markers share one smaller visual mass while remaining centered in the same row lane.
         complete = page.locator(".checkmark").first
+        current = page.locator(".journey-mark.current")
+        incomplete = page.locator(".completion-ring").first
+        for marker in (complete, current, incomplete):
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).width"), "24px")
+            self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
+
         self.assertEqual(complete.evaluate("el => getComputedStyle(el).fontSize"), "0px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "16px")
-        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "16px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
+        self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::before').height"), "14px")
         self.assertIn(
             "data:image/svg+xml",
             complete.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
         self.assertEqual(complete.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
-        # Current is one emphasized ring, not a bullseye/radio-control treatment.
-        current = page.locator(".journey-mark.current")
-        incomplete = page.locator(".completion-ring").first
         current_width = current.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
         incomplete_width = incomplete.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)")
         self.assertGreater(current_width, incomplete_width)
@@ -93,10 +106,10 @@ class G7ShellTestBrowser(unittest.TestCase):
             management.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Back and forward share the same canonical icon mask; direction is the only difference.
         chevron = page.locator(".chevron").first
         back = page.locator(".shell-test-link")
         self.assertEqual(chevron.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').width"), "20px")
         forward_mask = chevron.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
         back_mask = back.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage")
         self.assertEqual(forward_mask, back_mask)
@@ -115,15 +128,8 @@ class G7ShellTestBrowser(unittest.TestCase):
             reorder.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
         )
 
-        # Every trailing accessory shares one physical lane center, regardless of semantic glyph.
-        accessory_locators = [
-            page.locator(".checkmark").first,
-            current,
-            incomplete,
-            chevron,
-            reorder,
-            management,
-        ]
+        # Bounding-box centers stay shared even though the visible optical mass is no longer equal-sized.
+        accessory_locators = [complete, current, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:
             box = locator.bounding_box()
