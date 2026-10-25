@@ -6,7 +6,7 @@
 
 :root {
   --toolbar-visual-size: 36px;
-  --toolbar-row-title-gap: 12px;
+  --toolbar-row-title-gap: 8px;
   --value-control-width: 104px;
   --sheet-viewport-gap: 16px;
 }
@@ -72,9 +72,11 @@
 /* STATE RENDERING SAFETY
    state-primitives.css owns state artwork. Legacy text characters in fixture markup are never
    permitted to become a second visual owner if a more-specific old rule changes font size. */
-.journey-row .journey-mark,
-.form-row .checkmark,
-.form-row .completion-ring { font-size: 0; }
+.journey-mark.done,
+.journey-mark.current,
+.journey-mark.upcoming,
+.checkmark,
+.completion-ring { font-size: 0; }
 
 /* EDITABLE VALUE FRAME
    Content length must not decide the shape of Tempo vs Meter. Both occupy one stable trailing lane. */
