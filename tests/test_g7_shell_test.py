@@ -8,12 +8,13 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def test_real_g7_and_shell_test_load_same_deployment_revisioned_primitive_layer():
+def test_real_g7_and_shell_test_load_same_deployment_revisioned_primitive_layers():
     preview = read("v7-preview/index.html")
     shell_test = read("v7-preview/shell-test.html")
     for html in (preview, shell_test):
         assert f'./styles.css?v={REVISION}' in html
         assert f'./shell-primitives.css?v={REVISION}' in html
+        assert f'./state-primitives.css?v={REVISION}' in html
         assert "g7-shell-4" not in html
     assert f'./app.js?v={REVISION}' in preview
     assert f'./shell-test.js?v={REVISION}' in shell_test
@@ -39,7 +40,6 @@ def test_project_management_has_no_divider_and_accessories_use_canonical_icon_va
     assert "border-left: 0" in css
     assert "--accessory-box: 28px" in css
     assert "--accessory-glyph: 20px" in css
-    assert "--state-marker-size: 24px" in css
     for token in ("--icon-check", "--icon-chevron-right", "--icon-plus", "--icon-ellipsis", "--icon-menu"):
         assert token in css
     assert ".journey-mark" in css
@@ -47,7 +47,7 @@ def test_project_management_has_no_divider_and_accessories_use_canonical_icon_va
     assert ".reorder-handle::before" in css
 
 
-def test_accessory_family_uses_canonical_masks_and_single_ring_current_state():
+def test_accessory_family_uses_canonical_masks():
     css = read("v7-preview/shell-primitives.css")
 
     assert ".add-button::before" in css
@@ -60,12 +60,6 @@ def test_accessory_family_uses_canonical_masks_and_single_ring_current_state():
     assert "mask: var(--icon-check) center / contain no-repeat" in css
     assert 'content: "✓"' not in css
 
-    assert ".journey-mark.current" in css
-    assert "border: 2px solid var(--state-current-ring)" in css
-    assert "--state-current-ring: #d9d9df" in css
-    assert ".journey-mark.current::before,\n.journey-mark.current::after { content: none; }" in css
-    assert "state-current-inner-ring" not in css
-
     assert "--icon-chevron-right" in css
     assert "stroke-linecap='round'" in css
     assert "stroke-linejoin='round'" in css
@@ -76,6 +70,23 @@ def test_accessory_family_uses_canonical_masks_and_single_ring_current_state():
     assert ".chevron::after," in css
 
 
+def test_state_language_is_non_circular_and_current_is_not_a_selected_row():
+    css = read("v7-preview/state-primitives.css")
+    assert ".journey-row.current { background: transparent; }" in css
+    assert "--state-mark-box: 24px" in css
+    assert "--state-current-width: 18px" in css
+    assert "--state-current-height: 4px" in css
+    assert "--state-upcoming-width: 14px" in css
+    assert "--state-upcoming-height: 3px" in css
+    assert ".journey-mark.done," in css
+    assert ".checkmark" in css
+    assert "border-radius: 50%" not in css
+    assert ".journey-mark.current::before" in css
+    assert ".journey-mark.upcoming::before," in css
+    assert ".completion-ring::before" in css
+    assert "radio ring" in css
+
+
 def test_header_action_alignment_is_owned_by_shared_primitive_layer():
     css = read("v7-preview/shell-primitives.css")
     assert "--header-action-offset: 44px" in css
@@ -84,12 +95,13 @@ def test_header_action_alignment_is_owned_by_shared_primitive_layer():
 
 def test_shared_accessory_lane_keeps_hit_target_separate_from_visible_marker_mass():
     css = read("v7-preview/shell-primitives.css")
+    state_css = read("v7-preview/state-primitives.css")
     assert ".row,\n.form-row" not in css
     assert ".row > :last-child,\n.form-row > :last-child" not in css
     assert ".row {\n  grid-template-columns: minmax(0, 1fr) var(--touch);" in css
-    assert ".journey-mark,\n.checkmark,\n.completion-ring" in css
-    assert "width: var(--state-marker-size)" in css
-    assert "height: var(--state-marker-size)" in css
+    assert ".journey-mark,\n.checkmark,\n.completion-ring" in state_css
+    assert "width: var(--state-mark-box)" in state_css
+    assert "height: var(--state-mark-box)" in state_css
 
 
 def test_shell_test_palette_uses_same_icon_variables_without_becoming_product_chrome():
