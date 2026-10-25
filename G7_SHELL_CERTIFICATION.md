@@ -102,11 +102,11 @@ These are local working principles to validate through G7. Promote only genuinel
 - **Calm surface, expressive moments.** Restraint is the default; distinctive expression is reserved for moments/features that earn it.
 - **Familiar first, signature second.** Commodity controls should be excellent and platform-legible. Spend originality on Babel/FIRE experiences where novelty improves the musical job.
 
-## Current certification baseline
+## Adoption baseline (historical context)
 
-At adoption of this contract, all ten categories remain **Unresolved**. Existing G7 work is evidence and may quickly become Candidate, but no category is grandfathered into Locked without the certification gate.
+At adoption of this contract, all ten categories remained **Unresolved**. Existing G7 work was evidence and could quickly become Candidate, but no category was grandfathered into Locked without the certification gate. **Current category state lives only in `G7_SHELL_CERTIFICATION_STATUS.md`.**
 
-Immediate known shell findings include:
+The initial shell findings that motivated the certification pass were:
 
 - remove the project-row `•••` divider and optically align the management control within the row
 - optically center the `+` glyph within its control surface
