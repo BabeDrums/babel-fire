@@ -1,61 +1,53 @@
-"""Protect durable FIRE/Babel authority wiring and known stale definitions.
-
-This guard checks stable semantic markers and explicit stale contradictions. It intentionally
-avoids brittle wording from superseded drafts and does not encode temporary merge SHAs.
-"""
+"""Protect the small active FIRE authority set from stale/duplicate doctrine drift."""
 from pathlib import Path
 
 REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
+        "FOUNDATIONS.md",
         "Babel Continuity Buffer",
-        "Coordinated FIRE shell implementation/certification lives in the isolated G7 context",
-        "Lab is evidence, never authority",
-        "stale divergence",
-        "potential upstream improvement",
-        "app-local exception",
+    ],
+    "AGENTS.md": [
+        "BABEL_TRUTH.md",
+        "START_HERE.md",
+        "FIRE_CORE.md",
+        "production-projects-v1",
+        "production-projects-v1-v7-preview",
+        "No Codex for FIRE",
+        "G7_SHELL_CERTIFICATION_STATUS.md",
+        "active FIRE documentation set",
+    ],
+    "START_HERE.md": [
+        "G7 Shell",
+        "0 / 10 Locked",
+        "G7 is NOT FROZEN",
+        "PR **#89",
+        "d93729ff7a734035f25a6835323d19706f15186d",
+        "physical review",
+        "Babel Truth Issue #1",
     ],
     "FIRE_CORE.md": [
         "# Babel FIRE — Core Product Doctrine",
         "production companion",
-        "Match",
-        "Interpret",
-        "Reimagine",
         "Feel",
         "Identify",
         "Reason",
         "Experiment",
         "Evaluate",
+        "Match",
+        "Interpret",
+        "Reimagine",
         "Documentation authority and conflict policy",
         "G7 shell vs FIRE Core",
         "G7_SHELL_CERTIFICATION_STATUS.md",
     ],
-    "AGENTS.md": [
-        "BABEL_TRUTH.md",
-        "Babel Continuity Buffer",
-        "CONTINUITY_INBOX.md` is retired",
-        "production-projects-v1",
-        "production-projects-v1-v7-preview",
-        "No Codex for FIRE",
+    "V7_DRAFT.md": [
+        "`FIRE_CORE.md` governs cross-generation product doctrine",
         "G7_SHELL_CERTIFICATION_STATUS.md",
-        "Inline",
-        "Sheet",
-        "Navigation",
-    ],
-    "START_HERE.md": [
-        "BABEL_TRUTH.md",
-        "G7 Shell Certification active",
-        "G7_SHELL_CERTIFICATION_STATUS.md",
-        "PR **#66",
-        "PR **#67",
-        "G7 is not approved/frozen",
-        "Babel Truth Issue #1",
-        "Inline = choose/toggle/classify/confirm/evaluate",
-        "Sheet = create/edit/manage a discrete thing",
-        "G7** owns coordinated FIRE shell implementation",
-        "Lab is evidence, never authority",
-        "10/10 categories Locked",
+        "## Interaction grammar",
+        "## Canonical icon/accessory grammar",
+        "## Navigation and Back behavior",
     ],
     "G7_SHELL_CERTIFICATION.md": [
         "# Babel FIRE — G7 Shell Certification",
@@ -69,122 +61,55 @@ REQUIRED = {
         "0 / 10 Locked",
         "G7 NOT FROZEN",
     ],
-    "CONTEXT.md": [
-        "G7_SHELL_CERTIFICATION_STATUS.md",
-        "current category status/evidence",
-    ],
-    "BABEL_START_HERE.md": [
-        "BABEL_TRUTH.md",
-        "Product need earns an app",
-        "Dedicated learning product — not currently earned",
-        "Visual Identity product — promising candidate, deliberately underdefined",
-        "Babel World — optional future hub hypothesis",
-        "Babel Lab boundary",
-        "Shared evidence, local identity",
-        "Babel Truth Issue #1",
-        "WATER is not currently the learning app",
-    ],
-    "CONTINUITY_INBOX.md": [
-        "Retired Local Continuity Inbox",
-        "Do not add new continuity items here",
-        "BabeDrums/babel-truth",
-        "Babel Continuity Buffer",
-    ],
-    "BABEL_APPS.md": [
-        "# Babel — App Concept Ledger",
-        "Product need earns an app",
-        "Dedicated learning product — not currently earned",
-        "Visual Identity product — promising candidate, deliberately underdefined",
-        "Babel World — optional future hub hypothesis",
-        "Shared evidence, local identity",
-    ],
-    "BABEL_PLATFORM.md": [
-        "# Babel Platform — Future Hypotheses",
-        "Prepare the joints where future products can connect",
-        "Shared evidence, local identity",
-        "Evidence first, interpretation second",
-        "Babel Learning Contract",
-    ],
-    "V7_DRAFT.md": [
-        "`FIRE_CORE.md` governs cross-generation product doctrine",
-        "G7_SHELL_CERTIFICATION_STATUS.md",
-        "Delete before styling.",
-        "## Interaction grammar",
-        "## Physical rhythm and visual grammar primitives",
-        "## Canonical icon/accessory grammar",
-        "## Navigation and Back behavior",
-        "Shared row-content grid",
-        "Selection surface",
-        "Segmented control",
-        "Page action footer",
-        "Accurate",
-        "Structure arrangement objects do not earn completion checks merely by existing.",
-        "Track selections do not need redundant completion checks when selected fill already communicates selection.",
-    ],
 }
 
-FORBIDDEN = {
-    "BABEL_TRUTH.md": [
-        "including the current shell/visual harness",
-    ],
-    "AGENTS.md": [
-        "Continuity capture buffer",
-        "Do **not** update it for every message",
-        "G7_SHELL_CERTIFICATION.md` — active shell-completion checklist, Shell Test contract, category status, and freeze gate",
-    ],
-    "START_HERE.md": [
-        "PR **#59** is the last merged/deployed G7 baseline",
-        "Latest physical-device review after #59",
-        "Current rhythm/navigation refinement contract",
-        "Tracks still shows redundant selection checkmarks in the current implementation",
-        "visible Structure ordinal numbers push section names",
-        "Pause further exploratory shell styling in the product while Lab develops a candidate",
-    ],
-    "BABEL_START_HERE.md": [
-        "`CONTINUITY_INBOX.md` is a low-authority capture buffer",
-        "FIRE = making the music.\nThe learning app = studying.",
-        "WATER = learning",
-        "World = universal source of truth",
-    ],
-    "CONTINUITY_INBOX.md": [
-        "## Pending FIRE deltas",
-        "## Pending ecosystem deltas",
-    ],
-    "CONTEXT.md": [
-        "### Recreation — SECONDARY / LEARNING MODE",
-        "Project Home owns **Continue + Journey + Notes**",
-        "Detailed category status and freeze requirements live only in `G7_SHELL_CERTIFICATION.md`",
-    ],
-    "V7_DRAFT.md": [
-        "current Cover shell work remains **Song Setup → Structure → Tracks**",
-        "`Matches the song` is a separate grouped verification surface",
-        "`Other` belongs to the same selection surface",
-        "Tracks is the multi-select variant and adds visible checks to selected choices",
-        "- index\n- section name",
-        "## State and accessory grammar",
-        "`G7_SHELL_CERTIFICATION.md` must show all ten categories Locked",
-    ],
+RETIRED_ACTIVE_DOCS = {
+    "BABEL_APPS.md",
+    "BABEL_PLATFORM.md",
+    "BABEL_START_HERE.md",
+    "CHANGELOG.md",
+    "CONTEXT.md",
+    "CONTINUITY_INBOX.md",
+    "REFERENCES.md",
+}
+
+FORBIDDEN_TEXT = {
+    "AGENTS.md": ["BABEL_START_HERE.md", "CONTINUITY_INBOX.md", "CONTEXT.md"],
+    "FIRE_CORE.md": ["BABEL_APPS.md", "BABEL_PLATFORM.md", "BABEL_START_HERE.md", "CONTEXT.md", "REFERENCES.md"],
+    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md"],
 }
 
 
 def main() -> int:
     failures: list[str] = []
+
     for path, needles in REQUIRED.items():
-        text = Path(path).read_text(encoding="utf-8")
+        p = Path(path)
+        if not p.exists():
+            failures.append(f"missing active authority file: {path}")
+            continue
+        text = p.read_text(encoding="utf-8")
         for needle in needles:
             if needle not in text:
-                failures.append(f"{path}: missing required doctrine marker: {needle!r}")
-    for path, needles in FORBIDDEN.items():
+                failures.append(f"{path}: missing required marker: {needle!r}")
+
+    for path in sorted(RETIRED_ACTIVE_DOCS):
+        if Path(path).exists():
+            failures.append(f"retired duplicate documentation still active: {path}")
+
+    for path, needles in FORBIDDEN_TEXT.items():
         text = Path(path).read_text(encoding="utf-8")
         for needle in needles:
             if needle in text:
-                failures.append(f"{path}: stale/conflicting doctrine remains: {needle!r}")
+                failures.append(f"{path}: stale reference to retired authority: {needle!r}")
+
     if failures:
-        print("FIRE/Babel product doctrine consistency check failed:")
+        print("FIRE authority consistency check failed:")
         for failure in failures:
             print(f"  - {failure}")
         return 1
-    print("FIRE/Babel product doctrine consistency check passed.")
+
+    print("FIRE authority consistency check passed.")
     return 0
 
 

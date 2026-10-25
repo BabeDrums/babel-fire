@@ -1,35 +1,24 @@
 # Babel Truth Pointer — FIRE
 
-This repository follows shared cross-app Babel authority from:
+FIRE follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `d191882918402c1a2fbd22f485496a25d8abb700`
-- Active unresolved continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
+- Last reconciled Truth commit: `8862c5367691f618fe0eea9e166b7cfffee54c77`
+- Unresolved durable continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
 
-## Read before FIRE work
+## Shared read order
 
-1. Babel Truth `START_HERE.md` at the reconciled commit above
+1. Babel Truth `START_HERE.md` at the commit above
 2. Babel Truth `AGENTS.md`
-3. relevant shared Truth authority: `PRODUCT_PRINCIPLES.md`, `DESIGN.md`, `PROCESS.md`
-4. local `START_HERE.md`
-5. local FIRE authorities/specs in their documented order
-6. Babel Truth Issue #1 body plus newer comments for relevant unresolved FIRE items
+3. Babel Truth `FOUNDATIONS.md` when shared product/design/interaction foundations matter
+4. local `START_HERE.md` and FIRE authority in its documented order
+5. relevant Issue #1 body + newer comments
+6. code/tests as implementation evidence
 
 ## Ownership
 
-Babel Truth owns cross-app principles, design foundations, process, shared semantic contracts, repo roles, and major architecture decisions.
+Truth owns cross-app rules. `babel-fire` owns FIRE product doctrine, runtime, data, specs, tests, current build state, and local implementation decisions.
 
-`babel-fire` owns FIRE-specific product doctrine, runtime, data, generation specs, tests, current build state, and local implementation decisions. Coordinated FIRE shell implementation/certification lives in the isolated G7 context under this repo.
+Babel Lab may provide bounded evidence, but **Lab is evidence, never authority**. FIRE does not inherit a design merely because it exists in Lab.
 
-Babel Lab may contain bounded FIRE-bound experiments, but **Lab is evidence, never authority**. FIRE does not inherit a design merely because it exists in Lab. A chosen Lab experiment must be deliberately implemented and physically validated in FIRE before any transferable rule is eligible for Truth. Do not rebuild a parallel full FIRE shell in Lab merely to certify G7.
-
-Do not silently overwrite a FIRE-specific rule merely because a Truth rule looks similar. Classify conflicts first:
-
-- **stale divergence** → adopt Truth
-- **intentional experiment** → preserve and label it
-- **potential upstream improvement** → surface it before changing either side
-- **app-local exception** → keep it local and clarify ownership
-
-For persist-before-reply capture, append a new comment to Babel Truth Issue #1; do not replace its body during routine work. The body is refreshed only during explicit consolidation after reading newer comments.
-
-Update the reconciled Truth commit only after the comparison/reconciliation is complete.
+Truth adoption is explicit, never a live runtime dependency. Update this pointer only after reconciliation is complete.
