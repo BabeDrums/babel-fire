@@ -37,6 +37,8 @@ def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     assert 'symbolRow("symbol-button-circle", "Circle")' in js
     assert "symbol-button-glass" not in js
     assert "Liquid Glass" not in js
+    assert "Both rows use the same 24×24 vector source" not in js
+    assert "State can carry stronger visual emphasis" not in js
 
 
 def test_project_management_has_no_divider_and_accessories_use_canonical_icon_variables():
@@ -106,24 +108,26 @@ def test_visible_glyph_artwork_uses_one_downward_optical_baseline_without_moving
     assert "translateY(-.25px)" not in state_css
 
 
-def test_shell_test_comparison_normalizes_vector_geometry_with_one_mirrored_chevron_correction():
+def test_shell_test_comparison_uses_geometry_centering_and_intrinsic_chevron_optical_anchor():
     js = read("v7-preview/shell-test.js")
     css = read("v7-preview/shell-test-experiments.css")
 
     assert "const bounds = art.getBBox()" in js
-    assert "12 - (bounds.x + bounds.width / 2)" in js
-    assert "12 - (bounds.y + bounds.height / 2)" in js
+    assert "bounds.x + bounds.width / 2" in js
+    assert "bounds.y + bounds.height / 2" in js
     assert 'svg.dataset.normalized = "true"' in js
     assert 'viewBox="0 0 24 24"' in js
     for glyph in ("back", "forward", "plus", "check", "reorder", "more"):
         assert f"{glyph}:" in js
 
-    assert "const CHEVRON_OPTICAL_INSET = 1.2" in js
-    assert 'svg.dataset.symbol === "back"' in js
-    assert 'svg.dataset.symbol === "forward"' in js
-    assert "? CHEVRON_OPTICAL_INSET" in js
-    assert "? -CHEVRON_OPTICAL_INSET" in js
+    assert '<polyline points="15 18 9 12 15 6"/>' in js
+    assert '<polyline points="9 18 15 12 9 6"/>' in js
+    assert "function chevronHullCentroid" in js
+    assert 'const alignmentModel = hullCenter ? "convex-hull-centroid" : "geometry-bounds"' in js
+    assert 'svg.dataset.alignmentModel = alignmentModel' in js
+    assert 'svg.dataset.anchorX = anchor.x.toFixed(3)' in js
     assert 'svg.dataset.opticalShiftX = opticalDx.toFixed(3)' in js
+    assert "CHEVRON_OPTICAL_INSET" not in js
 
     assert "--symbol-optical-y" not in css
     assert ".symbol-button-current" in css
