@@ -39,6 +39,7 @@ def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     assert "Liquid Glass" not in js
     assert "Both rows use the same 24×24 vector source" not in js
     assert "State can carry stronger visual emphasis" not in js
+    assert "Same semantic primitive" not in js
 
 
 def test_project_management_has_no_divider_and_accessories_use_canonical_icon_variables():
@@ -56,8 +57,8 @@ def test_project_management_has_no_divider_and_accessories_use_canonical_icon_va
         "--icon-menu",
     ):
         assert token in css
-    assert ".journey-mark" in css
-    assert ".completion-ring" in css
+    assert ".journey-mark" in read("v7-preview/state-primitives.css")
+    assert ".completion-ring" in read("v7-preview/state-primitives.css")
     assert ".reorder-handle::before" in css
 
 
@@ -69,8 +70,9 @@ def test_accessory_family_uses_symbol_owned_canonical_assets():
     assert "mask-image: var(--icon-plus)" in css
     assert "mask-image: var(--icon-ellipsis)" in css
 
-    assert ".checkmark::before" in read("v7-preview/state-primitives.css")
-    assert "mask: var(--icon-check) center / contain no-repeat" in read("v7-preview/state-primitives.css")
+    state_css = read("v7-preview/state-primitives.css")
+    assert ".checkmark::before" in state_css
+    assert "mask: var(--icon-check) center / contain no-repeat" in state_css
     assert 'content: "✓"' not in css
 
     assert "--icon-chevron-forward" in css
@@ -82,6 +84,36 @@ def test_accessory_family_uses_symbol_owned_canonical_assets():
     assert ".shell-test-link::before" in css
     assert "scaleX(-1)" not in css
     assert ".chevron::after," in css
+
+
+def test_generated_symbol_and_state_artwork_share_one_explicit_host_center_contract():
+    css = read("v7-preview/shell-primitives.css")
+    state_css = read("v7-preview/state-primitives.css")
+    frame_css = read("v7-preview/frame-primitives.css")
+
+    assert "GENERATED ARTWORK HOST CONTRACT" in css
+    assert ".add-button::before," in css
+    assert ".more-button::before," in css
+    assert ".chevron::before," in css
+    assert ".back-glyph::before," in css
+    assert ".shell-test-link::before" in css
+    assert "position: absolute" in css
+    assert "inset: 0" in css
+    assert "margin: auto" in css
+
+    assert "STATE ARTWORK HOST CONTRACT" in state_css
+    assert ".journey-mark.current::before" in state_css
+    assert ".completion-ring::before" in state_css
+    assert "position: absolute" in state_css
+    assert "inset: 0" in state_css
+    assert "margin: auto" in state_css
+
+    # Host centering must not consume the transform channel used by intrinsic symbol metrics.
+    assert "transform: translate(-50%, -50%)" not in state_css
+
+    # The frame layer can stack symbol artwork, but must not replace its positioning model.
+    assert ".toolbar-button::before,\n.toolbar-button > *,\n.shell-test-link::before { z-index: 1; }" in frame_css
+    assert ".shell-test-link::before {\n  position: relative" not in frame_css
 
 
 def test_state_language_is_non_circular_and_current_is_not_a_selected_row():
@@ -110,7 +142,6 @@ def test_real_g7_symbol_alignment_is_intrinsic_without_global_nudge():
     assert "--toolbar-icon-size: 20px" in css
     assert "--toolbar-control-radius: 50%" in css
     assert "border-radius: var(--toolbar-control-radius)" in css
-    assert "background: var(--toolbar-control-bg)" in css
 
     # The approved chevron side bearings live in the SVG assets rather than CSS transforms.
     assert "d='m10 18 6-6-6-6'" in css
@@ -118,10 +149,10 @@ def test_real_g7_symbol_alignment_is_intrinsic_without_global_nudge():
     assert "translate(-1px" not in css
     assert "translate(1px" not in css
 
-    # Check owns its tiny vertical optical correction; symmetric symbols/state bars need none.
+    # Check owns its tiny intrinsic optical correction; symmetric state hosts add no transform.
     assert "transform='translate(0 .5)'" in css
     assert "transform: translateY" not in state_css
-    assert "top: 50%" in css
+    assert "transform: translate(-50%, -50%)" not in state_css
 
     # Accepted row/accessory geometry remains fixed.
     assert "padding-right: var(--accessory-edge-inset)" in css
@@ -162,10 +193,12 @@ def test_shell_test_comparison_uses_geometry_centering_and_intrinsic_chevron_opt
     assert "height: var(--touch)" in css
 
 
-def test_header_action_alignment_is_owned_by_shared_primitive_layer():
-    css = read("v7-preview/shell-primitives.css")
-    assert "--header-action-offset: 44px" in css
-    assert ".toolbar-trailing { transform: translateY(var(--header-action-offset)); }" in css
+def test_header_action_alignment_has_one_owner_without_dead_offset_rule():
+    shell_css = read("v7-preview/shell-primitives.css")
+    frame_css = read("v7-preview/frame-primitives.css")
+    assert "--header-action-offset" not in shell_css
+    assert "translateY(var(--header-action-offset))" not in shell_css
+    assert ".toolbar-trailing { transform: none; }" in frame_css
 
 
 def test_shared_accessory_lane_keeps_hit_target_separate_from_visible_marker_mass():
@@ -187,6 +220,16 @@ def test_shell_test_comparison_is_bounded_and_does_not_become_product_chrome():
     assert "must never redefine real G7 production primitives" in css
     assert "shell-test-experiments.css" in html
     assert "shell-test-experiments.css" not in preview
+
+
+def test_shell_test_sparse_fixture_has_intentional_inset_without_helper_narration():
+    css = read("v7-preview/shell-primitives.css")
+    js = read("v7-preview/shell-test.js")
+    assert ".shell-test-density .placeholder-state" in css
+    assert "padding: var(--space-4) var(--row-inline)" in css
+    assert ".shell-test-density .placeholder-state p" in css
+    assert "margin: 0" in css
+    assert "Same semantic primitive" not in js
 
 
 def test_shared_modal_spacing_uses_named_tokens_without_added_hairlines():

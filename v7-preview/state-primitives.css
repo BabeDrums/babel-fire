@@ -38,8 +38,24 @@
   line-height: 1;
 }
 
-/* Complete uses the canonical check asset, whose tiny optical correction belongs to the asset itself.
-   Current / Incomplete are symmetric bars and therefore need no extra transform. */
+/* STATE ARTWORK HOST CONTRACT
+   Generated state art always sits at the physical center of the 24px state box. Intrinsic optical
+   metrics (such as Check's tiny internal correction) stay inside the symbol asset rather than being
+   reinterpreted by each row/container. Absolute inset + auto margins avoids host-specific line-box
+   behavior while leaving the transform channel free for intrinsic symbol metrics. */
+.journey-mark.done::before,
+.checkmark::before,
+.journey-mark.current::before,
+.journey-mark.upcoming::before,
+.completion-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  pointer-events: none;
+}
+
+/* Complete uses the canonical check asset, whose tiny optical correction belongs to the asset itself. */
 .journey-mark.done,
 .checkmark {
   color: var(--state-complete);
@@ -48,13 +64,11 @@
 }
 .journey-mark.done::before,
 .checkmark::before {
-  content: "";
   width: var(--state-mark-visual);
   height: var(--state-mark-visual);
   background: currentColor;
   -webkit-mask: var(--icon-check) center / contain no-repeat;
   mask: var(--icon-check) center / contain no-repeat;
-  pointer-events: none;
 }
 .journey-mark.done::after,
 .checkmark::after { content: none; }
@@ -66,12 +80,10 @@
   background: transparent;
 }
 .journey-mark.current::before {
-  content: "";
   width: var(--state-current-width);
   height: var(--state-current-height);
   border-radius: 2px;
   background: currentColor;
-  pointer-events: none;
 }
 .journey-mark.current::after { content: none; }
 
@@ -84,12 +96,10 @@
 }
 .journey-mark.upcoming::before,
 .completion-ring::before {
-  content: "";
   width: var(--state-upcoming-width);
   height: var(--state-upcoming-height);
   border-radius: 2px;
   background: currentColor;
-  pointer-events: none;
 }
 .journey-mark.upcoming::after,
 .completion-ring::after { content: none; }

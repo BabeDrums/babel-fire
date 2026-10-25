@@ -25,8 +25,8 @@
 
 /* CONTROL FRAME
    Keep the full 44px interaction target while allowing a quieter visible material inside it.
-   Button placement is therefore governed by the 44px toolbar slot; visible shape size does not
-   change hit geometry or header alignment. */
+   Button placement is governed by the 44px toolbar slot; visible shape size does not change hit
+   geometry or header alignment. Generated symbol placement remains owned by shell-primitives.css. */
 .toolbar-button,
 .shell-test-link {
   position: relative;
@@ -63,10 +63,7 @@
 .shell-test-link:active::after { background: var(--toolbar-control-active); }
 .toolbar-button::before,
 .toolbar-button > *,
-.shell-test-link::before {
-  position: relative;
-  z-index: 1;
-}
+.shell-test-link::before { z-index: 1; }
 .back-glyph { z-index: 1; }
 
 /* STATE RENDERING SAFETY
