@@ -36,20 +36,29 @@ def test_project_management_has_no_divider_and_accessories_are_canonicalized():
     assert ".project-card-actions" in css
     assert "border-left: 0" in css
     assert "--accessory-box" in css
+    assert "--accessory-stroke" in css
     assert ".journey-mark" in css
     assert ".completion-ring" in css
-    assert ".chevron" in css
-    assert ".reorder-handle" in css
+    assert ".chevron::before" in css
+    assert ".reorder-handle::before" in css
 
 
-def test_current_state_is_ring_and_add_is_drawn_not_font_dependent():
+def test_current_state_is_neutral_nested_ring_and_actions_are_not_font_dependent():
     css = read("v7-preview/shell-primitives.css")
     assert ".add-button { font-size: 0; }" in css
     assert ".add-button::before" in css
     assert ".add-button::after" in css
+    assert ".more-button::before" in css
+    assert "width: 3px" in css
+    assert "box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor" in css
     assert ".journey-mark.current" in css
-    assert "border: 2px solid #d8d84f" in css
-    assert ".journey-mark.current::after { content: none; }" in css
+    assert "border: 2px solid var(--state-current-ring)" in css
+    assert "--state-current-ring: #d9d9df" in css
+    assert "--state-current-inner: rgba(232,232,237,.22)" in css
+    assert ".journey-mark.current::after" in css
+    assert "width: 10px" in css
+    assert "background: var(--state-current-inner)" in css
+    assert "#d8d84f" not in css
 
 
 def test_shared_modal_spacing_uses_named_tokens():
