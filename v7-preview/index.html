@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,12 +8,20 @@
   <meta name="theme-color" content="#09090b">
   <meta name="color-scheme" content="dark">
   <title>FIRE G7 Preview</title>
-  <link rel="stylesheet" href="./styles.css?v=g7-shell-4">
-  <link rel="stylesheet" href="./shell-primitives.css?v=g7-shell-4">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css?v={{ site.github.build_revision }}">
+  <link rel="stylesheet" href="./shell-primitives.css?v={{ site.github.build_revision }}">
+  <script type="importmap">
+    {
+      "imports": {
+        "./model.js": "./model.js?v={{ site.github.build_revision }}"
+      }
+    }
+  </script>
 </head>
 <body>
   <div id="app" class="app-shell" aria-live="polite"></div>
   <div id="sheetRoot" class="sheet-backdrop" hidden></div>
-  <script type="module" src="./app.js?v=g7-shell-4"></script>
+  <script type="module" src="./app.js?v={{ site.github.build_revision }}"></script>
 </body>
 </html>
