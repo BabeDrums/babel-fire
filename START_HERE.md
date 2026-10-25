@@ -25,7 +25,7 @@ PR **#66 — Return coordinated shell iteration to G7** established that complet
 
 PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review continued to expose systemic shell inconsistencies rather than final FIRE-workflow questions.
 
-The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, and reliable deployed-build identification.
+The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, reliable deployed-build identification, and real-screen regressions caused by over-broad shared selectors.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
@@ -39,6 +39,8 @@ Shell work must leave implementation, active authority, regression expectations,
 
 - Do not merge a shell change with known red regressions.
 - If a deliberate product/shell decision makes an old regression obsolete, update that regression in the same change rather than restoring superseded behavior just to get green.
+- **Shell Test passing is not sufficient for a shared-primitive merge.** Shared primitives used by real G7 must also pass browser coverage in the actual G7 fixture path at 390/440/820 widths. The current minimum real-screen path is Project → Setup → Structure temporary UI.
+- Real-screen regression coverage must guard current-state geometry, form-control containment, and sheet chrome so a certification specimen cannot be green while the project fixture is visibly broken.
 - G7 and Shell Test CSS/JS asset URLs are tied to the deployed GitHub Pages build revision rather than a manually bumped cache string.
 - G7's module dependency mapping revisions `model.js` with the same deployed build revision.
 - Shell Test and real G7 display the deployed short commit from `build-info.json`; physical review should target that exact revision.
@@ -60,7 +62,7 @@ The developer-only Shell Test lives **inside G7** and uses the actual G7 primiti
 
 It deliberately exercises the ten certification categories and representative sparse/normal/dense, short/long, default/selected/custom/disabled/focus/error states where applicable. A primitive fixed in Shell Test must be the same primitive used by real G7.
 
-Shell Test does not replace real-product or physical-device validation.
+Shell Test does not replace real-product or physical-device validation. Shared primitive changes must survive both the Shell Test and the real G7 fixture browser path before merge.
 
 ## Routing — G7, Lab, Truth, FIRE Core
 
@@ -84,7 +86,7 @@ Do not make G7 automatically match a Lab specimen.
 - toolbar `•••` means management/actions
 - project-row management has no decorative divider from the row
 - recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
-- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter faded inner ring; color alone does not carry the state
+- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter faded inner ring touching the inside edge of the outer ring; color alone does not carry the state
 - the accessory family uses one rounded construction vocabulary for drawn strokes/caps while preserving semantic hierarchy between state, navigation, reorder, add, and management affordances
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
@@ -105,7 +107,10 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 - `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
 - management `•••`, chevron, reorder, and completion check use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics where practical
 - canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
-- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inner ring, not the old yellow accent and not a center dot
+- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inner ring touching the outer ring's inside edge, not the old yellow accent and not a center dot
+- Current's generated inner ring is absolutely positioned so hidden legacy text in the real fixture cannot move it onto another grid row
+- shared accessory layout no longer overrides `.form-row`; Setup value controls retain their own label/control grid and stay contained at compact widths
+- shared sheet styling no longer adds an action-divider hairline or inset top hairline that was not part of the approved shell language
 - rounded terminals/caps unify the accessory family's visual handwriting without forcing different semantic meanings into identical containers
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
