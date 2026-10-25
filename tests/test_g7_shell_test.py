@@ -18,12 +18,14 @@ def test_real_g7_and_shell_test_load_same_deployment_revisioned_primitive_layers
         assert "g7-shell-4" not in html
     assert f'./app.js?v={REVISION}' in preview
     assert f'./shell-test.js?v={REVISION}' in shell_test
+    assert f'./shell-test-experiments.css?v={REVISION}' in shell_test
+    assert "shell-test-experiments.css" not in preview
     assert f'./model.js?v={REVISION}' in preview
 
 
 def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     js = read("v7-preview/shell-test.js")
-    assert "Glyph palette" in js
+    assert "Symbol system · container comparison" in js
     assert "Rows · accessories" in js
     assert "Controls · states" in js
     assert "Temporary UI" in js
@@ -31,7 +33,9 @@ def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     assert "intentionally not a FIRE workflow" not in js
     assert 'class="screen-meta build-info"' in js
     assert "G7 · ${commit}" in js
-    assert js.count('class="glyph-swatch"') == 6
+    assert 'symbolRow("symbol-button-current", "Current")' in js
+    assert 'symbolRow("symbol-button-circle", "Circle")' in js
+    assert 'symbolRow("symbol-button-glass", "Liquid Glass")' in js
 
 
 def test_project_management_has_no_divider_and_accessories_use_canonical_icon_variables():
@@ -101,6 +105,28 @@ def test_visible_glyph_artwork_uses_one_downward_optical_baseline_without_moving
     assert "translateY(-.25px)" not in state_css
 
 
+def test_shell_test_comparison_normalizes_vector_geometry_without_global_pixel_nudge():
+    js = read("v7-preview/shell-test.js")
+    css = read("v7-preview/shell-test-experiments.css")
+
+    assert "const bounds = art.getBBox()" in js
+    assert "12 - (bounds.x + bounds.width / 2)" in js
+    assert "12 - (bounds.y + bounds.height / 2)" in js
+    assert 'svg.dataset.normalized = "true"' in js
+    assert 'viewBox="0 0 24 24"' in js
+    for glyph in ("back", "forward", "plus", "check", "reorder", "more"):
+        assert f"{glyph}:" in js
+
+    assert "--symbol-optical-y" not in css
+    assert ".symbol-button-current" in css
+    assert ".symbol-button-circle" in css
+    assert ".symbol-button-glass" in css
+    assert "border-radius: 50%" in css
+    assert "backdrop-filter: blur(18px)" in css
+    assert "width: var(--touch)" in css
+    assert "height: var(--touch)" in css
+
+
 def test_header_action_alignment_is_owned_by_shared_primitive_layer():
     css = read("v7-preview/shell-primitives.css")
     assert "--header-action-offset: 44px" in css
@@ -118,14 +144,14 @@ def test_shared_accessory_lane_keeps_hit_target_separate_from_visible_marker_mas
     assert "height: var(--state-mark-box)" in state_css
 
 
-def test_shell_test_palette_uses_same_icon_variables_without_becoming_product_chrome():
-    css = read("v7-preview/shell-primitives.css")
-    js = read("v7-preview/shell-test.js")
-    assert ".shell-test-glyph-palette" in css
-    assert ".glyph-swatch" in css
-    for glyph in ("back", "forward", "plus", "check", "reorder", "more"):
-        assert f'data-glyph="{glyph}"' in js
-    assert "These are not a proposal to put every production glyph in a visible button" in css
+def test_shell_test_comparison_is_bounded_and_does_not_become_product_chrome():
+    css = read("v7-preview/shell-test-experiments.css")
+    html = read("v7-preview/shell-test.html")
+    preview = read("v7-preview/index.html")
+    assert "Shell Test-only experiments" in css
+    assert "must never redefine real G7 production primitives" in css
+    assert "shell-test-experiments.css" in html
+    assert "shell-test-experiments.css" not in preview
 
 
 def test_shared_modal_spacing_uses_named_tokens_without_added_hairlines():
