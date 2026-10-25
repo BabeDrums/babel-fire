@@ -147,7 +147,17 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
         self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
-        # State and commodity marks keep the same physical trailing-lane center.
+        # Every row family derives its far-right center from one canonical 44px lane.
+        row_examples = [
+            page.get_by_role("button", name="Complete"),
+            page.locator(".arrangement-row").first,
+            page.locator(".project-card").first,
+        ]
+        for row_example in row_examples:
+            columns = row_example.evaluate("el => getComputedStyle(el).gridTemplateColumns").split()
+            self.assertEqual(columns[-1], "44px")
+
+        # State and commodity marks share both the same center and the same edge-derived centerline.
         accessory_locators = [complete, current, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:
@@ -155,6 +165,14 @@ class G7ShellTestBrowser(unittest.TestCase):
             self.assertIsNotNone(box)
             centers.append(box["x"] + box["width"] / 2)
         self.assertLessEqual(max(centers) - min(centers), 1.5)
+
+        rows_group = page.locator("#rowsHeading").locator("xpath=..").locator(".group")
+        group_box = rows_group.bounding_box()
+        self.assertIsNotNone(group_box)
+        border_right = rows_group.evaluate("el => parseFloat(getComputedStyle(el).borderRightWidth)")
+        expected_center = group_box["x"] + group_box["width"] - border_right - 22
+        for center in centers:
+            self.assertLessEqual(abs(center - expected_center), 1.0)
 
     def test_shell_test_temporary_ui_uses_same_adaptive_dialog_primitive(self):
         page = self.open()
