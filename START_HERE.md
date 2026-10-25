@@ -44,58 +44,41 @@ The current symbol rule is:
 
 PR #87 proved the refined symbol family in Shell Test. PR #88 promoted that architecture into real G7 at `109590e66038845849c832d3f4e3ea93ba5193c1`.
 
-## Current physical finding — frame repair required after PR #88
+## PR #89 frame repair — merged and deployed
 
-Real-device iPhone review of `G7 · 109590e` showed that the remaining defects are **not primarily symbol-offset defects**. The shared shell frame is contradicting the symbol work.
+Real-device iPhone review of `G7 · 109590e` showed that the remaining defects were **not primarily symbol-offset defects**. The shared shell frame was contradicting the symbol work.
 
-Durable findings:
+PR **#89 — Repair G7 shared header, control, state, and modal frames** fixed that at the shared-primitive level and merged to `main` as `d93729ff7a734035f25a6835323d19706f15186d`.
 
-1. **Header frame:** Back remained in the toolbar row while trailing Add/More was translated down into the large-title line. This produced visibly split controls. The fix must be structural: one navigation/action row, then the large title/meta row beneath it. No independent side-specific toolbar translation.
-2. **Control frame:** keep the 44px interaction target, but do not make the full hit region visually heavy. Interaction geometry and visible material geometry are separate concerns.
-3. **State rendering:** `state-primitives.css` must remain the only visible state owner. Legacy text glyphs may exist as fixture residue only if they cannot render; they must never leak beneath Current/Incomplete/Complete artwork.
-4. **Editable-value frame:** Tempo and Meter must share one stable trailing lane rather than size themselves from content.
-5. **Modal frame:** compact sheets must not depend on bottom-edge anchoring under dynamic mobile browser chrome. The active candidate centers a bounded sheet using small-viewport-safe geometry and keeps task identity visible.
-6. **Edit-sheet action hierarchy:** Save / Duplicate / Delete must not collapse into three equivalent oversized slabs on narrow phones. The primary task remains visually primary; management actions remain secondary.
+Durable frame rules now implemented in real G7 and Shell Test:
 
-These findings are captured in Babel Truth Issue #1 under the persist-before-reply rule.
+1. **Header frame:** Back and trailing Add/More share one navigation/action row. Large title/meta live in a separate row beneath it. No independent side-specific toolbar translation.
+2. **Control frame:** the toolbar keeps a 44px interaction target while resting visible circular material is 36px. Hit geometry and visible material geometry are separate concerns.
+3. **State rendering:** `state-primitives.css` remains the artwork owner; the frame layer suppresses legacy text glyph leakage so Current/Incomplete/Complete cannot gain a second visible owner.
+4. **Editable-value frame:** Tempo and Meter share one stable trailing lane rather than sizing themselves from content.
+5. **Modal frame:** compact sheets center inside a bounded small-viewport-safe frame using `svh` rather than anchoring to Safari's dynamic bottom edge.
+6. **Edit-sheet hierarchy:** Save / Duplicate / Delete no longer collapse into three equivalent oversized stacked slabs on narrow phones.
 
-## Active implementation candidate
-
-Branch: `g7-shell-frame-repair`
-
-The active pass introduces `v7-preview/frame-primitives.css` as the shared owner for structural frame relationships while preserving existing ownership boundaries:
+Ownership remains explicit:
 
 - `shell-primitives.css` — symbol/accessory artwork and shared symbol metrics
 - `state-primitives.css` — progress/completion state artwork
 - `frame-primitives.css` — header frame, toolbar hit-vs-material geometry, editable-value lane, compact modal frame
 
-Current candidate rules:
+The PR gate passed **Authority/Handoff + Static + Chromium 390 / 440 / 820**, including the actual G7 Project → Setup → Structure path and Shell Test. After merge, GitHub Pages deployed the exact `d93729ff…` commit successfully and the post-merge Static + 390 / 440 / 820 matrix passed again on that exact SHA.
 
-- one 44px toolbar interaction row for Back + trailing contextual action
-- large title/meta in a separate row beneath toolbar actions
-- 44px tap target with a quieter 36px visible circular material
-- no horizontal accessory-lane rewrite
-- one fixed Tempo/Meter value lane
-- state glyph leakage explicitly suppressed at the shared frame level
-- compact sheets centered and bounded with `svh` rather than pinned to Safari's dynamic bottom edge
-- sheet task title sourced from the existing dialog label
-- three-action edit sheets avoid narrow-phone three-slab stacking
+These findings are captured in Babel Truth Issue #1 under the persist-before-reply rule.
 
-This is a shared-primitive pass, not a page-specific visual patch.
+## Immediate next gate — exact-build physical review
 
-## Immediate next gate
+The engineering pass is complete. Do **not** repeat PR #89 work unless physical evidence proves a remaining systemic contradiction.
 
-Run the full reliability gate on the frame candidate:
+Review the exact deployed `G7 · d93729f` build physically:
 
-**Authority/Handoff + Static + Chromium 390 / 440 / 820**, including the actual G7 Project → Setup → Structure path and Shell Test.
-
-If green:
-
-1. re-check current `main` and open PRs
-2. merge automatically
-3. verify the exact merge commit deploys to GitHub Pages
-4. verify post-merge 390 / 440 / 820
-5. physically review the exact deployed build on iPhone first, then iPad/regular width
+1. **iPhone first** — inspect Projects, project Home, Setup, Structure, Tracks, add/edit sheets, Back/Add/More positioning, state marks, Tempo/Meter lane, keyboard/focus feel, and Safari-chrome interaction.
+2. **iPad / regular width second** — confirm the same semantics and frame relationships adapt cleanly without introducing width-specific drift.
+3. Classify any remaining issue as shared-frame, symbol/state, page-local, or product-fixture content before changing code.
+4. Only after physical evidence should certification categories move from Candidate toward Locked under `G7_SHELL_CERTIFICATION.md`.
 
 Do **not** lock any certification category from browser evidence alone. FIRE Core remains blocked.
 
