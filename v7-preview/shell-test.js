@@ -2,6 +2,57 @@ const host = document.getElementById("shellTest");
 const sheetRoot = document.getElementById("sheetRoot");
 let buildCommitPromise = null;
 
+const SYMBOLS = {
+  back: '<path d="M15 18 9 12l6-6"/>',
+  forward: '<path d="m9 18 6-6-6-6"/>',
+  plus: '<path d="M5 12h14M12 5v14"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  reorder: '<path d="M4 5h16M4 12h16M4 19h16"/>',
+  more: '<circle cx="5" cy="12" r="1.25"/><circle cx="12" cy="12" r="1.25"/><circle cx="19" cy="12" r="1.25"/>'
+};
+
+const SYMBOL_LABELS = {
+  back: "Back",
+  forward: "Forward",
+  plus: "Add",
+  check: "Complete",
+  reorder: "Reorder",
+  more: "More"
+};
+
+const normalizedSymbol = (name) => `
+  <svg class="normalized-symbol" data-symbol="${name}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <g class="symbol-art">${SYMBOLS[name]}</g>
+  </svg>`;
+
+const symbolButton = (name, variant, variantLabel) => `
+  <button class="symbol-button ${variant}" data-symbol-button="${name}" aria-label="${variantLabel} ${SYMBOL_LABELS[name]}">
+    ${normalizedSymbol(name)}
+  </button>`;
+
+const symbolRow = (variant, label) => `
+  <div class="symbol-variant" data-symbol-variant="${variant}">
+    <span class="symbol-variant-label">${label}</span>
+    <div class="symbol-comparison-row">
+      ${Object.keys(SYMBOLS).map((name) => symbolButton(name, variant, label)).join("")}
+    </div>
+  </div>`;
+
+function normalizeSymbols(root = document) {
+  root.querySelectorAll(".normalized-symbol").forEach((svg) => {
+    const art = svg.querySelector(".symbol-art");
+    if (!art) return;
+    art.removeAttribute("transform");
+    const bounds = art.getBBox();
+    const dx = 12 - (bounds.x + bounds.width / 2);
+    const dy = 12 - (bounds.y + bounds.height / 2);
+    art.setAttribute("transform", `translate(${dx} ${dy})`);
+    svg.dataset.normalized = "true";
+    svg.dataset.shiftX = dx.toFixed(3);
+    svg.dataset.shiftY = dy.toFixed(3);
+  });
+}
+
 const toolbarButton = (kind, label) => kind === "add"
   ? `<button class="toolbar-button add-button" aria-label="${label}">+</button>`
   : `<button class="toolbar-button more-button" aria-label="${label}">•••</button>`;
@@ -20,15 +71,13 @@ host.innerHTML = `
     ${header}
 
     <section class="shell-test-section" aria-labelledby="glyphsHeading">
-      <h2 id="glyphsHeading" class="shell-test-heading">Glyph palette</h2>
-      <div class="shell-test-glyph-palette" aria-label="Current G7 glyph family">
-        <button class="glyph-swatch" data-glyph="back" aria-label="Back glyph"></button>
-        <button class="glyph-swatch" data-glyph="forward" aria-label="Forward glyph"></button>
-        <button class="glyph-swatch" data-glyph="plus" aria-label="Add glyph"></button>
-        <button class="glyph-swatch" data-glyph="check" aria-label="Check glyph"></button>
-        <button class="glyph-swatch" data-glyph="reorder" aria-label="Reorder glyph"></button>
-        <button class="glyph-swatch" data-glyph="more" aria-label="More glyph"></button>
+      <h2 id="glyphsHeading" class="shell-test-heading">Symbol system · container comparison</h2>
+      <div class="symbol-comparison-stage" aria-label="Normalized symbol button comparison">
+        ${symbolRow("symbol-button-current", "Current")}
+        ${symbolRow("symbol-button-circle", "Circle")}
+        ${symbolRow("symbol-button-glass", "Liquid Glass")}
       </div>
+      <p class="shell-test-note">All three rows use the same 24×24 vector source and automatic visible-bounds centering. Only the button container treatment changes.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="rowsHeading">
@@ -105,6 +154,8 @@ host.innerHTML = `
       </div>
     </section>
   </main>`;
+
+normalizeSymbols(host);
 
 function showBuildInfo() {
   const targets = document.querySelectorAll(".build-info");
