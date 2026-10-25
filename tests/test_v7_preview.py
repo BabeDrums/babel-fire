@@ -134,7 +134,7 @@ class V7Preview(unittest.TestCase):
         expect(actions).to_be_visible()
         self.assertGreaterEqual(actions.bounding_box()["width"], 44)
         self.assertGreaterEqual(actions.bounding_box()["height"], 44)
-        self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderLeftStyle"), "solid")
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
 
     def test_one_header_scaffold_and_title_scale_across_levels(self):
         projects = self.open("projects")
