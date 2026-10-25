@@ -29,8 +29,8 @@ class G7RealShellBrowser(unittest.TestCase):
 
     def open(self):
         width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
-        context = self.browser.new_context(viewport={"width": width, "height": 844}, has_touch=True)
-        self.addCleanup(context.close)
+        context = cls_context = self.browser.new_context(viewport={"width": width, "height": 844}, has_touch=True)
+        self.addCleanup(cls_context.close)
         page = context.new_page()
         page.set_default_timeout(5000)
         errors = []
@@ -65,7 +65,7 @@ class G7RealShellBrowser(unittest.TestCase):
         group_right = group_box["x"] + group_box["width"]
 
         # Tempo and Meter intentionally have different control widths in the base grammar:
-        # Tempo uses the regular 86px value control; Meter uses the 72px tight variant.
+        # Tempo uses the regular 86px value control; Meter's select-value override is 72px.
         # The regression we are guarding is either one collapsing into the 28px accessory lane
         # or escaping the form-group bounds on compact widths.
         expected_min_width = {
@@ -84,7 +84,8 @@ class G7RealShellBrowser(unittest.TestCase):
             self.assertGreaterEqual(control_box["left"], group_left - 1)
             self.assertLessEqual(control_box["right"], group_right + 1)
 
-        self.assertTrue(page.locator("#meterInput").locator("xpath=..").evaluate("el => el.classList.contains('tight')"))
+        meter_value = page.locator("#meterInput").locator("xpath=..")
+        self.assertTrue(meter_value.evaluate("el => el.classList.contains('select-value')"))
 
         for selector in ("#tempoInput", "#meterInput"):
             form_row = page.locator(selector).locator("xpath=../..")
