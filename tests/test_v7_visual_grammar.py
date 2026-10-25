@@ -120,8 +120,10 @@ class V7VisualGrammar(unittest.TestCase):
         project_type = page.locator(".project-type-control").bounding_box()
         fields = page.locator(".project-field-group").bounding_box()
         actions = page.locator(".sheet-actions").bounding_box()
-        self.assertAlmostEqual(fields["y"] - (project_type["y"] + project_type["height"]), 20.0, delta=1.0)
-        self.assertAlmostEqual(actions["y"] - (fields["y"] + fields["height"]), 16.0, delta=1.0)
+        major_gap = float(page.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-major-gap'))"))
+        action_gap = float(page.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-action-gap'))"))
+        self.assertAlmostEqual(fields["y"] - (project_type["y"] + project_type["height"]), major_gap, delta=1.0)
+        self.assertAlmostEqual(actions["y"] - (fields["y"] + fields["height"]), action_gap, delta=1.0)
 
     def test_project_action_cancel_matches_action_group_width(self):
         page = self.open("projects")
@@ -196,8 +198,10 @@ class V7VisualGrammar(unittest.TestCase):
         types = page.locator(".section-types").bounding_box()
         bars = page.locator(".bars-grid").bounding_box()
         actions = page.locator(".sheet-actions").bounding_box()
-        self.assertAlmostEqual(bars["y"] - (types["y"] + types["height"]), 20.0, delta=1.0)
-        self.assertAlmostEqual(actions["y"] - (bars["y"] + bars["height"]), 16.0, delta=1.0)
+        content_gap = float(page.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-content-gap'))"))
+        action_gap = float(page.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-action-gap'))"))
+        self.assertAlmostEqual(bars["y"] - (types["y"] + types["height"]), content_gap, delta=1.0)
+        self.assertAlmostEqual(actions["y"] - (bars["y"] + bars["height"]), action_gap, delta=1.0)
         self.assertEqual(page.locator("#sectionAddedNotice").count(), 0)
 
     def test_tracks_and_structure_use_toolbar_plus_without_fake_other_row(self):
