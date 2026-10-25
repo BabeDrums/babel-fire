@@ -67,22 +67,50 @@ class G7ShellTestBrowser(unittest.TestCase):
         add_center = add_box["y"] + add_box["height"] / 2
         self.assertLessEqual(abs(title_center - add_center), 2.0)
 
-        palette = page.locator(".shell-test-glyph-palette")
-        expect(palette).to_be_visible()
-        swatches = palette.locator(".glyph-swatch")
-        self.assertEqual(swatches.count(), 6)
-        for swatch in swatches.all():
-            self.assertEqual(swatch.evaluate("el => getComputedStyle(el).height"), "44px")
-            self.assertIn(
-                "data:image/svg+xml",
-                swatch.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        comparison = page.locator(".symbol-comparison-stage")
+        expect(comparison).to_be_visible()
+        variants = comparison.locator(".symbol-variant")
+        self.assertEqual(variants.count(), 3)
+        buttons = comparison.locator(".symbol-button")
+        symbols = comparison.locator(".normalized-symbol")
+        self.assertEqual(buttons.count(), 18)
+        self.assertEqual(symbols.count(), 18)
+
+        for button in buttons.all():
+            self.assertEqual(button.evaluate("el => getComputedStyle(el).width"), "44px")
+            self.assertEqual(button.evaluate("el => getComputedStyle(el).height"), "44px")
+
+        for symbol in symbols.all():
+            self.assertEqual(symbol.get_attribute("data-normalized"), "true")
+            self.assertEqual(symbol.evaluate("el => getComputedStyle(el).width"), "20px")
+            self.assertEqual(symbol.evaluate("el => getComputedStyle(el).height"), "20px")
+            center = symbol.evaluate(
+                """el => {
+                    const art = el.querySelector('.symbol-art');
+                    const b = art.getBBox();
+                    const m = art.transform.baseVal.consolidate()?.matrix;
+                    return {
+                        x: b.x + b.width / 2 + (m?.e || 0),
+                        y: b.y + b.height / 2 + (m?.f || 0)
+                    };
+                }"""
             )
-            self.assertAlmostEqual(optical_y(swatch), 1.0, delta=0.05)
+            self.assertAlmostEqual(center["x"], 12.0, delta=0.01)
+            self.assertAlmostEqual(center["y"], 12.0, delta=0.01)
+
+        current = comparison.locator('[data-symbol-variant="symbol-button-current"] .symbol-button').first
+        circle = comparison.locator('[data-symbol-variant="symbol-button-circle"] .symbol-button').first
+        glass = comparison.locator('[data-symbol-variant="symbol-button-glass"] .symbol-button').first
+        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderRadius"), "12px")
+        self.assertEqual(circle.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertEqual(glass.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
+        self.assertNotEqual(glass.evaluate("el => getComputedStyle(el).backdropFilter"), "none")
+        self.assertNotEqual(glass.evaluate("el => getComputedStyle(el).boxShadow"), "none")
 
         complete = page.locator(".checkmark").first
-        current = page.locator(".journey-mark.current")
+        current_state = page.locator(".journey-mark.current")
         incomplete = page.locator(".completion-ring").first
-        for marker in (complete, current, incomplete):
+        for marker in (complete, current_state, incomplete):
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).width"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).height"), "24px")
             self.assertEqual(marker.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
@@ -99,10 +127,10 @@ class G7ShellTestBrowser(unittest.TestCase):
         )
 
         # Current and incomplete share width/caps; only weight and contrast step down.
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
+        self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
+        self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+        self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
+        self.assertEqual(current_state.evaluate("el => getComputedStyle(el, '::before').backgroundColor"), "rgb(217, 217, 223)")
         self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').width"), "18px")
         self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').height"), "2px")
         self.assertEqual(incomplete.evaluate("el => getComputedStyle(el, '::before').borderRadius"), "2px")
@@ -158,8 +186,8 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertLess(bars_box["x"] + bars_box["width"], reorder_box["x"])
         self.assertLessEqual(abs(bars_box["x"] - name_box["x"]), 1.0)
 
-        # The existing horizontal accessory lane stays fixed; this pass changes visible y placement only.
-        accessory_locators = [complete, current, incomplete, chevron, reorder, management]
+        # The existing horizontal accessory lane stays fixed; this experiment does not alter real G7 geometry.
+        accessory_locators = [complete, current_state, incomplete, chevron, reorder, management]
         centers = []
         for locator in accessory_locators:
             box = locator.bounding_box()
