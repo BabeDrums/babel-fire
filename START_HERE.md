@@ -44,28 +44,52 @@ Current shared frame rules:
 
 `frame-primitives.css` owns those structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
 
-The PR #89 head and exact merged commit passed Static + Chromium **390 / 440 / 820**, including the real G7 Project → Setup → Structure path and Shell Test. Pages deployed the exact merge successfully.
+PR #89 passed Static + Chromium **390 / 440 / 820**, including the real G7 Project → Setup → Structure path and Shell Test. Pages deployed the exact merge successfully.
 
-PR #90 only refreshed handoff documentation after that deployment; it did not change the reviewed runtime.
+PR #91 later simplified authority/documentation only and made no G7/V6 runtime change. Exact Pages deployment and post-merge Static + Chromium 390/440/820 passed on `f512b90065c58a2426e79e4a99941a22b22fe35e`.
 
-## Immediate next gate — physical review
+## Active physical-review finding — host centering
 
-Do **not** redo PR #89 or reopen symbol metrics without new physical evidence.
+Physical iPad review of deployed `G7 · f512b90` found that the normalized glyphs look correct in the Shell Test container comparison, while the same generated artwork can sit visibly high in toolbar/action/row/state hosts.
 
-Review real G7 on **iPhone first**, then **iPad / regular width**. Judge:
-- Back / Add / More relationship in the shared header
-- 44px hit target vs 36px visible button material
+The defect is classified as a **host-centering contract problem**, not a new per-symbol optical-nudge problem:
+- `+` / `•••` read high in toolbar/action hosts
+- managed-row `•••` reads high
+- Current's status bar is the clearest high state mark; checks also need the same host consistency
+- Back / Forward and the intrinsic symbol metrics themselves should remain unchanged unless new evidence proves otherwise
+- accepted x-lanes, row/text geometry, 44px hit targets, and 36px visible toolbar material stay fixed
+
+Current candidate on `fix-g7-host-centering`:
+- generated symbol/state pseudo-elements are explicitly centered inside their stable host boxes using absolute inset + auto margins
+- host centering does not consume the CSS transform channel used by intrinsic symbol metrics
+- `frame-primitives.css` no longer changes symbol pseudo-elements back to relative positioning
+- the obsolete shell-level header action offset rule is removed; structural header placement has one owner in `frame-primitives.css`
+- Shell Test removes the redundant adaptive-dialog helper sentence and gives the sparse composition fixture intentional internal inset
+
+This candidate is not physically approved and does not lock any category.
+
+## Immediate next gate — candidate validation
+
+First require the normal engineering gate on the exact PR head:
+- Authority/Handoff
+- Static
+- Chromium 390 / 440 / 820
+- Shell Test and real G7 fixture coverage
+
+After exact deployment, review on **iPhone first**, then **iPad / regular width**. Specifically judge:
+- Add / More vertical seating inside top controls
+- managed-row More vertical seating
+- Complete / Current / Incomplete vertical seating as one state family
+- Back / Forward preservation
+- Reorder preservation
+- 44px interaction target vs 36px visible button material
 - title/meta spacing and hierarchy
-- Complete / Current / Incomplete / Reorder seating
 - Tempo / Meter lane
 - keyboard/focus progression
 - add/edit sheet hierarchy and placement
 - interaction with Safari browser chrome
-- any remaining cross-screen spacing/alignment inconsistency
 
-Classify any defect as shared-frame, symbol/state, page-local composition, browser/environment, or disposable fixture content before changing code.
-
-Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
+Do not infer iPhone approval from this iPad finding. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
 
 ## Stable boundaries
 
