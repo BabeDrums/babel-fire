@@ -22,6 +22,7 @@ def test_real_g7_and_shell_test_load_same_deployment_revisioned_primitive_layer(
 
 def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     js = read("v7-preview/shell-test.js")
+    assert "Glyph palette" in js
     assert "Rows · accessories" in js
     assert "Controls · states" in js
     assert "Temporary UI" in js
@@ -29,60 +30,50 @@ def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     assert "intentionally not a FIRE workflow" not in js
     assert 'class="screen-meta build-info"' in js
     assert "G7 · ${commit}" in js
+    assert js.count('class="glyph-swatch"') == 6
 
 
-def test_project_management_has_no_divider_and_accessories_are_canonicalized():
+def test_project_management_has_no_divider_and_accessories_use_canonical_icon_variables():
     css = read("v7-preview/shell-primitives.css")
     assert ".project-card-actions" in css
     assert "border-left: 0" in css
-    assert "--accessory-box" in css
-    assert "--accessory-stroke" in css
-    assert "--accessory-cap" in css
+    assert "--accessory-box: 28px" in css
+    assert "--accessory-glyph: 20px" in css
+    assert "--state-marker-size: 24px" in css
+    for token in ("--icon-check", "--icon-chevron-right", "--icon-plus", "--icon-ellipsis", "--icon-menu"):
+        assert token in css
     assert ".journey-mark" in css
     assert ".completion-ring" in css
-    assert "--chevron-mask" in css
     assert ".reorder-handle::before" in css
 
 
-def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring():
+def test_accessory_family_uses_canonical_masks_and_single_ring_current_state():
     css = read("v7-preview/shell-primitives.css")
 
-    # Toolbar actions remain geometry-driven, not font-metric driven.
-    assert ".add-button { font-size: 0; }" in css
     assert ".add-button::before" in css
-    assert ".add-button::after" in css
     assert ".more-button::before" in css
-    assert "box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor" in css
+    assert "mask-image: var(--icon-plus)" in css
+    assert "mask-image: var(--icon-ellipsis)" in css
 
-    # Complete is drawn from rounded strokes instead of inheriting a font checkmark shape.
     assert ".checkmark::before" in css
-    assert ".checkmark::after" in css
     assert ".journey-mark.done::before" in css
-    assert ".journey-mark.done::after" in css
+    assert "mask: var(--icon-check) center / contain no-repeat" in css
     assert 'content: "✓"' not in css
-    assert "border-radius: var(--accessory-cap)" in css
 
-    # Current is outer ring + a visibly thicker faded inner ring pinned to the outer ring's inside edge.
     assert ".journey-mark.current" in css
     assert "border: 2px solid var(--state-current-ring)" in css
     assert "--state-current-ring: #d9d9df" in css
-    assert "--state-current-inner-ring: rgba(232,232,237,.38)" in css
-    assert ".journey-mark.current::after" in css
-    assert "position: absolute" in css
-    assert "inset: 0" in css
-    assert "border: 3px solid var(--state-current-inner-ring)" in css
-    assert "background: transparent" in css
-    assert "#d8d84f" not in css
+    assert ".journey-mark.current::before,\n.journey-mark.current::after { content: none; }" in css
+    assert "state-current-inner-ring" not in css
 
-    # Back, Shell Test Back, and forward navigation are one rounded, seam-free mask mirrored by direction.
-    assert "--chevron-mask:" in css
+    assert "--icon-chevron-right" in css
     assert "stroke-linecap='round'" in css
     assert "stroke-linejoin='round'" in css
     assert ".chevron::before," in css
     assert ".back-glyph::before," in css
     assert ".shell-test-link::before" in css
-    assert ".back-glyph::before,\n.shell-test-link::before { transform: scaleX(-1); }" in css
-    assert ".chevron::after" not in css
+    assert "translateX(-1px) scaleX(-1)" in css
+    assert ".chevron::after," in css
 
 
 def test_header_action_alignment_is_owned_by_shared_primitive_layer():
@@ -91,11 +82,24 @@ def test_header_action_alignment_is_owned_by_shared_primitive_layer():
     assert ".toolbar-trailing { transform: translateY(var(--header-action-offset)); }" in css
 
 
-def test_shared_accessory_layer_does_not_override_form_control_grid():
+def test_shared_accessory_lane_keeps_hit_target_separate_from_visible_marker_mass():
     css = read("v7-preview/shell-primitives.css")
     assert ".row,\n.form-row" not in css
     assert ".row > :last-child,\n.form-row > :last-child" not in css
-    assert ".row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }" in css
+    assert ".row {\n  grid-template-columns: minmax(0, 1fr) var(--touch);" in css
+    assert ".journey-mark,\n.checkmark,\n.completion-ring" in css
+    assert "width: var(--state-marker-size)" in css
+    assert "height: var(--state-marker-size)" in css
+
+
+def test_shell_test_palette_uses_same_icon_variables_without_becoming_product_chrome():
+    css = read("v7-preview/shell-primitives.css")
+    js = read("v7-preview/shell-test.js")
+    assert ".shell-test-glyph-palette" in css
+    assert ".glyph-swatch" in css
+    for glyph in ("back", "forward", "plus", "check", "reorder", "more"):
+        assert f'data-glyph="{glyph}"' in js
+    assert "These are not a proposal to put every production glyph in a visible button" in css
 
 
 def test_shared_modal_spacing_uses_named_tokens_without_added_hairlines():
