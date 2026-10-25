@@ -168,7 +168,6 @@ host.innerHTML = `
         <button class="sheet-button sheet-secondary" data-open="confirm">Open confirmation</button>
         <button class="sheet-button sheet-danger-button" data-open="destructive">Open destructive</button>
       </div>
-      <p class="shell-test-note">Same semantic primitive: bottom sheet on compact width, centered dialog on regular width.</p>
     </section>
 
     <section class="shell-test-section" aria-labelledby="densityHeading">
