@@ -11,8 +11,9 @@ Use **Babel** as the project-facing name.
 5. `V6.md` for live production behavior
 6. `V7_DRAFT.md` for G7 successor behavior
 7. `G7_SHELL_CERTIFICATION.md` for the active shell-completion contract and freeze gate
-8. Babel Truth Issue #1 body **plus newer comments** for unresolved FIRE items
-9. code/tests as implementation evidence
+8. `G7_SHELL_CERTIFICATION_STATUS.md` for mutable category/evidence status
+9. Babel Truth Issue #1 body **plus newer comments** for unresolved FIRE items
+10. code/tests as implementation evidence
 
 ## Current state — G7 Shell Certification active
 
@@ -22,15 +23,28 @@ G7 remains the isolated successor preview at `/v7-preview/` using `production-pr
 
 PR **#66 — Return coordinated shell iteration to G7** established that complete coordinated FIRE shell work belongs in the real isolated G7 context; the former full-shell Lab replica is rejected evidence.
 
-PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review still exposed systemic shell inconsistencies: project-row management treatment, glyph/accessory geometry, modal composition, and fixture-specific UI being mistaken for shell work.
+PR **#67 — Refine G7 shell cohesion after physical review** is merged. Its deployed result is useful evidence, but physical review continued to expose systemic shell inconsistencies rather than final FIRE-workflow questions.
 
-PR **#73 — Repair G7 shell deployment verification and cache behavior** is the active reliability repair after a shell pass was merged despite red regressions and iOS/Safari could continue serving stale unversioned Shell Test assets. The repair versions G7/Shell Test asset URLs and realigns regression expectations with the current certification surface. Do not merge shell changes with red regressions; verify the exact deployed commit before physical review.
+The developer Shell Test is now the shared-primitives certification surface inside G7. Physical review has found it broadly useful while still exposing fundamentals to correct: project-row management treatment, optical glyph/accessory geometry, current-state language, modal/group rhythm, and reliable deployed-build identification.
 
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.**
 
-The active phase is now **G7 Shell Certification**. `G7_SHELL_CERTIFICATION.md` defines the finite ten-category completion contract, `Unresolved → Candidate → Locked` states, the developer-only Shell Test, and the final freeze gate.
+The active phase is **G7 Shell Certification**. `G7_SHELL_CERTIFICATION.md` defines the finite ten-category completion contract, `Unresolved → Candidate → Locked` states, the developer-only Shell Test, and the final freeze gate. `G7_SHELL_CERTIFICATION_STATUS.md` records mutable review evidence.
 
-At adoption of that contract, no category is automatically Locked. Existing G7 work remains evidence and can become Candidate/Locked only through the certification criteria.
+No category is automatically Locked. Existing G7 work remains evidence and can become Locked only through the certification criteria and physical-device validation.
+
+## Reliability baseline
+
+Shell work must leave implementation, active authority, regression expectations, handoff state, and deployed assets describing the same candidate.
+
+- Do not merge a shell change with known red regressions.
+- If a deliberate product/shell decision makes an old regression obsolete, update that regression in the same change rather than restoring superseded behavior just to get green.
+- G7 and Shell Test CSS/JS asset URLs are tied to the deployed GitHub Pages build revision rather than a manually bumped cache string.
+- G7's module dependency mapping revisions `model.js` with the same deployed build revision.
+- Shell Test and real G7 display the deployed short commit from `build-info.json`; physical review should target that exact revision.
+- CI preprocesses the same Pages revision placeholders for local browser regressions, so test behavior matches deployed asset wiring.
+- Browser-test dependencies are pinned for reproducibility instead of silently changing under the repo.
+- The authority/handoff gate protects current semantic markers, not exact wording from retired G7 drafts.
 
 ## Current strategy — certify the grammar, not the fixture screens
 
@@ -42,9 +56,9 @@ Do not spend shell work product-designing a fixture interaction merely because i
 
 ### Developer Shell Test
 
-Build a developer-only Shell Test **inside G7** using the actual G7 primitives/tokens/styles. It is a component/state stress-test surface, not a second FIRE implementation and not a FIRE Core destination.
+The developer-only Shell Test lives **inside G7** and uses the actual G7 primitives/tokens/styles. It is a component/state stress-test surface, not a second FIRE implementation and not a FIRE Core destination.
 
-It should deliberately exercise the ten certification categories and representative sparse/normal/dense, short/long, default/selected/custom/disabled/focus/error states where applicable. A primitive fixed in Shell Test must be the same primitive used by real G7.
+It deliberately exercises the ten certification categories and representative sparse/normal/dense, short/long, default/selected/custom/disabled/focus/error states where applicable. A primitive fixed in Shell Test must be the same primitive used by real G7.
 
 Shell Test does not replace real-product or physical-device validation.
 
@@ -57,7 +71,7 @@ Shell Test does not replace real-product or physical-device validation.
 
 Default shell workflow:
 
-**diagnose a certification category → exercise actual primitives in Shell Test and real G7 → optionally use Lab for a bounded experiment → implement the candidate in G7 → physical-device validation → mark category Candidate/Locked only when its gate is satisfied → repeat → final physical sweep → explicit shell freeze.**
+**diagnose a certification category → exercise actual primitives in Shell Test and real G7 → optionally use Lab for a bounded experiment → implement the candidate in G7 → run/reconcile regression + authority gates → deploy exact revision → physical-device validation → mark category Candidate/Locked only when its gate is satisfied → repeat → final physical sweep → explicit shell freeze.**
 
 Do not make G7 automatically match a Lab specimen.
 
@@ -68,6 +82,9 @@ Do not make G7 automatically match a Lab specimen.
 - history-aware Back retraces actual route history; direct work entry falls back safely to Project Home
 - toolbar `+` means add/create the primary discrete thing for the current view
 - toolbar `•••` means management/actions
+- project-row management has no decorative divider from the row
+- recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
+- current progress state uses the stronger outlined-ring language under physical review, not an inner-dot marker
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
@@ -79,20 +96,19 @@ Existing interaction semantics remain useful evidence:
 - Navigation enters another meaningful workspace
 - Menu/secondary affordance holds utilities that should not compete with musical work
 
-## Immediate certification findings / next implementation pass
+## Current certification findings / physical-review focus
 
-Use the latest physical review as input to the first Shell Certification pass:
+The following are **implemented Candidate evidence, not Locked conclusions**:
 
-- remove the divider separating project-row `•••`; make management feel native to and optically aligned within the row
-- optically center `+` inside its control surface and keep shared toolbar geometry coherent
-- establish one canonical recurring glyph/accessory system: check/current/incomplete/chevron/ellipsis/add/drag geometry, optical weight, size, and accessory slots
-- eliminate accidental differences between checkmarks/circles used for the same meaning
-- improve the shared modal/sheet primitive as Babel composition rather than polishing one Structure fixture
-- treat `Accurate` wording and the current Tracks UI as disposable fixture semantics; do not lock product architecture from them
-- use wider/different fixture density only when it helps stress-test the shell
-- continue solving typography, spacing, surfaces, actions, controls, responsive behavior, accessibility, and motion through the ten-category contract rather than page-by-page taste
+- project-row `•••` divider removed and management aligned through the shared accessory lane
+- `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
+- canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
+- current state uses an older-roadmap-inspired outlined ring rather than a center dot
+- modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
+- Shell Test subtitle is the live G7 deployed-version indicator
+- Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine
 
-No additional FIRE Core architecture should be inferred from this pass.
+Next product-facing work is physical confirmation of the repaired exact deployed revision, followed by category-by-category certification. Do not infer additional FIRE Core architecture from the fixture content.
 
 ## Certification and approval gate
 
