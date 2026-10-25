@@ -87,8 +87,22 @@
 }
 .chevron { color: var(--quiet); }
 .back-glyph { color: var(--muted); }
+.shell-test-link {
+  width: var(--touch);
+  height: var(--touch);
+  min-width: var(--touch);
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+.shell-test-link:active { background: rgba(255,255,255,.065); }
 .chevron::before,
-.back-glyph::before {
+.back-glyph::before,
+.shell-test-link::before {
   content: "";
   width: var(--accessory-glyph);
   height: var(--accessory-glyph);
@@ -97,7 +111,8 @@
   mask: var(--chevron-mask) center / contain no-repeat;
   pointer-events: none;
 }
-.back-glyph::before { transform: scaleX(-1); }
+.back-glyph::before,
+.shell-test-link::before { transform: scaleX(-1); }
 
 /* Management is an accessory, never a divided second column. */
 .project-card-actions {
