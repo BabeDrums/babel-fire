@@ -84,7 +84,7 @@ Do not make G7 automatically match a Lab specimen.
 - toolbar `•••` means management/actions
 - project-row management has no decorative divider from the row
 - recurring state/accessory meanings use one canonical shared geometry while different meanings are not forced into the same visible container
-- current progress state uses the stronger outlined-ring language under physical review, not an inner-dot marker
+- current progress state uses a neutral nested-ring language under physical review: a brighter outer ring plus a quieter inset circle; color alone does not carry the state
 - Tracks Done currently confirms a non-empty current selection and returns Home without a Home → Back → Tracks loop; this is fixture behavior, not promised FIRE Core architecture
 - iPhone/iPad share one product logic; presentation may adapt
 - V6 production schema/data remain untouched
@@ -102,8 +102,9 @@ The following are **implemented Candidate evidence, not Locked conclusions**:
 
 - project-row `•••` divider removed and management aligned through the shared accessory lane
 - `+` drawn from centered CSS strokes rather than a font glyph so Safari/iOS font metrics cannot shift it
+- management `•••`, chevron, and reorder marks use fixed drawn geometry on the shared accessory artboard rather than font baseline metrics
 - canonical completion/current/incomplete/chevron/ellipsis/add/drag accessory boxes and optical corrections live in the shared primitive layer
-- current state uses an older-roadmap-inspired outlined ring rather than a center dot
+- current state borrows only the older roadmap's nested-state structure: neutral outer ring plus a subtle faded inset circle, not the old yellow accent
 - modal content-group and action rhythm use named shared tokens rather than test-only magic numbers
 - Shell Test subtitle is the live G7 deployed-version indicator
 - Setup / Structure / Tracks remain disposable fixture semantics; `Accurate` wording and the Tracks layout are not FIRE Core doctrine

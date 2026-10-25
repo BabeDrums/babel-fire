@@ -49,10 +49,24 @@ class G7ShellTestBrowser(unittest.TestCase):
 
         current = page.locator(".journey-mark.current")
         self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopWidth"), "2px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), "none")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), '""')
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').width"), "10px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').height"), "10px")
 
         management = page.get_by_role("button", name="Example row actions")
         self.assertEqual(management.evaluate("el => getComputedStyle(el).borderLeftWidth"), "0px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').width"), "3px")
+        self.assertEqual(management.evaluate("el => getComputedStyle(el, '::before').height"), "3px")
+
+        chevron = page.locator(".chevron").first
+        self.assertEqual(chevron.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertEqual(chevron.evaluate("el => getComputedStyle(el, '::before').width"), "7px")
+
+        reorder = page.get_by_role("button", name="Reorder example")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertEqual(reorder.evaluate("el => getComputedStyle(el, '::before').width"), "14px")
 
     def test_shell_test_temporary_ui_uses_same_adaptive_dialog_primitive(self):
         page = self.open()
