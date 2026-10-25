@@ -3,7 +3,7 @@
 This repository follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `ae1e30b971571e7620578a48c637f0e18862375a`
+- Last reconciled Truth commit: `d191882918402c1a2fbd22f485496a25d8abb700`
 - Active unresolved continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
 
 ## Read before FIRE work

@@ -1,21 +1,17 @@
-/* G7 Shell Certification pass 11
-   Shared primitive refinements. Loaded by both real G7 and Shell Test.
-   Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
+/* G7 Shell Certification shared primitives
+   Loaded by both real G7 and Shell Test.
+   Standard interface glyphs use canonical Lucide geometry.
+   Progress-state visuals have one owner: state-primitives.css.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
 :root {
   --accessory-box: 28px;
   --accessory-glyph: 20px;
-  --state-marker-size: 24px;
   --toolbar-icon-size: 22px;
   --accessory-edge-inset: 4px;
   --symbol-optical-y: 1px;
   --toolbar-control-radius: 13px;
   --header-action-offset: 44px;
-  --state-ring: #666872;
-  --state-fill: #e8e8ed;
-  --state-current-ring: #d9d9df;
-  --state-current-fill: rgba(232,232,237,.035);
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
 
@@ -142,10 +138,7 @@
 }
 .row > :last-child { justify-self: center; }
 .journey-row { grid-template-columns: minmax(0, 1fr) var(--touch); }
-.journey-mark,
 .chevron,
-.checkmark,
-.completion-ring,
 .shell-accessory {
   width: var(--accessory-box);
   height: var(--accessory-box);
@@ -156,59 +149,6 @@
   line-height: 1;
   box-sizing: border-box;
 }
-
-/* State language is separate from commodity glyphs.
-   State markers are intentionally a little smaller than the old 28px treatment so their visual mass
-   balances the 20px navigation/management family while preserving the same 44px lane. */
-.journey-mark,
-.checkmark,
-.completion-ring {
-  width: var(--state-marker-size);
-  height: var(--state-marker-size);
-  min-width: var(--state-marker-size);
-}
-.journey-mark { font-size: 0; text-align: center; }
-.journey-mark.done,
-.checkmark {
-  position: relative;
-  border-radius: 50%;
-  background: var(--state-fill);
-  color: #101013;
-  border: 1px solid var(--state-fill);
-  font-size: 0;
-}
-.journey-mark.done::before,
-.checkmark::before {
-  content: "";
-  width: 14px;
-  height: 14px;
-  background: currentColor;
-  -webkit-mask: var(--icon-check) center / contain no-repeat;
-  mask: var(--icon-check) center / contain no-repeat;
-  transform: translateY(var(--symbol-optical-y));
-  pointer-events: none;
-}
-.journey-mark.done::after,
-.checkmark::after { content: none; }
-
-/* Current is deliberately not a bullseye/radio control: emphasis comes from ring weight and contrast only. */
-.journey-mark.current {
-  position: relative;
-  font-size: 0;
-  border-radius: 50%;
-  border: 2px solid var(--state-current-ring);
-  background: var(--state-current-fill);
-  box-shadow: none;
-}
-.journey-mark.current::before,
-.journey-mark.current::after { content: none; }
-.journey-mark.upcoming,
-.completion-ring {
-  border-radius: 50%;
-  border: 1.5px solid var(--state-ring);
-  background: transparent;
-}
-.journey-mark.upcoming { font-size: 0; }
 
 /* Reorder rows use one content lane plus one accessory lane.
    Supporting values belong to the content hierarchy, never beside the reorder affordance. */
