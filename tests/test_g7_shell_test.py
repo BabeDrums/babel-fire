@@ -35,7 +35,8 @@ def test_shell_test_is_disposable_certification_surface_not_fire_flow():
     assert "G7 · ${commit}" in js
     assert 'symbolRow("symbol-button-current", "Current")' in js
     assert 'symbolRow("symbol-button-circle", "Circle")' in js
-    assert 'symbolRow("symbol-button-glass", "Liquid Glass")' in js
+    assert "symbol-button-glass" not in js
+    assert "Liquid Glass" not in js
 
 
 def test_project_management_has_no_divider_and_accessories_use_canonical_icon_variables():
@@ -105,7 +106,7 @@ def test_visible_glyph_artwork_uses_one_downward_optical_baseline_without_moving
     assert "translateY(-.25px)" not in state_css
 
 
-def test_shell_test_comparison_normalizes_vector_geometry_without_global_pixel_nudge():
+def test_shell_test_comparison_normalizes_vector_geometry_with_one_mirrored_chevron_correction():
     js = read("v7-preview/shell-test.js")
     css = read("v7-preview/shell-test-experiments.css")
 
@@ -117,12 +118,22 @@ def test_shell_test_comparison_normalizes_vector_geometry_without_global_pixel_n
     for glyph in ("back", "forward", "plus", "check", "reorder", "more"):
         assert f"{glyph}:" in js
 
+    assert "const CHEVRON_OPTICAL_INSET = 1.2" in js
+    assert 'svg.dataset.symbol === "back"' in js
+    assert 'svg.dataset.symbol === "forward"' in js
+    assert "? CHEVRON_OPTICAL_INSET" in js
+    assert "? -CHEVRON_OPTICAL_INSET" in js
+    assert 'svg.dataset.opticalShiftX = opticalDx.toFixed(3)' in js
+
     assert "--symbol-optical-y" not in css
     assert ".symbol-button-current" in css
     assert ".symbol-button-circle" in css
-    assert ".symbol-button-glass" in css
+    assert ".symbol-button-glass" not in css
+    assert "backdrop-filter" not in css
+    assert "radial-gradient" not in css
+    assert "background: var(--surface)" in css
+    assert "border-radius: var(--group-radius)" in css
     assert "border-radius: 50%" in css
-    assert "backdrop-filter: blur(18px)" in css
     assert "width: var(--touch)" in css
     assert "height: var(--touch)" in css
 
