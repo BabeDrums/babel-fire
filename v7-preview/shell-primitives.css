@@ -1,11 +1,12 @@
-/* G7 Shell Certification pass 8
+/* G7 Shell Certification pass 9
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    Standard interface glyphs use canonical Lucide geometry; state markers remain Babel primitives.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
 :root {
   --accessory-box: 28px;
-  --accessory-glyph: 18px;
+  --accessory-glyph: 20px;
+  --state-marker-size: 24px;
   --toolbar-icon-size: 22px;
   --accessory-edge-inset: 4px;
   --toolbar-control-radius: 13px;
@@ -115,8 +116,9 @@
   mask: var(--icon-chevron-right) center / contain no-repeat;
   pointer-events: none;
 }
-.back-glyph::before,
-.shell-test-link::before { transform: scaleX(-1); }
+.chevron::before { transform: translateX(1px); }
+.back-glyph::before { transform: translateX(-1px) scaleX(-1); }
+.shell-test-link::before { transform: translateX(-1px) scaleX(-1); }
 .chevron::after,
 .back-glyph::after,
 .shell-test-link::after { content: none; }
@@ -130,7 +132,7 @@
 }
 
 /* One physical trailing lane across grouped rows, project cards and arrangement rows.
-   Rows use a 44px slot plus 4px right inset, matching the 52px centered slots used by project/arrangement rows. */
+   The lane is shared, but the visible marks are optically balanced inside it rather than forced to equal mass. */
 .row {
   grid-template-columns: minmax(0, 1fr) var(--touch);
   padding-right: var(--accessory-edge-inset);
@@ -153,7 +155,15 @@
 }
 
 /* State language is separate from commodity glyphs.
-   Complete = filled state + canonical check. Current = one emphasized ring. Incomplete = quiet ring. */
+   State markers are intentionally a little smaller than the old 28px treatment so their visual mass
+   balances the 20px navigation/management family while preserving the same 44px lane. */
+.journey-mark,
+.checkmark,
+.completion-ring {
+  width: var(--state-marker-size);
+  height: var(--state-marker-size);
+  min-width: var(--state-marker-size);
+}
 .journey-mark { font-size: 0; text-align: center; }
 .journey-mark.done,
 .checkmark {
@@ -167,11 +177,12 @@
 .journey-mark.done::before,
 .checkmark::before {
   content: "";
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: currentColor;
   -webkit-mask: var(--icon-check) center / contain no-repeat;
   mask: var(--icon-check) center / contain no-repeat;
+  transform: translateY(-.25px);
   pointer-events: none;
 }
 .journey-mark.done::after,
@@ -182,7 +193,7 @@
   position: relative;
   font-size: 0;
   border-radius: 50%;
-  border: 2.5px solid var(--state-current-ring);
+  border: 2px solid var(--state-current-ring);
   background: var(--state-current-fill);
   box-shadow: none;
 }
@@ -273,6 +284,67 @@
   align-items: center;
 }
 .shell-test-disabled { opacity: .42; }
+
+/* Compact visual palette: intentionally boxed only for comparison in Shell Test.
+   These are not a proposal to put every production glyph in a visible button. */
+.shell-test-glyph-palette {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.glyph-swatch {
+  position: relative;
+  min-width: 0;
+  height: var(--touch);
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  color: #c9c9d0;
+  background: #17171a;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: none;
+  font-size: 0;
+}
+.glyph-swatch::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  pointer-events: none;
+}
+.glyph-swatch[data-glyph="back"]::before,
+.glyph-swatch[data-glyph="forward"]::before {
+  -webkit-mask-image: var(--icon-chevron-right);
+  mask-image: var(--icon-chevron-right);
+}
+.glyph-swatch[data-glyph="back"]::before { transform: translateX(-1px) scaleX(-1); }
+.glyph-swatch[data-glyph="forward"]::before { transform: translateX(1px); }
+.glyph-swatch[data-glyph="plus"]::before {
+  width: 22px;
+  height: 22px;
+  -webkit-mask-image: var(--icon-plus);
+  mask-image: var(--icon-plus);
+}
+.glyph-swatch[data-glyph="check"]::before {
+  -webkit-mask-image: var(--icon-check);
+  mask-image: var(--icon-check);
+}
+.glyph-swatch[data-glyph="reorder"]::before {
+  -webkit-mask-image: var(--icon-menu);
+  mask-image: var(--icon-menu);
+}
+.glyph-swatch[data-glyph="more"]::before {
+  -webkit-mask-image: var(--icon-ellipsis);
+  mask-image: var(--icon-ellipsis);
+}
+.glyph-swatch:active { background: #202024; }
 
 @media (min-width: 700px) {
   .sheet {
