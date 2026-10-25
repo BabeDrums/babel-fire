@@ -19,37 +19,46 @@ Use **Babel** as the project-facing name.
 
 Production remains **V6**. G7 is the isolated successor preview at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
 
-PR **#66 — Return coordinated shell iteration to G7** established that complete coordinated FIRE shell work belongs in the real isolated G7 context; the former full-shell Lab replica is rejected evidence.
-
-PR **#67 — Refine G7 shell cohesion after physical review** is an important historical baseline for the current certification sequence. Later certification passes supersede its visual details where explicitly documented.
-
 **G7 is not approved/frozen. FIRE Core breadboarding has not started.** All ten certification categories remain Candidate; **0 / 10 are Locked**.
 
-## Current visual candidate
+Coordinated FIRE shell implementation/certification belongs in the real isolated G7 context. Babel Lab remains optional bounded evidence only and must not become a parallel FIRE shell.
 
-The active candidate is the result of the Shell Test / real-G7 accessory refinement sequence culminating in PR #83's vertical optical-baseline change. A later maintenance-only commit may have a newer build SHA without changing this visible candidate; the live `G7 · <short SHA>` indicator identifies the exact deployment under review.
+## Current symbol/alignment finding
 
-Current accepted structure:
+The deployed real-G7 candidate still contains PR #83's shared `--symbol-optical-y: 1px` correction. That candidate preserved the accepted horizontal row/accessory lanes, text anchors, hit targets, and header geometry while moving visible symbol/state artwork down 1px.
 
-- horizontal row/accessory lanes, text anchors, hit-target boxes, and header geometry are preserved
-- visible symbol/state artwork uses one shared **1px downward optical baseline** (`--symbol-optical-y`) because physical iPhone review found the artwork reading slightly high, not too far left/right
-- commodity interface glyphs use one canonical Lucide 24×24 source family for Check, Chevron, Plus, Ellipsis, and Reorder rather than independent hand-drawn CSS shapes
-- Back and Forward use the same chevron family; direction is the semantic difference
-- progress state is deliberately non-circular: **Complete = canonical check; Current = stronger 18px bar; Incomplete/upcoming = quieter 18px bar**
-- Current does not tint the whole row; selection and progression are separate semantics
-- arrangement metadata such as `8 bars` sits beneath the section name as supporting text; Reorder alone owns the far-right affordance
-- Shell Test contains a comparison-only glyph palette so Back / Forward / Add / Check / Reorder / More can be judged side-by-side
-- `state-primitives.css` is the sole owner of progress-state visual language; shared shell primitives own lane/grid/glyph infrastructure
+Physical iPhone review of `G7 · d00d146` found that the family is close but still does not feel consistently optically seated. The 1px candidate is therefore **not physically approved**.
 
-The last user physical feedback before the current vertical-baseline candidate was: **the overall shell looks very nice, but the visible glyph/state artwork feels slightly pushed up.** The required correction is vertical/down, not a horizontal lane shift. Do not reopen the accepted x-centers unless new physical evidence proves they are wrong.
+The next diagnosis is systemic: mathematically centering a 24×24 icon canvas does not guarantee that the visible vector artwork is optically centered. Do not continue by stacking page-specific or universal pixel nudges.
+
+### Active Shell Test experiment
+
+Shell Test now contains a bounded symbol-system comparison that does **not** alter real G7 production controls:
+
+- the same six commodity symbols are rendered as inline 24×24 SVG artwork
+- each symbol's visible vector bounds are measured with `getBBox()` and automatically translated so the artwork bounds center at 12×12
+- no `--symbol-optical-y` token participates in this experimental palette
+- the same normalized symbol implementation is shown in three rows:
+  1. **Current** — the existing rounded-square Shell Test container treatment
+  2. **Circle** — circular container, no glass treatment
+  3. **Liquid Glass** — circular web approximation using translucency, backdrop adaptation, highlights/depth, and compact press response
+
+Because G7 is static web, the Liquid Glass comparison cannot invoke Apple's native iOS `glass` material APIs. It is an evidence surface that approximates the material behavior closely enough for visual direction testing; it is not a claim of native-system rendering.
+
+The comparison intentionally changes only container treatment. Symbol source geometry, normalization, target size, and 44px interaction boxes stay the same across all three rows.
 
 ## Immediate next gate
 
-Open the exact deployed G7 and Shell Test, verify the build indicator, and physically review the current candidate on iPhone first, then iPad/regular width.
+Deploy the Shell Test experiment and physically review it on iPhone first, then iPad/regular width.
 
-Judge the symbol family together: Plus, Ellipsis, Back/Forward, Complete/Current/Incomplete, Reorder, and the Shell Test palette. Confirm whether the shared 1px downward artwork baseline resolves the slightly-high feeling without disturbing the accepted horizontal layout.
+Judge two questions separately:
 
-If a systemic defect remains, fix the **shared primitive**, add/update regression coverage, run all gates, auto-merge when green, verify the exact Pages deployment, then repeat physical review. Do not jump to FIRE Core and do not lock a category from screenshots alone.
+1. **Symbol system:** does geometry-derived normalization make Back / Forward / Plus / Check / Reorder / More feel naturally seated without manual nudging?
+2. **Container direction:** with symbol geometry held constant, which treatment feels best — Current, plain Circle, or circular Liquid Glass?
+
+Do **not** promote the experiment into real G7 until Babel physically chooses a direction. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
+
+After a direction is chosen, implement the smallest shared real-G7 primitive change, reconcile tests/authority/handoff, run all gates, merge/deploy, then repeat physical iPhone/iPad validation before locking any category.
 
 ## Reliability baseline
 
@@ -57,9 +66,10 @@ Shell work must leave implementation, active authority, regression expectations,
 
 - Do not merge a shell change with known red regressions.
 - If a deliberate decision supersedes an old regression, update that regression in the same change rather than restoring obsolete behavior.
-- **Shell Test passing is not sufficient.** Shared primitives used by real G7 must also pass actual-G7 browser coverage at 390 / 440 / 820 widths; the minimum real-screen path includes Project → Setup → Structure temporary UI.
-- G7 and Shell Test assets use the exact GitHub Pages build revision for cache busting, including `model.js`.
-- Shell Test and real G7 display the deployed short commit from `build-info.json`; physical review targets that exact revision.
+- **Shell Test passing is not sufficient** for any shared primitive used by real G7. Real-G7 browser coverage must still pass at 390 / 440 / 820 widths.
+- Shell Test-only experiments may remain isolated from production primitives until a direction is physically chosen.
+- G7 and Shell Test assets use the exact GitHub Pages build revision for cache busting.
+- Physical review targets the exact deployed revision shown by the G7/Shell Test build indicator.
 - The authority/handoff gate must pass before merge.
 - Production V6 runtime/data/schema remain untouched throughout shell certification.
 
@@ -67,18 +77,22 @@ Shell work must leave implementation, active authority, regression expectations,
 
 Current `Setup → Structure → Tracks` content is disposable shell/workspace fixture content. It exists to exercise transferable primitives; it is **not** frozen FIRE Core architecture, not a promise of exactly three checkpoints, and not a final Tracks/Map design.
 
-The developer-only Shell Test lives **inside G7** and renders the same primitives/tokens/styles used by real G7. It is a certification showroom/torture chamber, not a second FIRE implementation and not Babel Lab.
+The developer-only Shell Test lives **inside G7** and is a certification showroom/torture chamber, not a second FIRE implementation and not Babel Lab.
 
 Routing is explicit:
 
 - **G7** owns coordinated FIRE shell implementation, Shell Test, in-context validation, and certification.
-- **Babel Lab** is optional bounded evidence only. **Lab is evidence, never authority.** Do not rebuild a parallel full FIRE shell there.
+- **Babel Lab** is optional bounded evidence only. **Lab is evidence, never authority.**
 - **Babel Truth** owns only genuinely transferable cross-app principles after deliberate promotion and owning-product validation.
 - **FIRE Core** remains blocked until explicit G7 shell freeze.
 
 Default process:
 
-**diagnose → shape shared primitive → implement on branch → exercise Shell Test + real G7 → run authority/static/390/440/820 gates → auto-merge if green → verify exact Pages commit → physical iPhone/iPad review → update certification evidence → repeat.**
+**Observe → Diagnose → Shape → Contract → Build → Verify → Consolidate.**
+
+For active FIRE shell work:
+
+**physical finding → shared/system diagnosis → bounded Shell Test evidence when useful → branch → implementation/tests/docs → 390/440/820 gates → merge/deploy → exact-build physical iPhone/iPad review.**
 
 ## Stable semantic evidence
 
@@ -92,6 +106,8 @@ Preserve unless certification proves a better transferable primitive:
 - project-row management has no decorative divider
 - ~44px interaction targets remain even when resting toolbar actions are visually glyph-first
 - arrangement supporting metadata belongs to content hierarchy; the far-right lane belongs to the affordance
+- Complete = canonical check; Current = stronger short bar; Incomplete/upcoming = quieter short bar
+- Current does not tint the whole row
 - iPhone/iPad share one product logic even when presentation adapts
 
 Interaction semantics:
