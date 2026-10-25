@@ -69,12 +69,15 @@ class G7ShellTestBrowser(unittest.TestCase):
 
         comparison = page.locator(".symbol-comparison-stage")
         expect(comparison).to_be_visible()
+        self.assertEqual(comparison.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(20, 20, 22)")
+        self.assertEqual(comparison.evaluate("el => getComputedStyle(el).borderRadius"), "16px")
         variants = comparison.locator(".symbol-variant")
-        self.assertEqual(variants.count(), 3)
+        self.assertEqual(variants.count(), 2)
         buttons = comparison.locator(".symbol-button")
         symbols = comparison.locator(".normalized-symbol")
-        self.assertEqual(buttons.count(), 18)
-        self.assertEqual(symbols.count(), 18)
+        self.assertEqual(buttons.count(), 12)
+        self.assertEqual(symbols.count(), 12)
+        self.assertEqual(comparison.locator(".symbol-button-glass").count(), 0)
 
         for button in buttons.all():
             self.assertEqual(button.evaluate("el => getComputedStyle(el).width"), "44px")
@@ -84,6 +87,7 @@ class G7ShellTestBrowser(unittest.TestCase):
             self.assertEqual(symbol.get_attribute("data-normalized"), "true")
             self.assertEqual(symbol.evaluate("el => getComputedStyle(el).width"), "20px")
             self.assertEqual(symbol.evaluate("el => getComputedStyle(el).height"), "20px")
+            optical_x = float(symbol.get_attribute("data-optical-shift-x"))
             center = symbol.evaluate(
                 """el => {
                     const art = el.querySelector('.symbol-art');
@@ -95,17 +99,28 @@ class G7ShellTestBrowser(unittest.TestCase):
                     };
                 }"""
             )
-            self.assertAlmostEqual(center["x"], 12.0, delta=0.01)
+            self.assertAlmostEqual(center["x"], 12.0 + optical_x, delta=0.01)
             self.assertAlmostEqual(center["y"], 12.0, delta=0.01)
+
+        back_symbol = comparison.locator('.normalized-symbol[data-symbol="back"]').first
+        forward_symbol = comparison.locator('.normalized-symbol[data-symbol="forward"]').first
+        back_optical = float(back_symbol.get_attribute("data-optical-shift-x"))
+        forward_optical = float(forward_symbol.get_attribute("data-optical-shift-x"))
+        self.assertGreater(back_optical, 0)
+        self.assertLess(forward_optical, 0)
+        self.assertAlmostEqual(back_optical, -forward_optical, delta=0.001)
+        self.assertAlmostEqual(abs(back_optical), 1.2, delta=0.001)
+
+        for name in ("plus", "check", "reorder", "more"):
+            symbol = comparison.locator(f'.normalized-symbol[data-symbol="{name}"]').first
+            self.assertEqual(float(symbol.get_attribute("data-optical-shift-x")), 0.0)
 
         current = comparison.locator('[data-symbol-variant="symbol-button-current"] .symbol-button').first
         circle = comparison.locator('[data-symbol-variant="symbol-button-circle"] .symbol-button').first
-        glass = comparison.locator('[data-symbol-variant="symbol-button-glass"] .symbol-button').first
         self.assertEqual(current.evaluate("el => getComputedStyle(el).borderRadius"), "12px")
         self.assertEqual(circle.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
-        self.assertEqual(glass.evaluate("el => getComputedStyle(el).borderRadius"), "50%")
-        self.assertNotEqual(glass.evaluate("el => getComputedStyle(el).backdropFilter"), "none")
-        self.assertNotEqual(glass.evaluate("el => getComputedStyle(el).boxShadow"), "none")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el).boxShadow"), "none")
+        self.assertEqual(circle.evaluate("el => getComputedStyle(el).boxShadow"), "none")
 
         complete = page.locator(".checkmark").first
         current_state = page.locator(".journey-mark.current")
