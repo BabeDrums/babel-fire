@@ -31,30 +31,34 @@ Coordinated FIRE shell implementation/certification belongs in the real isolated
 
 The deployed real-G7 candidate still contains PR #83's shared `--symbol-optical-y: 1px` correction. That candidate preserved the accepted horizontal row/accessory lanes, text anchors, hit targets, and header geometry while moving visible symbol/state artwork down 1px.
 
-Physical iPhone review of `G7 · d00d146` did not approve that global 1px candidate, so PR #85 introduced a Shell Test-only inline-SVG normalization experiment. Each symbol's visible vector bounds are measured with `getBBox()` and translated to the 12×12 center of a 24×24 frame without changing real G7 production primitives.
+Physical iPhone review of `G7 · d00d146` did not approve that global 1px candidate, so PR #85 introduced a Shell Test-only inline-SVG normalization experiment. Plus / Check / Reorder / More now read correctly enough in the bounded experiment and should remain undisturbed.
 
-Physical iPad review of deployed `G7 · cf344e6` materially narrowed the remaining problem:
+PR #86 deployed `G7 · 4e84bd5` with Liquid Glass removed, a standard FIRE comparison card, Current vs Circle only, and a mirrored **inward** chevron correction. Physical iPad review rejected that chevron direction: Back / Forward now read too far inward. The helper paragraphs beneath the symbol comparison and Rows · accessories also add unnecessary developer narration and should be removed from the visual review surface.
 
-- **Plus, Check, Reorder, and More now read correctly enough that they should not be disturbed in the experiment.**
-- **Back / Forward chevrons are the remaining symbol culprits.** Their mathematically centered geometry still reads slightly pulled toward each directional tip.
-- The next experimental chevron correction is one mirrored family rule: Back moves slightly inward/right and Forward moves by the same amount inward/left. This is not a page-specific nudge and does not alter production G7 yet.
-- **Liquid Glass is rejected for this shell direction.** Remove the glass row and its ambient/glass substrate rather than retaining dormant styling.
-- **Plain Circle is the preferred container direction from this physical comparison**, but it is not yet promoted into real G7. Keep Current vs Circle side-by-side until the refined chevrons are physically reviewed.
+The research/implementation conclusion is that **bounding-box centering and optical centering are different problems**. Runtime `getBBox()` can mechanically center geometry, but a directional asymmetric glyph can still read off. The next Shell Test candidate therefore treats alignment as an intrinsic symbol metric instead of another container-specific pixel nudge:
+
+- Plus / Check / Reorder / More keep their accepted geometry-bounds centering.
+- Back / Forward use the centroid of the triangular convex hull formed by their three chevron vertices as the optical anchor.
+- For the current 24×24 source geometry, Back's hull center is `x=13` and Forward's is `x=11`; centering those anchors at `x=12` deterministically yields `-1` for Back and `+1` for Forward — equal-and-opposite **outward** movement derived from the glyph geometry rather than a hand-entered correction.
+- The optical rule remains Shell Test-only. Real G7 production controls are unchanged until physical approval.
+
+**Liquid Glass remains rejected.** Plain Circle remains the current physical preference, but it is not yet promoted into real G7.
 
 ### Active Shell Test experiment
 
-Shell Test now contains a bounded two-row symbol/container comparison that does **not** alter real G7 production controls:
+Shell Test contains a bounded two-row symbol/container comparison that does **not** alter real G7 production controls:
 
 - the same six commodity symbols render as inline 24×24 SVG artwork
-- each symbol first receives automatic visible-bounds centering
-- Back and Forward then receive one equal-and-opposite inward optical correction because physical review isolated those two symbols as the remaining offenders
+- Plus / Check / Reorder / More use geometry-bounds centering
+- Back / Forward derive their optical anchor from their own triangular convex-hull centroid, producing mirrored outward seating without a magic offset constant
 - the comparison card uses the standard FIRE grouped surface tokens; it is not a special ambient/glass field
-- the same normalized symbol implementation is shown in two rows:
+- the same symbol implementation is shown in two rows:
   1. **Current** — existing rounded-square Shell Test container treatment
   2. **Circle** — the same simple material in a circular container
 - no Liquid Glass treatment remains in the experiment
+- the two now-redundant explanatory helper paragraphs beneath the symbol comparison and Rows · accessories are removed
 
-The comparison intentionally changes only container shape. Symbol source geometry, normalized placement, target size, simple material, and 44px interaction boxes stay consistent across the two rows.
+The comparison intentionally changes only container shape. Symbol source geometry, alignment model, target size, simple material, and 44px interaction boxes stay consistent across the two rows.
 
 ## Immediate next gate
 
@@ -62,10 +66,10 @@ Deploy the refined Shell Test and physically review it on iPhone first, then iPa
 
 Judge two questions separately:
 
-1. **Chevron seating:** does the symmetric inward correction make Back / Forward feel naturally centered relative to each other and to Plus / Check / Reorder / More?
-2. **Container direction:** with the glass option removed and symbol geometry held constant, does plain Circle still clearly beat Current rounded-square?
+1. **Chevron seating:** does the intrinsic convex-hull optical anchor make Back / Forward feel naturally centered relative to each other and to Plus / Check / Reorder / More without requiring another arbitrary nudge?
+2. **Container direction:** with symbol geometry/alignment held constant, does plain Circle still clearly beat Current rounded-square?
 
-Do **not** promote Circle or the chevron correction into real G7 until Babel physically approves the refined comparison. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
+Do **not** promote Circle or the chevron optical-anchor model into real G7 until Babel physically approves the refined comparison. Do not reopen accepted horizontal accessory lanes unless new physical evidence specifically proves they are wrong.
 
 After a direction is approved, implement the smallest shared real-G7 primitive change, reconcile tests/authority/handoff, run all gates, merge/deploy, then repeat physical iPhone/iPad validation before locking any category.
 
