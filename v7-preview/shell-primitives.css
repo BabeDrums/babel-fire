@@ -1,13 +1,16 @@
-/* G7 Shell Certification pass 3
+/* G7 Shell Certification pass 4
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
 :root {
   --accessory-box: 28px;
   --accessory-glyph: 18px;
+  --accessory-stroke: 2px;
   --toolbar-control-radius: 13px;
   --state-ring: #666872;
   --state-fill: #e8e8ed;
+  --state-current-ring: #d9d9df;
+  --state-current-inner: rgba(232,232,237,.22);
   --sheet-content-gap: 24px;
   --sheet-action-gap: 20px;
 }
@@ -39,17 +42,26 @@
 }
 .add-button::before { width: 18px; height: 2px; }
 .add-button::after { width: 2px; height: 18px; }
+
+/* Draw overflow from three fixed circles on the same optical center as the button.
+   Do not depend on bullet-glyph baseline/side-bearing metrics, which vary in Safari. */
 .more-button {
+  position: relative;
   font-size: 0;
   letter-spacing: 0;
 }
 .more-button::before {
-  content: "•••";
-  display: block;
-  font-size: 15px;
-  line-height: .8;
-  letter-spacing: 1.4px;
-  transform: translate(.7px, -2.2px);
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: -7px 0 0 currentColor, 7px 0 0 currentColor;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 /* Management is an accessory, never a divided second column. */
@@ -81,7 +93,8 @@
   box-sizing: border-box;
 }
 
-/* State language: stronger than navigation, inspired by the older roadmap's clear progress hierarchy. */
+/* State language: shape/contrast carry meaning without requiring accent color.
+   Complete = filled/check. Current = brighter double-level ring. Incomplete = quiet outline. */
 .journey-mark { font-size: var(--accessory-glyph); text-align: center; }
 .journey-mark.done,
 .checkmark {
@@ -102,16 +115,23 @@
   font-size: 13px;
   transform: translateY(0);
 }
-/* Current uses the older roadmap language: a strong outlined progress ring with a quiet inset field, not a dot. */
+/* Current borrows only the older roadmap's nested-state structure, not its yellow accent.
+   The subtle inset circle adds a second visual cue while keeping the Babel shell neutral. */
 .journey-mark.current {
   position: relative;
   font-size: 0;
   border-radius: 50%;
-  border: 2px solid #d8d84f;
+  border: 2px solid var(--state-current-ring);
   background: transparent;
-  box-shadow: inset 0 0 0 5px rgba(216,216,79,.06);
+  box-shadow: none;
 }
-.journey-mark.current::after { content: none; }
+.journey-mark.current::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--state-current-inner);
+}
 .journey-mark.upcoming,
 .completion-ring {
   border-radius: 50%;
@@ -119,24 +139,40 @@
   background: transparent;
 }
 .journey-mark.upcoming { font-size: 0; }
+
+/* Commodity affordances use the same artboard/stroke family but remain visually quiet. */
 .chevron {
-  font-size: 23px;
+  position: relative;
+  font-size: 0;
   font-weight: 400;
   color: var(--quiet);
-  transform: translate(1.2px, -.7px);
+  transform: none;
+}
+.chevron::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-top: var(--accessory-stroke) solid currentColor;
+  border-right: var(--accessory-stroke) solid currentColor;
+  transform: translateX(-1px) rotate(45deg);
 }
 .reorder-handle {
+  position: relative;
   width: var(--touch);
   height: var(--touch);
   font-size: 0;
 }
 .reorder-handle::before {
-  content: "≡";
-  font-size: 20px;
-  font-weight: 450;
-  line-height: .8;
-  color: var(--quiet);
-  transform: translate(.2px, -1.2px);
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--quiet);
+  box-shadow: 0 -5px 0 var(--quiet), 0 5px 0 var(--quiet);
+  transform: translate(-50%, -50%);
 }
 
 /* Modal/dialog composition: calm material, strong conceptual grouping, stable actions. */
