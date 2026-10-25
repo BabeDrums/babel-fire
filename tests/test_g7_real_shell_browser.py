@@ -51,20 +51,27 @@ class G7RealShellBrowser(unittest.TestCase):
         self.open_fixture_project(page)
 
         current = page.locator(".journey-row.current .journey-mark.current")
+        upcoming = page.locator(".journey-row.upcoming .journey-mark.upcoming").first
         expect(current).to_be_visible()
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').position"), "absolute")
-        for side in ("top", "right", "bottom", "left"):
-            self.assertEqual(current.evaluate(f"el => getComputedStyle(el, '::after').{side}"), "0px")
-        self.assertGreaterEqual(
-            current.evaluate("el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"),
-            2.5,
+        expect(upcoming).to_be_visible()
+        self.assertGreater(
+            current.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)"),
+            upcoming.evaluate("el => parseFloat(getComputedStyle(el).borderTopWidth)"),
         )
-        self.assertEqual(
-            current.evaluate("el => getComputedStyle(el, '::after').borderTopColor"),
-            "rgba(232, 232, 237, 0.38)",
-        )
+        self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::before').content"), "none")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), "none")
 
-        # Real project Back uses the canonical continuous chevron mask rather than a font glyph.
+        # Current and upcoming occupy the same trailing lane center in the actual project.
+        current_box = current.bounding_box()
+        upcoming_box = upcoming.bounding_box()
+        self.assertIsNotNone(current_box)
+        self.assertIsNotNone(upcoming_box)
+        current_center = current_box["x"] + current_box["width"] / 2
+        upcoming_center = upcoming_box["x"] + upcoming_box["width"] / 2
+        self.assertLessEqual(abs(current_center - upcoming_center), 1.0)
+
+        # Real project Back uses the same canonical masked chevron family as forward navigation.
         back = page.locator(".back-glyph")
         self.assertEqual(back.evaluate("el => getComputedStyle(el).fontSize"), "0px")
         self.assertIn(
@@ -83,7 +90,7 @@ class G7RealShellBrowser(unittest.TestCase):
 
         # Tempo and Meter intentionally have different control widths in the base grammar:
         # Tempo uses the regular 86px value control; Meter's select-value override is 72px.
-        # The regression we are guarding is either one collapsing into the 28px accessory lane
+        # The regression we are guarding is either one collapsing into the accessory lane
         # or escaping the form-group bounds on compact widths.
         expected_min_width = {
             "#tempoInput": 85,
@@ -115,7 +122,7 @@ class G7RealShellBrowser(unittest.TestCase):
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
 
-        # The plus action shares the title line rather than floating above the header.
+        # The plus action shares the title line, is glyph-first at rest, and uses one canonical mask.
         add = page.get_by_role("button", name="Add Section")
         title_box = page.locator("h1").bounding_box()
         add_box = add.bounding_box()
@@ -124,6 +131,12 @@ class G7RealShellBrowser(unittest.TestCase):
         title_center = title_box["y"] + title_box["height"] / 2
         add_center = add_box["y"] + add_box["height"] / 2
         self.assertLessEqual(abs(title_center - add_center), 2.0)
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
+        self.assertEqual(add.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertIn(
+            "data:image/svg+xml",
+            add.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
+        )
 
         page.get_by_role("button", name="Add Section").click()
         sheet = page.locator(".sheet")
