@@ -1,4 +1,4 @@
-/* G7 Shell Certification pass 5
+/* G7 Shell Certification pass 6
    Shared primitive refinements. Loaded by both real G7 and Shell Test.
    The old roadmap is a style reference only: borrow hierarchy/state clarity, never its product layout. */
 
@@ -73,11 +73,10 @@
   background: transparent;
 }
 
-/* One accessory lane, different semantic symbols. Do not circle commodity affordances merely for symmetry. */
-.row,
-.form-row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }
-.row > :last-child,
-.form-row > :last-child { justify-self: center; }
+/* One accessory lane, different semantic symbols. Do not circle commodity affordances merely for symmetry.
+   Form rows deliberately keep their own label/control grid so inputs never collapse into the accessory lane. */
+.row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }
+.row > :last-child { justify-self: center; }
 .journey-row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }
 .journey-mark,
 .chevron,
@@ -136,7 +135,8 @@
 }
 
 /* Current borrows only the older roadmap's nested-ring structure, not its yellow accent.
-   The inset is a faded ring—not a dot—so Current stays related to Incomplete without reading like a radio control. */
+   Absolute positioning keeps generated content out of grid flow. inset: 0 pins the inner ring to the
+   padding edge, which is exactly the inside edge of the 2px outer border: no gap, no floating center ring. */
 .journey-mark.current {
   position: relative;
   font-size: 0;
@@ -147,12 +147,13 @@
 }
 .journey-mark.current::after {
   content: "";
-  width: 10px;
-  height: 10px;
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
   border: 1.5px solid var(--state-current-inner-ring);
   background: transparent;
   box-sizing: border-box;
+  pointer-events: none;
 }
 .journey-mark.upcoming,
 .completion-ring {
@@ -203,16 +204,17 @@
   transform: translate(-50%, -50%);
 }
 
-/* Modal/dialog composition: calm material, strong conceptual grouping, stable actions. */
+/* Modal/dialog composition: calm material, strong conceptual grouping, stable actions.
+   No decorative hairline is introduced by the shared primitive layer. */
 .sheet {
   background: #19191d;
-  box-shadow: 0 -20px 64px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.025);
+  box-shadow: 0 -20px 64px rgba(0,0,0,.34);
 }
 .sheet-content-group + .sheet-content-group { margin-top: var(--sheet-content-gap); }
 .sheet-actions {
   margin-top: var(--sheet-action-gap);
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 0;
+  border-top: 0;
 }
 .sheet-actions.single-action { margin-top: 16px; }
 .sheet-button { min-height: 48px; }
@@ -270,7 +272,7 @@
 
 @media (min-width: 700px) {
   .sheet {
-    box-shadow: 0 24px 80px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.025);
+    box-shadow: 0 24px 80px rgba(0,0,0,.42);
   }
   .shell-test-screen { padding-bottom: 120px; }
 }

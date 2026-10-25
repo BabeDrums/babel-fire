@@ -63,12 +63,14 @@ def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring
     assert 'content: "✓"' not in css
     assert "border-radius: var(--accessory-cap)" in css
 
-    # Current is outer ring + faded inner ring, never a dot or accent-color fill.
+    # Current is outer ring + faded inner ring, pinned to the outer ring's inside edge.
     assert ".journey-mark.current" in css
     assert "border: 2px solid var(--state-current-ring)" in css
     assert "--state-current-ring: #d9d9df" in css
     assert "--state-current-inner-ring: rgba(232,232,237,.30)" in css
     assert ".journey-mark.current::after" in css
+    assert "position: absolute" in css
+    assert "inset: 0" in css
     assert "border: 1.5px solid var(--state-current-inner-ring)" in css
     assert "background: transparent" in css
     assert "#d8d84f" not in css
@@ -80,12 +82,22 @@ def test_accessory_family_uses_drawn_rounded_geometry_and_current_is_nested_ring
     assert "height: var(--accessory-stroke)" in css
 
 
-def test_shared_modal_spacing_uses_named_tokens():
+def test_shared_accessory_layer_does_not_override_form_control_grid():
+    css = read("v7-preview/shell-primitives.css")
+    assert ".row,\n.form-row" not in css
+    assert ".row > :last-child,\n.form-row > :last-child" not in css
+    assert ".row { grid-template-columns: minmax(0, 1fr) var(--accessory-box); }" in css
+
+
+def test_shared_modal_spacing_uses_named_tokens_without_added_hairlines():
     css = read("v7-preview/shell-primitives.css")
     assert "--sheet-content-gap: 24px" in css
     assert "--sheet-action-gap: 20px" in css
     assert "margin-top: var(--sheet-content-gap)" in css
     assert "margin-top: var(--sheet-action-gap)" in css
+    assert "padding-top: 0" in css
+    assert "border-top: 0" in css
+    assert "inset 0 1px 0" not in css
 
 
 def test_status_remains_unfrozen_until_physical_review():

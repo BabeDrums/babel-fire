@@ -60,8 +60,9 @@ class G7ShellTestBrowser(unittest.TestCase):
         self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopWidth"), "2px")
         self.assertEqual(current.evaluate("el => getComputedStyle(el).borderTopColor"), "rgb(217, 217, 223)")
         self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').content"), '""')
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').width"), "10px")
-        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').height"), "10px")
+        self.assertEqual(current.evaluate("el => getComputedStyle(el, '::after').position"), "absolute")
+        for side in ("top", "right", "bottom", "left"):
+            self.assertEqual(current.evaluate(f"el => getComputedStyle(el, '::after').{side}"), "0px")
         inner_ring_width = current.evaluate(
             "el => parseFloat(getComputedStyle(el, '::after').borderTopWidth)"
         )
@@ -98,6 +99,10 @@ class G7ShellTestBrowser(unittest.TestCase):
         dialog = page.get_by_role("dialog", name="Shell Test dialog")
         expect(dialog).to_be_visible()
         self.assertEqual(page.evaluate("document.body.style.overflow"), "hidden")
+        actions = dialog.locator(".sheet-actions")
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
+        self.assertNotIn("inset", dialog.evaluate("el => getComputedStyle(el).boxShadow"))
         page.keyboard.press("Escape")
         expect(dialog).to_be_hidden()
         self.assertEqual(page.evaluate("document.body.style.overflow"), "")
