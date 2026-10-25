@@ -38,7 +38,8 @@
   line-height: 1;
 }
 
-/* Complete, Current, and Incomplete all draw inside the same 18px optical frame. */
+/* Complete, Current, and Incomplete all draw inside the same 18px optical frame and use
+   the shared downward optical baseline without moving their boxes or row geometry. */
 .journey-mark.done,
 .checkmark {
   color: var(--state-complete);
@@ -53,7 +54,7 @@
   background: currentColor;
   -webkit-mask: var(--icon-check) center / contain no-repeat;
   mask: var(--icon-check) center / contain no-repeat;
-  transform: translateY(-.25px);
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .journey-mark.done::after,
@@ -71,6 +72,7 @@
   height: var(--state-current-height);
   border-radius: 2px;
   background: currentColor;
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .journey-mark.current::after { content: none; }
@@ -89,6 +91,7 @@
   height: var(--state-upcoming-height);
   border-radius: 2px;
   background: currentColor;
+  transform: translateY(var(--symbol-optical-y));
   pointer-events: none;
 }
 .journey-mark.upcoming::after,
