@@ -40,6 +40,7 @@ const symbolRow = (variant, label) => `
 
 // Optical alignment is an intrinsic symbol metric, not a container-specific nudge.
 // The commodity symbols that already passed physical review stay centered on their geometry bounds.
+// This is a bounded candidate metric for this chevron family, not a universal optical-center formula.
 // A chevron's two strokes form a triangular convex hull whose centroid captures the asymmetric
 // visual envelope: Back resolves to x=13 and Forward to x=11, so centering that anchor moves
 // the pair outward by equal-and-opposite amounts derived directly from the glyph geometry.
