@@ -95,38 +95,48 @@
 .inline-select { width: 100%; }
 
 /* MODAL FRAME
-   Center the task inside the small viewport rather than anchoring a large fixed surface to the
-   browser's dynamic bottom edge. `svh` intentionally reserves the browser-chrome case on iOS.
-   The existing aria-label is also the single source for the visible task title. */
+   Presentation adapts instead of forcing one geometry everywhere:
+   - compact width: edge-attached bottom sheet with internal scrolling
+   - regular width: centered card
+   Accessible dialog labels stay semantic and are not automatically duplicated as visible headings.
+   Explicit content headings (for example destructive confirmations) remain visible when authored. */
 .sheet-backdrop {
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  overflow: auto;
-  padding:
-    max(var(--sheet-viewport-gap), env(safe-area-inset-top))
-    var(--sheet-viewport-gap)
-    max(calc(var(--sheet-viewport-gap) + 8px), env(safe-area-inset-bottom));
+  overflow: hidden;
+  padding: max(var(--sheet-viewport-gap), env(safe-area-inset-top)) 0 0;
 }
 .sheet {
   width: min(100%, 520px);
-  max-height: min(72svh, 650px);
-  margin: auto;
+  max-height: min(calc(100dvh - max(var(--sheet-viewport-gap), env(safe-area-inset-top))), 650px);
+  margin: 0;
   border: 1px solid var(--line-strong);
-  border-radius: 22px;
-  padding: var(--sheet-inset);
-  box-shadow: 0 24px 72px rgba(0,0,0,.42);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  padding:
+    var(--sheet-inset)
+    var(--sheet-inset)
+    max(var(--sheet-inset), env(safe-area-inset-bottom));
+  box-shadow: 0 -18px 60px rgba(0,0,0,.28);
+  overscroll-behavior: contain;
+  scroll-padding-block:
+    var(--sheet-inset)
+    calc(var(--sheet-inset) + var(--control-height) + var(--sheet-action-gap));
 }
 .sheet::before {
-  content: attr(aria-label);
-  display: block;
-  margin: 0 0 var(--sheet-major-gap);
-  color: var(--text);
-  font-size: 20px;
-  line-height: 1.15;
-  font-weight: 730;
-  letter-spacing: -.025em;
+  content: none;
+  display: none;
 }
-.sheet:has(> h2)::before { display: none; content: none; }
+.sheet .field {
+  scroll-margin-block:
+    var(--space-5)
+    calc(var(--control-height) + var(--sheet-action-gap) + var(--space-5));
+}
+#customSectionArea:not([hidden]),
+#customBarsArea:not([hidden]) {
+  display: grid;
+  margin-top: var(--space-2);
+}
 
 /* Edit-section management remains secondary to the edit task. Prevent narrow phones from turning
    three peer actions into three oversized stacked slabs. */
@@ -138,9 +148,22 @@
 }
 
 @media (min-width: 700px) {
+  .sheet-backdrop {
+    align-items: center;
+    overflow: auto;
+    padding:
+      max(28px, env(safe-area-inset-top))
+      28px
+      max(28px, env(safe-area-inset-bottom));
+  }
   .sheet {
     width: min(460px, calc(100vw - 56px));
     max-height: min(78svh, 650px);
+    margin: auto;
+    border-bottom: 1px solid var(--line-strong);
+    border-radius: 22px;
+    padding: var(--sheet-inset);
+    box-shadow: 0 24px 72px rgba(0,0,0,.42);
   }
 }
 
