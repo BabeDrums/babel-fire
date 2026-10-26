@@ -9,6 +9,9 @@
   --toolbar-row-title-gap: 8px;
   --value-control-width: 104px;
   --sheet-viewport-gap: 16px;
+  --sheet-related-gap: var(--space-3);
+  --sheet-section-gap: var(--space-6);
+  --sheet-footer-gap: var(--space-6);
 }
 
 /* HEADER FRAME
@@ -99,7 +102,13 @@
    - compact width: edge-attached bottom sheet with internal scrolling
    - regular width: centered card
    Accessible dialog labels stay semantic and are not automatically duplicated as visible headings.
-   Explicit content headings (for example destructive confirmations) remain visible when authored. */
+   Explicit content headings (for example destructive confirmations) remain visible when authored.
+
+   Vertical rhythm has one semantic grammar:
+   - related disclosure: 12px
+   - major section transition: 24px
+   - task content -> footer actions: 24px
+   Individual sheets must not invent their own vertical margins. */
 .sheet-backdrop {
   align-items: flex-end;
   justify-content: center;
@@ -121,7 +130,7 @@
   overscroll-behavior: contain;
   scroll-padding-block:
     var(--sheet-inset)
-    calc(var(--sheet-inset) + var(--control-height) + var(--sheet-action-gap));
+    calc(var(--sheet-inset) + var(--control-height) + var(--sheet-footer-gap));
 }
 /* Keep the semantic task label available to the contract while never rendering it as a routine
    heading. Visible sheet titles must be authored explicitly in the sheet content. */
@@ -132,13 +141,21 @@
 .sheet .field {
   scroll-margin-block:
     var(--space-5)
-    calc(var(--control-height) + var(--sheet-action-gap) + var(--space-5));
+    calc(var(--control-height) + var(--sheet-footer-gap) + var(--space-5));
 }
+
+/* One rhythm system for every routine sheet. */
+.sheet .project-type-control { margin-bottom: var(--sheet-section-gap); }
+.sheet .sheet-content-group + .sheet-content-group { margin-top: var(--sheet-section-gap); }
+.sheet .sheet-actions,
+.sheet .sheet-actions.single-action { margin-top: var(--sheet-footer-gap); }
 #customSectionArea:not([hidden]),
 #customBarsArea:not([hidden]) {
   display: grid;
-  margin-top: var(--space-2);
+  margin-top: var(--sheet-related-gap);
 }
+/* The disclosure wrapper owns the relationship gap. Do not stack another margin on its field. */
+#customBarsArea .numeric-field { margin-top: 0; }
 
 /* Edit-section management remains secondary to the edit task. Prevent narrow phones from turning
    three peer actions into three oversized stacked slabs. */
