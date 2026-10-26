@@ -5,7 +5,7 @@
 ## Naming
 
 - **V6** — current production implementation generation.
-- **G7** — active successor/shell generation. Technical identifiers remain `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears.
+- **G7** — frozen successor shell generation. Technical identifiers remain `V7_DRAFT.md`, `/v7-preview/`, and `production-projects-v1-v7-preview` unless a real migration reason appears.
 - **FIRE Core** — first complete functional product: idea or reference → finished, release-ready audio with FIRE acting as a useful production companion.
 - **FIRE 1.0** — future validated release milestone after FIRE Core proves itself on real projects and is intentionally promoted.
 
@@ -139,18 +139,20 @@ This helps prevent perfection loops. Recreation does not require an indistinguis
 
 ## G7 shell vs FIRE Core
 
-- **G7 shell** = successor implementation/design generation and reusable shell grammar being certified before product breadboarding.
+- **G7 shell** = frozen successor implementation/design generation and reusable shell grammar.
 - **FIRE Core** = complete functional production companion + reasoning/learning system.
 - Current `Setup → Structure → Tracks` is disposable shell fixture content. Its polish does not approve the FIRE Core journey, Map architecture, checkpoint count, or exact future interactions.
-- `G7_SHELL_CERTIFICATION.md` defines the finite shell completion/freeze contract; `G7_SHELL_CERTIFICATION_STATUS.md` records mutable evidence/state.
+- `G7_SHELL_CERTIFICATION.md` is the completed finite shell contract; `G7_SHELL_CERTIFICATION_STATUS.md` records **10 / 10 Locked** and the freeze evidence.
+- The approved shell runtime anchor is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`.
 - Shell Test is G7 developer infrastructure using actual G7 primitives; it is not product architecture, a second FIRE implementation, or a substitute for physical validation.
-- Do **not** begin FIRE Core breadboarding until all ten certification categories are Locked, the final real-device sweep reveals no unresolved systemic contradiction, and Babel explicitly freezes the shell.
+- **FIRE Core breadboarding may now begin.** The shell freeze gate has been satisfied and Babel explicitly approved the final physical-review result.
 - Shell freeze means the foundational grammar is stable enough to build confidently; it does not prohibit a deliberate minimal extension when FIRE Core proves a genuinely new primitive is needed.
-- After freeze, breadboard Original + Recreation Core end-to-end before deeply designing later phases.
+- Do not casually reopen locked shell categories because Core content differs from fixtures. Reopen only when new evidence shows the foundation itself is wrong.
+- Breadboard Original + Recreation Core end-to-end before deeply designing later phases.
 - Understand the whole journey; deeply design only the next area being built.
 - Real songs drive depth.
 
-Current route/primitive behavior lives in `V7_DRAFT.md`; current review/build state lives in `START_HERE.md`.
+Current route/primitive behavior lives in `V7_DRAFT.md`; current build/next-step state lives in `START_HERE.md`.
 
 ## Documentation authority and conflict policy
 
@@ -159,9 +161,9 @@ Shared cross-app process/design rules come from the immutable Babel Truth commit
 FIRE-local authority is:
 1. `FIRE_CORE.md` — doctrine
 2. `V6.md` — shipped production behavior
-3. `V7_DRAFT.md` — active successor behavior
-4. `G7_SHELL_CERTIFICATION.md` — shell certification/freeze contract
-5. `G7_SHELL_CERTIFICATION_STATUS.md` — mutable certification evidence/status
+3. `V7_DRAFT.md` — frozen successor shell behavior
+4. `G7_SHELL_CERTIFICATION.md` — completed shell certification/freeze contract
+5. `G7_SHELL_CERTIFICATION_STATUS.md` — completed certification evidence/status
 6. `START_HERE.md` — exact current verified state/next gate
 7. code/tests — implementation evidence
 
@@ -171,7 +173,7 @@ When doctrine changes, reconcile affected active FIRE authority/tests/handoff in
 
 ## Open hypotheses for FIRE Core breadboarding
 
-Do not prematurely lock:
+These are now active breadboarding questions, not shell blockers. Do not prematurely lock:
 - exact Track → Element → Role data/UI
 - whether coaching depth needs explicit control or remains contextual
 - how skill confidence is represented without fake mastery
