@@ -44,17 +44,24 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         self.assertIsNotNone(match, f"Expected translucent white pressed surface, got {color}")
         self.assertAlmostEqual(float(match.group(1)), 0.045, delta=0.003)
 
-    def press_and_read_without_click(self, page, control, parent):
-        """Hold long enough to inspect :active, then release away from the control to cancel click."""
-        box = control.bounding_box()
-        self.assertIsNotNone(box)
-        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-        page.mouse.down()
-        parent_color = parent.evaluate("el => getComputedStyle(el).backgroundColor")
-        child_color = control.evaluate("el => getComputedStyle(el).backgroundColor")
-        page.mouse.move(0, 0)
-        page.mouse.up()
-        return parent_color, child_color
+    def force_active_and_read(self, page, selector, parent):
+        """Ask Chromium's CSS engine to force :active without dispatching a click."""
+        control = page.locator(selector)
+        expect(control).to_be_visible()
+        session = page.context.new_cdp_session(page)
+        try:
+            session.send("DOM.enable")
+            session.send("CSS.enable")
+            root = session.send("DOM.getDocument")["root"]["nodeId"]
+            node = session.send("DOM.querySelector", {"nodeId": root, "selector": selector})["nodeId"]
+            self.assertTrue(node, f"Could not resolve selector for forced :active: {selector}")
+            session.send("CSS.forcePseudoState", {"nodeId": node, "forcedPseudoClasses": ["active"]})
+            parent_color = parent.evaluate("el => getComputedStyle(el).backgroundColor")
+            child_color = control.evaluate("el => getComputedStyle(el).backgroundColor")
+            session.send("CSS.forcePseudoState", {"nodeId": node, "forcedPseudoClasses": []})
+            return parent_color, child_color
+        finally:
+            session.detach()
 
     def test_project_text_fields_restore_normal_text_assistance_and_keep_focus_progression(self):
         page = self.open()
@@ -82,25 +89,25 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
 
         # Projects: both the main target and trailing actions target paint the parent row.
         project_row = page.locator('[data-project-card="preview-creep"]')
-        more = project_row.locator(".project-card-actions")
-        parent_color, child_color = self.press_and_read_without_click(page, more, project_row)
+        more_selector = '[data-project-card="preview-creep"] .project-card-actions'
+        parent_color, child_color = self.force_active_and_read(page, more_selector, project_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         expect(page.locator(".sheet")).to_be_hidden()
 
-        # Semantic action remains independent of the visual-state inspection.
-        more.click()
+        # Semantic action remains independent of visual-state inspection.
+        page.locator(more_selector).click()
         expect(page.locator(".sheet")).to_be_visible()
         page.get_by_role("button", name="Cancel").click()
         expect(page.locator(".sheet")).to_be_hidden()
 
-        project_open = project_row.locator(".project-open")
-        parent_color, child_color = self.press_and_read_without_click(page, project_open, project_row)
+        project_open_selector = '[data-project-card="preview-creep"] .project-open'
+        parent_color, child_color = self.force_active_and_read(page, project_open_selector, project_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         expect(page.locator("h1")).to_have_text("Projects")
 
-        project_open.click()
+        page.locator(project_open_selector).click()
         expect(page.locator("h1")).to_have_text("Creep")
 
         # Structure: edit content and reorder accessory share the same parent-owned press surface.
@@ -108,19 +115,19 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         expect(page.locator("h1")).to_have_text("Structure")
         structure_row = page.locator(".arrangement-row").first
 
-        edit = structure_row.locator(".section-edit-target")
-        parent_color, child_color = self.press_and_read_without_click(page, edit, structure_row)
+        edit_selector = ".arrangement-row:first-child .section-edit-target"
+        parent_color, child_color = self.force_active_and_read(page, edit_selector, structure_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         expect(page.locator(".sheet")).to_be_hidden()
 
-        edit.click()
+        page.locator(edit_selector).click()
         expect(page.locator(".sheet")).to_be_visible()
         page.keyboard.press("Escape")
         expect(page.locator(".sheet")).to_be_hidden()
 
-        handle = structure_row.locator(".reorder-handle")
-        parent_color, child_color = self.press_and_read_without_click(page, handle, structure_row)
+        handle_selector = ".arrangement-row:first-child .reorder-handle"
+        parent_color, child_color = self.force_active_and_read(page, handle_selector, structure_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
 
