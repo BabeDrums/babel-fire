@@ -8,7 +8,7 @@ Read `BABEL_TRUTH.md` first, then the pinned Truth `START_HERE.md` / `AGENTS.md`
 
 - Production remains **V6** at the root app. No production promotion has occurred.
 - G7 remains isolated at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
-- **G7 SHELL IS FROZEN. All 10 certification categories are Locked.**
+- **G7 SHELL IS FROZEN. 10 / 10 Locked.**
 - The exact owning-product runtime that received final explicit Babel approval is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489` (PR #96).
 - That runtime passed exact Pages deployment plus post-merge Static and Chromium 390 / 440 / 820. Accumulated physical iPhone/iPad review plus Babel's explicit final approval closed the physical-review gate.
 - Later closeout commits may update authority/tests/pointers only; they do not redefine the approved shell runtime unless they intentionally touch G7 runtime files.
