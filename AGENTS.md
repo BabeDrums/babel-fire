@@ -2,112 +2,100 @@
 
 Use **Babel** as the project-facing name.
 
-Shared Babel process, feedback interpretation, research expectations, foundations, contradiction handling, continuity, Lab-incubation ownership, and shared-surface concurrency live in the pinned Babel Truth authority. Read `BABEL_TRUTH.md` first; do not duplicate those rules here unless FIRE needs a real local exception.
+Shared process, feedback interpretation, continuity, closeout, and cross-app architecture come from the Truth commit pinned in `BABEL_TRUTH.md`. Keep this file FIRE-local.
 
-## Zero-context FIRE entry
+## Entry
 
-After `BABEL_TRUTH.md` and the pinned Truth authority:
-1. `START_HERE.md` — current verified FIRE state and next gate
-2. `FIRE_CORE.md` — canonical cross-generation FIRE product doctrine
-3. `V6.md` — current production-generation behavior
-4. `V7_DRAFT.md` — frozen G7 shell behavior/primitive grammar
-5. `G7_SHELL_CERTIFICATION.md` — completed shell certification/freeze contract
-6. `G7_SHELL_CERTIFICATION_STATUS.md` — completed category evidence/status
-7. relevant Babel Truth Issue #1 items
-8. code/tests as implementation evidence
+1. `BABEL_TRUTH.md`
+2. pinned Truth `START_HERE.md` / `AGENTS.md`
+3. local `START_HERE.md`
+4. `FIRE_CORE.md`
+5. generation/frozen-shell authority only when the task needs it
+6. current Issue #1 state when unresolved context matters
+7. code/tests as implementation evidence
 
-Do not reconstruct current state from old PRs or Git history unless investigating history.
+Do not reconstruct current state from old PRs/Git history unless investigating history.
 
 ## FIRE authority
 
 For FIRE-local behavior:
-1. `FIRE_CORE.md`
-2. `V6.md` for shipped production behavior
-3. `V7_DRAFT.md` for frozen successor shell behavior
-4. `G7_SHELL_CERTIFICATION.md` for certification definitions/freeze criteria
-5. `G7_SHELL_CERTIFICATION_STATUS.md` for completed category state/evidence
-6. `START_HERE.md` for exact current build/review/next step
-7. code/tests as implementation evidence
+1. `FIRE_CORE.md` — canonical cross-generation product doctrine
+2. `V6.md` — shipped production-generation behavior
+3. `V7_DRAFT.md` — frozen G7 shell behavior/primitive grammar
+4. `G7_SHELL_CERTIFICATION.md` / `G7_SHELL_CERTIFICATION_STATUS.md` — completed shell certification evidence
+5. `START_HERE.md` — exact current gate
+6. code/tests — implementation evidence
 
-Current authority should contain one present truth. Git/PR history is the archive.
+Current authority contains one present truth. History stays in Git/PRs.
 
-## Build/review workflow
+## Durable workflow
 
-For durable FIRE work in the owning product:
+**refresh main/open PRs → branch → diagnose/shape → implement → test → reconcile authority/handoff → PR → recheck overlap/gates → merge → verify exact merge/deploy → physical review when relevant**
 
-**re-read current main/open PRs → branch → diagnose/shape → implement → test → reconcile authority/handoff → PR → required checks → merge → Pages deploy → verify exact merge → physical-device review when relevant**
-
-- Never implement directly on `main`.
-- Preserve unfinished work; never reset/discard it merely to get a clean tree.
-- Babel has standing permission to merge when the diff is reviewed, required gates are green, production-data safety is clear, and no genuine product decision remains unresolved.
-- Stop instead of merging when tests fail, data safety is uncertain, behavior is destructive/risky, or a real product decision remains unresolved.
-- Automated browser checks do not replace physical iOS Safari review for visual/interaction work.
+- never implement directly on `main`
+- preserve unfinished work; never discard it just to clean the tree
+- automated browser checks do not replace physical iOS Safari review for visual/interaction work
+- merge only when behavior/ownership/data safety are clear and required gates pass
 
 ## Frozen shell boundary
 
 - V6 remains production until deliberate promotion.
-- G7 remains the isolated successor at `/v7-preview/`.
-- The approved frozen shell runtime anchor is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`; all 10 certification categories are Locked.
-- Current `Setup → Structure → Tracks` content is disposable shell-fixture content, not FIRE Core architecture.
-- Shell Test is developer infrastructure inside G7, not a second FIRE implementation and not Babel Lab.
-- **FIRE Core work is unblocked.** Product work should now start from `FIRE_CORE.md`, not by continuing generic shell polish.
-- Do not casually reopen frozen categories because Core content differs from the fixtures. Extend the smallest necessary primitive when Core proves a genuinely new need; reopen a locked category only when evidence shows the foundation itself is wrong.
+- G7 remains isolated at `/v7-preview/`.
+- G7 is **10 / 10 Locked and Frozen** at runtime anchor `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`.
+- `Setup → Structure → Tracks` is disposable fixture content, not FIRE Core architecture.
+- the historical Shell Test stays FIRE certification evidence; Lab Shell Gallery is separate
+- do not casually reopen frozen shell categories for Core content. Extend the smallest needed primitive only when evidence proves a genuinely new need; reopen a category only when the foundation itself is wrong.
 
 ## FIRE Core incubation boundary
 
-Babel Truth ADR 0006 allows a bounded **unproven FIRE Core interaction** to incubate in Babel Lab while FIRE remains the sole product owner.
+ADR 0006 allows a bounded **unproven** FIRE Core interaction under `babel-lab/fire/core/**` while FIRE remains sole product owner.
 
-Current FIRE-specific rules:
 - doctrine, canonical behavior, production/runtime data, specs, migrations, and promoted implementation stay in `babel-fire`
-- a disposable interaction audition may live under `babel-lab/fire/core/**` using fake/local isolated state
-- Lab prototype code is evidence, not production code; promote the behavior deliberately back into FIRE only after it survives real use
-- the Lab Core lane must never read/write V6 or G7 FIRE storage merely to feel realistic
-- the existing Lab Fire visualization experiment is separate and must not be silently redefined as Core
-- the historical G7 Shell Test remains frozen FIRE certification evidence; Lab Shell Gallery is a different shared-UI proving environment
-- Draft FIRE PR #99 is seed/history unless `START_HERE.md` records a newer disposition; do not merge it merely because its code exists
+- Lab audition uses fake/local isolated state and never touches V6/G7 storage
+- Fire Visualization and FIRE Core are separate experiments
+- Lab prototype code is evidence; surviving behavior is deliberately implemented/reconciled back into FIRE
+- closed PR #99 is seed/history for the first audition, not a merge path
 
-When working in Lab for a FIRE audition, respect Lab path ownership and Babel Truth shared-surface concurrency rails. A FIRE pass may own `fire/core/**`; it must reconcile before changing Lab root/shared/shell/Truth-pointer/cross-cutting CI surfaces and must not rewrite WORLD product logic.
+Respect Lab's path ownership/concurrency rules before touching shared Lab surfaces. Do not rewrite WORLD logic from the FIRE lane.
 
-## Engineering/data safety
+## Engineering / data safety
 
 - V6 localStorage: `production-projects-v1`
 - G7 preview localStorage: `production-projects-v1-v7-preview`
-- G7 must never mutate V6 production data.
-- Schema changes require tested forward migration; never wipe projects.
-- Preserve stable IDs and V6 downstream dependencies/browser-history behavior during V6 maintenance.
-- Keep GitHub Pages simple static HTML/CSS/JS unless a real approved need justifies architecture change.
-- Preserve ~44px touch targets, keyboard/focus accessibility, reduced-motion alternatives, and discoverable interactions.
-- One product logic/hierarchy/actions/states across iPhone/iPad; presentation may adapt.
-- Do not add overlay-polish files or MutationObserver visual rewrites; fix the owning primitive/component.
-- Permanent regressions belong in `tests/`; do not commit debug/browser artifacts.
+- G7 must never mutate V6 production data
+- schema changes require tested forward migration; never wipe projects
+- preserve stable IDs and existing downstream/browser-history dependencies during V6 maintenance
+- keep GitHub Pages simple static HTML/CSS/JS unless a real need earns architecture change
+- preserve touch/focus/keyboard/reduced-motion accessibility and one product logic across iPhone/iPad
+- fix the owning primitive/component rather than stacking overlay polish or MutationObserver rewrites
+- permanent regressions belong in tests; debug/browser artifacts do not
 
 ## Tooling
 
 **No Codex for FIRE.** Use the normal ChatGPT GitHub connector/direct repository workflow unless Babel explicitly changes this rule.
 
-## Documentation ownership
+## Active documentation set
 
-- `BABEL_TRUTH.md` — immutable shared-Truth adoption pointer
-- `START_HERE.md` — current verified FIRE state / immediate next gate
-- `FIRE_CORE.md` — canonical FIRE doctrine
-- `V6.md` — shipped production-generation spec
-- `V7_DRAFT.md` — frozen G7 shell spec and local primitive grammar
-- `G7_SHELL_CERTIFICATION.md` — completed shell-certification contract
-- `G7_SHELL_CERTIFICATION_STATUS.md` — completed certification evidence/status
+- `BABEL_TRUTH.md`
+- `AGENTS.md`
+- `START_HERE.md`
+- `FIRE_CORE.md`
+- `V6.md`
+- `V7_DRAFT.md`
+- `G7_SHELL_CERTIFICATION.md`
+- `G7_SHELL_CERTIFICATION_STATUS.md`
 
-That is the active FIRE documentation set. Do not recreate separate ecosystem ledgers, continuity inboxes, changelog-as-authority, research registries, or supporting-context catchalls. Use Babel Truth/Issue #1, the owning spec, and Git history instead.
+Do not recreate ecosystem ledgers, continuity inboxes, changelog-as-authority, or catchall context docs. Use Truth/Issue #1, the owning spec, and Git history.
 
-## Definition of done
+## Done
 
-A FIRE change is not done until:
+A FIRE change is done when:
 - behavior matches active authority
 - user data is preserved/migrated safely
 - relevant regressions pass
-- startup/JS has no known app errors
 - representative compact/wide behavior is checked
+- physical Safari review is completed when applicable
 - dead/replaced code and active documentation are removed
-- `START_HERE.md` accurately states the current next gate
-- durable unresolved findings are captured in Truth Issue #1 when appropriate
-- merged/deployed state is verified when the workflow calls for it
-
-For visual work, physical Safari review is a distinct gate. The G7 shell has completed its certification/freeze gate; future shell-affecting changes must respect the frozen-state rule above.
+- `START_HERE.md` states the current next gate
+- durable unresolved findings are captured in Truth Issue #1
+- merged/deployed state is verified when required
