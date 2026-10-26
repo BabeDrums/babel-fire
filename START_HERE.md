@@ -38,6 +38,8 @@ PR #93 then removed the final real-G7 Back-only host contradiction by neutralizi
 
 `frame-primitives.css` owns structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
 
+Historical frame milestone: PR **#89** repaired the shared header/control/state/modal frame and merged at `d93729ff7a734035f25a6835323d19706f15186d`. Later physical review and PRs #92/#93 refined generated-art seating and the Back host without reopening that frame architecture.
+
 Current verified frame rules:
 - Back and trailing Add/More share one navigation/action row; large title/meta live below it
 - toolbar keeps a 44px interaction target with quieter 36px visible material
