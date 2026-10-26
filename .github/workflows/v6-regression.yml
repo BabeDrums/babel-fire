@@ -24,6 +24,10 @@ jobs:
             node --check v7-preview/app.js
             node --check v7-preview/model.js
           fi
+          if [ -f v7-preview/core-app.js ]; then
+            node --check v7-preview/core-app.js
+            node --check v7-preview/core-model.js
+          fi
           if [ -f v7-preview/shell-test.js ]; then
             node --check v7-preview/shell-test.js
           fi
@@ -75,8 +79,10 @@ jobs:
 
           revision = os.environ['GITHUB_SHA']
           Path('build-info.json').write_text(json.dumps({'commit': revision}), encoding='utf-8')
-          for html_path in ('index.html', 'v7-preview/index.html', 'v7-preview/shell-test.html'):
+          for html_path in ('index.html', 'v7-preview/index.html', 'v7-preview/core.html', 'v7-preview/shell-test.html'):
               path = Path(html_path)
+              if not path.exists():
+                  continue
               text = path.read_text(encoding='utf-8').replace('{{ site.github.build_revision }}', revision)
               if text.startswith('---\n---\n'):
                   text = text[8:]
