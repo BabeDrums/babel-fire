@@ -236,21 +236,34 @@ class G7ShellTestBrowser(unittest.TestCase):
 
     def test_shell_test_temporary_ui_uses_same_adaptive_dialog_primitive(self):
         page = self.open()
+        width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
         page.get_by_role("button", name="Open selection").click()
         dialog = page.get_by_role("dialog", name="Shell Test dialog")
+        backdrop = page.locator(".sheet-backdrop")
         expect(dialog).to_be_visible()
         self.assertEqual(page.evaluate("document.body.style.overflow"), "hidden")
         actions = dialog.locator(".sheet-actions")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
-        self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
-        self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
-        self.assertNotIn("inset", dialog.evaluate("el => getComputedStyle(el).boxShadow"))
-        self.assertEqual(dialog.evaluate("el => getComputedStyle(el, '::before').content"), '"Shell Test dialog"')
+        self.assertEqual(dialog.get_attribute("aria-label"), "Shell Test dialog")
+        self.assertEqual(dialog.evaluate("el => getComputedStyle(el, '::before').display"), "none")
+
         dialog_box = dialog.bounding_box()
         self.assertIsNotNone(dialog_box)
-        self.assertGreater(dialog_box["y"], 0)
-        self.assertLess(dialog_box["y"] + dialog_box["height"], page.viewport_size["height"])
+        viewport_height = page.viewport_size["height"]
+        if width < 700:
+            self.assertEqual(backdrop.evaluate("el => getComputedStyle(el).alignItems"), "flex-end")
+            self.assertLessEqual(abs(dialog_box["y"] + dialog_box["height"] - viewport_height), 1.0)
+            self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomWidth"), "0px")
+            self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "0px")
+        else:
+            self.assertEqual(backdrop.evaluate("el => getComputedStyle(el).alignItems"), "center")
+            self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
+            self.assertEqual(dialog.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
+            self.assertNotIn("inset", dialog.evaluate("el => getComputedStyle(el).boxShadow"))
+            self.assertGreater(dialog_box["y"], 0)
+            self.assertLess(dialog_box["y"] + dialog_box["height"], viewport_height)
+
         page.keyboard.press("Escape")
         expect(dialog).to_be_hidden()
         self.assertEqual(page.evaluate("document.body.style.overflow"), "")
