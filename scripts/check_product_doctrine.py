@@ -5,12 +5,10 @@ REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
-        "9f6a4d5b65456c3df807955f947708e1f1134d99",
+        "21cb7307f8a1306101d7761f11da79b44752e13b",
         "CHAT_CLOSEOUT.md",
-        "FOUNDATIONS.md",
-        "ADR 0005",
-        "ADR 0006",
-        "Babel Continuity Buffer",
+        "Babel Truth Issue #1",
+        "Lab is evidence, never authority",
     ],
     "AGENTS.md": [
         "BABEL_TRUTH.md",
@@ -20,18 +18,18 @@ REQUIRED = {
         "production-projects-v1-v7-preview",
         "No Codex for FIRE",
         "G7_SHELL_CERTIFICATION_STATUS.md",
-        "active FIRE documentation set",
+        "Active documentation set",
         "FIRE Core incubation boundary",
         "babel-lab/fire/core/**",
-        "Draft FIRE PR #99",
+        "closed PR #99",
     ],
     "START_HERE.md": [
         "G7 SHELL IS FROZEN",
         "10 / 10 Locked",
         "4a258c5170dd1d96dcbc0f2b0a9c35b283cec489",
         "Target → Production Map → Active Focus → FIRE Loop",
-        "FIRE PR #99 is Draft seed material",
-        "bounded FIRE Core audition in Lab",
+        "FIRE PR #99 is closed seed/history",
+        "FIRE Core audition in Lab",
         "babel-lab/fire/core/**",
         "Babel Truth Issue #1",
     ],
@@ -58,7 +56,6 @@ REQUIRED = {
         "Deep model underneath. Minimal burden on the musician.",
         "First FIRE Core interaction audition",
         "babel-lab/fire/core/**",
-        "Draft FIRE PR #99",
         "Cross-app boundary",
         "ADR 0006",
         "Documentation authority and conflict policy",
@@ -102,9 +99,26 @@ RETIRED_ACTIVE_DOCS = {
 
 FORBIDDEN_TEXT = {
     "AGENTS.md": ["BABEL_START_HERE.md", "CONTINUITY_INBOX.md", "CONTEXT.md"],
-    "FIRE_CORE.md": ["BABEL_APPS.md", "BABEL_PLATFORM.md", "BABEL_START_HERE.md", "CONTEXT.md", "REFERENCES.md", "Sequencing is a dependency map, not a course"],
-    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md", "**0 / 10 Locked", "G7 is NOT FROZEN"],
-    "G7_SHELL_CERTIFICATION_STATUS.md": ["**0 / 10 Locked", "G7 NOT FROZEN", "FIRE Core breadboarding blocked"],
+    "FIRE_CORE.md": [
+        "BABEL_APPS.md",
+        "BABEL_PLATFORM.md",
+        "BABEL_START_HERE.md",
+        "CONTEXT.md",
+        "REFERENCES.md",
+        "Sequencing is a dependency map, not a course",
+    ],
+    "START_HERE.md": [
+        "CONTINUITY_INBOX.md",
+        "BABEL_START_HERE.md",
+        "**0 / 10 Locked",
+        "G7 is NOT FROZEN",
+        "FIRE PR #99 is Draft seed material",
+    ],
+    "G7_SHELL_CERTIFICATION_STATUS.md": [
+        "**0 / 10 Locked",
+        "G7 NOT FROZEN",
+        "FIRE Core breadboarding blocked",
+    ],
 }
 
 
