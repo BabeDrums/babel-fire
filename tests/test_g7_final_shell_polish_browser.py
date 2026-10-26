@@ -44,13 +44,15 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         self.assertIsNotNone(match, f"Expected translucent white pressed surface, got {color}")
         self.assertAlmostEqual(float(match.group(1)), 0.045, delta=0.003)
 
-    def press_and_read(self, page, control, parent):
+    def press_and_read_without_click(self, page, control, parent):
+        """Hold long enough to inspect :active, then release away from the control to cancel click."""
         box = control.bounding_box()
         self.assertIsNotNone(box)
         page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
         page.mouse.down()
         parent_color = parent.evaluate("el => getComputedStyle(el).backgroundColor")
         child_color = control.evaluate("el => getComputedStyle(el).backgroundColor")
+        page.mouse.move(0, 0)
         page.mouse.up()
         return parent_color, child_color
 
@@ -78,34 +80,47 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
     def test_split_action_rows_use_one_edge_to_edge_pressed_surface(self):
         page = self.open()
 
-        # Projects: both the main target and the trailing actions target paint the parent row.
+        # Projects: both the main target and trailing actions target paint the parent row.
         project_row = page.locator('[data-project-card="preview-creep"]')
         more = project_row.locator(".project-card-actions")
-        parent_color, child_color = self.press_and_read(page, more, project_row)
+        parent_color, child_color = self.press_and_read_without_click(page, more, project_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
+        expect(page.locator(".sheet")).to_be_hidden()
+
+        # Semantic action remains independent of the visual-state inspection.
+        more.click()
+        expect(page.locator(".sheet")).to_be_visible()
         page.get_by_role("button", name="Cancel").click()
+        expect(page.locator(".sheet")).to_be_hidden()
 
         project_open = project_row.locator(".project-open")
-        parent_color, child_color = self.press_and_read(page, project_open, project_row)
+        parent_color, child_color = self.press_and_read_without_click(page, project_open, project_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
+        expect(page.locator("h1")).to_have_text("Projects")
+
+        project_open.click()
         expect(page.locator("h1")).to_have_text("Creep")
 
         # Structure: edit content and reorder accessory share the same parent-owned press surface.
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
         structure_row = page.locator(".arrangement-row").first
+
         edit = structure_row.locator(".section-edit-target")
-        parent_color, child_color = self.press_and_read(page, edit, structure_row)
+        parent_color, child_color = self.press_and_read_without_click(page, edit, structure_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
+        expect(page.locator(".sheet")).to_be_hidden()
+
+        edit.click()
         expect(page.locator(".sheet")).to_be_visible()
         page.keyboard.press("Escape")
         expect(page.locator(".sheet")).to_be_hidden()
 
         handle = structure_row.locator(".reorder-handle")
-        parent_color, child_color = self.press_and_read(page, handle, structure_row)
+        parent_color, child_color = self.press_and_read_without_click(page, handle, structure_row)
         self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
 
