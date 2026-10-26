@@ -15,6 +15,7 @@ Read `BABEL_TRUTH.md` first, then the pinned Truth `START_HERE.md` / `AGENTS.md`
 - **FIRE Core breadboarding is now unblocked.**
 - Current `Setup → Structure → Tracks` content remains disposable shell-fixture content, not FIRE Core architecture.
 - Shell Test remains developer infrastructure inside G7, not a second FIRE implementation and not Babel Lab.
+- FIRE has explicitly adopted Babel Truth ADR 0005's cross-app context/handoff boundary. This does not make World a FIRE dependency and does not change the frozen G7 runtime.
 
 ## Frozen shell baseline
 
@@ -33,7 +34,7 @@ The reusable shell grammar proven through the G7 certification cycle includes:
 - one product logic across iPhone/iPad; presentation may adapt
 - content-before-chrome, quiet-until-important, tactile-not-decorative composition
 
-Genuinely transferable versions of these rules now live in Babel Truth `FOUNDATIONS.md` at the commit pinned by `BABEL_TRUTH.md`. FIRE-specific fixture workflow/copy and implementation code were not promoted.
+Genuinely transferable versions of these rules live in Babel Truth. FIRE-specific fixture workflow/copy and implementation code were not promoted.
 
 ## Freeze record
 
@@ -47,15 +48,21 @@ Locked does not mean immutable. If FIRE Core proves a genuinely new UI requireme
 
 ## Immediate next gate — FIRE Core breadboarding
 
-The next work is **product architecture, not more shell polish**.
+The next work is **product architecture, production knowledge, and real-song validation — not more shell polish**.
 
 Start from `FIRE_CORE.md` and breadboard both first-class project types end-to-end before deeply designing individual screens:
 
 1. **Original** — intention/material → useful diagnosis → DAW experiment → evaluation/decision → finish.
 2. **Recreation / Cover** — reference + Match/Interpret/Reimagine bias → meaningful difference → diagnosis → DAW experiment → evaluation/decision → finish.
-3. Find the thinnest shared FIRE spine that makes the promise true: **the musician leaves FIRE knowing what to do in the DAW that they did not clearly know before opening it.**
-4. Keep Track → Element → Role, coaching depth, skill-confidence representation, Practice/Skills/Growth, Fire visualization, and later-phase details as hypotheses until the thin spine or real projects actually require them.
-5. Use real songs to validate product logic before deep polish. Do not promote G7 fixtures into Core architecture just because they are already implemented.
+3. For every meaningful step, identify what FIRE must know to guide it: relevant production principles, required project state, what earlier work already answered, what clarification is genuinely necessary, what musician evidence changes the recommendation, and what should be preserved afterward.
+4. Find the thinnest shared FIRE spine that makes the promise true: **the musician leaves FIRE knowing what to do in the DAW that they did not clearly know before opening it.**
+5. Treat the current production order in `FIRE_CORE.md` as a dependency-map hypothesis, not a mandatory course. Allow later symptoms to reopen upstream work when evidence points there.
+6. As meaningful project facts emerge, identify which are purely FIRE-local versus genuinely useful outside FIRE. Do not design a universal schema or World workflow inside FIRE.
+7. Test the active hypothesis that Original/Cover describes the song-production workflow while a larger single/EP/album relationship, if earned, sits on a different axis above individual song projects.
+8. Keep Track → Element → Role, coaching depth, skill-confidence representation, Practice/Skills/Growth, Fire visualization, exact cross-app projection fields, and later-phase details unresolved until the thin spine or real projects actually require them.
+9. Use real songs to validate product logic before deep polish. Do not promote G7 fixtures into Core architecture just because they are already implemented.
+
+FIRE remains independently usable. A user who only wants to make a song should be able to do exactly that without World setup, artist profiling, career planning, or ecosystem prompts getting in the way. Broader Babel possibilities may be revealed only when the work makes them relevant and after FIRE has already provided value.
 
 Do not change V6 production behavior or migrate G7 data merely to begin Core breadboarding. A production-generation promotion remains a separate deliberate decision.
 
