@@ -2,7 +2,7 @@
 
 Use **Babel** as the project-facing name.
 
-Shared Babel process, feedback interpretation, research expectations, foundations, contradiction handling, and continuity live in the pinned Babel Truth authority. Read `BABEL_TRUTH.md` first; do not duplicate those rules here unless FIRE needs a real local exception.
+Shared Babel process, feedback interpretation, research expectations, foundations, contradiction handling, continuity, Lab-incubation ownership, and shared-surface concurrency live in the pinned Babel Truth authority. Read `BABEL_TRUTH.md` first; do not duplicate those rules here unless FIRE needs a real local exception.
 
 ## Zero-context FIRE entry
 
@@ -33,7 +33,7 @@ Current authority should contain one present truth. Git/PR history is the archiv
 
 ## Build/review workflow
 
-For durable FIRE work:
+For durable FIRE work in the owning product:
 
 **re-read current main/open PRs → branch → diagnose/shape → implement → test → reconcile authority/handoff → PR → required checks → merge → Pages deploy → verify exact merge → physical-device review when relevant**
 
@@ -50,8 +50,23 @@ For durable FIRE work:
 - The approved frozen shell runtime anchor is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`; all 10 certification categories are Locked.
 - Current `Setup → Structure → Tracks` content is disposable shell-fixture content, not FIRE Core architecture.
 - Shell Test is developer infrastructure inside G7, not a second FIRE implementation and not Babel Lab.
-- **FIRE Core breadboarding is unblocked.** Product work should now start from `FIRE_CORE.md`, not by continuing generic shell polish.
+- **FIRE Core work is unblocked.** Product work should now start from `FIRE_CORE.md`, not by continuing generic shell polish.
 - Do not casually reopen frozen categories because Core content differs from the fixtures. Extend the smallest necessary primitive when Core proves a genuinely new need; reopen a locked category only when evidence shows the foundation itself is wrong.
+
+## FIRE Core incubation boundary
+
+Babel Truth ADR 0006 allows a bounded **unproven FIRE Core interaction** to incubate in Babel Lab while FIRE remains the sole product owner.
+
+Current FIRE-specific rules:
+- doctrine, canonical behavior, production/runtime data, specs, migrations, and promoted implementation stay in `babel-fire`
+- a disposable interaction audition may live under `babel-lab/fire/core/**` using fake/local isolated state
+- Lab prototype code is evidence, not production code; promote the behavior deliberately back into FIRE only after it survives real use
+- the Lab Core lane must never read/write V6 or G7 FIRE storage merely to feel realistic
+- the existing Lab Fire visualization experiment is separate and must not be silently redefined as Core
+- the historical G7 Shell Test remains frozen FIRE certification evidence; Lab Shell Gallery is a different shared-UI proving environment
+- Draft FIRE PR #99 is seed/history unless `START_HERE.md` records a newer disposition; do not merge it merely because its code exists
+
+When working in Lab for a FIRE audition, respect Lab path ownership and Babel Truth shared-surface concurrency rails. A FIRE pass may own `fire/core/**`; it must reconcile before changing Lab root/shared/shell/Truth-pointer/cross-cutting CI surfaces and must not rewrite WORLD product logic.
 
 ## Engineering/data safety
 
