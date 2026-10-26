@@ -3,8 +3,10 @@
 FIRE follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `8862c5367691f618fe0eea9e166b7cfffee54c77`
+- Last reconciled Truth commit: `df8b1c25c3148d4376de31fe56cf24b13fc9cf77`
 - Unresolved durable continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
+
+This adoption includes the validated Babel shell baseline promoted from FIRE's own frozen G7 shell. FIRE remains the owning product for its runtime, product doctrine, fixtures, data, and future Core behavior; Truth owns only the transferable cross-app shell principles.
 
 ## Shared read order
 
