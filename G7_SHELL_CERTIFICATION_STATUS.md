@@ -48,6 +48,7 @@ This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The
   - project type and major content groups use the same major rhythm
   - Custom Section / Custom Bars attach with the same related gap
   - Custom Bars removes the nested field margin so one relationship has one spacing owner
+  - legacy `--sheet-major-gap`, `--sheet-content-gap`, and `--sheet-action-gap` names alias the canonical section/footer tokens instead of carrying independent values
 - Liquid Glass remains rejected for the current FIRE shell direction.
 - Setup / Structure / Tracks remain disposable product fixtures. Their current behavior does not approve FIRE Core architecture.
 
