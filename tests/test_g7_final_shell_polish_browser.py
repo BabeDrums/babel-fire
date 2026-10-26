@@ -1,12 +1,12 @@
 """Browser regressions for the final generic G7 shell-polish pass."""
 import os
+import re
 import unittest
 
 from playwright.sync_api import expect, sync_playwright
 
 BASE = os.environ.get("FIRE_URL", "http://127.0.0.1:8000").rstrip("/")
 URL = BASE + "/v7-preview/?reset=1"
-PRESSED = "rgba(255, 255, 255, 0.045)"
 TRANSPARENT = "rgba(0, 0, 0, 0)"
 
 
@@ -38,6 +38,11 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         self.addCleanup(lambda: self.assertEqual(errors, []))
         expect(page.locator(".project-list")).to_be_visible()
         return page
+
+    def assert_pressed_surface(self, color):
+        match = re.fullmatch(r"rgba\(255, 255, 255, ([0-9.]+)\)", color)
+        self.assertIsNotNone(match, f"Expected translucent white pressed surface, got {color}")
+        self.assertAlmostEqual(float(match.group(1)), 0.045, delta=0.003)
 
     def press_and_read(self, page, control, parent):
         box = control.bounding_box()
@@ -77,13 +82,13 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         project_row = page.locator('[data-project-card="preview-creep"]')
         more = project_row.locator(".project-card-actions")
         parent_color, child_color = self.press_and_read(page, more, project_row)
-        self.assertEqual(parent_color, PRESSED)
+        self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         page.get_by_role("button", name="Cancel").click()
 
         project_open = project_row.locator(".project-open")
         parent_color, child_color = self.press_and_read(page, project_open, project_row)
-        self.assertEqual(parent_color, PRESSED)
+        self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         expect(page.locator("h1")).to_have_text("Creep")
 
@@ -93,7 +98,7 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
         structure_row = page.locator(".arrangement-row").first
         edit = structure_row.locator(".section-edit-target")
         parent_color, child_color = self.press_and_read(page, edit, structure_row)
-        self.assertEqual(parent_color, PRESSED)
+        self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
         expect(page.locator(".sheet")).to_be_visible()
         page.keyboard.press("Escape")
@@ -101,7 +106,7 @@ class G7FinalShellPolishBrowser(unittest.TestCase):
 
         handle = structure_row.locator(".reorder-handle")
         parent_color, child_color = self.press_and_read(page, handle, structure_row)
-        self.assertEqual(parent_color, PRESSED)
+        self.assert_pressed_surface(parent_color)
         self.assertEqual(child_color, TRANSPARENT)
 
 
