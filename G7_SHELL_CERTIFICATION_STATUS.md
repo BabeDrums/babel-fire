@@ -1,82 +1,56 @@
 # G7 Shell Certification — Status Board
 
-This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The certification contract defines what each category means and how it can be locked.
+This file is the completed mutable status board for `G7_SHELL_CERTIFICATION.md`. The certification contract defines what each category means and how it can be locked.
 
-**Current phase:** final generic shell-polish candidate after physical iPhone/iPad review of exact G7 `5d6ab57` found two remaining interaction defects: routine text fields suppress normal iOS predictive/correction assistance, and split-action rows highlight only the pressed child region instead of the full parent row. No category is Locked and FIRE Core remains blocked.
+**Current phase:** **G7 SHELL FROZEN. 10 / 10 Locked. FIRE Core breadboarding unblocked.**
 
-| Category | State | Current note |
+The exact shell runtime that received final explicit Babel approval is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489` (PR #96). That exact merge deployed successfully and passed post-merge Static + Chromium 390 / 440 / 820. Accumulated physical iPhone/iPad review plus Babel's explicit final approval closed the physical-review gate with no remaining systemic shell contradiction.
+
+| Category | State | Freeze evidence |
 | --- | --- | --- |
-| 1. Page frame | Candidate | Shared navigation/action row + large title/meta below remain intact. Current candidate does not alter page-header geometry. |
-| 2. Typography | Candidate | Representative title/meta/row/supporting roles remain intact. Routine sheet headings stay hidden unless explicitly authored. |
-| 3. Spacing and alignment | Candidate | PR #95 unified sheet rhythm to 12px related and 24px major/footer gaps. Current candidate only changes pressed-surface ownership, not spacing. |
-| 4. Surfaces | Candidate | Adaptive compact bottom-sheet / regular centered-card surfaces remain intact. Split-action rows now use one parent-owned pressed surface rather than child-only patches. |
-| 5. Actions | Candidate | Add/More semantics and circle treatment remain physically strong. Project and Structure split-action rows preserve separate actions while sharing one visual press state. |
-| 6. Icons and accessories | Candidate | Symbol architecture remains unchanged. Physical review reports the current Back chevron looks great; do not reopen without new contradictory evidence. |
-| 7. Controls and states | Candidate | Normal text assistance is restored for ordinary `.field` text inputs while specialized `inputmode` controls remain specialized. `state-primitives.css` remains sole progress-state art owner. |
-| 8. Temporary UI | Candidate | PR #94/#95 adaptive sheet presentation and rhythm remain intact. Current candidate changes only generic text-entry assistance and split-row pressed feedback. |
-| 9. Responsive behavior | Candidate | Same product logic must hold across iPhone and iPad/regular width; final physical sanity pass is required after exact deployment. |
-| 10. Accessibility and motion | Candidate | Dialog labels/focus behavior remain intact. Text fields keep explicit capitalization and Next/Done progression while normal correction/spelling assistance returns. |
+| 1. Page frame | Locked | Shared navigation/action row, title/meta hierarchy, sparse/dense composition, natural scrolling, and safe responsive page behavior survived real G7 + physical review. |
+| 2. Typography | Locked | Stable title/meta/row/supporting/control roles hold across representative screens and temporary UI without state-driven label movement. |
+| 3. Spacing and alignment | Locked | Shared row/accessory anchors, optical symbol seating, stable value lanes, and 12px related / 24px major-footer sheet rhythm survived the final physical review cycle. |
+| 4. Surfaces | Locked | Grouped surfaces, adaptive sheets/dialogs, selection geometry, and parent-owned split-row pressed surfaces compose coherently without competing nested rectangles. |
+| 5. Actions | Locked | Primary/secondary/destructive hierarchy plus Add/More/Cancel/Done semantics and toolbar treatment are coherent across real G7 contexts. |
+| 6. Icons and accessories | Locked | Canonical Plus/More/Back/Forward/Check/Current/Upcoming/Reorder geometry and host placement survived Shell Test, real G7, and physical review. |
+| 7. Controls and states | Locked | Ordinary text fields preserve normal assistance; specialized input modes stay specialized; selection/value/progression states retain stable geometry and semantics. |
+| 8. Temporary UI | Locked | Compact bottom-sheet and regular-width centered-card presentations share one semantic/action hierarchy and the unified spacing grammar. |
+| 9. Responsive behavior | Locked | Same product logic holds across compact iPhone and regular/iPad widths with adaptive presentation, wrapping, scrolling, focus, and modal form. |
+| 10. Accessibility and motion | Locked | Approximately 44px+ touch targets, semantic labels, keyboard/focus behavior, appropriate input semantics, and reduced-motion/accessibility baselines are preserved. |
 
-## Current evidence
+## Completed evidence chain
 
-- Developer Shell Test: `v7-preview/shell-test.html`.
+- Developer Shell Test: `v7-preview/shell-test.html` uses the real primitive layers rather than a replica.
 - Shared symbol/accessory infrastructure: `v7-preview/shell-primitives.css`.
 - Progress-state visual authority: `v7-preview/state-primitives.css`.
-- Shared structural frame authority: `v7-preview/frame-primitives.css`, loaded by both real G7 and Shell Test after symbol/state layers.
-- Shared routine text-entry normalization candidate: `v7-preview/input-primitives.js`, loaded only by real G7.
+- Shared structural frame authority: `v7-preview/frame-primitives.css`.
+- Shared ordinary text-entry normalization: `v7-preview/input-primitives.js`.
 - Shell Test-only comparison styling remains isolated in `v7-preview/shell-test-experiments.css`.
-- PR #88 merged the symbol architecture into real G7 at `109590e66038845849c832d3f4e3ea93ba5193c1`.
-- PR #89 repaired header/action rows, 44px target vs 36px material, state visual ownership, Tempo/Meter lane, and modal framing at `d93729ff7a734035f25a6835323d19706f15186d`.
-- PR #92 fixed generated-art host seating and merged at `8d26e015da05aa4836d31bde0cb5405f50e448c1`; exact Pages deployment and post-merge Static + Chromium 390/440/820 passed.
-- PR #93 neutralized the final nested Back-host transform contradiction and merged at `c444d9b2a26d8e9196a901155586763c78af2f86`. Physical review says the chevron now looks great.
-- PR #94 restored adaptive sheets and merged at `c4c69f7927a6c34221e3044d2660b5d50fc75726`.
-- PR #95 unified sheet vertical rhythm and merged at `5d6ab57a6cd2109c873689c758d0e32b437cace1`:
-  - related disclosure gap = 12px
-  - major section gap = 24px
-  - footer gap = 24px
-  - single- and multi-action footers share one separation
-  - Custom Section / Custom Bars use one related disclosure gap
-  - Custom Bars no longer stacks a second field margin
-  - exact pre/post merge Chromium 390/440/820 passed
-- Physical iPhone/iPad review after PR #95 found the shell broadly solid and exposed only two new generic interaction issues:
-  - normal iOS predictive/correction behavior is suppressed by legacy text-field attributes
-  - Project/Structure split-action rows highlight only one child region during press
-- Current candidate on `g7-final-shell-interaction-polish`:
-  - ordinary `.field` text inputs remove restrictive autocomplete suppression and normalize `autocorrect="on"` + `spellcheck="true"`
-  - `autocapitalize="words"` and explicit Enter-key progression remain owned by existing fixture markup/app behavior
-  - specialized fields with `inputmode` (for example numeric Custom Bars) are not normalized as ordinary text fields
-  - Project and Structure parent rows own the edge-to-edge pressed surface through shared frame CSS
-  - project-open / project-actions / section-edit / reorder children no longer paint separate pressed backgrounds
-  - symbol geometry, modal geometry/rhythm, product fixture content, V6, and FIRE Core remain untouched
-- Fixture-specific wording/content decisions such as `Accurate` → `Confirmed` and Tracks/FX are outside this shell candidate.
-- Liquid Glass remains rejected for the current FIRE shell direction.
-- Setup / Structure / Tracks remain disposable product fixtures. Their current behavior does not approve FIRE Core architecture.
+- PR #88 promoted the normalized symbol architecture into real G7.
+- PR #89 repaired the shared header/control/state/modal frame.
+- PR #92 fixed generated-art host seating.
+- PR #93 removed the final Back-host contradiction; subsequent physical review reported the chevron correct.
+- PR #94 restored intended compact/wide adaptive sheets.
+- PR #95 unified sheet vertical rhythm: 12px related disclosure spacing and 24px major/footer separation.
+- PR #96 restored normal iOS text assistance for ordinary fields and moved split-action pressed feedback to the parent row surface.
+- Exact PR #96 head `e70f829455d26023a239087a6be119f1449333c4` passed Authority/Handoff + Static + Chromium 390 / 440 / 820.
+- Exact merged runtime `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489` passed GitHub Pages deploy plus post-merge Static + Chromium 390 / 440 / 820.
+- Physical review occurred repeatedly on iPhone/iPad throughout certification. Babel's explicit final approval after the exact PR #96 deployment closed the remaining shell gate.
+- Liquid Glass remains rejected for the current FIRE/Babel shell direction.
+- Setup / Structure / Tracks remain disposable shell fixtures; their current behavior does not approve FIRE Core architecture.
 
-## Reliability gate
+## Frozen-state guard
 
-Do not merge the final shell-polish candidate unless the exact PR head passes:
-- Authority/Handoff
-- Static
-- Chromium 390 / 440 / 820
-- real G7 fixture coverage
+**10 / 10 Locked — G7 SHELL FROZEN. FIRE Core breadboarding unblocked.**
 
-The browser contract must prove:
-- New Project ordinary text fields receive correction/spelling assistance instead of explicit suppression
-- word capitalization and Title → Artist Enter progression remain intact
-- specialized numeric/input-mode fields are not generalized
-- pressing either side of Project split rows paints one parent-owned surface
-- pressing edit or reorder in Structure paints one parent-owned surface
-- child controls remain visually transparent during the parent press state
-- PR #94/#95 adaptive sheet presentation/rhythm remain intact
+Locked means the generic foundation is stable enough to build confidently; it does not mean every future FIRE Core need already exists.
 
-After exact deployment, physical review is **iPhone first**, then iPad/regular width. If these final two shell defects are resolved and no new systemic contradiction appears, proceed to explicit shell approval/freeze instead of reopening fixture-specific product content.
+When Core exposes a new requirement:
+1. first decide whether it is product-specific composition or a genuinely missing primitive
+2. extend the smallest necessary primitive when possible
+3. preserve unrelated locked categories
+4. reopen a category only when new evidence shows the frozen foundation itself is wrong
+5. require physical review again when the changed primitive affects real mobile visual/interaction behavior
 
-Physical review must target the exact deployed revision shown by the G7/Shell Test build indicator.
-
-## Freeze status
-
-**0 / 10 Locked — G7 NOT FROZEN. FIRE Core breadboarding blocked.**
-
-All ten categories are currently **Candidate**, not Locked. Candidate means there is a coherent implementation/evidence surface to review; it does not substitute for physical validation.
-
-Do not change a category to Locked without satisfying `G7_SHELL_CERTIFICATION.md` and recording the physical-validation evidence that justified the change.
+The approved shell runtime anchor remains `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489` unless an intentional later runtime change explicitly supersedes it.
