@@ -5,6 +5,7 @@ REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
+        "df8b1c25c3148d4376de31fe56cf24b13fc9cf77",
         "FOUNDATIONS.md",
         "Babel Continuity Buffer",
     ],
@@ -17,14 +18,14 @@ REQUIRED = {
         "No Codex for FIRE",
         "G7_SHELL_CERTIFICATION_STATUS.md",
         "active FIRE documentation set",
+        "FIRE Core breadboarding is unblocked",
     ],
     "START_HERE.md": [
-        "G7 Shell",
-        "0 / 10 Locked",
-        "G7 is NOT FROZEN",
-        "PR **#89",
-        "d93729ff7a734035f25a6835323d19706f15186d",
+        "G7 SHELL IS FROZEN",
+        "10 / 10 Locked",
+        "4a258c5170dd1d96dcbc0f2b0a9c35b283cec489",
         "physical review",
+        "FIRE Core breadboarding is now unblocked",
         "Babel Truth Issue #1",
     ],
     "FIRE_CORE.md": [
@@ -41,6 +42,7 @@ REQUIRED = {
         "Documentation authority and conflict policy",
         "G7 shell vs FIRE Core",
         "G7_SHELL_CERTIFICATION_STATUS.md",
+        "FIRE Core breadboarding may now begin",
     ],
     "V7_DRAFT.md": [
         "`FIRE_CORE.md` governs cross-generation product doctrine",
@@ -48,18 +50,22 @@ REQUIRED = {
         "## Interaction grammar",
         "## Canonical icon/accessory grammar",
         "## Navigation and Back behavior",
+        "FIRE Core breadboarding is unblocked",
     ],
     "G7_SHELL_CERTIFICATION.md": [
         "# Babel FIRE — G7 Shell Certification",
         "G7_SHELL_CERTIFICATION_STATUS.md",
         "Developer Shell Test",
-        "all 10 categories are **Locked**",
-        "Babel explicitly approves/freezes the shell",
+        "all 10 categories **Locked**",
+        "explicit Babel approval",
+        "G7 Shell Frozen",
     ],
     "G7_SHELL_CERTIFICATION_STATUS.md": [
         "# G7 Shell Certification — Status Board",
-        "0 / 10 Locked",
-        "G7 NOT FROZEN",
+        "10 / 10 Locked",
+        "G7 SHELL FROZEN",
+        "FIRE Core breadboarding unblocked",
+        "4a258c5170dd1d96dcbc0f2b0a9c35b283cec489",
     ],
 }
 
@@ -76,7 +82,8 @@ RETIRED_ACTIVE_DOCS = {
 FORBIDDEN_TEXT = {
     "AGENTS.md": ["BABEL_START_HERE.md", "CONTINUITY_INBOX.md", "CONTEXT.md"],
     "FIRE_CORE.md": ["BABEL_APPS.md", "BABEL_PLATFORM.md", "BABEL_START_HERE.md", "CONTEXT.md", "REFERENCES.md"],
-    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md"],
+    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md", "0 / 10 Locked", "G7 is NOT FROZEN"],
+    "G7_SHELL_CERTIFICATION_STATUS.md": ["0 / 10 Locked", "G7 NOT FROZEN", "FIRE Core breadboarding blocked"],
 }
 
 
@@ -101,7 +108,7 @@ def main() -> int:
         text = Path(path).read_text(encoding="utf-8")
         for needle in needles:
             if needle in text:
-                failures.append(f"{path}: stale reference to retired authority: {needle!r}")
+                failures.append(f"{path}: stale reference to retired/superseded authority: {needle!r}")
 
     if failures:
         print("FIRE authority consistency check failed:")
