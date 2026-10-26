@@ -47,26 +47,39 @@ Current verified frame rules:
 - Tempo and Meter share one stable trailing value lane
 - symbol/state hosts seat generated artwork consistently instead of inheriting line-box behavior
 
-## Active physical review finding — adaptive sheets
+### Adaptive sheets
 
-Physical iPhone review of the current shell found the next systemic issue in temporary UI:
-- compact/iPhone modals are appearing as centered cards instead of the previous bottom-sheet presentation
-- this is not a Safari-only mystery: `frame-primitives.css` currently overrides the base responsive sheet contract and centers `.sheet-backdrop` at every width
-- the base stylesheet already has the intended adaptive model: compact width bottom sheet, regular width centered card
-- routine sheet titles also reappeared because the shared frame synthesizes visible text from each dialog's `aria-label` via `.sheet::before`
-- destructive confirmations already author explicit `<h2>` titles and can keep them independently
-- Add Section / Edit Section Custom choices already reveal and focus their dependent inputs; the remaining work is presentation/scroll rhythm, not new product logic
+PR #94 restored the intended adaptive presentation and merged at `c4c69f7927a6c34221e3044d2660b5d50fc75726`:
+- `<700px`: edge-attached bottom sheet
+- `>=700px`: centered card
+- routine `aria-label` stays semantic and is not duplicated as a visible heading
+- explicit destructive confirmation headings remain visible
+- Custom Section / Custom Bars stay progressively disclosed and focusable
+- symbol/header/state systems remain untouched
 
-Current candidate on `g7-adaptive-sheet-system`:
-- restore compact-width edge-attached bottom sheets
-- keep regular-width (`>=700px`) centered cards
-- stop converting accessibility labels into automatic visible headings
-- preserve explicitly authored confirmation headings
-- keep sheet content internally scrollable and give fields scroll margin so focused Custom inputs remain reachable
-- keep revealed Custom Section / Custom Bars fields visually attached to the choice that opened them
-- preserve all symbol/header/state work from PRs #92/#93
+Pre-merge Authority/Handoff + Static + Chromium 390/440/820 passed. Exact Pages deployment on the merge succeeded. Physical iPhone review confirmed the adaptive direction is much better, but exposed one remaining systemic contradiction: **sheet vertical rhythm is inconsistent across sheet types and disclosure states**.
 
-## Immediate next gate — sheet-system validation
+## Active physical review finding — sheet rhythm
+
+The current issue is not presentation mode anymore; it is competing vertical-spacing ownership:
+- `.project-type-control` has its own bottom margin
+- `.sheet-content-group + .sheet-content-group` owns another major gap
+- `.sheet-actions` and `.sheet-actions.single-action` use different footer gaps
+- Custom Bars stacks the disclosure-wrapper margin with `.numeric-field` margin, creating an accidental double gap
+- as a result, New Project, Project actions, Add Track, Add Section, Edit Section, and Custom states can all be locally valid while reading as one inconsistent family
+
+Current candidate on `g7-sheet-rhythm-system` establishes one semantic rhythm:
+- **related disclosure gap:** 12px
+- **major section gap:** 24px
+- **task content → footer actions:** 24px
+- single-action and multi-action footers use the same separation
+- Custom Section / Custom Bars fields attach to the triggering group with the same related gap
+- the Custom Bars field no longer adds a second local top margin
+- keyboard/focus scrolling preserves the same internal rhythm instead of introducing a second layout
+
+No symbol, header, state-art, product-flow, V6, or FIRE Core change belongs to this candidate.
+
+## Immediate next gate — sheet rhythm validation
 
 Require the normal engineering gate on the exact PR head:
 - Authority/Handoff
@@ -75,23 +88,16 @@ Require the normal engineering gate on the exact PR head:
 - real G7 fixture coverage
 
 The browser contract must prove:
-- compact widths bottom-anchor the sheet
-- regular width centers the card
-- routine sheets do not synthesize a visible heading from `aria-label`
-- the accessible dialog label remains intact
-- Custom Section and Custom Bars reveal/focus their fields directly beneath the triggering choice
+- New Project uses 24px project-type → fields → footer rhythm
+- Project actions uses the same 24px content → single-action footer rhythm
+- Add Section keeps 24px between major groups and before footer actions
+- Custom Section / Custom Bars disclosures use 12px attachment gaps
+- Custom Bars has no stacked field margin
+- compact bottom-sheet and regular-width centered-card presentation from PR #94 remain intact
 
-After exact deployment, physical review is **iPhone first**, especially:
-- New Project
-- Project actions
-- Edit project
-- Add Track
-- Add Section with Custom section name
-- Add Section / Edit Section with Custom bars
-- destructive confirmations
-- keyboard/focus behavior and whether the bottom sheet remains composed around Safari chrome
+After exact deployment, physical review is **iPhone first**, especially New Project, Project actions, Add Track, Add Section with both Custom disclosures, Edit Section, and keyboard-open state. Then review the same family on iPad / regular width.
 
-Then review the same temporary-UI family on iPad / regular width. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
+Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
 
 ## Stable boundaries
 
