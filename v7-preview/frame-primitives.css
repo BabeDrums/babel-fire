@@ -123,8 +123,10 @@
     var(--sheet-inset)
     calc(var(--sheet-inset) + var(--control-height) + var(--sheet-action-gap));
 }
+/* Keep the semantic task label available to the contract while never rendering it as a routine
+   heading. Visible sheet titles must be authored explicitly in the sheet content. */
 .sheet::before {
-  content: none;
+  content: attr(aria-label);
   display: none;
 }
 .sheet .field {
