@@ -2,97 +2,64 @@
 
 Use **Babel** as the project-facing name.
 
-Read `BABEL_TRUTH.md` first, then the pinned Truth `START_HERE.md` / `AGENTS.md` / `FOUNDATIONS.md`. This file owns only the **current FIRE state and immediate next gate**.
-
-For a fresh FIRE conversation, reconstruct from the repositories in that read order and trust newer documented repo state over any stale prompt hash or old chat detail. The previous conversation is history, not required operational memory.
+Read `BABEL_TRUTH.md` first. This file owns only the **current FIRE state and immediate next gate**. Product doctrine lives in `FIRE_CORE.md`; generation/frozen-shell details live in their owning specs.
 
 ## Current state
 
-- Production remains **V6** at the root app. No production promotion has occurred.
-- G7 remains isolated at `/v7-preview/` using `production-projects-v1-v7-preview`; it must never mutate V6 `production-projects-v1` data.
-- **G7 SHELL IS FROZEN. 10 / 10 Locked.**
-- The exact owning-product runtime that received final explicit Babel approval is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489` (PR #96).
-- Current `Setup → Structure → Tracks` content remains disposable shell-fixture content, not FIRE Core architecture.
-- The historical G7 Shell Test remains developer/certification infrastructure inside FIRE. It is not a second FIRE implementation, not Babel Lab, and not the living shared Shell Gallery.
-- `FIRE_CORE.md` now owns the current FIRE Core operating model: **Target → Production Map → Active Focus → FIRE Loop → DAW → Evaluate/Update → Next Focus**, with Original and Recreation/Cover using one production engine.
-- The current Production Map uses nine production domains as orientation/dependency, not a compulsory course. Domain state is evidence-based and reversible rather than permanent completion.
-- Babel Truth ADR 0005 governs cross-app context/handoff. ADR 0006 permits bounded unproven FIRE interaction behavior to incubate in Lab without transferring FIRE ownership.
-- **FIRE PR #99 is Draft seed material, not merge-ready runtime.** It contains the first coded Active Focus → DAW experiment → evaluation → changed-focus proof plus Creep/Even fixtures, but its interaction proof should be auditioned/reshaped in Lab before any promoted FIRE runtime implementation.
+- **V6 remains production.** No production-generation promotion has occurred.
+- **G7 SHELL IS FROZEN — 10 / 10 Locked.** Approved runtime anchor: `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`.
+- G7 remains isolated at `/v7-preview/` and must never mutate V6 `production-projects-v1` data.
+- Current `Setup → Structure → Tracks` content is disposable shell-fixture content, not FIRE Core architecture.
+- The historical G7 Shell Test remains FIRE certification evidence; Lab Shell Gallery is a separate living shared-UI proving environment.
+- `FIRE_CORE.md` is canonical for the current FIRE Core product model: **Target → Production Map → Active Focus → FIRE Loop → DAW → Evaluate/Update → Next Focus**.
+- Original and Recreation/Cover use one production engine. The Production Map uses evidence-based, reversible domain state rather than a compulsory course or percent-complete model.
+- Babel Truth ADR 0005 governs cross-app context. ADR 0006 governs bounded Lab incubation.
+- **FIRE PR #99 is closed seed/history, not a merge path or runtime candidate.** Its Creep/Even interaction proof may be mined selectively for the Lab audition.
 
-## Frozen shell baseline
+## Immediate next gate — FIRE Core audition in Lab
 
-The reusable shell grammar proven through the G7 certification cycle includes:
+Do not start another broad architecture pass and do not revive PR #99 as a merge path.
 
-- stable toolbar/navigation/action row with title/meta composing below it
-- roughly 44px interaction targets with quieter visible material where appropriate
-- shared structural ownership split across `frame-primitives.css`, `shell-primitives.css`, and `state-primitives.css`
-- symbol placement model: **geometry baseline → optional intrinsic symbol optical metric → container placement**
-- familiar accessory semantics: `+` add/create, `•••` management, chevron navigation, drag handle reorder, canonical completion/current/upcoming marks
-- parent-owned grouped/split-row pressed surfaces rather than competing child rectangles
-- stable trailing value/control lanes
-- adaptive temporary UI: compact bottom sheet, regular-width centered card, same semantics/action hierarchy
-- sheet rhythm proven at 12px related disclosure spacing and 24px major/footer separation
-- ordinary text fields preserve normal platform correction/spelling/predictive assistance; specialized input modes remain specialized
-- one product logic across iPhone/iPad; presentation may adapt
-- content-before-chrome, quiet-until-important, tactile-not-decorative composition
+Work under `BabeDrums/babel-lab/fire/core/**` using fake/local isolated state and prove only this thin interaction:
 
-Genuinely transferable versions of these rules live in Babel Truth. FIRE-specific fixture workflow/copy and implementation code were not promoted.
+**Active Focus → concise why → one useful DAW experiment → return with result → preserve evidence → update project/domain state → changed next Active Focus**
 
-## Core architecture now in force
+Use the current proof pair:
+- **Creep** — Recreation/reference case.
+- **Even** — Original using already-known artist-authored context.
 
-`FIRE_CORE.md` is canonical for the product model. Important current rules include:
+The audition should support at least:
+- **Helped** — evidence may make the current domain provisionally stable and move focus.
+- **Didn't help** — keep the domain active and try a cheaper alternate test before escalating.
+- **Revealed something else** — redirect/reopen from new evidence instead of blindly advancing.
 
-- **Original** may begin from nothing, a seed, demo, developed production, or near-finished record; FIRE orients to actual state rather than forcing restart.
-- **Recreation / Cover** uses the external reference as a persistent overlay across production, not only a final comparison phase. Match / Interpret / Reimagine is a mutable overall bias; individual differences may be Match / Intentional / Explore.
-- The Production Map is a finite set of domains, not a rigid staircase or percentage-completion system.
-- A domain can be not-yet-relevant, active, **provisionally stable under current evidence**, or reopened by new evidence.
-- **Prevent what can reasonably be prevented now. Commit when there is enough evidence. Reopen only when new evidence earns it.** Reopening is not an excuse for FIRE missing a problem it could reasonably have caught earlier.
-- **Active Focus** chooses what deserves attention now using leverage, dependency, target relevance, uncertainty, reversibility/cost, constraints, history, and finish risk rather than blindly advancing to a next stage.
-- FIRE should be information-rich underneath and information-light for the musician. Questions exist only to obtain evidence that materially changes the next useful recommendation or prevents a bad one; a small DAW experiment may be better than asking.
-- Reporting/perception/intention/state questions never randomize. Playful choice belongs only after FIRE has narrowed the space to genuinely viable action alternatives.
-- FIRE retains production meaning the DAW does not already understand well rather than requiring the entire Logic session to be mirrored.
-- Fire visualization remains a hypothesis; do not use generic XP/percent-complete. Current semantic candidate is where the record has unresolved **heat/attention**.
+Physical-use gate: iPhone first, then regular width as useful. Judge whether the interaction gets the musician to a useful DAW action with minimal burden—not whether the prototype looks complete.
 
-## Immediate next gate — bounded FIRE Core audition in Lab
-
-Do **not** begin another architecture pass by default and do **not** merge PR #99 as-is.
-
-The next deliberate FIRE step is:
-
-1. Work under `BabeDrums/babel-lab/fire/core/**`, which is the explicitly non-canonical FIRE Core incubation lane.
-2. Use Draft PR #99 as seed evidence/code, not authority and not production code.
-3. Build only the thin interaction contract already defined by FIRE doctrine:
-   **Active Focus → concise why → one useful Logic/DAW experiment → return with result → preserve evidence/decision → update domain/project state → changed next Active Focus.**
-4. Use fake/local isolated Lab state only. Never read/write FIRE production or G7 storage from the Lab specimen.
-5. Exercise the same spine with the current proof pair: a Recreation/reference case (`Creep` is current seed) and the Original `Even`, reusing already-known artist-authored context rather than re-asking it.
-6. Physically use the specimen on iPhone first, then regular width as useful. Judge whether it feels production-useful and information-light—not whether the prototype looks complete.
-7. Reshape/delete freely in Lab until the behavior earns promotion.
-8. Only after the interaction survives, deliberately implement/reconcile the surviving behavior back into `babel-fire` against real FIRE navigation/state/data. Prototype code is not automatically promoted code.
-
-FIRE remains independently usable. A user who only wants to make a song should be able to do exactly that without World setup, artist profiling, career planning, or ecosystem prompts getting in the way.
-
-## Parallel-lane boundary
-
-FIRE and WORLD work may proceed in parallel, but ownership is strict:
-
-- FIRE doctrine/canonical behavior/runtime/data/promoted implementation → `babel-fire`
-- FIRE Core experimental interaction → `babel-lab/fire/core/**`
-- Fire visualization experiment → `babel-lab/fire/visualization/**`
-- WORLD experimental product logic → its owned Lab paths
-- generic shared UI candidate work → Lab Shell Gallery / shared-shell lane
-
-Before touching shared Lab surfaces such as root navigation, `shared/**`, `shell/**`, Truth adoption pointers, or cross-cutting CI/tests, reconcile current Lab `main` and open PRs first. Do not let a FIRE pass silently rewrite WORLD logic or shared shell work.
+If the behavior survives, deliberately implement/reconcile it back into `babel-fire` against real FIRE navigation/state/data. Lab prototype code is not production code.
 
 ## Stable boundaries
 
-- public project types remain Original / Cover; canonical doctrine calls the second workflow Recreation
-- history-aware Back retraces actual in-app path with a safe fallback for direct entry
-- `+` = add/create the primary discrete object for the current view
-- `•••` = management/actions
-- arrangement metadata belongs in content hierarchy; reorder owns its far-right affordance
-- Complete = canonical check; Current = stronger short bar; Incomplete/upcoming = quieter short bar
-- Current does not tint the whole row
-- one product logic across iPhone/iPad; presentation may adapt
-- V6 runtime/data/schema remain untouched unless a separate approved V6 change requires otherwise
+- FIRE remains independently useful; a musician does not need WORLD setup, artist profiling, or ecosystem management to make/finish a song.
+- public project types remain **Original / Cover**; canonical doctrine calls the second workflow **Recreation**.
+- FIRE owns detailed production reasoning. Cross-app handoff should expose only meaning that genuinely transfers, not FIRE internals.
+- V6 runtime/data/schema remain untouched unless a separate approved change requires otherwise.
+- Frozen shell categories stay frozen unless evidence shows the foundation itself is wrong. A new Core content need does not automatically reopen the shell.
+- Fire visualization, Track→Element→Role, exact focus-ranking/scoring, larger-body-of-work details, and exact cross-app projection fields remain hypotheses unless `FIRE_CORE.md` says otherwise.
 
-New durable unresolved FIRE findings go to Babel Truth Issue #1 under the shared persist-before-reply rule.
+## Parallel lane boundary
+
+FIRE product authority/runtime → `babel-fire`.
+
+FIRE Core experiment → `babel-lab/fire/core/**`.
+
+Do not rewrite WORLD product logic from the FIRE lane. Before touching shared Lab root/shared/shell/adoption/CI surfaces, refresh Lab `main`, inspect open PRs/changed files, and serialize overlap.
+
+## Read deeper only when needed
+
+- `FIRE_CORE.md` — canonical FIRE doctrine/product model.
+- `V6.md` — current shipped production generation.
+- `V7_DRAFT.md` — frozen G7 shell behavior/primitive grammar.
+- `G7_SHELL_CERTIFICATION.md` / `_STATUS.md` — completed shell certification evidence.
+- Babel Truth Issue #1 — current unresolved durable state.
+
+New durable unresolved FIRE findings go to Babel Truth Issue #1. Historical implementation detail belongs in Git/PR history, not this handoff.
