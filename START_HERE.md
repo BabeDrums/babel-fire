@@ -30,15 +30,15 @@ PR #88 promoted the physically preferred symbol architecture into real G7:
 - Liquid Glass is rejected
 - symbol alignment belongs to the symbol primitive, never page-specific CSS
 
-PR #92 later fixed the broader host-centering contradiction so generated `+`, `•••`, completion/state art, and shared row accessories seat from one stable host contract. Exact Pages deployment and post-merge Static + Chromium 390 / 440 / 820 passed on `8d26e015da05aa4836d31bde0cb5405f50e448c1`.
+PR #92 fixed generated-art host seating and merged at `8d26e015da05aa4836d31bde0cb5405f50e448c1`.
 
-PR #93 then removed the final real-G7 Back-only host contradiction by neutralizing the legacy nested `.back-glyph` transform while leaving chevron artwork/optical metrics untouched. It merged at `c444d9b2a26d8e9196a901155586763c78af2f86`, deployed successfully, and physical review reported the chevron looks great. Do not reopen the chevron system without new contradictory evidence.
+PR #93 removed the final real-G7 Back-host contradiction and merged at `c444d9b2a26d8e9196a901155586763c78af2f86`. Physical review reports the chevron now looks great. Do not reopen the chevron system without new contradictory evidence.
 
 ### Shared frame
 
 `frame-primitives.css` owns structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
 
-Historical frame milestone: PR **#89** repaired the shared header/control/state/modal frame and merged at `d93729ff7a734035f25a6835323d19706f15186d`. Later physical review and PRs #92/#93 refined generated-art seating and the Back host without reopening that frame architecture.
+Historical frame milestone: PR **#89** repaired the shared header/control/state/modal frame and merged at `d93729ff7a734035f25a6835323d19706f15186d`.
 
 Current verified frame rules:
 - Back and trailing Add/More share one navigation/action row; large title/meta live below it
@@ -47,7 +47,7 @@ Current verified frame rules:
 - Tempo and Meter share one stable trailing value lane
 - symbol/state hosts seat generated artwork consistently instead of inheriting line-box behavior
 
-### Adaptive sheets
+### Adaptive sheets and rhythm
 
 PR #94 restored the intended adaptive presentation and merged at `c4c69f7927a6c34221e3044d2660b5d50fc75726`:
 - `<700px`: edge-attached bottom sheet
@@ -55,31 +55,37 @@ PR #94 restored the intended adaptive presentation and merged at `c4c69f7927a6c3
 - routine `aria-label` stays semantic and is not duplicated as a visible heading
 - explicit destructive confirmation headings remain visible
 - Custom Section / Custom Bars stay progressively disclosed and focusable
-- symbol/header/state systems remain untouched
 
-Pre-merge Authority/Handoff + Static + Chromium 390/440/820 passed. Exact Pages deployment on the merge succeeded. Physical iPhone review confirmed the adaptive direction is much better, but exposed one remaining systemic contradiction: **sheet vertical rhythm is inconsistent across sheet types and disclosure states**.
+Physical review of PR #94 then exposed inconsistent vertical rhythm across sheet types.
 
-## Active physical review finding — sheet rhythm
-
-The current issue is not presentation mode anymore; it is competing vertical-spacing ownership:
-- `.project-type-control` has its own bottom margin
-- `.sheet-content-group + .sheet-content-group` owns another major gap
-- `.sheet-actions` and `.sheet-actions.single-action` use different footer gaps
-- Custom Bars stacks the disclosure-wrapper margin with `.numeric-field` margin, creating an accidental double gap
-- as a result, New Project, Project actions, Add Track, Add Section, Edit Section, and Custom states can all be locally valid while reading as one inconsistent family
-
-Current candidate on `g7-sheet-rhythm-system` establishes one semantic rhythm:
+PR #95 unified that rhythm and merged at `5d6ab57a6cd2109c873689c758d0e32b437cace1`:
 - **related disclosure gap:** 12px
 - **major section gap:** 24px
 - **task content → footer actions:** 24px
 - single-action and multi-action footers use the same separation
-- Custom Section / Custom Bars fields attach to the triggering group with the same related gap
-- the Custom Bars field no longer adds a second local top margin
-- keyboard/focus scrolling preserves the same internal rhythm instead of introducing a second layout
+- Custom Section / Custom Bars attach with the same related gap
+- Custom Bars no longer stacks a second local top margin
+- compact bottom-sheet and regular-width centered-card presentation remain intact
 
-No symbol, header, state-art, product-flow, V6, or FIRE Core change belongs to this candidate.
+Exact pre/post merge browser coverage passed at 390 / 440 / 820, and subsequent physical iPhone/iPad review found the sheets broadly solid.
 
-## Immediate next gate — sheet rhythm validation
+## Active physical review finding — final generic shell polish
+
+The latest physical iPhone/iPad review of exact G7 `5d6ab57` surfaced two remaining generic shell defects before freeze:
+
+1. **Normal iOS text assistance is suppressed in routine text fields.** Legacy fixture markup still emits restrictive `autocomplete`, `autocorrect`, and `spellcheck` attributes, so Title/Artist and similar ordinary text entry lose predictive/correction assistance even though word capitalization and Next/Done progression still work.
+2. **Split-action rows paint pressed state on child controls instead of the full parent row.** Project rows split main-open vs `•••`; Structure rows split edit vs reorder. Pressing either side currently highlights only that child region, which reads as a glitch rather than one coherent row.
+
+Current candidate on `g7-final-shell-interaction-polish` fixes those at the shell level:
+- `input-primitives.js` restores normal assistance only for ordinary `.field` text inputs; specialized `inputmode` controls such as numeric Custom Bars remain untouched
+- existing capitalization and Enter-key focus progression stay intact
+- Project and Structure split-action rows now let the **parent row own one edge-to-edge pressed surface**
+- child controls retain separate semantics/accessory emphasis but no longer paint competing pressed rectangles
+- no symbol geometry, sheet rhythm, product fixture content, V6 runtime/data, or FIRE Core behavior changes in this pass
+
+Fixture-specific wording/content cleanup such as `Accurate` → `Confirmed` or Tracks/FX decisions is outside this shell-polish pass.
+
+## Immediate next gate — final shell-polish validation
 
 Require the normal engineering gate on the exact PR head:
 - Authority/Handoff
@@ -88,14 +94,15 @@ Require the normal engineering gate on the exact PR head:
 - real G7 fixture coverage
 
 The browser contract must prove:
-- New Project uses 24px project-type → fields → footer rhythm
-- Project actions uses the same 24px content → single-action footer rhythm
-- Add Section keeps 24px between major groups and before footer actions
-- Custom Section / Custom Bars disclosures use 12px attachment gaps
-- Custom Bars has no stacked field margin
-- compact bottom-sheet and regular-width centered-card presentation from PR #94 remain intact
+- New Project Title/Artist receive normal correction/spelling assistance instead of explicit suppression
+- `autocapitalize="words"` and Next → Done keyboard progression remain intact
+- specialized numeric inputs are not generalized into text-assistance behavior
+- pressing either side of a Project split row paints one full parent-row surface
+- pressing either side of a Structure edit/reorder row paints one full parent-row surface
+- child controls do not add a second local pressed rectangle
+- PR #94/#95 adaptive sheet geometry and rhythm remain intact
 
-After exact deployment, physical review is **iPhone first**, especially New Project, Project actions, Add Track, Add Section with both Custom disclosures, Edit Section, and keyboard-open state. Then review the same family on iPad / regular width.
+After exact deployment, run one final physical sanity pass on **iPhone first, then iPad / regular width**. If those two interaction defects are resolved and no new systemic contradiction appears, proceed to explicit shell approval/freeze rather than reopening fixture-specific product content.
 
 Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
 

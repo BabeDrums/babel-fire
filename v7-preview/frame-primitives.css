@@ -79,6 +79,25 @@
   transform: none;
 }
 
+/* SPLIT-ROW INTERACTION FRAME
+   A row may expose separate semantic actions without looking visually segmented while pressed.
+   The parent owns one edge-to-edge pressed surface; child controls own only their action/accessory
+   semantics. This keeps Project rows and Structure/reorder rows in one interaction language. */
+.project-card:has(.project-open:active),
+.project-card:has(.project-card-actions:active),
+.arrangement-row:has(.section-edit-target:active),
+.arrangement-row:has(.reorder-handle:active) {
+  background: rgba(255,255,255,.045);
+}
+.project-open:active,
+.project-card-actions:active,
+.section-edit-target:active,
+.reorder-handle:active {
+  background: transparent;
+}
+.project-card-actions:active { color: var(--text); }
+.reorder-handle:active { color: var(--muted); }
+
 /* STATE RENDERING SAFETY
    state-primitives.css owns state artwork. Legacy text characters in fixture markup are never
    permitted to become a second visual owner if a more-specific old rule changes font size. */
