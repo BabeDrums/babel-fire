@@ -3,20 +3,21 @@
 FIRE follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `9b9414ca360035fd76c2b30db5ecbe561bf130fe`
+- Last reconciled Truth commit: `9f6a4d5b65456c3df807955f947708e1f1134d99`
 - Unresolved durable continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
 
-This adoption includes the validated Babel shell baseline promoted from FIRE's own frozen G7 shell, ADR 0005's cross-app context/handoff boundary, and ADR 0006's bounded Lab-incubation/concurrency boundary. FIRE remains the owning product for its doctrine, runtime, data, production knowledge, canonical behavior, and promoted implementation; Truth owns only transferable cross-app contracts and shared foundations.
+This adoption includes the validated Babel shell baseline promoted from FIRE's own frozen G7 shell, ADR 0005's cross-app context/handoff boundary, ADR 0006's bounded Lab-incubation/concurrency boundary, and the reusable Babel conversation-closeout protocol. FIRE remains the owning product for its doctrine, runtime, data, production knowledge, canonical behavior, and promoted implementation; Truth owns only transferable cross-app contracts and shared foundations.
 
 ## Shared read order
 
 1. Babel Truth `START_HERE.md` at the commit above
 2. Babel Truth `AGENTS.md`
-3. Babel Truth `FOUNDATIONS.md` when shared product/design/interaction foundations matter
-4. relevant accepted Babel Truth decisions when cross-app architecture matters, especially ADR 0005 and ADR 0006
-5. local `START_HERE.md` and FIRE authority in its documented order
-6. relevant Issue #1 body + newer comments
-7. code/tests as implementation evidence
+3. Babel Truth `CHAT_CLOSEOUT.md` when closing/migrating a conversation
+4. Babel Truth `FOUNDATIONS.md` when shared product/design/interaction foundations matter
+5. relevant accepted Babel Truth decisions when cross-app architecture matters, especially ADR 0005 and ADR 0006
+6. local `START_HERE.md` and FIRE authority in its documented order
+7. relevant Issue #1 body + newer comments
+8. code/tests as implementation evidence
 
 ## Ownership
 
