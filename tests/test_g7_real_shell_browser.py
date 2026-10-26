@@ -46,6 +46,13 @@ class G7RealShellBrowser(unittest.TestCase):
         page.locator('[data-project="preview-creep"]').click()
         expect(page.locator("h1")).to_have_text("Creep")
 
+    def vertical_gap(self, upper, lower):
+        upper_box = upper.bounding_box()
+        lower_box = lower.bounding_box()
+        self.assertIsNotNone(upper_box)
+        self.assertIsNotNone(lower_box)
+        return lower_box["y"] - (upper_box["y"] + upper_box["height"])
+
     def test_real_project_state_marks_and_setup_controls_preserve_geometry(self):
         page = self.open()
         self.open_fixture_project(page)
@@ -121,6 +128,30 @@ class G7RealShellBrowser(unittest.TestCase):
         meter_value = page.locator("#meterInput").locator("xpath=..")
         self.assertTrue(meter_value.evaluate("el => el.classList.contains('select-value')"))
 
+    def test_sheet_vertical_rhythm_is_shared_across_forms_and_action_menus(self):
+        page = self.open()
+
+        # Routine form: project type -> fields -> footer all use the shared 24px major rhythm.
+        page.get_by_role("button", name="New Project").click()
+        sheet = page.locator(".sheet")
+        expect(sheet).to_be_visible()
+        project_type = sheet.locator(".project-type-control")
+        project_fields = sheet.locator(".project-field-group")
+        actions = sheet.locator(".sheet-actions")
+        self.assertLessEqual(abs(self.vertical_gap(project_type, project_fields) - 24), 1.0)
+        self.assertLessEqual(abs(self.vertical_gap(project_fields, actions) - 24), 1.0)
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).marginTop"), "24px")
+        page.get_by_role("button", name="Cancel").click()
+
+        # Action menu: the single Cancel footer uses the same 24px separation instead of a local gap.
+        self.open_fixture_project(page)
+        page.get_by_role("button", name="Project actions").click()
+        menu = page.locator(".action-menu")
+        single_actions = page.locator(".sheet-actions.single-action")
+        expect(single_actions).to_be_visible()
+        self.assertLessEqual(abs(self.vertical_gap(menu, single_actions) - 24), 1.0)
+        self.assertEqual(single_actions.evaluate("el => getComputedStyle(el).marginTop"), "24px")
+
     def test_real_structure_header_alignment_and_adaptive_sheet(self):
         page = self.open()
         width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
@@ -161,6 +192,7 @@ class G7RealShellBrowser(unittest.TestCase):
         expect(actions).to_be_visible()
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
+        self.assertEqual(actions.evaluate("el => getComputedStyle(el).marginTop"), "24px")
         self.assertEqual(sheet.get_attribute("aria-label"), "Add Section")
         self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').display"), "none")
         self.assertEqual(sheet.locator("h2").count(), 0)
@@ -183,16 +215,23 @@ class G7RealShellBrowser(unittest.TestCase):
             self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
             self.assertNotIn("inset", sheet.evaluate("el => getComputedStyle(el).boxShadow"))
 
-        # Custom choices progressively reveal and focus the field directly attached to that choice.
+        groups = sheet.locator(".sheet-content-group")
+        first_group = groups.nth(0)
+        second_group = groups.nth(1)
+        self.assertLessEqual(abs(self.vertical_gap(first_group, second_group) - 24), 1.0)
+        self.assertLessEqual(abs(self.vertical_gap(second_group, actions) - 24), 1.0)
+
+        # Custom choices progressively reveal and focus the field with one shared 12px related gap.
         custom_type = sheet.locator('[data-action="choose-section-type"][data-name="Custom"]')
         custom_type.click()
         custom_section = page.locator("#customSectionArea")
         expect(custom_section).to_be_visible()
         expect(page.locator("#customSectionName")).to_be_focused()
         self.assertLessEqual(
-            custom_section.bounding_box()["y"] - custom_type.bounding_box()["y"] - custom_type.bounding_box()["height"],
-            16,
+            abs(self.vertical_gap(sheet.locator(".section-types"), custom_section) - 12),
+            1.0,
         )
+        self.assertLessEqual(abs(self.vertical_gap(first_group, second_group) - 24), 1.0)
 
         custom_bars = sheet.locator('[data-action="choose-section-bars"][data-bars="custom"]')
         custom_bars.click()
@@ -200,9 +239,11 @@ class G7RealShellBrowser(unittest.TestCase):
         expect(custom_bars_area).to_be_visible()
         expect(page.locator("#customBarsInput")).to_be_focused()
         self.assertLessEqual(
-            custom_bars_area.bounding_box()["y"] - custom_bars.bounding_box()["y"] - custom_bars.bounding_box()["height"],
-            16,
+            abs(self.vertical_gap(sheet.locator(".bars-grid"), custom_bars_area) - 12),
+            1.0,
         )
+        self.assertEqual(page.locator("#customBarsInput").evaluate("el => getComputedStyle(el).marginTop"), "0px")
+        self.assertLessEqual(abs(self.vertical_gap(second_group, actions) - 24), 1.0)
 
 
 if __name__ == "__main__":

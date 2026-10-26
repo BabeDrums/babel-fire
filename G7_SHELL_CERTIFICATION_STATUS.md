@@ -2,20 +2,20 @@
 
 This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The certification contract defines what each category means and how it can be locked.
 
-**Current phase:** adaptive sheet-system candidate after physical iPhone review confirmed the symbol/header cleanup is dramatically improved and the Back chevron now looks great. The remaining active contradiction is temporary UI presentation: compact/iPhone sheets were being forced into centered-card geometry by the shared frame. No category is Locked and FIRE Core remains blocked.
+**Current phase:** sheet-rhythm candidate after physical iPhone review of PR #94 confirmed adaptive bottom-sheet presentation is much better but exposed inconsistent vertical spacing between sheet content, progressive disclosures, and footer actions. No category is Locked and FIRE Core remains blocked.
 
 | Category | State | Current note |
 | --- | --- | --- |
-| 1. Page frame | Candidate | Shared navigation/action row + large title/meta below remain intact. Current sheet candidate does not alter page-header geometry. |
-| 2. Typography | Candidate | Representative title/meta/row/supporting roles remain intact. Current sheet candidate removes only synthetic routine sheet headings; explicitly authored confirmation headings remain. |
-| 3. Spacing and alignment | Candidate | PR #92 unified generated-art host seating; PR #93 removed the last Back-host transform contradiction. Current candidate changes only temporary-UI spacing/presentation. |
-| 4. Surfaces | Candidate | Grouped/selection/field surfaces remain. Sheet surface becomes adaptive again: compact bottom sheet, regular-width centered card. |
-| 5. Actions | Candidate | Add/More semantics and circle treatment remain physically strong. Sheet action hierarchy remains secondary to task content. |
+| 1. Page frame | Candidate | Shared navigation/action row + large title/meta below remain intact. Current sheet-rhythm candidate does not alter page-header geometry. |
+| 2. Typography | Candidate | Representative title/meta/row/supporting roles remain intact. Routine sheet headings stay hidden unless explicitly authored. |
+| 3. Spacing and alignment | Candidate | Active candidate unifies temporary-UI rhythm into 12px related disclosure gaps and 24px major/footer gaps instead of local per-sheet margins. |
+| 4. Surfaces | Candidate | PR #94 restored adaptive sheet surfaces: compact bottom sheet, regular-width centered card. Current candidate changes only internal rhythm. |
+| 5. Actions | Candidate | Add/More semantics and circle treatment remain physically strong. Sheet footers now share one 24px content-to-actions separation, including single-action menus. |
 | 6. Icons and accessories | Candidate | Symbol architecture remains unchanged. Physical review reports the current Back chevron looks great; do not reopen without new contradictory evidence. |
-| 7. Controls and states | Candidate | `state-primitives.css` remains sole state-art owner. No state-art change is part of the sheet candidate. |
-| 8. Temporary UI | Candidate | Active candidate restores compact bottom sheets, regular-width centered cards, removes automatic visible aria-label headings, preserves explicit confirmation headings, and keeps Custom disclosures attached/focusable. |
-| 9. Responsive behavior | Candidate | Adaptive presentation is now the focus: `<700px` bottom sheet, `>=700px` centered card, same product logic. Must pass 390/440/820 and physical iPhone/iPad review. |
-| 10. Accessibility and motion | Candidate | Dialog `aria-label` remains intact even when not duplicated visually. Focused Custom fields must remain reachable inside the internally scrollable sheet. |
+| 7. Controls and states | Candidate | `state-primitives.css` remains sole state-art owner. No state-art change is part of the sheet-rhythm candidate. |
+| 8. Temporary UI | Candidate | PR #94 restored adaptive presentation. Current candidate unifies vertical spacing and removes the Custom Bars accidental double gap. |
+| 9. Responsive behavior | Candidate | Same sheet rhythm must hold across `<700px` bottom sheets and `>=700px` centered cards, with keyboard/focus movement preserving internal relationships. |
+| 10. Accessibility and motion | Candidate | Dialog labels remain semantic; focused Custom fields remain reachable inside the internally scrollable sheet. No accessibility behavior is removed. |
 
 ## Current evidence
 
@@ -29,35 +29,46 @@ This file is the small mutable status board for `G7_SHELL_CERTIFICATION.md`. The
 - PR #89 repaired header/action rows, 44px target vs 36px material, state visual ownership, Tempo/Meter lane, and modal framing at `d93729ff7a734035f25a6835323d19706f15186d`.
 - PR #92 fixed generated-art host seating and merged at `8d26e015da05aa4836d31bde0cb5405f50e448c1`; exact Pages deployment and post-merge Static + Chromium 390/440/820 passed.
 - PR #93 neutralized the final nested Back-host transform contradiction and merged at `c444d9b2a26d8e9196a901155586763c78af2f86`. Exact Pages deploy succeeded; physical review says the chevron now looks great.
-- Current physical review finding is temporary UI rather than symbol geometry:
-  - compact/iPhone sheets are centered instead of bottom-attached
-  - `frame-primitives.css` is the direct cause because it overrides `.sheet-backdrop` to center at every width
-  - base `styles.css` still contains the intended adaptive contract: bottom sheet by default, centered card at `min-width: 700px`
-  - routine titles reappeared because `.sheet::before` displays `aria-label`
-  - destructive confirmations already author their own `<h2>` title
-  - Custom Section / Custom Bars logic already reveals and focuses the dependent field
-- Current candidate on `g7-adaptive-sheet-system`:
-  - compact `.sheet-backdrop` uses `align-items: flex-end`
-  - compact sheet is edge-attached with top-only radius and no bottom border
-  - regular width returns to centered full-radius card geometry
-  - `.sheet::before` no longer renders visible content
-  - dialog `aria-label` remains present for accessibility
-  - sheet remains internally scrollable with focused-field scroll margins
-  - Custom fields reveal directly beneath their triggering group
+- PR #94 restored adaptive sheets and merged at `c4c69f7927a6c34221e3044d2660b5d50fc75726`:
+  - compact `<700px` presentation is bottom-attached
+  - regular `>=700px` presentation is centered
+  - routine `aria-label` headings are not visually duplicated
+  - explicit destructive headings remain
+  - Custom disclosure/focus behavior remains intact
+  - pre-merge Authority/Handoff + Static + Chromium 390/440/820 passed and exact Pages deployment succeeded
+- Physical iPhone review of PR #94 found the adaptive direction much better but exposed inconsistent rhythm:
+  - project-type → fields, content-group → content-group, and content → footer do not all share one system
+  - `.sheet-actions.single-action` currently differs from normal footers
+  - Custom Bars stacks its wrapper gap with `.numeric-field` top margin
+- Current candidate on `g7-sheet-rhythm-system`:
+  - related disclosure gap = 12px
+  - major section gap = 24px
+  - footer gap = 24px
+  - normal and single-action footers share the same separation
+  - project type and major content groups use the same major rhythm
+  - Custom Section / Custom Bars attach with the same related gap
+  - Custom Bars removes the nested field margin so one relationship has one spacing owner
+  - legacy `--sheet-major-gap`, `--sheet-content-gap`, and `--sheet-action-gap` names alias the canonical section/footer tokens instead of carrying independent values
 - Liquid Glass remains rejected for the current FIRE shell direction.
 - Setup / Structure / Tracks remain disposable product fixtures. Their current behavior does not approve FIRE Core architecture.
 
 ## Reliability gate
 
-Do not merge the adaptive sheet candidate unless the exact PR head passes:
+Do not merge the sheet-rhythm candidate unless the exact PR head passes:
 - Authority/Handoff
 - Static
 - Chromium 390 / 440 / 820
-- real G7 Project → Structure → Add Section coverage
+- real G7 fixture coverage
 
-The browser contract must prove compact bottom anchoring, regular-width centering, no synthetic routine heading, retained accessible label, and Custom field reveal/focus behavior.
+The browser contract must prove:
+- New Project uses 24px project-type → fields → footer rhythm
+- Project actions uses the same 24px content → single-action footer rhythm
+- Add Section uses 24px major section/footer gaps
+- Custom Section / Custom Bars use 12px related gaps
+- Custom Bars does not retain a second local top margin
+- PR #94 compact/regular presentation remains intact
 
-After exact deployment, physical review is **iPhone first** across New Project, Project actions, Edit project, Add Track, Add Section/Edit Section Custom flows, destructive confirmations, and keyboard behavior. Then review iPad/regular-width presentation.
+After exact deployment, physical review is **iPhone first** across New Project, Project actions, Edit project, Add Track, Add Section/Edit Section Custom flows, and keyboard behavior. Then review iPad/regular width.
 
 Physical review must target the exact deployed revision shown by the G7/Shell Test build indicator.
 
