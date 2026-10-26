@@ -10,9 +10,9 @@ After `BABEL_TRUTH.md` and the pinned Truth authority:
 1. `START_HERE.md` — current verified FIRE state and next gate
 2. `FIRE_CORE.md` — canonical cross-generation FIRE product doctrine
 3. `V6.md` — current production-generation behavior
-4. `V7_DRAFT.md` — active G7 successor behavior/primitive grammar
-5. `G7_SHELL_CERTIFICATION.md` — stable shell certification/freeze contract
-6. `G7_SHELL_CERTIFICATION_STATUS.md` — mutable category evidence/status
+4. `V7_DRAFT.md` — frozen G7 shell behavior/primitive grammar
+5. `G7_SHELL_CERTIFICATION.md` — completed shell certification/freeze contract
+6. `G7_SHELL_CERTIFICATION_STATUS.md` — completed category evidence/status
 7. relevant Babel Truth Issue #1 items
 8. code/tests as implementation evidence
 
@@ -23,9 +23,9 @@ Do not reconstruct current state from old PRs or Git history unless investigatin
 For FIRE-local behavior:
 1. `FIRE_CORE.md`
 2. `V6.md` for shipped production behavior
-3. `V7_DRAFT.md` for active successor behavior
+3. `V7_DRAFT.md` for frozen successor shell behavior
 4. `G7_SHELL_CERTIFICATION.md` for certification definitions/freeze criteria
-5. `G7_SHELL_CERTIFICATION_STATUS.md` for current category state/evidence
+5. `G7_SHELL_CERTIFICATION_STATUS.md` for completed category state/evidence
 6. `START_HERE.md` for exact current build/review/next step
 7. code/tests as implementation evidence
 
@@ -43,13 +43,15 @@ For durable FIRE work:
 - Stop instead of merging when tests fail, data safety is uncertain, behavior is destructive/risky, or a real product decision remains unresolved.
 - Automated browser checks do not replace physical iOS Safari review for visual/interaction work.
 
-## Current shell boundary
+## Frozen shell boundary
 
 - V6 remains production until deliberate promotion.
-- G7 is the isolated successor at `/v7-preview/`.
+- G7 remains the isolated successor at `/v7-preview/`.
+- The approved frozen shell runtime anchor is `4a258c5170dd1d96dcbc0f2b0a9c35b283cec489`; all 10 certification categories are Locked.
 - Current `Setup → Structure → Tracks` content is disposable shell-fixture content, not FIRE Core architecture.
 - Shell Test is developer infrastructure inside G7, not a second FIRE implementation and not Babel Lab.
-- Do not begin FIRE Core breadboarding until the certification contract is satisfied and Babel explicitly freezes the G7 shell.
+- **FIRE Core breadboarding is unblocked.** Product work should now start from `FIRE_CORE.md`, not by continuing generic shell polish.
+- Do not casually reopen frozen categories because Core content differs from the fixtures. Extend the smallest necessary primitive when Core proves a genuinely new need; reopen a locked category only when evidence shows the foundation itself is wrong.
 
 ## Engineering/data safety
 
@@ -74,9 +76,9 @@ For durable FIRE work:
 - `START_HERE.md` — current verified FIRE state / immediate next gate
 - `FIRE_CORE.md` — canonical FIRE doctrine
 - `V6.md` — shipped production-generation spec
-- `V7_DRAFT.md` — active G7 successor spec
-- `G7_SHELL_CERTIFICATION.md` — stable shell-certification contract
-- `G7_SHELL_CERTIFICATION_STATUS.md` — mutable certification evidence/status
+- `V7_DRAFT.md` — frozen G7 shell spec and local primitive grammar
+- `G7_SHELL_CERTIFICATION.md` — completed shell-certification contract
+- `G7_SHELL_CERTIFICATION_STATUS.md` — completed certification evidence/status
 
 That is the active FIRE documentation set. Do not recreate separate ecosystem ledgers, continuity inboxes, changelog-as-authority, research registries, or supporting-context catchalls. Use Babel Truth/Issue #1, the owning spec, and Git history instead.
 
@@ -93,4 +95,4 @@ A FIRE change is not done until:
 - durable unresolved findings are captured in Truth Issue #1 when appropriate
 - merged/deployed state is verified when the workflow calls for it
 
-For visual work, physical Safari review is a distinct gate. For shell freeze, the stricter certification contract applies.
+For visual work, physical Safari review is a distinct gate. The G7 shell has completed its certification/freeze gate; future shell-affecting changes must respect the frozen-state rule above.
