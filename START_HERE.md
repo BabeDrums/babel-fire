@@ -44,52 +44,43 @@ Current shared frame rules:
 
 `frame-primitives.css` owns those structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
 
-PR #89 passed Static + Chromium **390 / 440 / 820**, including the real G7 Project → Setup → Structure path and Shell Test. Pages deployed the exact merge successfully.
-
 PR #91 later simplified authority/documentation only and made no G7/V6 runtime change. Exact Pages deployment and post-merge Static + Chromium 390/440/820 passed on `f512b90065c58a2426e79e4a99941a22b22fe35e`.
 
-## Active physical review finding — host centering
+PR **#92 — Center generated G7 symbols consistently across hosts** merged at `8d26e015da05aa4836d31bde0cb5405f50e448c1`. It fixed the host-centering contradiction exposed on iPad: generated `+`, `•••`, completion/state art, and shared row accessories now seat from one stable host contract rather than inheriting context-specific line-box behavior. Exact Pages deployment and post-merge Static + Chromium **390 / 440 / 820** passed on that merge.
 
-Physical iPad review of deployed `G7 · f512b90` found that the normalized glyphs look correct in the Shell Test container comparison, while the same generated artwork can sit visibly high in toolbar/action/row/state hosts.
+Physical iPhone review of deployed `G7 · 8d26e01` reported the shell as dramatically improved and broadly loved. The Shell Test chevron looked correctly seated, while the selected-project real-G7 Back chevron still appeared slightly high.
 
-The defect is classified as a **host-centering contract problem**, not a new per-symbol optical-nudge problem:
-- `+` / `•••` read high in toolbar/action hosts
-- managed-row `•••` reads high
-- Current's status bar is the clearest high state mark; checks also need the same host consistency
-- Back / Forward and the intrinsic symbol metrics themselves should remain unchanged unless new evidence proves otherwise
-- accepted x-lanes, row/text geometry, 44px hit targets, and 36px visible toolbar material stay fixed
+## Active physical review finding — real Back host
 
-Current candidate on `fix-g7-host-centering`:
-- generated symbol/state pseudo-elements are explicitly centered inside their stable host boxes using absolute inset + auto margins
-- host centering does not consume the CSS transform channel used by intrinsic symbol metrics
-- `frame-primitives.css` no longer changes symbol pseudo-elements back to relative positioning
-- the obsolete shell-level header action offset rule is removed; structural header placement has one owner in `frame-primitives.css`
-- Shell Test removes the redundant adaptive-dialog helper sentence and gives the sparse composition fixture intentional internal inset
+The remaining Back issue is classified as a **legacy host transform contradiction**, not a reason to reopen the chevron artwork or optical metric:
+- Shell Test Back uses the shared chevron asset without the nested real-G7 `.back-glyph` host and looks correct.
+- Real G7 Back wraps that same artwork in `.back-glyph`.
+- the base stylesheet still applies a historical `transform: translateY(-1px)` to `.back-glyph`
+- the shared frame layer otherwise centers the host correctly
+
+Current candidate on `fix-g7-back-host-center`:
+- `frame-primitives.css` explicitly neutralizes host-level transform on `.back-glyph`
+- chevron artwork, mirrored side bearing, circle material, 44px hit target, 36px visible material, toolbar geometry, title geometry, and all other symbols remain unchanged
+- the real-product browser contract now asserts `.back-glyph` computes to `transform: none`
 
 This candidate is not physically approved and does not lock any category.
 
-## Immediate next gate — candidate validation
+## Immediate next gate — Back host validation
 
 First require the normal engineering gate on the exact PR head:
 - Authority/Handoff
 - Static
 - Chromium 390 / 440 / 820
-- Shell Test and real G7 fixture coverage
+- real G7 fixture coverage
 
-After exact deployment, review on **iPhone first**, then **iPad / regular width**. Specifically judge:
-- Add / More vertical seating inside top controls
-- managed-row More vertical seating
-- Complete / Current / Incomplete vertical seating as one state family
-- Back / Forward preservation
-- Reorder preservation
-- 44px interaction target vs 36px visible button material
-- title/meta spacing and hierarchy
-- Tempo / Meter lane
-- keyboard/focus progression
-- add/edit sheet hierarchy and placement
-- interaction with Safari browser chrome
+After exact deployment, review on **iPhone first**. Compare:
+- Shell Test top Back
+- selected-project home Back
+- Setup / Structure / Tracks Back
 
-Do not infer iPhone approval from this iPad finding. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
+The goal is one thing only: the real nested Back host should now seat exactly like the already-approved Shell Test Back. Do not change the chevron asset or add a new optical offset unless new physical evidence proves the shared asset itself is wrong.
+
+After iPhone confirmation, continue the broader iPad / regular-width shell certification sweep. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
 
 ## Stable boundaries
 

@@ -83,6 +83,7 @@ class G7RealShellBrowser(unittest.TestCase):
         back_glyph = page.locator(".back-glyph")
         back_button = page.locator(".toolbar-button.icon-back")
         self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el).fontSize"), "0px")
+        self.assertEqual(back_glyph.evaluate("el => getComputedStyle(el).transform"), "none")
         self.assertIn(
             "data:image/svg+xml",
             back_glyph.evaluate("el => getComputedStyle(el, '::before').webkitMaskImage"),
