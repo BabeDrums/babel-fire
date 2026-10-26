@@ -5,8 +5,9 @@ REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
-        "df8b1c25c3148d4376de31fe56cf24b13fc9cf77",
+        "68229103cd199cd9474307e0ac73e254f16e915a",
         "FOUNDATIONS.md",
+        "ADR 0005",
         "Babel Continuity Buffer",
     ],
     "AGENTS.md": [
@@ -39,6 +40,9 @@ REQUIRED = {
         "Match",
         "Interpret",
         "Reimagine",
+        "FIRE Knowledge model",
+        "Sequencing is a dependency map, not a course",
+        "Cross-app boundary",
         "Documentation authority and conflict policy",
         "G7 shell vs FIRE Core",
         "G7_SHELL_CERTIFICATION_STATUS.md",
