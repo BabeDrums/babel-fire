@@ -5,7 +5,8 @@ REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
-        "9b9414ca360035fd76c2b30db5ecbe561bf130fe",
+        "9f6a4d5b65456c3df807955f947708e1f1134d99",
+        "CHAT_CLOSEOUT.md",
         "FOUNDATIONS.md",
         "ADR 0005",
         "ADR 0006",
