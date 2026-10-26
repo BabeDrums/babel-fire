@@ -30,57 +30,66 @@ PR #88 promoted the physically preferred symbol architecture into real G7:
 - Liquid Glass is rejected
 - symbol alignment belongs to the symbol primitive, never page-specific CSS
 
-### Shared frame repair
+PR #92 later fixed the broader host-centering contradiction so generated `+`, `•••`, completion/state art, and shared row accessories seat from one stable host contract. Exact Pages deployment and post-merge Static + Chromium 390 / 440 / 820 passed on `8d26e015da05aa4836d31bde0cb5405f50e448c1`.
 
-PR **#89 — Repair G7 shared header, control, state, and modal frames** merged at `d93729ff7a734035f25a6835323d19706f15186d` and was successfully deployed/tested.
+PR #93 then removed the final real-G7 Back-only host contradiction by neutralizing the legacy nested `.back-glyph` transform while leaving chevron artwork/optical metrics untouched. It merged at `c444d9b2a26d8e9196a901155586763c78af2f86`, deployed successfully, and physical review reported the chevron looks great. Do not reopen the chevron system without new contradictory evidence.
 
-Current shared frame rules:
+### Shared frame
+
+`frame-primitives.css` owns structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
+
+Current verified frame rules:
 - Back and trailing Add/More share one navigation/action row; large title/meta live below it
 - toolbar keeps a 44px interaction target with quieter 36px visible material
 - `state-primitives.css` owns progress/completion artwork; legacy text glyphs cannot leak through
 - Tempo and Meter share one stable trailing value lane
-- compact sheets use bounded small-viewport-safe geometry rather than depending on Safari's dynamic bottom edge
-- edit-sheet action hierarchy avoids three equal oversized action slabs
+- symbol/state hosts seat generated artwork consistently instead of inheriting line-box behavior
 
-`frame-primitives.css` owns those structural relationships; `shell-primitives.css` owns symbol/accessory artwork; `state-primitives.css` owns progress-state artwork.
+## Active physical review finding — adaptive sheets
 
-PR #91 later simplified authority/documentation only and made no G7/V6 runtime change. Exact Pages deployment and post-merge Static + Chromium 390/440/820 passed on `f512b90065c58a2426e79e4a99941a22b22fe35e`.
+Physical iPhone review of the current shell found the next systemic issue in temporary UI:
+- compact/iPhone modals are appearing as centered cards instead of the previous bottom-sheet presentation
+- this is not a Safari-only mystery: `frame-primitives.css` currently overrides the base responsive sheet contract and centers `.sheet-backdrop` at every width
+- the base stylesheet already has the intended adaptive model: compact width bottom sheet, regular width centered card
+- routine sheet titles also reappeared because the shared frame synthesizes visible text from each dialog's `aria-label` via `.sheet::before`
+- destructive confirmations already author explicit `<h2>` titles and can keep them independently
+- Add Section / Edit Section Custom choices already reveal and focus their dependent inputs; the remaining work is presentation/scroll rhythm, not new product logic
 
-PR **#92 — Center generated G7 symbols consistently across hosts** merged at `8d26e015da05aa4836d31bde0cb5405f50e448c1`. It fixed the host-centering contradiction exposed on iPad: generated `+`, `•••`, completion/state art, and shared row accessories now seat from one stable host contract rather than inheriting context-specific line-box behavior. Exact Pages deployment and post-merge Static + Chromium **390 / 440 / 820** passed on that merge.
+Current candidate on `g7-adaptive-sheet-system`:
+- restore compact-width edge-attached bottom sheets
+- keep regular-width (`>=700px`) centered cards
+- stop converting accessibility labels into automatic visible headings
+- preserve explicitly authored confirmation headings
+- keep sheet content internally scrollable and give fields scroll margin so focused Custom inputs remain reachable
+- keep revealed Custom Section / Custom Bars fields visually attached to the choice that opened them
+- preserve all symbol/header/state work from PRs #92/#93
 
-Physical iPhone review of deployed `G7 · 8d26e01` reported the shell as dramatically improved and broadly loved. The Shell Test chevron looked correctly seated, while the selected-project real-G7 Back chevron still appeared slightly high.
+## Immediate next gate — sheet-system validation
 
-## Active physical review finding — real Back host
-
-The remaining Back issue is classified as a **legacy host transform contradiction**, not a reason to reopen the chevron artwork or optical metric:
-- Shell Test Back uses the shared chevron asset without the nested real-G7 `.back-glyph` host and looks correct.
-- Real G7 Back wraps that same artwork in `.back-glyph`.
-- the base stylesheet still applies a historical `transform: translateY(-1px)` to `.back-glyph`
-- the shared frame layer otherwise centers the host correctly
-
-Current candidate on `fix-g7-back-host-center`:
-- `frame-primitives.css` explicitly neutralizes host-level transform on `.back-glyph`
-- chevron artwork, mirrored side bearing, circle material, 44px hit target, 36px visible material, toolbar geometry, title geometry, and all other symbols remain unchanged
-- the real-product browser contract now asserts `.back-glyph` computes to `transform: none`
-
-This candidate is not physically approved and does not lock any category.
-
-## Immediate next gate — Back host validation
-
-First require the normal engineering gate on the exact PR head:
+Require the normal engineering gate on the exact PR head:
 - Authority/Handoff
 - Static
 - Chromium 390 / 440 / 820
 - real G7 fixture coverage
 
-After exact deployment, review on **iPhone first**. Compare:
-- Shell Test top Back
-- selected-project home Back
-- Setup / Structure / Tracks Back
+The browser contract must prove:
+- compact widths bottom-anchor the sheet
+- regular width centers the card
+- routine sheets do not synthesize a visible heading from `aria-label`
+- the accessible dialog label remains intact
+- Custom Section and Custom Bars reveal/focus their fields directly beneath the triggering choice
 
-The goal is one thing only: the real nested Back host should now seat exactly like the already-approved Shell Test Back. Do not change the chevron asset or add a new optical offset unless new physical evidence proves the shared asset itself is wrong.
+After exact deployment, physical review is **iPhone first**, especially:
+- New Project
+- Project actions
+- Edit project
+- Add Track
+- Add Section with Custom section name
+- Add Section / Edit Section with Custom bars
+- destructive confirmations
+- keyboard/focus behavior and whether the bottom sheet remains composed around Safari chrome
 
-After iPhone confirmation, continue the broader iPad / regular-width shell certification sweep. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
+Then review the same temporary-UI family on iPad / regular width. Browser evidence alone cannot lock a certification category. Physical evidence + the certification contract govern locking.
 
 ## Stable boundaries
 
