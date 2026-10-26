@@ -82,8 +82,8 @@ RETIRED_ACTIVE_DOCS = {
 FORBIDDEN_TEXT = {
     "AGENTS.md": ["BABEL_START_HERE.md", "CONTINUITY_INBOX.md", "CONTEXT.md"],
     "FIRE_CORE.md": ["BABEL_APPS.md", "BABEL_PLATFORM.md", "BABEL_START_HERE.md", "CONTEXT.md", "REFERENCES.md"],
-    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md", "0 / 10 Locked", "G7 is NOT FROZEN"],
-    "G7_SHELL_CERTIFICATION_STATUS.md": ["0 / 10 Locked", "G7 NOT FROZEN", "FIRE Core breadboarding blocked"],
+    "START_HERE.md": ["CONTINUITY_INBOX.md", "BABEL_START_HERE.md", "**0 / 10 Locked", "G7 is NOT FROZEN"],
+    "G7_SHELL_CERTIFICATION_STATUS.md": ["**0 / 10 Locked", "G7 NOT FROZEN", "FIRE Core breadboarding blocked"],
 }
 
 
