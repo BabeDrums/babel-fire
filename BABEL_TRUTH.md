@@ -3,28 +3,27 @@
 FIRE follows shared cross-app Babel authority from:
 
 - Truth repo: `BabeDrums/babel-truth`
-- Last reconciled Truth commit: `9f6a4d5b65456c3df807955f947708e1f1134d99`
-- Unresolved durable continuity: Babel Truth Issue #1 — `Babel Continuity Buffer`
+- Last reconciled Truth commit: `21cb7307f8a1306101d7761f11da79b44752e13b`
+- Unresolved durable continuity: Babel Truth Issue #1
 
-This adoption includes the validated Babel shell baseline promoted from FIRE's own frozen G7 shell, ADR 0005's cross-app context/handoff boundary, ADR 0006's bounded Lab-incubation/concurrency boundary, and the reusable Babel conversation-closeout protocol. FIRE remains the owning product for its doctrine, runtime, data, production knowledge, canonical behavior, and promoted implementation; Truth owns only transferable cross-app contracts and shared foundations.
+## Read order
 
-## Shared read order
+1. pinned Truth `START_HERE.md`
+2. pinned Truth `AGENTS.md`
+3. `FOUNDATIONS.md` / relevant ADR only when the task needs them
+4. local `START_HERE.md`
+5. `FIRE_CORE.md` and generation-specific authority relevant to the task
+6. current Issue #1 state when unresolved context matters
+7. code/tests as implementation evidence
 
-1. Babel Truth `START_HERE.md` at the commit above
-2. Babel Truth `AGENTS.md`
-3. Babel Truth `CHAT_CLOSEOUT.md` when closing/migrating a conversation
-4. Babel Truth `FOUNDATIONS.md` when shared product/design/interaction foundations matter
-5. relevant accepted Babel Truth decisions when cross-app architecture matters, especially ADR 0005 and ADR 0006
-6. local `START_HERE.md` and FIRE authority in its documented order
-7. relevant Issue #1 body + newer comments
-8. code/tests as implementation evidence
+Read Truth `CHAT_CLOSEOUT.md` only when closing/migrating a conversation.
 
 ## Ownership
 
-Truth owns cross-app rules. `babel-fire` owns FIRE product doctrine, runtime, data, specs, tests, current build state, production knowledge, and local implementation decisions.
+Truth owns transferable cross-app rules and shared foundations. `babel-fire` owns FIRE doctrine, canonical behavior, runtime/data, production knowledge, specs/tests, and promoted implementation.
 
-Babel Lab may provide bounded evidence, including clearly labeled unproven FIRE Core interaction auditions under fake/local state, but **Lab is evidence, never authority**. FIRE does not inherit a design or implementation merely because it exists in Lab. Surviving behavior is deliberately promoted/reconciled back into FIRE.
+Babel Lab may audition bounded unproven FIRE interactions with fake/local state, but **Lab is evidence, never authority**. Surviving behavior is deliberately implemented/reconciled back into FIRE.
 
-FIRE's historical frozen G7 Shell Test remains FIRE certification evidence. Lab's Shell Gallery is a separate living shared-UI proving environment.
+FIRE's frozen G7 Shell Test remains FIRE certification evidence. Lab Shell Gallery is a separate shared-UI proving environment.
 
-Truth adoption is explicit, never a live runtime dependency. Update this pointer only after reconciliation is complete.
+Truth adoption is explicit and pinned; there is no runtime dependency on Truth or Lab.
