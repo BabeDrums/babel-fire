@@ -162,7 +162,7 @@ class G7RealShellBrowser(unittest.TestCase):
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
         self.assertEqual(sheet.get_attribute("aria-label"), "Add Section")
-        self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').content"), "none")
+        self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').display"), "none")
         self.assertEqual(sheet.locator("h2").count(), 0)
 
         sheet_box = sheet.bounding_box()
