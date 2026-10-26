@@ -12,6 +12,11 @@
   --sheet-related-gap: var(--space-3);
   --sheet-section-gap: var(--space-6);
   --sheet-footer-gap: var(--space-6);
+  /* Legacy semantic names remain aliases so older consumers cannot disagree with the canonical
+     rhythm. One relationship has one source of truth. */
+  --sheet-major-gap: var(--sheet-section-gap);
+  --sheet-content-gap: var(--sheet-section-gap);
+  --sheet-action-gap: var(--sheet-footer-gap);
 }
 
 /* HEADER FRAME
