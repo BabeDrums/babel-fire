@@ -4,6 +4,8 @@ Use **Babel** as the project-facing name.
 
 Read `BABEL_TRUTH.md` first, then the pinned Truth `START_HERE.md` / `AGENTS.md` / `FOUNDATIONS.md`. This file owns only the **current FIRE state and immediate next gate**.
 
+For a fresh FIRE conversation, reconstruct from the repositories in that read order and trust newer documented repo state over any stale prompt hash or old chat detail. The previous conversation is history, not required operational memory.
+
 ## Current state
 
 - Production remains **V6** at the root app. No production promotion has occurred.
