@@ -64,7 +64,12 @@
 .toolbar-button::before,
 .toolbar-button > *,
 .shell-test-link::before { z-index: 1; }
-.back-glyph { z-index: 1; }
+/* The base stylesheet historically pulled the nested real-G7 Back host up by 1px.
+   The shared frame owns host placement now; intrinsic chevron optics stay inside the symbol asset. */
+.back-glyph {
+  z-index: 1;
+  transform: none;
+}
 
 /* STATE RENDERING SAFETY
    state-primitives.css owns state artwork. Legacy text characters in fixture markup are never
