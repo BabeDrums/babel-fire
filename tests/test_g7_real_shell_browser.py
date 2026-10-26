@@ -121,8 +121,9 @@ class G7RealShellBrowser(unittest.TestCase):
         meter_value = page.locator("#meterInput").locator("xpath=..")
         self.assertTrue(meter_value.evaluate("el => el.classList.contains('select-value')"))
 
-    def test_real_structure_header_alignment_and_sheet_chrome(self):
+    def test_real_structure_header_alignment_and_adaptive_sheet(self):
         page = self.open()
+        width = int(os.environ.get("FIRE_TEST_WIDTH", "390"))
         self.open_fixture_project(page)
         page.locator('.journey-row[data-route="structure"]').click()
         expect(page.locator("h1")).to_have_text("Structure")
@@ -154,22 +155,54 @@ class G7RealShellBrowser(unittest.TestCase):
 
         page.get_by_role("button", name="Add Section").click()
         sheet = page.locator(".sheet")
+        backdrop = page.locator(".sheet-backdrop")
         expect(sheet).to_be_visible()
         actions = sheet.locator(".sheet-actions")
         expect(actions).to_be_visible()
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
         self.assertEqual(actions.evaluate("el => getComputedStyle(el).paddingTop"), "0px")
-        self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
-        self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
-        self.assertNotIn("inset", sheet.evaluate("el => getComputedStyle(el).boxShadow"))
+        self.assertEqual(sheet.get_attribute("aria-label"), "Add Section")
+        self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').display"), "none")
+        self.assertEqual(sheet.locator("h2").count(), 0)
 
-        # The modal is centered away from the dynamic browser bottom edge and carries a visible task title.
         sheet_box = sheet.bounding_box()
         self.assertIsNotNone(sheet_box)
         viewport_height = page.viewport_size["height"]
-        self.assertGreater(sheet_box["y"], 0)
-        self.assertLess(sheet_box["y"] + sheet_box["height"], viewport_height)
-        self.assertEqual(sheet.evaluate("el => getComputedStyle(el, '::before').content"), '"Add Section"')
+        if width < 700:
+            # Compact presentation is an edge-attached bottom sheet, not a centered dialog.
+            self.assertEqual(backdrop.evaluate("el => getComputedStyle(el).alignItems"), "flex-end")
+            self.assertLessEqual(abs(sheet_box["y"] + sheet_box["height"] - viewport_height), 1.0)
+            self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomWidth"), "0px")
+            self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "0px")
+        else:
+            # Regular width keeps the compact centered-card treatment.
+            self.assertEqual(backdrop.evaluate("el => getComputedStyle(el).alignItems"), "center")
+            self.assertGreater(sheet_box["y"], 0)
+            self.assertLess(sheet_box["y"] + sheet_box["height"], viewport_height)
+            self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomWidth"), "1px")
+            self.assertEqual(sheet.evaluate("el => getComputedStyle(el).borderBottomLeftRadius"), "22px")
+            self.assertNotIn("inset", sheet.evaluate("el => getComputedStyle(el).boxShadow"))
+
+        # Custom choices progressively reveal and focus the field directly attached to that choice.
+        custom_type = sheet.locator('[data-action="choose-section-type"][data-name="Custom"]')
+        custom_type.click()
+        custom_section = page.locator("#customSectionArea")
+        expect(custom_section).to_be_visible()
+        expect(page.locator("#customSectionName")).to_be_focused()
+        self.assertLessEqual(
+            custom_section.bounding_box()["y"] - custom_type.bounding_box()["y"] - custom_type.bounding_box()["height"],
+            16,
+        )
+
+        custom_bars = sheet.locator('[data-action="choose-section-bars"][data-bars="custom"]')
+        custom_bars.click()
+        custom_bars_area = page.locator("#customBarsArea")
+        expect(custom_bars_area).to_be_visible()
+        expect(page.locator("#customBarsInput")).to_be_focused()
+        self.assertLessEqual(
+            custom_bars_area.bounding_box()["y"] - custom_bars.bounding_box()["y"] - custom_bars.bounding_box()["height"],
+            16,
+        )
 
 
 if __name__ == "__main__":
