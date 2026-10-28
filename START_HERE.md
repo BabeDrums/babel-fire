@@ -14,28 +14,29 @@ Read `BABEL_TRUTH.md` first. This file owns only the **current FIRE state and im
 - `FIRE_CORE.md` is canonical for the current FIRE Core product model: **Target → Production Map → Active Focus → FIRE Loop → DAW → Evaluate/Update → Next Focus**.
 - Original and Recreation/Cover use one production engine. The Production Map uses evidence-based, reversible domain state rather than a compulsory course or percent-complete model.
 - Babel Truth ADR 0005 governs cross-app context. ADR 0006 governs bounded Lab incubation.
-- **FIRE PR #99 is closed seed/history, not a merge path or runtime candidate.** Its Creep/Even interaction proof may be mined selectively for the Lab audition.
+- **FIRE PR #99 is closed seed/history, not a merge path or runtime candidate.**
+- The current non-canonical FIRE Core interaction specimen lives in `babel-lab/fire/core/**`. Lab PR #41 merged/deployed the first **top-of-product heartbeat** at `ee1214be831a8f880f54c9a1930608dd12c63532`; it supersedes the earlier V1/V2 interaction auditions.
 
-## Immediate next gate — FIRE Core audition in Lab
+## Immediate next gate — physical review of the Lab heartbeat
 
-Do not start another broad architecture pass and do not revive PR #99 as a merge path.
+Do not start another broad architecture pass, reconstruct V1/V2, or revive PR #99.
 
-Work under `BabeDrums/babel-lab/fire/core/**` using fake/local isolated state and prove only this thin interaction:
+The current Lab audition is:
 
-**Active Focus → concise why → one useful DAW experiment → return with result → preserve evidence → update project/domain state → changed next Active Focus**
+**Songs → New Song → starting reality → earned Next → Update when meaningful → smarter Next → reopen/continue**
 
-Use the current proof pair:
-- **Creep** — Recreation/reference case.
-- **Even** — Original using already-known artist-authored context.
+Key interaction hypotheses now under review:
+- start from a real Songs surface rather than dropping the musician into an assumed Active Focus;
+- keep Original/Cover identity in the New Song creation surface;
+- accept one lightweight factual starting-reality input instead of a rigid stage taxonomy or open-ended questionnaire;
+- persist one useful `Next` recommendation without requiring start/in-progress task bookkeeping;
+- use Move-specific `Update` outcomes only when the musician wants FIRE to reconsider reality;
+- let new evidence visibly change the next recommendation;
+- preserve the song and current guidance across exit/reopen.
 
-The audition should support at least:
-- **Helped** — evidence may make the current domain provisionally stable and move focus.
-- **Didn't help** — keep the domain active and try a cheaper alternate test before escalating.
-- **Revealed something else** — redirect/reopen from new evidence instead of blindly advancing.
+Physical gate: **iPhone first**. Exercise the one-riff Original path (`+` → Original + title/optional album → `a guitar riff` → first `Next` → `Update` with a meaningful result → changed `Next` → return to Songs → reopen). Judge whether FIRE feels like calm, useful musical guidance rather than onboarding, chat, or task management.
 
-Physical-use gate: iPhone first, then regular width as useful. Judge whether the interaction gets the musician to a useful DAW action with minimal burden—not whether the prototype looks complete.
-
-If the behavior survives, deliberately implement/reconcile it back into `babel-fire` against real FIRE navigation/state/data. Lab prototype code is not production code.
+If the behavior survives physical use, deliberately reconcile/implement the surviving behavior back into `babel-fire` against real FIRE navigation/state/data. Lab prototype code remains evidence, not production code.
 
 ## Stable boundaries
 
