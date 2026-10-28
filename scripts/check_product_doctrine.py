@@ -5,7 +5,7 @@ REQUIRED = {
     "BABEL_TRUTH.md": [
         "BabeDrums/babel-truth",
         "Last reconciled Truth commit",
-        "21cb7307f8a1306101d7761f11da79b44752e13b",
+        "5858e544f2e61ceab4b0cae2a52d2c922b800d77",
         "CHAT_CLOSEOUT.md",
         "Babel Truth Issue #1",
         "Lab is evidence, never authority",
@@ -29,7 +29,7 @@ REQUIRED = {
         "4a258c5170dd1d96dcbc0f2b0a9c35b283cec489",
         "Target → Production Map → Active Focus → FIRE Loop",
         "FIRE PR #99 is closed seed/history",
-        "FIRE Core audition in Lab",
+        "physical review of the Lab heartbeat",
         "babel-lab/fire/core/**",
         "Babel Truth Issue #1",
     ],
